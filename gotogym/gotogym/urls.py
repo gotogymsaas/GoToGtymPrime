@@ -21,6 +21,7 @@ urlpatterns += i18n_patterns(
     path('gestion/',   include('gestion.urls')),
     path('',           include('users.urls')),
     path('blog/', include('blog.urls', namespace='blog')),
+    path('api/', include('auth.urls')),
     path('dashboard/', include(('dashboard.urls', 'dashboard'), namespace='dashboard')),
     path('cart/',      include(('cart.urls', 'cart'),          namespace='cart')),
     path('tienda/',    include(('store.urls', 'store'),        namespace='store')),
