@@ -1,0 +1,114 @@
+{%  extends "_base_dasboard.html" %}
+{%  load static widget_tweaks %}
+{% load i18n %}
+{% block title %}Agregar producto{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center py-14">
+  <div class="w-full max-w-5xl bg-white/80 backdrop-blur-lg border border-gray-200 rounded-3xl shadow-xl shadow-black/5 px-10 py-12">
+    <h1 class="text-3xl font-semibold text-gray-800 mb-10 flex items-center gap-3">
+      <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+      </svg>
+      Nuevo producto
+    </h1>
+
+    <form action="{% url 'products:add_product' %}" method="post" enctype="multipart/form-data" class="grid lg:grid-cols-2 gap-14">
+      {% csrf_token %}
+      <div class="flex flex-col items-center">
+        <div class="relative w-72 h-72 rounded-2xl border-2 border-dashed border-gray-300/70 flex items-center justify-center overflow-hidden">
+          <img id="preview" src="{% static 'images/img/placeholder.webp' %}" alt="Vista previa"  class="object-cover w-full h-full transition-opacity duration-300">
+        </div>
+        {% with form.image as img_field %}
+          {{ img_field|attr:"accept:image/*"|add_class:"hidden" }}
+          <label for="{{ img_field.id_for_label }}" class="mt-6 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary text-white font-medium hover:bg-primary/90 active:scale-95 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"  d="M16.5 9.5L7.5 18.5M7.5 9.5L16.5 18.5" />
+            </svg>
+            Seleccionar imagen
+          </label>
+          {% for err in img_field.errors %}
+            <p class="mt-2 text-sm text-rose-600">{{ err }}</p>
+          {% endfor %}
+        {% endwith %}
+      </div>
+
+
+      <div class="space-y-7">
+        {% for field in form %}
+          {% if field.name != 'image' %}
+            <div>
+              <label for="{{ field.id_for_label }}" class="block mb-1 text-sm font-medium text-gray-700">
+                {{ field.label }}
+              </label>
+
+              {% if field.field.widget.input_type == "checkbox" %}
+                <div class="flex items-center gap-3">
+                  {{ field|add_class:"h-5 w-5 rounded-md text-primary focus:ring-2 focus:ring-primary/60"}}
+                  <span class="text-gray-600 text-sm">Activo</span>
+                </div>
+
+              {% elif field.field.widget.input_type == "select" %}
+                {{ field | add_class:"w-full rounded-xl border border-gray-300/70 bg-white px-4 py-2.5 focus:border-primary focus:ring-2 focus:ring-primary/50 transition shadow-sm"}}
+
+              {% elif field.field.widget.input_type == "textarea" %}
+                {{ field | add_class:"w-full rounded-xl border border-gray-300/70 bg-white px-4 py-3  focus:border-primary focus:ring-2 focus:ring-primary/50 transition shadow-sm resize-none placeholder-gray-400"}}
+
+              {% else %}
+                {{ field | add_class:"w-full rounded-xl border border-gray-300/70 bg-white px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/50 transition shadow-sm placeholder-gray-400"}}
+              {% endif %}
+
+              {% for err in field.errors %}
+                <p class="mt-1 text-sm text-rose-600">{{ err }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        {% if form.non_field_errors %}
+          <div class="text-rose-600 text-sm">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <a href="{% url 'products:list_product' %}" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300 transition">
+          {% trans "Cancelar" %}
+        </a>
+        <button type="submit"
+                class="bg-violet-600 text-white px-6 py-2 rounded-full hover:bg-violet-700 transition">
+          {% trans "Agregar" %}
+        </button>
+      </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  :root { --twc-primary: #5747ff; }         /* ajusta el tono a tu branding */
+  .text-primary     { color: var(--twc-primary); }
+  .bg-primary       { background-color: var(--twc-primary); }
+  .shadow-primary\/20 { box-shadow: 0 2px 6px rgba(87,71,255,.2); }
+  .focus\:ring-primary\/50:focus { --tw-ring-color: rgba(87,71,255,.5); }
+  .focus\:ring-primary\/60:focus { --tw-ring-color: rgba(87,71,255,.6); }
+  .hover\:bg-primary\/90:hover   { background-color: rgba(87,71,255,.9); }
+</style>
+
+<script>
+  const fileInput = document.getElementById('id_image');
+  const preview   = document.getElementById('preview');
+
+  fileInput?.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) {
+      preview.classList.add('opacity-0');
+      preview.onload = () => { preview.classList.remove('opacity-0'); };
+      preview.src = URL.createObjectURL(file);
+    } else {
+      preview.src = "{% static 'images/img/placeholder.webp' %}";
+    }
+  });
+</script>
+{% endblock %}

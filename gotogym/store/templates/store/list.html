@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Catálogo" %}{% endblock %}
+
+{% block content %}
+<section class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+  <h1 class="text-4xl font-extrabold mb-10 tracking-tight text-gray-900">{% trans "Catálogo" %}</h1>
+
+  <div class="sm:flex sm:gap-8">
+    <!-- Sidebar de filtros -->
+    <aside class="w-full sm:w-72 bg-white/90 backdrop-blur rounded-3xl shadow p-6 mb-10 sm:mb-0 sticky top-24 h-fit max-h-[90vh] overflow-y-auto">
+      <form method="get" class="space-y-10 text-sm text-gray-800">
+        <!-- Categorías -->
+        <section>
+          <h2 class="font-semibold mb-3">{% trans "Categorías" %}</h2>
+          <ul class="space-y-2">
+            <li>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="cat" value="" class="accent-[#C5A46B]" {% if not request.GET.cat %}checked{% endif %}>
+                <span>{% trans "Todas" %}</span>
+              </label>
+            </li>
+            {% for c in cats %}
+            <li>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="cat" value="{{ c.id }}" class="accent-[#C5A46B]" {% if request.GET.cat|stringformat:"s" == c.id|stringformat:"s" %}checked{% endif %}>
+                <span>{{ c.name }}</span>
+              </label>
+            </li>
+            {% endfor %}
+          </ul>
+        </section>
+
+        <!-- Precio -->
+        <section>
+          <h2 class="font-semibold mb-3">{% trans "Precio" %}</h2>
+          <div class="flex items-center gap-3">
+            <input name="min" type="number" step="0.01" placeholder="Min" value="{{ request.GET.min }}"
+              class="w-[100px] rounded-lg border-gray-300 focus:border-[#C5A46B] focus:ring-[#C5A46B]/40 p-1.5">
+            <span class="text-gray-400">—</span>
+            <input name="max" type="number" step="0.01" placeholder="Max" value="{{ request.GET.max }}"
+              class="w-[100px] rounded-lg border-gray-300 focus:border-[#C5A46B] focus:ring-[#C5A46B]/40 p-1.5">
+          </div>
+        </section>
+
+        <!-- Ordenar -->
+        <section>
+          <h2 class="font-semibold mb-3">{% trans "Ordenar" %}</h2>
+          <select name="o" class="w-full rounded-lg border-gray-300 focus:border-[#C5A46B] focus:ring-[#C5A46B]/40 p-2">
+            <option value="">{% trans "Relevancia" %}</option>
+            <option value="a" {% if request.GET.o == 'a' %}selected{% endif %}>A → Z</option>
+            <option value="za" {% if request.GET.o == 'za' %}selected{% endif %}>Z → A</option>
+            <option value="p" {% if request.GET.o == 'p' %}selected{% endif %}>↑ {% trans "Precio" %}</option>
+            <option value="mp" {% if request.GET.o == 'mp' %}selected{% endif %}>↓ {% trans "Precio" %}</option>
+          </select>
+        </section>
+
+        <!-- Botones -->
+        <div class="flex gap-3 pt-2">
+          <button type="submit"
+            class="flex-1 py-2 rounded-lg bg-[#C5A46B] text-black font-medium hover:bg-[#d7bb83] active:scale-[.98] transition">
+            {% trans "Aplicar" %}
+          </button>
+          <a href="{% url 'store:catalog' %}"
+            class="flex-1 py-2 rounded-lg border text-center border-gray-300 hover:bg-gray-50 transition">
+            {% trans "Limpiar" %}
+          </a>
+        </div>
+      </form>
+    </aside>
+
+    <!-- Productos -->
+    <section class="flex-1">
+      <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+        {% for p in products %}
+        <article
+          class="group flex flex-col rounded-3xl bg-white/90 backdrop-blur shadow hover:shadow-xl transition duration-300 overflow-hidden">
+          <a href="{% url 'store:detail' p.id %}" class="relative aspect-[4/3]">
+            {% if p.image %}
+              <img src="{{ p.image.url }}" alt="{{ p.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            {% else %}
+              <img src="{% static 'img/placeholder.png' %}" alt="{{ p.name }}" class="w-full h-full object-cover opacity-60">
+            {% endif %}
+          </a>
+
+          <div class="p-5 flex flex-col gap-2 flex-1">
+            <h3 class="text-lg font-semibold text-gray-800 truncate">{{ p.name }}</h3>
+            <p class="text-sm text-gray-500 line-clamp-2">{{ p.description }}</p>
+            <p class="text-xl font-bold text-[#C5A46B]">{{ p.price|floatformat:0|intcomma }}</p>
+
+            <div class="mt-auto flex items-center justify-between pt-2">
+              <a href="{% url 'store:detail' p.id %}"
+                class="text-sm px-4 py-1.5 rounded-full border border-[#C5A46B]/60 text-[#C5A46B] hover:bg-[#C5A46B]/10 transition">
+                {% trans "Detalle" %}
+              </a>
+
+              <form action="{% url 'cart:add' p.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" aria-label="{% trans 'Añadir al carrito' %}"
+                  class="w-9 h-9 rounded-full bg-[#C5A46B] text-black flex items-center justify-center hover:bg-[#d7bb83] active:scale-95 transition">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.6 20h12.8M7 13l4-8 4 8m-5 7a1 1 0 11-2 0 1 1 0 012 0zm6 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                  </svg>
+                </button>
+              </form>
+            </div>
+          </div>
+        </article>
+        {% empty %}
+        <p class="col-span-full py-20 text-center text-gray-500">{% trans "Sin resultados" %}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Paginación -->
+      {% if is_paginated %}
+      <nav class="mt-14 flex justify-center items-center gap-4 select-none text-sm">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&{{ params.urlencode }}"
+          class="px-4 py-2 rounded-full border border-gray-300 hover:bg-gray-100 transition">‹</a>
+        {% endif %}
+        <span class="text-gray-600">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&{{ params.urlencode }}"
+          class="px-4 py-2 rounded-full bg-[#C5A46B] text-black hover:bg-[#d7bb83] transition">›</a>
+        {% endif %}
+      </nav>
+      {% endif %}
+    </section>
+  </div>
+</section>
+{% endblock %}
