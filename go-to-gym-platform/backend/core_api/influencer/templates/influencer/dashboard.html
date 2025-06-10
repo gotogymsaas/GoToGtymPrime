@@ -1,0 +1,31 @@
+{# Dashboard para influencers. Modificar libremente en React o HTML. #}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Influencer Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Panel de Influencer</h1>
+    <p>Código de referido: {{ profile.referral_code }}</p>
+    <p>Enlace: https://gotogym.com/?ref={{ profile.referral_code }}</p>
+    <p>Usuarios referidos: {{ profile.total_referred_users }}</p>
+    <p>Comisión ganada: {{ profile.commission_earned }}</p>
+    <canvas id="salesChart" width="400" height="200"></canvas>
+    <button>Solicitar retiro</button>
+    <script>
+        const ctx = document.getElementById('salesChart');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Ventas'],
+                datasets: [{
+                    label: 'Valor total',
+                    data: [{{ profile.total_sales_value }}],
+                    borderWidth: 1
+                }]
+            }
+        });
+    </script>
+</body>
+</html>
