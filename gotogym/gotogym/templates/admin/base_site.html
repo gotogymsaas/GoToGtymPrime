@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}GoToGym Administración{% endblock %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <!-- Fuente TT Norms -->
+    <link rel="stylesheet" href="{% static 'css/ttnorms.css' %}">
+    <!-- CSS personalizado del admin -->
+    <link rel="stylesheet" href="{% static 'css/admin_custom.css' %}">
+{% endblock %}
+
+{% block branding %}
+  <div id="site-name" style="display: flex; align-items: center;">
+    <a href="{% url 'admin:index' %}" style="display:flex; align-items:center; text-decoration:none;">
+      <img src="{% static 'images/logo_gotogym_blanco.png' %}" alt="GoToGym" style="height:50px; margin-right:10px;">
+      <span style="font-family:'TTnorms-Bold', sans-serif; color:#D4AF37; font-size:24px;">
+        GoToGym Administración
+      </span>
+    </a>
+  </div>
+{% endblock %}
+
+{% block nav-global %}
+  <nav style="background-color:#20415B; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; font-family:'TTnorms-Regular', sans-serif; color:#FFFFFF;">
+    <span>
+      Panel de Administración Premium
+    </span>
+    <span>
+      <a href="/" style="color:#D4AF37; text-decoration:none; margin-right:15px;">Ir al Sitio</a>
+      <a href="{% url 'admin:logout' %}" style="color:#D4AF37; text-decoration:none;">Cerrar Sesión</a>
+    </span>
+  </nav>
+{% endblock %}
+

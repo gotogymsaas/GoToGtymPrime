@@ -1,0 +1,47 @@
+{% extends '_base_dasboard.html' %} {% block content %}
+
+<div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+  <div class="p-4 bg-gray-200 rounded">
+    <h3 class="text-lg font-semibold">Configuración</h3>
+
+    <div class="p-4 bg-white rounded mb-4" style="font-size: 12px">
+      <h2>Editar Perfils</h2>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %} {{ form.as_p }}
+        <button type="submit">Guardar Cambios</button>
+      </form>
+    </div>
+    <div class="p-4 bg-white rounded">
+      <h3 class="text-lg font-semibold">Configuración de Marca</h3>
+      <p>Contenido del panel 2.</p>
+    </div>
+  </div>
+
+  <div class="p-4 bg-gray-200 rounded">
+    <h3 class="text-lg font-semibold">Estadisticas</h3>
+    <div class="p-4 bg-white rounded mb-4">
+      <h3 class="text-lg font-semibold">Edicion de Perfil</h3>
+      <p>ccc</p>
+    </div>
+    <div class="p-4 bg-white rounded">
+      <h3 class="text-lg font-semibold">Configuración de Marca</h3>
+      <p>Contenido del panel 2.</p>
+    </div>
+  </div>
+  <div class="p-4 bg-gray-200 rounded">
+    <h3 class="text-lg font-semibold">Administración</h3>
+    <div class="p-4 bg-white rounded mb-4">
+      <h3 class="text-lg font-semibold">Edicion de Perfil</h3>
+      <p>ccc</p>
+    </div>
+    <div class="p-4 bg-white rounded mb-4">
+      <h3 class="text-lg font-semibold">Edicion de Perfil</h3>
+      <p>ccc</p>
+    </div>
+    <div class="p-4 bg-white rounded">
+      <h3 class="text-lg font-semibold">Configuración de Marca</h3>
+      <p>Contenido del panel 2.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

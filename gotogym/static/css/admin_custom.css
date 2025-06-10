@@ -1,0 +1,21 @@
+/* Fuente y colores de GoToGym */
+body, .module, .grp-changelist, .grp-changeform {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #F8F8F8;
+}
+
+#header, #user-tools, #branding {
+    background-color: #003366;  /* Azul marino */
+    color: #D4AF37;             /* Dorado */
+}
+
+#branding a {
+    color: #D4AF37;
+    text-decoration: none;
+}
+
+/* Personalización para enlaces y botones */
+a, .button, .grp-button {
+    color: #006633;  /* Verde esmeralda */
+}
+

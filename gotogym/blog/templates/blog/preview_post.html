@@ -1,0 +1,26 @@
+{% extends "_base_dasboard.html" %}
+{% load static %}
+{% load i18n %}
+<div class="p-6 space-y-4">
+    {% if post.image %}
+        <img src="{{ post.image.url }}" alt="Imagen del post" class="rounded-md w-full object-cover max-h-72">
+    {% endif %}
+    <h3 class="text-2xl font-bold text-gray-800">{{ post.title }}</h3>
+    <p class="text-sm text-gray-500">
+        Autor: {{ post.author }} |
+        Publicado: {{ post.published|date:"d M Y" }}
+    </p>
+    <div class="prose max-w-none">
+        {{ post.body|safe }}
+    </div>
+</div>
+<div class="flex justify-end gap-2 px-6 py-4 border-t bg-gray-50">
+    <a href="{% url 'blog:editar_post' post.id %}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Editar</a>
+    <form action="{% url 'blog:eliminar_post' post.id %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" onclick="return confirm('¿Eliminar publicación?');" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+            Eliminar
+        </button>
+    </form>
+    <button @click="$dispatch('close-modal')" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Cerrar</button>
+</div>

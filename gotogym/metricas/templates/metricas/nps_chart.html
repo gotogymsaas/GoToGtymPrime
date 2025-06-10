@@ -1,0 +1,125 @@
+{% extends "_base_dasboard.html" %} 
+{% block content %}
+
+<div class="w-full h-screen flex justify-center items-center bg-gray-100">
+  <div class="w-full max-w-4xl p-4 bg-gray-200 rounded">
+        <div class="p-4 bg-white rounded mb-4" style="font-size: 12px">
+    
+          <h1 class="text-xl font-bold mb-4">Gráfico de NPS</h1>
+
+  <!-- Dropdown para seleccionar el rango de tiempo -->
+  <form method="get" id="timeRangeForm" class="mb-4">
+    <label for="timeRange" class="block mb-2 text-sm font-medium text-gray-700">Seleccionar rango de tiempo:</label>
+    <select
+      name="range"
+      id="timeRange"
+      onchange="document.getElementById('timeRangeForm').submit();"
+      class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+    >
+      <option value="day" {% if selected_range == 'day' %}selected{% endif %}>Día</option>
+      <option value="month" {% if selected_range == 'month' %}selected{% endif %}>Mes</option>
+      <option value="year" {% if selected_range == 'year' %}selected{% endif %}>Año</option>
+    </select>
+  </form>
+
+  <!-- Contenedor del canvas -->
+  <div class="mx-auto bg-white rounded shadow-md">
+    <canvas id="npsChart" class="w-full h-full"></canvas>
+  </div>
+</div>
+</div>
+  <script>
+    // Obtener los datos del contexto de Django
+    var dates = {{ dates|safe }};
+    var avgScores = {{ avg_scores|safe }};
+    var medianScores = {{ median_scores|safe }};
+    var allScores = {{ all_scores|safe }};
+
+    // Aplanar la lista de listas de allScores para obtener todos los puntajes individuales
+    var individualData = [];
+    for (var i = 0; i < allScores.length; i++) {
+      for (var j = 0; j < allScores[i].length; j++) {
+        individualData.push({
+          x: dates[i],
+          y: allScores[i][j]
+        });
+      }
+    }
+
+    // Configurar el gráfico
+    var ctx = document.getElementById('npsChart').getContext('2d');
+    var npsChart = new Chart(ctx, {
+        data: {
+            labels: dates,
+            datasets: [
+              {
+                type: 'line',
+                label: 'Promedio NPS',
+                data: avgScores,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                fill: false,
+                tension: 0.1,
+                yAxisID: 'y',
+              },
+              {
+                type: 'line',
+                label: 'Mediana NPS',
+                data: medianScores,
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                fill: false,
+                tension: 0.1,
+                yAxisID: 'y',
+              },
+              {
+                type: 'line',
+                label: 'Puntajes Individuales',
+                data: individualData,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                yAxisID: 'y',
+              }
+            ]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'category',
+                    title: {
+                        display: true,
+                        text: 'Fecha'
+                    }
+                },
+                y: {
+                    min: 0,
+                    max: 10,
+                    title: {
+                        display: true,
+                        text: 'Puntaje NPS'
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                legend: {
+                    position: 'top',
+                },
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            },
+        }
+    });
+  </script>
+</div>
+
+{% endblock content %}
+
+
+

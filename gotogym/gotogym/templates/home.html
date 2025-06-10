@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}GoToGym • Lujo Deportivo y Bienestar
+{% endblock %}
+
+{% block extra_head %}
+  <link href="{% static 'fonts/@fontsource/playfair-display/700.css' %}" rel="stylesheet">
+  <link href="{% static 'fonts/@fontsource/outfit/400.css' %}"         rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+
+
+<section class="relative h-screen bg-cover bg-center flex items-center justify-center" style="background-image:url('{% static 'images/img/hero.webp' %}');">
+  <span class="absolute inset-0 bg-black/50"></span>
+  <div class="relative z-10 text-center px-4" data-aos="fade-up">
+    <h1 class="text-6xl md:text-7xl font-bold text-white drop-shadow-xl">{% trans "Innovación Cuántica y Bienestar Personalizado" %} </h1>
+    <p class="mt-4 text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto"> {% trans "Descubre la elegancia del lujo deportivo combinado con tecnología avanzada." %}" </p>
+    <a href="{% url 'products:list_product' %}" class="mt-8 inline-block bg-gradient-to-r from-[#C5A46B] to-[#003057] text-white font-semibold px-10 py-4 rounded-full drop-shadow-md hover:scale-105 transition">{% trans "Explorar ahora" %}</a>
+  </div>
+</section>
+
+
+<div class="flex flex-col md:flex-row justify-center items-center gap-6 mt-12" data-aos="zoom-in">
+  <a href="{% url 'login' %}" class="w-64 px-8 py-3 rounded-full bg-white/70 backdrop-blur-md text-lg font-medium text-[#101820] shadow-lg hover:bg-white hover:scale-105 transition">
+   🔐 {% trans "Iniciar sesión" %}
+    <span class="block text-xs text-[#101820cc]">{% trans "Ya tengo cuenta"%}</span>
+  </a>
+
+  <a href="{% url 'register' %}" class="w-64 px-8 py-3 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#AF8C4F] text-lg font-medium text-white shadow-lg hover:scale-105 transition">
+    ✨ {% trans "Crear cuenta" %}
+    <span class="block text-xs text-white/90">{% trans "Empieza tu transformación" %}</span>
+  </a>
+</div>
+
+
+<section class=" bg-white">
+  <div class="container mx-auto text-center">
+    <h2 class="text-4xl font-bold text-[#C5A46B] mb-8" data-aos="fade-up">
+      {% trans "Colección destacada" %}
+    </h2>
+
+    <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+      <img src="{% static 'images/img/coleccion_john_frank_alza.webp' %}" alt="Colección John Frank Alza" class="rounded-xl shadow-lg w-full md:w-1/2" data-aos="fade-right">
+      <div class="text-left md:w-1/2" data-aos="fade-left">
+        <h3 class="text-3xl font-semibold text-[#101820]">{% trans "Alianza exclusiva con John Frank Alza" %}
+        </h3>
+        <p class="mt-4 text-lg text-[#101820cc]">
+          {% trans "Presentamos una colección que redefine la moda deportiva fusionando la alta costura con la más avanzada tecnología textil." %}
+        </p>
+        <a href="{% url 'products:list_product' %}" class="mt-6 inline-block bg-[#C5A46B] text-white px-6 py-3 rounded-full hover:shadow-xl transition">
+          {% trans "Descubrir colección" %}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="py-20 bg-[#101820]">
+  <div class="container mx-auto text-center">
+    <h2 class="text-4xl font-bold text-[#E5E5E5]" data-aos="fade-up"> {% trans "Nuestra esencia" %} </h2>
+    <p class="mt-6 text-xl text-white/90 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+      {% trans "Fusionamos lujo deportivo con nanotecnología avanzada y bienestar integral, creando una experiencia de usuario única y emocionalmente gratificante." %}
+    </p>
+  </div>
+</section>
+
+
+    <section class="py-20 bg-gray-50">
+      <div class="container mx-auto text-center">
+        <h2 class="text-4xl font-bold text-[#C5A46B] mb-12" data-aos="fade-up">
+          {% trans "Beneficios Clave" %}
+        </h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+          <div class="p-6 bg-white shadow-lg rounded-xl" data-aos="zoom-in">
+            <h3 class="text-2xl font-semibold text-[#101820]">{% trans "Rendimiento Mejorado" %}</h3>
+            <p class="mt-3 text-[#101820cc]">
+              {% trans "Optimiza tu desempeño con textiles avanzados que se adaptan a tu ritmo."%}
+            </p>
+          </div>
+
+          <div class="p-6 bg-white shadow-lg rounded-xl" data-aos="zoom-in" data-aos-delay="100">
+            <h3 class="text-2xl font-semibold text-[#101820]">{% trans "Protección UV" %}</h3>
+            <p class="mt-3 text-[#101820cc]">
+              {% trans "Cuida tu piel con nuestra tecnología antimicrobiana y protección solar integrada."%}
+            </p>
+          </div>
+
+          <div class="p-6 bg-white shadow-lg rounded-xl" data-aos="zoom-in" data-aos-delay="200">
+            <h3 class="text-2xl font-semibold text-[#101820]">{% trans "Control Térmico"%}</h3>
+            <p class="mt-3 text-[#101820cc]">
+              {% trans "Mantente cómodo con materiales que regulan tu temperatura corporal."%}
+            </p>
+          </div>
+          <div class="p-6 bg-white shadow-lg rounded-xl" data-aos="zoom-in" data-aos-delay="300">
+            <h3 class="text-2xl font-semibold text-[#101820]">{% trans "Confort Personalizado "%}</h3>
+            <p class="mt-3 text-[#101820cc]">
+              {% trans "Texturas únicas que brindan una experiencia sensorial inigualable."%}
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
+<section class="py-20 bg-white">
+  <div class="container mx-auto text-center" data-aos="fade-up">
+    <h2 class="text-4xl font-bold text-[#C5A46B]">{% trans "Nuestros clientes opinan"%}</h2>
+    <blockquote class="mt-8 italic text-xl text-[#101820] max-w-3xl mx-auto">
+      {% trans '“Las prendas de GoToGym se convirtieron en mis favoritas. Al principio parecían normales, pero con el tiempo noté la diferencia positiva en rendimiento y comodidad. Ahora no puedo hacer ejercicio sin ellas.”' %}
+    </blockquote>
+    <p class="mt-4 text-[#C5A46B] font-semibold">{% trans "— Juan Manuel Goenaga"%}</p>
+  </div>
+</section>
+
+
+<section class="py-20 bg-white">
+  <div class="container mx-auto text-center">
+    <h2 class="text-4xl font-bold text-[#101820]" data-aos="fade-up">
+      {% trans "Tecnología innovadora" %}
+    </h2>
+    <p class="mt-6 text-xl text-[#101820cc] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+      {% trans "Utilizamos grafeno y nanotecnología en nuestras prendas, garantizando resistencia, flexibilidad y un compromiso continuo con la sostenibilidad ambiental."%}
+    </p>
+    <a href="/tecnologia/" class="mt-6 inline-block bg-gradient-to-r from-[#C5A46B] to-[#003057] text-white px-6 py-3 rounded-full hover:shadow-xl transition">
+      {% trans "Conocer más"%}
+    </a>
+  </div>
+</section>
+
+{% endblock %}
