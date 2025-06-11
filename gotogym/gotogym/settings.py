@@ -53,6 +53,10 @@ INSTALLED_APPS = [
     'gestion',
     'users',
     'blog',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'corsheaders',
+    'auth',
     'cart',
     'store',
     'crispy_forms',
@@ -66,6 +70,7 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "django.middleware.locale.LocaleMiddleware",
     'django.middleware.common.CommonMiddleware',
@@ -180,5 +185,13 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 WAGTAILADMIN_BASE_URL = os.getenv(
     "WAGTAILADMIN_BASE_URL",
-    "http://localhost:8000"  
+    "http://localhost:8000"
 )
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+AUTH_USER_MODEL = 'auth.User'
