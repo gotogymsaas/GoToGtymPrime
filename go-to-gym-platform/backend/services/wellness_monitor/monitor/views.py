@@ -1,7 +1,13 @@
 from rest_framework import generics, permissions
+ hijjd8-codex/desarrollar-microservicio-wellness_monitor-en-django
 
 from django.shortcuts import render
 from django.views.generic import TemplateView
+
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import get_user_model
+ main
 from datetime import datetime
 
 from .models import HealthMetric
@@ -35,6 +41,7 @@ class MetricListView(generics.ListAPIView):
         if end:
             end_dt = datetime.fromisoformat(end)
         return get_metrics(self.request.user, metric_type=metric_type, start=start_dt, end=end_dt)
+ hijjd8-codex/desarrollar-microservicio-wellness_monitor-en-django
 
 
 def index(request):
@@ -50,3 +57,5 @@ class MetricsPageView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['metrics'] = get_metrics(self.request.user)
         return context
+
+ main
