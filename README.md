@@ -20,3 +20,19 @@ consultar las métricas del microservicio.
 
 Para que la señal de usuarios cree contactos automáticamente en HubSpot debes
 definir la variable de entorno `HUBSPOT_PRIVATE_TOKEN` con tu token privado.
+
+## Pagos con Mercado Pago
+
+La tienda utiliza [Mercado Pago](https://www.mercadopago.com/) para procesar
+los pagos. Configura las siguientes variables de entorno con tus credenciales
+de producción:
+
+```bash
+export MERCADOPAGO_PUBLIC_KEY="<PUBLIC_KEY>"
+export MERCADOPAGO_ACCESS_TOKEN="<ACCESS_TOKEN>"
+export MERCADOPAGO_CLIENT_ID="<CLIENT_ID>"
+export MERCADOPAGO_CLIENT_SECRET="<CLIENT_SECRET>"
+```
+
+Al finalizar la compra se creará una *preference* y el usuario será
+redireccionado al flujo de pago de Mercado Pago.

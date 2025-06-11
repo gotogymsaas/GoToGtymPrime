@@ -14,3 +14,4 @@ psycopg2-binary
 
 python-oqs
 cryptography>=42.0.0
+mercadopago>=2.1
