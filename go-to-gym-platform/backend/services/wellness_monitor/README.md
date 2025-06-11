@@ -14,6 +14,11 @@ Todos los endpoints están protegidos con autenticación JWT.
 
 ## Instalación rápida
 ```bash
+# instala las dependencias principales si no cuentas con un `requirements.txt`
 pip install django djangorestframework djangorestframework-simplejwt django-cors-headers psycopg2-binary
+
+# o bien, si ya tienes un archivo de requerimientos disponible
+# pip install -r ../../../../requirements.txt
+
 python manage.py migrate
 ```
