@@ -6,7 +6,6 @@ Microservicio en Django 5.2 para almacenar métricas de salud provenientes de di
 - `POST /api/metrics/upload/` – Registrar una métrica.
 - `GET /api/metrics/` – Consultar métricas filtradas por `metric_type`, `start` y `end`.
 
-hijjd8-codex/desarrollar-microservicio-wellness_monitor-en-django
 Todos los endpoints están protegidos con autenticación JWT.
 
 ## Páginas HTML
@@ -43,4 +42,3 @@ python manage.py migrate
 # Ejecutar en el puerto 8001
 python manage.py runserver 0.0.0.0:8001
 ```
- main
