@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>¡Sigue entrenando!</title>
+    <style>
+        body {font-family: Arial, sans-serif; background:#fafafa; padding:20px;}
+        .container {max-width:600px; margin:auto; background:#ffffff; padding:20px; border-radius:4px; text-align:center;}
+        h2 {color:#2c3e50;}
+        p {color:#555555;}
+        a.button {display:inline-block; margin-top:20px; padding:10px 20px; background:#28a745; color:#fff; text-decoration:none; border-radius:4px;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>¡Buen trabajo, {{ user_name }}!</h2>
+    <p>{{ body }}</p>
+    {% if action_url %}
+    <a href="{{ action_url }}" class="button">Ir a la rutina</a>
+    {% endif %}
+</div>
+</body>
+</html>
