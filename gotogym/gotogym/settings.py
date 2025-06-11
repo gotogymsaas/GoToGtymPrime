@@ -61,7 +61,8 @@ INSTALLED_APPS = [
     'store',
     'crispy_forms',
     'crispy_tailwind',
-    
+    'translations',
+
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = ("tailwind",)
@@ -168,6 +169,7 @@ USE_I18N = True
 
 USE_TZ = True
 LOCALE_PATHS = [BASE_DIR / "locale"]
+FRONTEND_LOCALES_DIR = BASE_DIR.parent / 'go-to-gym-platform' / 'frontend' / 'webapp' / 'public' / 'locales'
 
 
 MEDIA_URL  = "/media/"
