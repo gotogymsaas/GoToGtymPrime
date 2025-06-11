@@ -18,7 +18,17 @@ Todos los endpoints están protegidos con autenticación JWT.
 pip install django djangorestframework djangorestframework-simplejwt django-cors-headers psycopg2-binary
 
 # o bien, si ya tienes un archivo de requerimientos disponible
-# pip install -r ../../../../requirements.txt
+# pip install -r ../../../requirements.txt
 
 python manage.py migrate
 ```
+
+## Estado de integraciones con wearables
+| Marca / Ecosistema | Estado sugerido | Método de integración |
+| ------------------ | --------------- | -------------------- |
+| Google Fit | ✅ Integrar ahora | REST API + OAuth2 |
+| Apple Health | ✅ Integrar ahora | HealthKit (iOS native) |
+| Samsung Health | ✅ Integrar ahora | Samsung Health SDK |
+| Fitbit | 🔜 En fase 2 | REST API + OAuth2 |
+| Garmin | 🔜 En fase 2 | Requiere aprobación |
+| Huawei Health | ⛔ Omitir por ahora | SDK cerrado |
