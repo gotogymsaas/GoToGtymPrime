@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
 from products.models import Product
 from .cart import SessionCart
+from integrations.mercadopago.mercadopago_client import MercadoPagoClient
 
 
 class AddToCart(View):
@@ -59,3 +60,32 @@ class CartDetail(View):
     def get(self, request):
         cart = SessionCart(request)
         return render(request, self.template_name, {"cart": cart})
+
+
+class CheckoutView(View):
+    """Create a Mercado Pago preference for the current cart."""
+
+    def post(self, request):
+        cart = SessionCart(request)
+        products = Product.objects.filter(id__in=cart.cart.keys())
+
+        items = []
+        for p in products:
+            qty = cart.cart[str(p.id)]
+            items.append({
+                "title": p.name,
+                "quantity": int(qty),
+                "unit_price": float(p.price),
+                "currency_id": "USD",
+            })
+
+        if not items:
+            return redirect("cart:detail")
+
+        preference_data = {"items": items}
+        client = MercadoPagoClient()
+        response = client.create_preference(preference_data)
+        init_point = response.get("init_point")
+        if init_point:
+            return redirect(init_point)
+        return redirect("cart:detail")
