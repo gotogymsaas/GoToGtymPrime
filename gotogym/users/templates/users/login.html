@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% comment %} {% load tailwind_filters %} {% endcomment %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+  <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+  
+      <img src="{% static 'images/Logo GoToGym 2.png' %}" alt="Logo GoToGym" class="mx-auto w-24 h-auto">
+    
+    <h2 class="text-3xl font-bold text-center text-indigo-600 mb-6">Iniciar sesión</h2>
+
+    <form method="post" class="space-y-6">
+      {% csrf_token %}
+      {{ form|crispy }}
+
+      <button
+        type="submit"
+        class="w-full rounded-lg bg-indigo-600 px-5 py-3 text-white font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
+      >
+        Ingresar
+      </button>
+    </form>
+
+    <p class="mt-6 text-center text-sm text-gray-500">
+      ¿No tienes una cuenta?
+      <a href="{% url 'register' %}" class="text-indigo-600 hover:underline font-medium">Regístrate</a>
+    </p>
+  </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,101 @@
+{# cart/templates/cart/detail.html #}
+{% extends "base.html" %}
+{% load i18n humanize static %}
+
+{% block title %}{% trans "Carrito" %}{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-extrabold mb-10">{% trans "Mi carrito" %}</h1>
+
+{% if cart.cart %}
+<div class="mx-4 md:mx-8 lg:mx-12 xl:mx-16">
+  <div class="grid gap-8 lg:grid-cols-[1fr_300px] lg:gap-14">
+    <section id="cartList" class="space-y-6">
+      <label class="flex items-center gap-3 py-3 px-4 bg-white rounded shadow">
+        <input id="checkAll" type="checkbox" class="h-5 w-5 rounded text-sky-600 focus:ring-2">
+        <span class="font-medium text-sm">{% trans "Todos los productos" %}</span>
+      </label>
+
+      {% for item in cart %}
+      <article class="rounded-xl bg-white shadow overflow-hidden" data-id="{{ item.product.id }}" data-price="{{ item.product.price }}" data-subtotal="{{ item.subtotal }}">
+        <header class="flex items-center gap-3 px-5 py-3 border-b">
+          <input type="checkbox" class="itemChk h-5 w-5 rounded text-sky-600">
+          <p class="font-semibold text-sm truncate">
+            {{ item.product.name|truncatechars:60 }}
+          </p>
+        </header>
+        <div class="flex flex-col md:flex-row gap-5 p-5">
+          <a href="{% url 'store:detail' item.product.id %}" class="shrink-0 w-24 h-24 rounded border overflow-hidden">
+            {% if item.product.image %}
+              <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="object-cover w-full h-full">
+            {% else %}
+              <img src="{% static 'images/img/placeholder.webp' %}" alt="" class="object-cover w-full h-full opacity-60">
+            {% endif %}
+          </a>
+
+          <div class="flex-1 flex flex-col gap-3">
+            <h3 class="font-semibold">{{ item.product.name }}</h3>
+            <div class="flex items-center justify-between gap-4">
+              <form action="{% url 'cart:update' item.product.id %}" method="post" class="flex items-center gap-1">
+                {% csrf_token %}
+                <button name="action" value="dec" class="w-7 h-7 flex items-center justify-center rounded border text-gray-600 hover:bg-gray-50">−</button>
+                <input name="qty" value="{{ item.qty }}" type="number" min="1" class="w-10 text-center border rounded">
+                <button name="action" value="inc" class="w-7 h-7 flex items-center justify-center rounded border text-gray-600 hover:bg-gray-50">+</button>
+              </form>
+              <p class="itemSubtotal font-semibold text-lg text-gray-800"> $ {{ item.subtotal|floatformat:0|intcomma }}
+              </p>
+            </div>
+            <div class="flex gap-4 text-xs text-sky-600 font-medium">
+              <form action="{% url 'cart:remove' item.product.id %}" method="post">
+                {% csrf_token %}
+                <button class="hover:underline">{% trans "Eliminar" %}</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <footer class="px-5 pb-5 md:pb-3">
+          <div class="flex items-center justify-between text-xs">
+            <span>{% trans "Envío" %}</span>
+            <span class="font-medium text-emerald-600">{% trans "Gratis" %}</span>
+          </div>
+          <div class="h-1 bg-emerald-500 rounded-full mt-1"></div>
+        </footer>
+      </article>
+      {% endfor %}
+    </section>
+    <aside class="sticky top-24 self-start bg-white rounded-xl shadow p-6 space-y-4">
+      <h2 class="font-semibold text-lg">{% trans "Resumen de compra" %}</h2>
+      <div class="text-sm space-y-2">
+        <div class="flex justify-between">
+          <span id="lblSel">{% trans "Productos seleccionados" %}</span>
+          <span id="selTotal">$ 0</span>
+        </div>
+        <div class="flex justify-between">
+          <span>{% trans "Envíos" %}</span><span>{% trans "Gratis" %}</span>
+        </div>
+      </div>
+
+      <hr class="border-dashed">
+      <div class="flex justify-between font-bold text-lg">
+        <span>{% trans "Total" %}</span>
+        <span id="grandTotal">$ 0</span>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 mt-4">
+        <a href="{% url 'store:catalog' %}" class="flex-1 text-center bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 rounded transition">
+          {% trans "Continuar compra" %}
+        </a>
+        <a href="" class="flex-1 text-center bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded transition">
+          {% trans "Finalizar compra" %}
+        </a>
+
+      </div>
+    </aside>
+  </div>
+</div>
+{% else %}
+  <p class="text-gray-500">{% trans "Tu carrito está vacío." %}</p>
+{% endif %}
+{% endblock %}
+

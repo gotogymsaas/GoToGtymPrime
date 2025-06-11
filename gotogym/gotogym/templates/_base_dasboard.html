@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+  <title>Dashboard Admin</title>
+  {% load static %}
+</head>
+
+<body class="bg-gray-100 font-sans" x-data="{ sidebarOpen: false }">
+  <div class="flex h-screen overflow-hidden">
+
+    {% comment %} <aside :class="sidebarOpen || window.innerWidth >= 768 ? 'w-64' : 'w-16'" class="bg-[#093f62] text-white transition-all duration-300 h-full flex-shrink-0" x-init="
+      if (window.innerWidth >= 768) { sidebarOpen = true }
+    "> {% endcomment %}
+    <aside :class="sidebarOpen ? 'w-64' : 'w-16'" class="bg-[#093f62] text-white transition-all duration-300 h-full flex-shrink-0 relative" x-init="if (window.innerWidth >= 768) { sidebarOpen = true } ">
+      <div class="flex items-center justify-between px-4 py-4">
+        <h1 class="text-2xl font-bold" x-show="sidebarOpen">Panel Admin</h1>
+        <button @click="sidebarOpen = !sidebarOpen" class="bg-white text-[#093f62] rounded-md p-1  flex items-center justify-center hover:bg-gray-200 transition">
+      <span class="material-icons-outlined" x-show="sidebarOpen">chevron_left</span>
+      <span class="material-icons-outlined" x-show="!sidebarOpen">chevron_right</span>
+    </button>
+      </div>
+      
+
+      <nav class="mt-4">
+        <ul>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="{% url 'home' %}" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">store</span>
+              <span x-show="sidebarOpen" class="ml-4">Go To Gym</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="#" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">person</span>
+              <span x-show="sidebarOpen" class="ml-4">Editar Perfil</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="#" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">settings</span>
+              <span x-show="sidebarOpen" class="ml-4">Configuración Marca</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="{% url 'group_chart' %}" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">timeline</span>
+              <span x-show="sidebarOpen" class="ml-4">Línea Tendencia</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="{% url 'nps_chart' %}" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">thumbs_up_down</span>
+              <span x-show="sidebarOpen" class="ml-4">Net Promoter Score</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="#" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">admin_panel_settings</span>
+              <span x-show="sidebarOpen" class="ml-4">Crear Super Admin</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="#" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">bar_chart</span>
+              <span x-show="sidebarOpen" class="ml-4">Consolidados</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="#" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">search</span>
+              <span x-show="sidebarOpen" class="ml-4">Buscador</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="#" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">edit</span>
+              <span x-show="sidebarOpen" class="ml-4">Editar Páginas Web</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="{% url 'products:list_product' %}" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">inventory_2</span>
+              <span x-show="sidebarOpen" class="ml-4">Productos</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <form action="{% url 'logout' %}" method="post" class="w-full flex items-center">
+              {% csrf_token %}
+              <span class="material-icons-outlined">logout</span>
+              <button x-show="sidebarOpen" class="ml-4 text-white" type="submit">Logout</button>
+            </form>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="{% url 'adminpanel:dashboard' %}" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">article</span>
+              <span x-show="sidebarOpen" class="ml-4">Gestionar Posts</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <div class=" content-center flex-1 overflow-auto">
+      <main class="p-6 md:p-10">
+        {% block content %}
+        {% endblock content %}
+      </main>
+    </div>
+  </div>
+
+
+  <script type="text/javascript" src="{% static 'js/script.js' %}"></script>
+
+  <script>
+    function openModal(postId, postTitle) {
+      const modal = document.getElementById('deleteModal');
+      const form = document.getElementById('deleteForm');
+      const title = document.getElementById('modalPostTitle');
+      form.action = `/adminpanel/post/${postId}/eliminar/`;
+      title.textContent = postTitle;
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('deleteModal');
+      modal.classList.add('hidden');
+    }
+  </script>
+
+</body>
+</html>
+
+

@@ -1,0 +1,330 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-28 14:33-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\cart\templates\cart\detail.html:4 .\cart\templates\cart\detail.html:7
+msgid "Mi carrito"
+msgstr ""
+
+#: .\cart\templates\cart\detail.html:13
+msgid "Producto"
+msgstr ""
+
+#: .\cart\templates\cart\detail.html:14 .\store\templates\store\detail.html:19
+msgid "Cantidad"
+msgstr ""
+
+#: .\cart\templates\cart\detail.html:15
+msgid "Subtotal"
+msgstr ""
+
+#: .\cart\templates\cart\detail.html:28
+msgid "Eliminar"
+msgstr ""
+
+#: .\cart\templates\cart\detail.html:37
+msgid "Total"
+msgstr ""
+
+#: .\cart\templates\cart\detail.html:40
+msgid "Tu carrito está vacío."
+msgstr ""
+
+#: .\gotogym\templates\base.html:49 .\gotogym\templates\base.html:120
+msgid "Inicio"
+msgstr "Home"
+
+#: .\gotogym\templates\base.html:52 .\gotogym\templates\base.html:123
+msgid "Coleccion"
+msgstr "Collection"
+
+#: .\gotogym\templates\base.html:53 .\gotogym\templates\base.html:124
+msgid "Pedidos"
+msgstr "Orders"
+
+#: .\gotogym\templates\base.html:54 .\gotogym\templates\base.html:125
+msgid "Bienestar"
+msgstr "Wellness"
+
+#: .\gotogym\templates\base.html:55 .\gotogym\templates\base.html:126
+msgid "Tecnologia"
+msgstr "Technology"
+
+#: .\gotogym\templates\base.html:56 .\gotogym\templates\base.html:127
+#: .\gotogym\templates\base.html:160
+msgid "Contacto"
+msgstr "Contact"
+
+#: .\gotogym\templates\base.html:57 .\gotogym\templates\base.html:128
+msgid "Blog"
+msgstr "Blog"
+
+#: .\gotogym\templates\base.html:58
+msgid "Tienda"
+msgstr ""
+
+#: .\gotogym\templates\base.html:69
+msgid "Administrador"
+msgstr "Administrator"
+
+#: .\gotogym\templates\base.html:75 .\gotogym\templates\base.html:131
+msgid "Cerrar sesión"
+msgstr "Log out"
+
+#: .\gotogym\templates\base.html:81 .\gotogym\templates\base.html:133
+#: .\gotogym\templates\home.html:28
+msgid "Iniciar sesión"
+msgstr "Login"
+
+#: .\gotogym\templates\base.html:84 .\gotogym\templates\base.html:134
+#: .\gotogym\templates\home.html:33
+msgid "Crear cuenta"
+msgstr "Create account"
+
+#: .\gotogym\templates\base.html:159
+msgid "Acerca de"
+msgstr "About"
+
+#: .\gotogym\templates\base.html:161
+msgid "Privacidad"
+msgstr "Privacy"
+
+#: .\gotogym\templates\base.html:162
+msgid "Términos"
+msgstr "Terms"
+
+#: .\gotogym\templates\base.html:164
+msgid "Únete a nuestra comunidad y descubre la revolución del bienestar."
+msgstr "Join our community and discover the wellness revolution."
+
+#: .\gotogym\templates\base.html:168
+msgid "Síguenos en redes sociales:"
+msgstr "Follow us on social networks:"
+
+#: .\gotogym\templates\base.html:203
+msgid "2025 GoToGym. Todos los derechos reservados."
+msgstr "2025 GoToGym. All rights reserved."
+
+#: .\gotogym\templates\home.html:19
+msgid "Innovación Cuántica y Bienestar Personalizado"
+msgstr "Quantum Innovation and Personalized Wellness"
+
+#: .\gotogym\templates\home.html:20
+msgid ""
+"Descubre la elegancia del lujo deportivo combinado con tecnología avanzada."
+msgstr ""
+"Discover the elegance of sporty luxury combined with advanced technology."
+
+#: .\gotogym\templates\home.html:21
+msgid "Explorar ahora"
+msgstr "Explore now"
+
+#: .\gotogym\templates\home.html:29
+msgid "Ya tengo cuenta"
+msgstr "I already have an account"
+
+#: .\gotogym\templates\home.html:34
+msgid "Empieza tu transformación"
+msgstr "Start your transformation"
+
+#: .\gotogym\templates\home.html:42
+msgid "Colección destacada"
+msgstr "Featured collection"
+
+#: .\gotogym\templates\home.html:48
+msgid "Alianza exclusiva con John Frank Alza"
+msgstr "Exclusive partnership with John Frank Alza"
+
+#: .\gotogym\templates\home.html:51
+msgid ""
+"Presentamos una colección que redefine la moda deportiva fusionando la alta "
+"costura con la más avanzada tecnología textil."
+msgstr ""
+"We present a collection that redefines sports fashion by fusing high  "
+"couture with the most advanced textile technology."
+
+#: .\gotogym\templates\home.html:54
+msgid "Descubrir colección"
+msgstr "Discover collection"
+
+#: .\gotogym\templates\home.html:64
+msgid "Nuestra esencia"
+msgstr "Our essence"
+
+#: .\gotogym\templates\home.html:66
+msgid ""
+"Fusionamos lujo deportivo con nanotecnología avanzada y bienestar integral, "
+"creando una experiencia de usuario única y emocionalmente gratificante."
+msgstr ""
+"We fuse sporty luxury with advanced nanotechnology and holistic wellness, "
+"creating a unique and emotionally rewarding user experience."
+
+#: .\gotogym\templates\home.html:75
+msgid "Beneficios Clave"
+msgstr "Key Benefits"
+
+#: .\gotogym\templates\home.html:80
+msgid "Rendimiento Mejorado"
+msgstr "Improved performance"
+
+#: .\gotogym\templates\home.html:82
+msgid "Optimiza tu desempeño con textiles avanzados que se adaptan a tu ritmo."
+msgstr ""
+"Optimize your performance with advanced textiles that adapt to your pace."
+
+#: .\gotogym\templates\home.html:87
+msgid "Protección UV"
+msgstr "UV protection"
+
+#: .\gotogym\templates\home.html:89
+msgid ""
+"Cuida tu piel con nuestra tecnología antimicrobiana y protección solar "
+"integrada."
+msgstr ""
+"Take care of your skin with our antimicrobial and sun protection technology "
+"integrated"
+
+#: .\gotogym\templates\home.html:94
+msgid "Control Térmico"
+msgstr "Thermal Control"
+
+#: .\gotogym\templates\home.html:96
+msgid "Mantente cómodo con materiales que regulan tu temperatura corporal."
+msgstr "Stay comfortable with materials that regulate your body temperature."
+
+#: .\gotogym\templates\home.html:100
+msgid "Confort Personalizado "
+msgstr "Personalized Comfort"
+
+#: .\gotogym\templates\home.html:102
+msgid "Texturas únicas que brindan una experiencia sensorial inigualable."
+msgstr "Unique textures that provide an unparalleled sensory experience."
+
+#: .\gotogym\templates\home.html:113
+msgid "Nuestros clientes opinan"
+msgstr "Our customers say"
+
+#: .\gotogym\templates\home.html:115
+msgid ""
+"“Las prendas de GoToGym se convirtieron en mis favoritas. Al principio "
+"parecían normales, pero con el tiempo noté la diferencia positiva en "
+"rendimiento y comodidad. Ahora no puedo hacer ejercicio sin ellas.”"
+msgstr ""
+"“GoToGym garments became my favorite. At first They seemed ordinary, but "
+"over time I noticed the positive difference in performance and comfort. Now "
+"I can't exercise without them.”"
+
+#: .\gotogym\templates\home.html:117
+msgid "— Juan Manuel Goenaga"
+msgstr ""
+
+#: .\gotogym\templates\home.html:125
+msgid "Tecnología innovadora"
+msgstr "Innovative technology"
+
+#: .\gotogym\templates\home.html:128
+msgid ""
+"Utilizamos grafeno y nanotecnología en nuestras prendas, garantizando "
+"resistencia, flexibilidad y un compromiso continuo con la sostenibilidad "
+"ambiental."
+msgstr ""
+"We use graphene and nanotechnology in our garments, ensuring strength, "
+"flexibility and an ongoing commitment to environmental environmental "
+"sustainability."
+
+#: .\gotogym\templates\home.html:131
+msgid "Conocer más"
+msgstr "Learn more"
+
+#: .\products\templates\products\list_product.html:15
+#: .\store\templates\store\detail.html:24
+msgid "Añadir al carrito"
+msgstr ""
+
+#: .\service\models.py:9
+msgid "Nombre de la empresa"
+msgstr "Company name"
+
+#: .\service\models.py:10
+msgid "Identificador único"
+msgstr "Unique identifier"
+
+#: .\service\models.py:10
+msgid "Ej.: NIT, CIF, CUIT o cualquier ID interno"
+msgstr "Ex: NIT, CIF, CUIT or any other internal ID"
+
+#: .\service\models.py:11
+msgid "Administradores"
+msgstr "Administrators"
+
+#: .\service\models.py:12 .\service\models.py:32
+msgid "Fecha de creación"
+msgstr "Date created"
+
+#: .\service\models.py:13 .\service\models.py:33
+msgid "Última actualización"
+msgstr "Last update"
+
+#: .\service\models.py:16 .\service\models.py:28
+msgid "Empresa"
+msgstr "Company"
+
+#: .\service\models.py:17
+msgid "Empresas"
+msgstr "Companies"
+
+#: .\service\models.py:29
+msgid "Nombre de la marca"
+msgstr "Brand name"
+
+#: .\service\models.py:30
+msgid "Logotipo"
+msgstr "Logotype"
+
+#: .\service\models.py:31
+msgid "Descripción de la marca"
+msgstr "Brand description"
+
+#: .\service\models.py:36
+msgid "Marca"
+msgstr "Brands"
+
+#: .\service\models.py:37
+msgid "Marcas"
+msgstr "Brands"
+
+#: .\store\templates\store\list.html:4 .\store\templates\store\list.html:7
+msgid "Catálogo"
+msgstr ""
+
+#: .\store\templates\store\list.html:25
+msgid "Añadir"
+msgstr ""
+
+#: .\store\templates\store\list.html:31
+msgid "Detalle"
+msgstr ""
+
+#: .\store\templates\store\list.html:43
+msgid "Anterior"
+msgstr ""
+
+#: .\store\templates\store\list.html:47
+msgid "Siguiente"
+msgstr ""
