@@ -53,6 +53,7 @@ Esta guía resume las librerías, dependencias y herramientas recomendadas para 
 | CRM | HubSpot CRM API, `requests` | Webhooks de registro, contacto y venta |
 | Pasarela de pagos | MercadoPago API, `stripe` (respaldo) | Checkout, webhook pagos exitosos |
 | Contabilidad | Alegra API, `json`, `requests`, `uuid` | Facturación electrónica y gastos |
+| | **Variables**: `ALEGRA_EMAIL`, `ALEGRA_TOKEN` | Credenciales para la API |
 | Dispositivos inteligentes | Google Fit API, Apple HealthKit, Samsung Health SDK | Datos biométricos, hábitos |
 | Automatización | n8n (auto-hosted o SaaS) | Flujos de tareas entre APIs |
 | Seguridad | `oauthlib`, `requests-oauthlib` | Autenticación con proveedores externos |

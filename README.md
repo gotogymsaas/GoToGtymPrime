@@ -36,3 +36,13 @@ export MERCADOPAGO_CLIENT_SECRET="<CLIENT_SECRET>"
 
 Al finalizar la compra se creará una *preference* y el usuario será
 redireccionado al flujo de pago de Mercado Pago.
+
+## Contabilidad con Alegra
+
+Para emitir facturas y registrar gastos se utiliza [Alegra](https://www.alegra.com/).
+Define las siguientes variables de entorno con tus credenciales de API:
+
+```bash
+export ALEGRA_EMAIL="<EMAIL_DE_CUENTA>"
+export ALEGRA_TOKEN="<TOKEN_DE_API>"
+```
