@@ -17,3 +17,6 @@ python gotogym/manage.py runserver 0.0.0.0:8000
 
 La aplicación PWA se encuentra en `go-to-gym-platform/frontend/webapp` y puede
 consultar las métricas del microservicio.
+
+Para que la señal de usuarios cree contactos automáticamente en HubSpot debes
+definir la variable de entorno `HUBSPOT_PRIVATE_TOKEN` con tu token privado.
