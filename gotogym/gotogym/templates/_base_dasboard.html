@@ -13,10 +13,6 @@
 
 <body class="bg-gray-100 font-sans" x-data="{ sidebarOpen: false }">
   <div class="flex h-screen overflow-hidden">
-
-    {% comment %} <aside :class="sidebarOpen || window.innerWidth >= 768 ? 'w-64' : 'w-16'" class="bg-[#093f62] text-white transition-all duration-300 h-full flex-shrink-0" x-init="
-      if (window.innerWidth >= 768) { sidebarOpen = true }
-    "> {% endcomment %}
     <aside :class="sidebarOpen ? 'w-64' : 'w-16'" class="bg-[#093f62] text-white transition-all duration-300 h-full flex-shrink-0 relative" x-init="if (window.innerWidth >= 768) { sidebarOpen = true } ">
       <div class="flex items-center justify-between px-4 py-4">
         <h1 class="text-2xl font-bold" x-show="sidebarOpen">Panel Admin</h1>
