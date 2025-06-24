@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoToGym - Lujo Deportivo y Bienestar</title>
+
+  <!-- Tailwind & estilos personalizados -->
+  <link href="{% static 'css/tailwind.css' %}" rel="stylesheet" />
+  <link href="{% static 'css/custom_styles.css' %}" rel="stylesheet" />
+
+  <!-- Librería AOS para animaciones en scroll -->
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+  <!-- Fuentes (versión local o CDN) -->
+  <!-- Si tienes las fuentes en tu proyecto: -->
+  <link href="{% static 'fonts/@fontsource/playfair-display/700.css' %}" rel="stylesheet">
+  <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Si no, puedes usar un CDN como fallback (descomenta si es necesario) -->
+  <!--
+  <link href="https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@4.5.13/700.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@fontsource/outfit@4.5.10/400.css" rel="stylesheet">
+  -->
+
+  <style>
+    /* Configuración básica tipográfica */
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #F8F9FA;
+      margin: 0; /* Asegura que no haya espacios inesperados */
+    }
+    h1, h2, h3 {
+      font-family: 'Playfair Display', serif;
+    }
+    /* Efecto hover para blockquote */
+    blockquote:hover {
+      transform: scale(1.02);
+      transition: all 0.3s ease-in-out;
+      color: #C5A46B;
+    }
+    /* Manejo del scroll en body para la cabecera fija */
+    main {
+      margin-top: 4rem; /* Ajusta según la altura de tu header */
+    }
+  </style>
+</head>
+<body class="text-[#101820]">
+  <!-- HEADER -->
+<header class="bg-[#101820] shadow fixed w-full z-50 top-0 left-0">
+  <nav class="container mx-auto flex items-center justify-between p-4 text-white">
+    
+    <!-- LOGO -->
+    <img src="{% static 'images/Logo_GoToGym_Blanco.png' %}" alt="GoToGym" class="h-10" />
+
+    <!-- MENÚ EN ESCRITORIO -->
+    <ul class="hidden md:flex space-x-6 text-sm font-medium items-center">
+      <li><a href="/" class="hover:text-[#C5A46B] transition">Inicio</a></li>
+      <li><a href="/productos/" class="hover:text-[#C5A46B] transition">Colección</a></li>
+      <li><a href="/pedidos/" class="hover:text-[#C5A46B] transition">Pedidos</a></li>
+      <li><a href="/bienestar/" class="hover:text-[#C5A46B] transition">Bienestar</a></li>
+      <li><a href="/metricas/" class="hover:text-[#C5A46B] transition">Tecnología</a></li>
+      <li><a href="/gestion/" class="hover:text-[#C5A46B] transition">Contacto</a></li>
+    </ul>
+
+    <!-- BOTONES DE ACCESO EN ESCRITORIO -->
+    <div class="hidden md:flex space-x-4">
+      <a href="{% url 'login' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Iniciar Sesión</a>
+      <a href="{% url 'register' %}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Crear Cuenta</a>
+    </div>
+
+    <!-- BOTÓN HAMBURGUESA -->
+    <button class="md:hidden text-[#C5A46B]" onclick="toggleMobileMenu()">
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- MENÚ MÓVIL DESPLEGABLE -->
+  <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg p-4">
+    <ul class="space-y-4 text-sm font-medium text-[#101820]">
+      <li><a href="/" class="block hover:text-[#C5A46B]">Inicio</a></li>
+      <li><a href="/productos/" class="block hover:text-[#C5A46B]">Colección</a></li>
+      <li><a href="/pedidos/" class="block hover:text-[#C5A46B]">Pedidos</a></li>
+      <li><a href="/bienestar/" class="block hover:text-[#C5A46B]">Bienestar</a></li>
+      <li><a href="/metricas/" class="block hover:text-[#C5A46B]">Tecnología</a></li>
+      <li><a href="/gestion/" class="block hover:text-[#C5A46B]">Contacto</a></li>
+    </ul>
+
+    <!-- BOTONES DE ACCESO EN MÓVIL -->
+    <div class="mt-6 space-y-3">
+      <a href="{% url 'login' %}" class="block bg-blue-600 text-white text-center px-4 py-2 rounded hover:bg-blue-700 transition">Iniciar Sesión</a>
+      <a href="{% url 'register' %}" class="block bg-green-600 text-white text-center px-4 py-2 rounded hover:bg-green-700 transition">Crear Cuenta</a>
+    </div> 
+  </div>
+</header>
+
+<script>
+  function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('hidden');
+  }
+</script>
+
+<main class="container mx-auto px-4 py-12">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="bg-black py-12 text-white mt-10">
+  <div class="container mx-auto text-center px-4">
+
+    <div class="flex flex-wrap justify-center space-x-8 mb-6 text-sm">
+      <a href="/acerca-de" class="hover:text-[#D4B46A] transition">Acerca de</a>
+      <a href="/contacto" class="hover:text-[#D4B46A] transition">Contacto</a>
+      <a href="/politica-privacidad" class="hover:text-[#D4B46A] transition">Privacidad</a>
+      <a href="/terminos" class="hover:text-[#D4B46A] transition">Términos</a>
+    </div>
+
+
+    <p class="mb-4 text-sm text-white/70">Únete a nuestra comunidad y descubre la revolución del bienestar.</p>
+
+
+<div class="mb-6">
+  <p class="text-sm text-white/90">Síguenos en redes sociales:</p>
+  <div class="flex flex-wrap justify-center gap-4 mt-4">
+    <!-- Facebook -->
+    <a href="https://www.facebook.com/Gotogym.Sportwear" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+      <img src="{% static 'images/facebook.png' %}" alt="Facebook" class="h-6 w-6">
+    </a>
+    <!-- Twitter -->
+    <a href="https://twitter.com/GOTOGYM6" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+      <img src="{% static 'images/twitter.png' %}" alt="Twitter" class="h-6 w-6">
+    </a>
+    <!-- Instagram -->
+    <a href="https://www.instagram.com/gotogym.sportwear" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+      <img src="{% static 'images/instagram.png' %}" alt="Instagram" class="h-6 w-6">
+    </a>
+    <!-- Pinterest -->
+    <a href="https://co.pinterest.com/gotogym_/" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+      <img src="{% static 'images/pinterest.png' %}" alt="Pinterest" class="h-6 w-6">
+    </a>
+    <!-- LinkedIn -->
+    <a href="https://www.linkedin.com/company/33262154/" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+      <img src="{% static 'images/linkedin.png' %}" alt="LinkedIn" class="h-6 w-6">
+    </a>
+    <!-- YouTube -->
+    <a href="https://www.youtube.com/channel/UCXRp8PgcE7L75jEewIixeXg" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+      <img src="{% static 'images/youtube.png' %}" alt="YouTube" class="h-6 w-6">
+    </a>
+    <!-- SoundCloud -->
+    <a href="https://soundcloud.com/go-to-gym-sportswear-as-a-service" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+      <img src="{% static 'images/soundcloud.png' %}" alt="SoundCloud" class="h-6 w-6">
+    </a>
+    <!-- TikTok -->
+    <a href="https://www.tiktok.com/@gotogym.sportwear" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+      <img src="{% static 'images/tiktok.png' %}" alt="TikTok" class="h-6 w-6">
+    </a>
+    <!-- GitHub -->
+    <a href="https://github.com/gotogymsaas" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+      <img src="{% static 'images/github.png' %}" alt="GitHub" class="h-6 w-6">
+    </a>
+  </div>
+</div>
+
+    <!-- Copyright -->
+    <p class="text-sm text-white/60">
+      © 2025 GoToGym. Todos los derechos reservados.
+    </p>
+  </div>
+</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 1200, once: true });
+    function toggleMobileMenu() {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+

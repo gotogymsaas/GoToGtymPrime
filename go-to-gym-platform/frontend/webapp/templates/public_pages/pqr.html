@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>PQR - Peticiones, Quejas y Reclamos</title>
+    <!-- Estilos personalizados -->
+</head>
+<body>
+    <!-- Aquí va el menú -->
+
+    <main>
+        <h1>PQR - Peticiones, Quejas y Reclamos</h1>
+        <!-- Contenido principal -->
+        <section>
+            <form>
+                <!-- Campo nombre -->
+                <label>Nombre:
+                    <input type="text" name="nombre" required>
+                </label>
+                <!-- Campo email -->
+                <label>Email:
+                    <input type="email" name="email" required>
+                </label>
+                <!-- Tipo de solicitud -->
+                <label>Tipo de solicitud:
+                    <select name="tipo">
+                        <option value="peticion">Petición</option>
+                        <option value="queja">Queja</option>
+                        <option value="reclamo">Reclamo</option>
+                    </select>
+                </label>
+                <!-- Mensaje -->
+                <label>Mensaje:
+                    <textarea name="mensaje" required></textarea>
+                </label>
+                <!-- Botón de envío -->
+                <button type="submit">Enviar</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Aquí va el footer -->
+    <!-- Scripts adicionales -->
+</body>
+</html>

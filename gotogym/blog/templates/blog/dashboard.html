@@ -15,9 +15,16 @@
             <a href="{% url 'blog:dashboard' %}" class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded transition">
                 Limpiar
             </a>
+<<<<<<< HEAD
             <a href="{% url 'blog:agregar_post' %}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium rounded shadow transition-all">
                 <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+=======
+            <a href="{% url 'blog:agregar_post' %}"
+                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium rounded shadow transition-all">
+                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
                 </svg>
                 Nuevo Post
             </a>
@@ -43,6 +50,7 @@
                     <td class="px-6 py-4">{{ forloop.counter }}</td>
                     <td class="px-6 py-4 max-w-xs truncate" title="{{ post.title }}">{{ post.title }}</td>
                     <td class="px-6 py-4 max-w-md truncate" title="{{ post.body }}">{{ post.body|truncatewords:15 }}</td>
+<<<<<<< HEAD
                     <td class="px-6 py-4 text-center flex justify-center gap-3">
                         <a href="{% url 'blog:editar_post' post.id %}" class="group relative p-2 rounded-full border transition duration-300 text-yellow-500 border-yellow-500 hover:bg-yellow-500 hover:text-white dark:text-yellow-300 dark:border-yellow-300 dark:hover:bg-yellow-400 dark:hover:text-black">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -96,6 +104,61 @@
                                 </span>
                             </button>
                         </form>
+=======
+                        <td class="px-6 py-4 text-center flex justify-center gap-3">
+                            <a href="{% url 'blog:editar_post' post.id %}" class="group relative p-2 rounded-full border transition duration-300 text-yellow-500 border-yellow-500 hover:bg-yellow-500 hover:text-white dark:text-yellow-300 dark:border-yellow-300 dark:hover:bg-yellow-400 dark:hover:text-black">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3zM5 19h14"/>
+                                </svg>
+                                <span class="absolute -top-9 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-all bg-black text-white text-xs rounded px-2 py-1 pointer-events-none z-50 dark:bg-gray-700">
+                                    Editar publicación
+                                </span>
+                            </a>
+                
+                            <div  x-data="{ open: false }">
+                                <button @click="open = true" class="group relative p-2 rounded-full border transition-all duration-300 ease-in-out text-green-600 border-green-600 hover:bg-green-600 hover:text-white dark:text-green-400 dark:border-green-400 dark:hover:bg-green-500 dark:hover:text-white" target="_blank">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    <span class="absolute -top-10 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-all bg-gray-800 text-white text-xs rounded px-2 py-1 pointer-events-none z-50 dark:bg-gray-700">
+                                        Vista previa
+                                    </span>
+                                </button>
+                                    
+                                <div x-show="open" x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+                                    <div @click.outside="open = false" class="bg-white rounded-lg max-w-3xl w-full mx-4 overflow-hidden shadow-lg">
+                                        <div class="flex justify-between items-center p-4 border-b">
+                                            <h2 class="text-xl font-semibold text-gray-800">{{ post.title }}</h2>
+                                            <button @click="open = false" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                                        </div>
+                                        {% if post.featured %}
+                                            <img src="{{ post.featured.url }}" class="w-full max-h-80 object-cover" alt="Imagen del post">
+                                        {% endif %}
+                                        <div class="p-4 space-y-4">
+                                            <p class="text-sm text-gray-600">Autor: {{ post.author }} | Publicado: {{ post.published|date:"d M Y" }}</p>
+                                            <div class="prose max-w-none">
+                                                {{ post.body|safe }}
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+
+                            </div>
+                            
+                            <form action="{% url 'blog:eliminar_post' post.id %}" method="post" class="inline-block" onsubmit="return confirm('¿Estás seguro de eliminar \"{{ post.title }}\"?');">
+                                {% csrf_token %}
+                                <button type="submit" class="group relative p-2 rounded-full border transition duration-300 text-red-600 border-red-600 hover:bg-red-600 hover:text-white dark:text-red-400 dark:border-red-400 dark:hover:bg-red-500 dark:hover:text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                    <span class="absolute -top-9 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-all bg-black text-white text-xs rounded px-2 py-1 pointer-events-none z-50 dark:bg-gray-700">
+                                        Eliminar publicación
+                                    </span>
+                                </button>
+                            </form>
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
                     </td>
                 </tr>
                 {% endfor %}

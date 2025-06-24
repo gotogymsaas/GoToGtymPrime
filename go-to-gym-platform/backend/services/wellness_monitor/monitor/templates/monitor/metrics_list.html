@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Métricas</title>
+</head>
+<body>
+    <h1>Métricas</h1>
+    <ul>
+    {% for metric in metrics %}
+        <li>{{ metric.timestamp }} - {{ metric.metric_type }}: {{ metric.value }}</li>
+    {% empty %}
+        <li>No hay métricas para mostrar.</li>
+    {% endfor %}
+    </ul>
+</body>
+</html>

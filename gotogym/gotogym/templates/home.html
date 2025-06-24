@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
+<<<<<<< HEAD
 {% comment %} {% block title %}GoToGym • Lujo Deportivo y Bienestar
 {% endblock %} {% endcomment %}
+=======
+{% block title %}GoToGym • Lujo Deportivo y Bienestar
+{% endblock %}
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
 
 {% block extra_head %}
   <link href="{% static 'fonts/@fontsource/playfair-display/700.css' %}" rel="stylesheet">
@@ -17,7 +22,11 @@
   <span class="absolute inset-0 bg-black/50"></span>
   <div class="relative z-10 text-center px-4" data-aos="fade-up">
     <h1 class="text-6xl md:text-7xl font-bold text-white drop-shadow-xl">{% trans "Innovación Cuántica y Bienestar Personalizado" %} </h1>
+<<<<<<< HEAD
     <p class="mt-4 text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto"> {% trans "Descubre la elegancia del lujo deportivo combinado con tecnología avanzada." %}</p>
+=======
+    <p class="mt-4 text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto"> {% trans "Descubre la elegancia del lujo deportivo combinado con tecnología avanzada." %}" </p>
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
     <a href="{% url 'products:list_product' %}" class="mt-8 inline-block bg-gradient-to-r from-[#C5A46B] to-[#003057] text-white font-semibold px-10 py-4 rounded-full drop-shadow-md hover:scale-105 transition">{% trans "Explorar ahora" %}</a>
   </div>
 </section>
