@@ -12,7 +12,20 @@
 </head>
 
 <body class="bg-gray-100 font-sans" x-data="{ sidebarOpen: false }">
+<<<<<<< HEAD
   <div class="flex h-screen overflow-hidden">
+=======
+
+
+
+  <!-- MAIN CONTAINER -->
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR -->
+    {% comment %} <aside :class="sidebarOpen || window.innerWidth >= 768 ? 'w-64' : 'w-16'" class="bg-[#093f62] text-white transition-all duration-300 h-full flex-shrink-0" x-init="
+      if (window.innerWidth >= 768) { sidebarOpen = true }
+    "> {% endcomment %}
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
     <aside :class="sidebarOpen ? 'w-64' : 'w-16'" class="bg-[#093f62] text-white transition-all duration-300 h-full flex-shrink-0 relative" x-init="if (window.innerWidth >= 768) { sidebarOpen = true } ">
       <div class="flex items-center justify-between px-4 py-4">
         <h1 class="text-2xl font-bold" x-show="sidebarOpen">Panel Admin</h1>
@@ -102,7 +115,12 @@
       </nav>
     </aside>
 
+<<<<<<< HEAD
     <div class=" content-center flex-1 overflow-auto">
+=======
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="flex-1 overflow-auto">
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
       <main class="p-6 md:p-10">
         {% block content %}
         {% endblock content %}
@@ -110,7 +128,11 @@
     </div>
   </div>
 
+<<<<<<< HEAD
 
+=======
+  <!-- JS personalizado -->
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
   <script type="text/javascript" src="{% static 'js/script.js' %}"></script>
 
   <script>

@@ -86,9 +86,18 @@
         <a href="{% url 'store:catalog' %}" class="flex-1 text-center bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 rounded transition">
           {% trans "Continuar compra" %}
         </a>
+<<<<<<< HEAD
         <a href="" class="flex-1 text-center bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded transition">
           {% trans "Finalizar compra" %}
         </a>
+=======
+        <form action="{% url 'cart:checkout' %}" method="post" class="flex-1">
+          {% csrf_token %}
+          <button type="submit" class="w-full text-center bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded transition">
+            {% trans "Finalizar compra" %}
+          </button>
+        </form>
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
 
       </div>
     </aside>

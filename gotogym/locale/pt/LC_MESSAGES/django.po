@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
@@ -334,3 +335,341 @@ msgstr ""
 #~| msgid "Crear cuenta"
 #~ msgid "✨ Crear cuenta"
 #~ msgstr "Criar uma conta"
+=======
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-28 14:33-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\cart\templates\cart\detail.html:4 .\cart\templates\cart\detail.html:7
+msgid "Mi carrito"
+msgstr ""
+
+#: .\cart\templates\cart\detail.html:13
+msgid "Producto"
+msgstr ""
+
+#: .\cart\templates\cart\detail.html:14 .\store\templates\store\detail.html:19
+msgid "Cantidad"
+msgstr ""
+
+#: .\cart\templates\cart\detail.html:15
+msgid "Subtotal"
+msgstr ""
+
+#: .\cart\templates\cart\detail.html:28
+msgid "Eliminar"
+msgstr ""
+
+#: .\cart\templates\cart\detail.html:37
+msgid "Total"
+msgstr ""
+
+#: .\cart\templates\cart\detail.html:40
+msgid "Tu carrito está vacío."
+msgstr ""
+
+#: .\gotogym\templates\base.html:49 .\gotogym\templates\base.html:120
+msgid "Inicio"
+msgstr ""
+
+#: .\gotogym\templates\base.html:52 .\gotogym\templates\base.html:123
+msgid "Coleccion"
+msgstr "Coleção"
+
+#: .\gotogym\templates\base.html:53 .\gotogym\templates\base.html:124
+msgid "Pedidos"
+msgstr "Pedidos"
+
+#: .\gotogym\templates\base.html:54 .\gotogym\templates\base.html:125
+msgid "Bienestar"
+msgstr "Bem-estar"
+
+#: .\gotogym\templates\base.html:55 .\gotogym\templates\base.html:126
+msgid "Tecnologia"
+msgstr "Tecnologia"
+
+#: .\gotogym\templates\base.html:56 .\gotogym\templates\base.html:127
+#: .\gotogym\templates\base.html:160
+msgid "Contacto"
+msgstr "Contato"
+
+#: .\gotogym\templates\base.html:57 .\gotogym\templates\base.html:128
+msgid "Blog"
+msgstr "Blog"
+
+#: .\gotogym\templates\base.html:58
+msgid "Tienda"
+msgstr ""
+
+#: .\gotogym\templates\base.html:69
+#, fuzzy
+#| msgid "Administradores"
+msgid "Administrador"
+msgstr "Administradores"
+
+#: .\gotogym\templates\base.html:75 .\gotogym\templates\base.html:131
+msgid "Cerrar sesión"
+msgstr "Faça logoff”."
+
+#: .\gotogym\templates\base.html:81 .\gotogym\templates\base.html:133
+#: .\gotogym\templates\home.html:28
+msgid "Iniciar sesión"
+msgstr "Fazer login"
+
+#: .\gotogym\templates\base.html:84 .\gotogym\templates\base.html:134
+#: .\gotogym\templates\home.html:33
+msgid "Crear cuenta"
+msgstr "Criar uma conta"
+
+#: .\gotogym\templates\base.html:159
+msgid "Acerca de"
+msgstr ""
+
+#: .\gotogym\templates\base.html:161
+msgid "Privacidad"
+msgstr ""
+
+#: .\gotogym\templates\base.html:162
+msgid "Términos"
+msgstr ""
+
+#: .\gotogym\templates\base.html:164
+msgid "Únete a nuestra comunidad y descubre la revolución del bienestar."
+msgstr ""
+
+#: .\gotogym\templates\base.html:168
+msgid "Síguenos en redes sociales:"
+msgstr ""
+
+#: .\gotogym\templates\base.html:203
+msgid "2025 GoToGym. Todos los derechos reservados."
+msgstr ""
+
+#: .\gotogym\templates\home.html:19
+msgid "Innovación Cuántica y Bienestar Personalizado"
+msgstr "Inovação Quântica e Bem-Estar Personalizado"
+
+#: .\gotogym\templates\home.html:20
+msgid ""
+"Descubre la elegancia del lujo deportivo combinado con tecnología avanzada."
+msgstr ""
+
+#: .\gotogym\templates\home.html:21
+msgid "Explorar ahora"
+msgstr ""
+
+#: .\gotogym\templates\home.html:29
+msgid "Ya tengo cuenta"
+msgstr ""
+
+#: .\gotogym\templates\home.html:34
+msgid "Empieza tu transformación"
+msgstr ""
+
+#: .\gotogym\templates\home.html:42
+#, fuzzy
+#| msgid "Colección"
+msgid "Colección destacada"
+msgstr "Coleção"
+
+#: .\gotogym\templates\home.html:48
+msgid "Alianza exclusiva con John Frank Alza"
+msgstr ""
+
+#: .\gotogym\templates\home.html:51
+msgid ""
+"Presentamos una colección que redefine la moda deportiva fusionando la alta "
+"costura con la más avanzada tecnología textil."
+msgstr ""
+
+#: .\gotogym\templates\home.html:54
+#, fuzzy
+#| msgid "Colección"
+msgid "Descubrir colección"
+msgstr "Coleção"
+
+#: .\gotogym\templates\home.html:64
+msgid "Nuestra esencia"
+msgstr ""
+
+#: .\gotogym\templates\home.html:66
+msgid ""
+"Fusionamos lujo deportivo con nanotecnología avanzada y bienestar integral, "
+"creando una experiencia de usuario única y emocionalmente gratificante."
+msgstr ""
+
+#: .\gotogym\templates\home.html:75
+msgid "Beneficios Clave"
+msgstr ""
+
+#: .\gotogym\templates\home.html:80
+msgid "Rendimiento Mejorado"
+msgstr ""
+
+#: .\gotogym\templates\home.html:82
+msgid "Optimiza tu desempeño con textiles avanzados que se adaptan a tu ritmo."
+msgstr ""
+
+#: .\gotogym\templates\home.html:87
+#, fuzzy
+#| msgid "Colección"
+msgid "Protección UV"
+msgstr "Coleção"
+
+#: .\gotogym\templates\home.html:89
+msgid ""
+"Cuida tu piel con nuestra tecnología antimicrobiana y protección solar "
+"integrada."
+msgstr ""
+
+#: .\gotogym\templates\home.html:94
+msgid "Control Térmico"
+msgstr ""
+
+#: .\gotogym\templates\home.html:96
+msgid "Mantente cómodo con materiales que regulan tu temperatura corporal."
+msgstr ""
+
+#: .\gotogym\templates\home.html:100
+msgid "Confort Personalizado "
+msgstr ""
+
+#: .\gotogym\templates\home.html:102
+msgid "Texturas únicas que brindan una experiencia sensorial inigualable."
+msgstr ""
+
+#: .\gotogym\templates\home.html:113
+msgid "Nuestros clientes opinan"
+msgstr ""
+
+#: .\gotogym\templates\home.html:115
+msgid ""
+"“Las prendas de GoToGym se convirtieron en mis favoritas. Al principio "
+"parecían normales, pero con el tiempo noté la diferencia positiva en "
+"rendimiento y comodidad. Ahora no puedo hacer ejercicio sin ellas.”"
+msgstr ""
+
+#: .\gotogym\templates\home.html:117
+msgid "— Juan Manuel Goenaga"
+msgstr ""
+
+#: .\gotogym\templates\home.html:125
+#, fuzzy
+#| msgid "Tecnologia"
+msgid "Tecnología innovadora"
+msgstr "Tecnologia"
+
+#: .\gotogym\templates\home.html:128
+msgid ""
+"Utilizamos grafeno y nanotecnología en nuestras prendas, garantizando "
+"resistencia, flexibilidad y un compromiso continuo con la sostenibilidad "
+"ambiental."
+msgstr ""
+
+#: .\gotogym\templates\home.html:131
+msgid "Conocer más"
+msgstr ""
+
+#: .\products\templates\products\list_product.html:15
+#: .\store\templates\store\detail.html:24
+msgid "Añadir al carrito"
+msgstr ""
+
+#: .\service\models.py:9
+msgid "Nombre de la empresa"
+msgstr "Nome da empresa"
+
+#: .\service\models.py:10
+msgid "Identificador único"
+msgstr "Identificador exclusivo"
+
+#: .\service\models.py:10
+msgid "Ej.: NIT, CIF, CUIT o cualquier ID interno"
+msgstr "Por exemplo: NIT, CIF, CUIT ou qualquer outra ID interna"
+
+#: .\service\models.py:11
+msgid "Administradores"
+msgstr "Administradores"
+
+#: .\service\models.py:12 .\service\models.py:32
+msgid "Fecha de creación"
+msgstr "Data de criação"
+
+#: .\service\models.py:13 .\service\models.py:33
+msgid "Última actualización"
+msgstr "Última atualização"
+
+#: .\service\models.py:16 .\service\models.py:28
+msgid "Empresa"
+msgstr "Companhia"
+
+#: .\service\models.py:17
+msgid "Empresas"
+msgstr "Companhias"
+
+#: .\service\models.py:29
+msgid "Nombre de la marca"
+msgstr "Nome da marca"
+
+#: .\service\models.py:30
+msgid "Logotipo"
+msgstr "Logotipo"
+
+#: .\service\models.py:31
+msgid "Descripción de la marca"
+msgstr "Descrição da marca"
+
+#: .\service\models.py:36
+msgid "Marca"
+msgstr "Marcas"
+
+#: .\service\models.py:37
+msgid "Marcas"
+msgstr "Marcas"
+
+#: .\store\templates\store\list.html:4 .\store\templates\store\list.html:7
+msgid "Catálogo"
+msgstr ""
+
+#: .\store\templates\store\list.html:25
+msgid "Añadir"
+msgstr ""
+
+#: .\store\templates\store\list.html:31
+msgid "Detalle"
+msgstr ""
+
+#: .\store\templates\store\list.html:43
+msgid "Anterior"
+msgstr ""
+
+#: .\store\templates\store\list.html:47
+msgid "Siguiente"
+msgstr ""
+
+#, fuzzy
+#~| msgid "Iniciar sesión"
+#~ msgid "🔐 Iniciar sesión"
+#~ msgstr "Fazer login"
+
+#, fuzzy
+#~| msgid "Crear cuenta"
+#~ msgid "✨ Crear cuenta"
+#~ msgstr "Criar uma conta"
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01

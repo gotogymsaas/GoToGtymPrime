@@ -1,9 +1,14 @@
+<<<<<<< HEAD
+=======
+{# blog/templates/blog/editar_post.html #}
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
 {% extends "_base_dasboard.html" %}
 {% load static i18n %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto mt-10 bg-white shadow-xl rounded-3xl p-10">
   <h2 class="text-3xl font-bold text-gray-900 mb-10 flex items-center gap-2">
+<<<<<<< HEAD
     <svg class="w-8 h-8 text-violet-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M12 4h9M3 4h.01M3 20h.01M3 12h18"/></svg>
     {% trans "Editar publicación" %}
   </h2>
@@ -14,6 +19,23 @@
     <div class="flex flex-col items-center">
       <div class="w-64 h-64 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50">
 
+=======
+    <svg class="w-8 h-8 text-violet-600" fill="none" stroke="currentColor" stroke-width="2"
+         viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
+         d="M12 20h9M12 4h9M3 4h.01M3 20h.01M3 12h18"/></svg>
+    {% trans "Editar publicación" %}
+  </h2>
+
+  <form method="post" enctype="multipart/form-data"
+        class="grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
+    {% csrf_token %}
+
+    {# ─── Imagen destacada ──────────────────────────────── #}
+    <div class="flex flex-col items-center">
+      <div class="w-64 h-64 rounded-xl border-2 border-dashed border-gray-300
+                  flex items-center justify-center overflow-hidden bg-gray-50">
+        {# si ya hay imagen, mostrarla; si no, placeholder #}
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
         {% if post.featured %}
           <img id="imagePreview" src="{{ post.featured.url }}"
                alt="{{ post.title }}" class="object-contain h-full w-full" />

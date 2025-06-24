@@ -1,18 +1,28 @@
 {% load i18n %}
 {% load static %}
+<<<<<<< HEAD
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
+=======
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="GoToGym - Ropa deportiva y bienestar con estilo.">
+<<<<<<< HEAD
   <title>{% block title %}GoToGym{% endblock %}</title>
 
 {% comment %} 
   <link href="{% static 'css/tailwind.css' %}" rel="stylesheet" /> {% endcomment %}
   {% comment %} <link href="{% static 'css/custom_styles.css' %}" rel="stylesheet" /> {% endcomment %}
+=======
+  <title>GoToGym - Lujo Deportivo y Bienestar</title>
+
+  <link href="{% static 'css/tailwind.css' %}" rel="stylesheet" />
+  <link href="{% static 'css/custom_styles.css' %}" rel="stylesheet" />
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
   <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,11 +42,19 @@
       font-family: 'Poetsen One', serif;
     }
     
+<<<<<<< HEAD
     {% comment %} blockquote:hover {
       transform: scale(1.02);
       transition: all 0.3s ease-in-out;
       color: #C5A46B;
     } {% endcomment %}
+=======
+    blockquote:hover {
+      transform: scale(1.02);
+      transition: all 0.3s ease-in-out;
+      color: #C5A46B;
+    }
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
   
   </style>
 </head>
@@ -52,10 +70,17 @@
         <ul id="desktop-menu" class="hidden md:flex space-x-6 text-sm font-medium items-center">
           <li><a href="/" class="hover:text-[#C5A46B]">{% trans "Inicio" %}</a></li>
           {% comment %} <li><a href="/productos/" class="hover:text-[#C5A46B]">Colección</a></li> {% endcomment %}
+<<<<<<< HEAD
           {% comment %} <li><a href="/productos/" class="hover:text-[#C5A46B]">{% trans "Coleccion" %}</a></li> {% endcomment %}
           <li><a href="/pedidos/" class="hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
           <li><a href="/bienestar/" class="hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
           {% comment %} <li><a href="/metricas/" class="hover:text-[#C5A46B]">{% trans "Tecnologia" %}</a></li> {% endcomment %}
+=======
+          <li><a href="/productos/" class="hover:text-[#C5A46B]">{% trans "Coleccion" %}</a></li>
+          <li><a href="/pedidos/" class="hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
+          <li><a href="/bienestar/" class="hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
+          <li><a href="/metricas/" class="hover:text-[#C5A46B]">{% trans "Tecnologia" %}</a></li>
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
           <li><a href="/gestion/" class="hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
           <li><a href="/blog/" class="hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
           <li><a href="/tienda/" class="hover:text-[#C5A46B]">{% trans "Tienda" %}</a></li>
@@ -115,6 +140,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
+<<<<<<< HEAD
       <button id="darkModeToggle" class="ml-4 text-[#C5A46B] hover:opacity-80 transition" title="Modo oscuro">
   <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -124,6 +150,8 @@
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.95l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.05l-.71-.71M12 5a7 7 0 100 14a7 7 0 000-14z" />
   </svg>
+=======
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
     </div>
 
     <div id="mobile-menu" class="md:hidden hidden border-t border-white/10">
@@ -152,6 +180,7 @@
           <li><a href="{% url 'login' %}" class="text-[#C5A46B]">{% trans "Iniciar sesión" %}</a></li>
           <li><a href="{% url 'register' %}" class="text-[#C5A46B]">{% trans "Crear cuenta" %}</a></li>
         {% endif %}
+<<<<<<< HEAD
         
 </button>
 
@@ -161,6 +190,22 @@
 
 </nav>
 
+=======
+      </ul>
+    </div>
+</nav>
+
+
+<script>
+function toggleMobileMenu () {
+  const menu = document.getElementById('mobile-menu');
+  menu.classList.toggle('hidden');
+}
+</script>
+
+
+
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
 <main class="mx-auto">
   {% block content %}{% endblock %}
 </main>
@@ -264,6 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }));
 });
 </script>
+<<<<<<< HEAD
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   const toggleBtn = document.getElementById("darkModeToggle");
@@ -293,6 +339,11 @@ document.addEventListener("DOMContentLoaded", function () {
 {% endblock %}
 
 
+=======
+{% endblock %}
+
+  
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
 </body>
 </html>
 

@@ -26,38 +26,81 @@
     </div>
 
     <div class="space-y-6">
+<<<<<<< HEAD
       <div>
           <label for="{{ form.title.id_for_label }}" class="block text-gray-700 font-semibold mb-1">{% trans "Título" %}</label>
           {{ form.title }}
       </div>
+=======
+        <div>
+            <label for="{{ form.title.id_for_label }}" class="block text-gray-700 font-semibold mb-1">{% trans "Título" %}</label>
+            {{ form.title }}
+        </div>
+
+      <!-- Slug -->
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
       <div>
         <label for="{{ form.slug.id_for_label }}" class="block text-gray-700 font-semibold mb-1">Slug</label>
         {{ form.slug }}
       </div>
+<<<<<<< HEAD
+=======
+
+      <!-- Autor -->
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
       <div>
         <label for="{{ form.author.id_for_label }}" class="block text-gray-700 font-semibold mb-1">{% trans "Autor" %}</label>
         {{ form.author }}
       </div>
     </div>
+<<<<<<< HEAD
     <div class="space-y-6">
+=======
+
+    <!-- Columna 3: Contenido y botones -->
+    <div class="space-y-6">
+      <!-- Categoría -->
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
       <div>
         <label for="{{ form.category.id_for_label }}" class="block text-gray-700 font-semibold mb-1">{% trans "Categoría" %}</label>
         {{ form.category }}
       </div>
+<<<<<<< HEAD
+=======
+
+      <!-- Excerpt -->
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
       <div>
         <label for="{{ form.excerpt.id_for_label }}" class="block text-gray-700 font-semibold mb-1">{% trans "Resumen" %}</label>
         {{ form.excerpt }}
       </div>
+<<<<<<< HEAD
+=======
+
+      <!-- Cuerpo -->
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
       <div>
         <label for="{{ form.body.id_for_label }}" class="block text-gray-700 font-semibold mb-1">{% trans "Contenido" %}</label>
         {{ form.body }}
       </div>
+<<<<<<< HEAD
       <div class="flex justify-between pt-4">
         <a href="{% url 'blog:dashboard' %}" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300 transition">
           {% trans "Cancelar" %}
         </a>
         <button type="submit"
             class="bg-violet-600 text-white px-6 py-2 rounded-full hover:bg-violet-700 transition">
+=======
+
+      <!-- Botones -->
+      <div class="flex justify-between pt-4">
+        <a href="{% url 'blog:dashboard' %}"
+           class="bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300 transition">
+          {% trans "Cancelar" %}
+        </a>
+        <button type="submit"
+                class="bg-violet-600 text-white px-6 py-2 rounded-full hover:bg-violet-700 transition">
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
           {% trans "Agregar" %}
         </button>
       </div>
@@ -65,7 +108,11 @@
   </form>
 </div>
 
+<<<<<<< HEAD
 
+=======
+<!-- Script para previsualizar imagen -->
+>>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
 <script>
   function previewImage(event) {
     const input = event.target;
