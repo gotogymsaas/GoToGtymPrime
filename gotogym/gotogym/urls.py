@@ -1,84 +1,52 @@
-<<<<<<< HEAD
+"""
+URL configuration for gotogym project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/5.2/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import TemplateView
 from django.conf.urls.i18n import i18n_patterns
-
-#  ← importa estas dos utilidades
+from django.views.i18n import set_language
+from django.shortcuts import redirect
+from . import views
 from django.conf import settings
 from django.conf.urls.static import static
-
-
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('i18n/', include('django.conf.urls.i18n')),
+    path('accounts', lambda request: redirect('login', permanent=False)),
+    path('setlang/', set_language, name='set_language'),
 ]
 
 urlpatterns += i18n_patterns(
+    path('', views.home, name='home'),
     path('admin/', admin.site.urls),
-    path('',  TemplateView.as_view(template_name='home.html'), name='home'),
-    path('products/', include('products.urls', namespace='products')),
-    path('metricas/',  include('metricas.urls')),
-    path('gestion/',   include('gestion.urls')),
-    path('',           include('users.urls')),
+    path('accounts/', include('accounts.urls')),
+    path('influencer/', include('influencer.urls')),
+    # Password reset URLs
+    path('accounts/password_reset/', auth_views.PasswordResetView.as_view(template_name='accounts/password_reset_form.html'), name='password_reset'),
+    path('accounts/password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='accounts/password_reset_done.html'), name='password_reset_done'),
+    path('accounts/reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='accounts/password_reset_confirm.html'), name='password_reset_confirm'),
+    path('accounts/reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='accounts/password_reset_complete.html'), name='password_reset_complete'),
     path('blog/', include('blog.urls', namespace='blog')),
-    path('dashboard/', include(('dashboard.urls', 'dashboard'), namespace='dashboard')),
-    path('cart/',      include(('cart.urls', 'cart'),          namespace='cart')),
-    path('tienda/',    include(('store.urls', 'store'),        namespace='store')),
-    path('adminpanel/', include('adminpanel.urls')),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('products/', include('products.urls', namespace='products')),
+    path('configuracion-marca/', include('configuracion_marca.urls', namespace='configuracion_marca')),
+    path('contabilidad/', include('contabilidad.urls', namespace='contabilidad')),
+    path('tienda/', include('tienda.urls', namespace='tienda')),
+    path('carrito/', include('carrito.urls', namespace='carrito')),
+    path('crm/', include('crm.urls')),
 )
 
-if settings.DEBUG:
-    urlpatterns += static(
-        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-    )
-
-
-# urlpatterns = [
-#     path('admin/', admin.site.urls),
-#     path('productos/', ProductListView.as_view(), name='list_product'),
-# ]
-
-=======
-from django.contrib import admin
-from django.urls import path, include
-from django.views.generic import TemplateView
-from django.conf.urls.i18n import i18n_patterns
-
-#  ← importa estas dos utilidades
-from django.conf import settings
-from django.conf.urls.static import static
-
-
-
-urlpatterns = [
-    path('i18n/', include('django.conf.urls.i18n')),
-]
-
-urlpatterns += i18n_patterns(
-    path('admin/', admin.site.urls),
-    path('',  TemplateView.as_view(template_name='home.html'), name='home'),
-    path('products/', include('products.urls', namespace='products')),
-    path('metricas/',  include('metricas.urls')),
-    path('gestion/',   include('gestion.urls')),
-    path('',           include('users.urls')),
-    path('blog/', include('blog.urls', namespace='blog')),
-    path('api/', include('auth.urls')),
-    path('dashboard/', include(('dashboard.urls', 'dashboard'), namespace='dashboard')),
-    path('cart/',      include(('cart.urls', 'cart'),          namespace='cart')),
-    path('tienda/',    include(('store.urls', 'store'),        namespace='store')),
-    path('adminpanel/', include('adminpanel.urls')),
-)
-
-if settings.DEBUG:
-    urlpatterns += static(
-        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-    )
-
-
-# urlpatterns = [
-#     path('admin/', admin.site.urls),
-#     path('productos/', ProductListView.as_view(), name='list_product'),
-# ]
-
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

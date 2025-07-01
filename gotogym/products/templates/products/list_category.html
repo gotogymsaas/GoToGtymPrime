@@ -1,63 +1,56 @@
-{% extends "base.html" %}
-{% load static %}                 {#  ⬅️  Sólo tailwind_filters si lo necesitas #}
+{% extends '_base_dasboard.html' %}
+{% load static %}
 
 {% block extra_head %}
-<!-- Quita el CDN si tu base.html ya compila Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-slate-50 flex items-start justify-center py-14">
-    <div class="w-full max-w-7xl bg-white/80 backdrop-blur border border-gray-200 shadow-xl rounded-3xl px-10 py-12">
+<div class="min-h-screen flex items-start justify-center">
+  <div class="w-full max-w-5xl bg-white/80 backdrop-blur border border-gray-200 shadow-xl rounded-3xl px-10 py-12">
     <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between mb-8">
-        <h1 class="text-3xl font-semibold text-gray-800 flex items-center gap-3">
-            Lista de productos
-        </h1>
-
-
-        <div class="flex flex-wrap gap-3">
-            <a href="{% url 'add_category' %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-indigo-600 text-white font-medium hover:bg-indigo-700 active:scale-95 transition shadow-indigo-500/20 shadow-md">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
-            Nueva categoría
-            </a>
-
-            <a href="{% url 'list_product' %}"
-            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 active:scale-95 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-            Ver Productos
-            </a>
-        </div>
+      <h1 class="text-3xl font-semibold text-gray-800 flex items-center gap-3">
+        Categorías de productos
+      </h1>
+      <div class="flex flex-wrap gap-3">
+        <a href="{% url 'products:add_category' %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-indigo-600 text-white font-medium hover:bg-indigo-700 active:scale-95 transition shadow-indigo-500/20 shadow-md">
+          <span class="material-icons-outlined">add</span>
+          Nueva categoría
+        </a>
+      </div>
     </div>
-
-
-    <div class="overflow-x-auto rounded-2xl border border-gray-200">
+    <div id="categoryTableWrapper" class="overflow-x-auto rounded-2xl border border-gray-200">
       <table class="min-w-full divide-y divide-gray-200 text-sm">
         <thead class="bg-gray-100 text-gray-700 uppercase tracking-wide text-xs">
           <tr>
             <th class="px-6 py-3 text-left w-1/3">Nombre</th>
             <th class="px-6 py-3 text-left">Descripción</th>
+            <th class="px-6 py-3 text-center">Acciones</th>
           </tr>
         </thead>
-
         <tbody class="divide-y divide-gray-100">
           {% for category in categories %}
           <tr class="hover:bg-gray-50 transition">
-            <td class="px-6 py-3 font-medium text-gray-800 whitespace-nowrap">
-              {{ category.name }}
-            </td>
-            <td class="px-6 py-3 text-gray-600">
-              {{ category.description|default:"—" }}
+            <td class="px-6 py-3 font-medium text-gray-800 whitespace-nowrap">{{ category.name }}</td>
+            <td class="px-6 py-3 text-gray-600">{{ category.description|default:"—" }}</td>
+            <td class="px-6 py-3 text-center">
+              <div class="flex flex-row justify-center items-center gap-2 min-w-[90px]">
+                <button onclick="openCategoryModal({{ category.pk }})" class="inline-flex items-center justify-center text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 rounded-full p-2 transition" title="Visualizar">
+                  <span class="material-icons-outlined align-middle">visibility</span>
+                </button>
+                <a href="{% url 'products:edit_category' category.pk %}" class="inline-flex items-center justify-center text-yellow-600 hover:text-yellow-800 bg-yellow-50 hover:bg-yellow-100 rounded-full p-2 transition" title="Editar">
+                  <span class="material-icons-outlined align-middle">edit</span>
+                </a>
+                <button type="button" class="inline-flex items-center justify-center text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 rounded-full p-2 transition delete-category-btn" title="Eliminar" data-id="{{ category.pk }}" data-name="{{ category.name }}">
+                  <span class="material-icons-outlined align-middle">delete</span>
+                </button>
+              </div>
             </td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="2" class="px-6 py-10 text-center text-gray-500">
+            <td colspan="3" class="px-6 py-10 text-center text-gray-500">
               No hay categorías registradas.
             </td>
           </tr>
@@ -65,7 +58,157 @@
         </tbody>
       </table>
     </div>
+    <div class="flex justify-center mt-8">
+      <nav class="inline-flex rounded-md shadow-sm" aria-label="Pagination">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">&laquo;</a>
+        {% else %}
+          <span class="px-3 py-2 rounded-l-md border border-gray-200 bg-gray-100 text-gray-300">&laquo;</span>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <span class="px-3 py-2 border-t border-b border-gray-300 bg-indigo-100 text-indigo-700 font-bold">{{ num }}</span>
+          {% else %}
+            <a href="?page={{ num }}" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-700 hover:bg-gray-50">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">&raquo;</a>
+        {% else %}
+          <span class="px-3 py-2 rounded-r-md border border-gray-200 bg-gray-100 text-gray-300">&raquo;</span>
+        {% endif %}
+      </nav>
+    </div>
+    <div id="categoryModal" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none hidden">
+      <div class="absolute inset-0 transition-all duration-300" id="categoryModalOverlay" style="z-index:1;"></div>
+      <div class="relative z-10 pointer-events-auto bg-gradient-to-br from-white via-indigo-50 to-indigo-100 rounded-3xl max-w-lg w-full mx-4 shadow-2xl border-2 border-indigo-200 animate-fade-in-up overflow-hidden">
+        <div class="flex justify-between items-center px-8 py-6 border-b-2 border-indigo-100 bg-gradient-to-r from-indigo-50 to-white rounded-t-3xl">
+          <div class="flex flex-col gap-1">
+            <h2 class="text-2xl font-extrabold text-indigo-800 flex items-center gap-2 tracking-tight drop-shadow-sm" id="modalCategoryName"></h2>
+          </div>
+          <button onclick="closeCategoryModal()" class="text-indigo-300 hover:text-red-500 text-3xl font-bold transition p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-red-200 bg-white/70 shadow-md">
+            <span class="material-icons-outlined">close</span>
+          </button>
+        </div>
+        <div class="px-8 py-8 flex flex-col md:flex-row gap-8 items-center bg-white/80">
+          <div class="flex-1 space-y-4 w-full">
+            <span class="inline-flex items-center gap-1 px-4 py-1.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold self-start mb-1 shadow">
+              <span class="material-icons-outlined text-base">category</span>
+              <span id="modalCategoryNameBadge"></span>
+              <p class="text-gray-700 text-lg font-medium" id="modalCategoryDescription"></p>
+            </span>
+          </div>  
+        </div>
+      </div>
+    </div>
 
+    
+    <div id="deleteCategoryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
+      <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full border border-gray-200 text-center relative animate-fade-in">
+        <button id="closeDeleteCategoryModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition text-2xl">
+          <span class="material-icons-outlined">close</span>
+        </button>
+        <div class="flex flex-col items-center gap-4">
+          <span class="material-icons-outlined text-6xl text-red-400">warning_amber</span>
+          <h2 class="text-2xl font-bold text-gray-800">¿Eliminar categoría?</h2>
+          <p class="text-gray-600 mb-2">La categoría <span id="deleteCategoryName" class="font-semibold text-red-600"></span> será eliminada. ¿Deseas continuar?</p>
+          <form id="deleteCategoryForm" method="post" class="flex flex-col gap-3 w-full">
+            {% csrf_token %}
+            <div class="flex justify-center gap-4 mt-2">
+              <button type="button" id="cancelDeleteCategoryBtn" class="px-6 py-2 rounded-full border border-gray-300 text-gray-700 bg-gray-100 hover:bg-gray-200 transition">Cancelar</button>
+              <button type="submit" class="px-6 py-2 rounded-full bg-red-600 text-white font-semibold shadow hover:bg-red-700 transition">Eliminar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div id="modalBlurBg" class="modal-blur-bg hidden"></div>
   </div>
 </div>
+<script>
+const deleteCategoryUrlBase = "{% url 'products:delete_category_ajax' 0 %}";
+let categoryIdToDelete = null;
+let deleteCategoryModal = document.getElementById('deleteCategoryModal');
+let deleteCategoryForm = document.getElementById('deleteCategoryForm');
+let deleteCategoryName = document.getElementById('deleteCategoryName');
+const deleteCategoryBtns = document.querySelectorAll('.delete-category-btn');
+
+function showModalBlur() {
+  document.getElementById('modalBlurBg').classList.remove('hidden');
+}
+function hideModalBlur() {
+  document.getElementById('modalBlurBg').classList.add('hidden');
+}
+
+function openDeleteCategoryModal(categoryId, categoryName) {
+  showModalBlur();
+  deleteCategoryModal.classList.remove('hidden');
+  deleteCategoryName.textContent = categoryName;
+  categoryIdToDelete = categoryId;
+}
+function closeDeleteCategoryModal() {
+  hideModalBlur();
+  deleteCategoryModal.classList.add('hidden');
+  categoryIdToDelete = null;
+}
+
+const categoriesData = {
+  {% for category in categories %}
+  {{ category.pk }}: {
+    name: `{{ category.name|escapejs }}`,
+    description: `{{ category.description|default:'—'|escapejs }}`
+  },
+  {% endfor %}
+};
+function openCategoryModal(pk) {
+  showModalBlur();
+  document.getElementById('categoryTableWrapper').classList.add('brightness-50');
+  const overlay = document.getElementById('categoryModalOverlay');
+  overlay.className = 'absolute inset-0 bg-black/40 backdrop-blur-sm';
+  overlay.style.pointerEvents = 'auto';
+  const modal = document.getElementById('categoryModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  const data = categoriesData[pk];
+  document.getElementById('modalCategoryName').textContent = data.name;
+  document.getElementById('modalCategoryDescription').textContent = data.description;
+}
+function closeCategoryModal() {
+  hideModalBlur();
+  document.getElementById('categoryModal').classList.add('hidden');
+  document.getElementById('categoryModal').classList.remove('flex');
+  document.getElementById('categoryTableWrapper').classList.remove('brightness-50');
+  // Quitar overlay
+  const overlay = document.getElementById('categoryModalOverlay');
+  overlay.className = '';
+  overlay.style.pointerEvents = 'none';
+}
+document.getElementById('cancelDeleteCategoryBtn').onclick = function(e) { e.preventDefault(); closeDeleteCategoryModal(); };
+document.getElementById('closeDeleteCategoryModal').onclick = closeDeleteCategoryModal;
+deleteCategoryModal.onclick = function(e) { if (e.target === deleteCategoryModal) closeDeleteCategoryModal(); };
+deleteCategoryBtns.forEach(btn => {
+  btn.onclick = function(e) {
+    e.preventDefault();
+    const categoryId = this.getAttribute('data-id');
+    const categoryName = this.getAttribute('data-name');
+    openDeleteCategoryModal(categoryId, categoryName);
+  };
+});
+deleteCategoryForm.onsubmit = function(e) {
+  e.preventDefault();
+  if (!categoryIdToDelete) return;
+  fetch(deleteCategoryUrlBase.replace('/0/', '/' + categoryIdToDelete + '/'), {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+    }
+  }).then(res => res.json()).then(data => {
+    if (data.success) { 
+      const row = document.querySelector(`button.delete-category-btn[data-id='${categoryIdToDelete}']`)?.closest('tr');
+      if (row) row.remove();
+      closeDeleteCategoryModal();
+    }
+  });
+};
+</script>
 {% endblock %}
