@@ -1,197 +1,133 @@
-{%  extends "_base_dasboard.html" %}
-{%  load static widget_tweaks %}
-{% load i18n %}
-{% block title %}Agregar producto{% endblock %}
-
-{% block extra_head %}
-<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-{% endblock %}
-
+{% extends '_base_dasboard.html' %}
+{% load widget_tweaks %}
 {% block content %}
-<<<<<<< HEAD
-<div class="content-center flex items-center justify-center">
-  <div class="w-full max-w-7xl bg-white/80 backdrop-blur-lg border border-gray-200 rounded-3xl shadow-xl shadow-black/5 px-10 py-12">
-=======
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center py-14">
-  <div class="w-full max-w-5xl bg-white/80 backdrop-blur-lg border border-gray-200 rounded-3xl shadow-xl shadow-black/5 px-10 py-12">
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
-    <h1 class="text-3xl font-semibold text-gray-800 mb-10 flex items-center gap-3">
-      <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-      </svg>
-      Nuevo producto
-    </h1>
-
-<<<<<<< HEAD
-    <form action="{% url 'products:add_product' %}" method="post" enctype="multipart/form-data" class="grid lg:grid-cols-3 gap-10">
-      {% csrf_token %}
-
-      <!-- Columna 1: Imagen -->
-      <div class="flex flex-col items-center">
-        <div class="relative w-72 h-72 rounded-2xl border-2 border-dashed border-gray-300/70 flex items-center justify-center overflow-hidden">
-          <img id="preview" src="{% static 'images/img/placeholder.webp' %}" alt="Vista previa" class="object-cover w-full h-full transition-opacity duration-300">
-        </div>
-        {% with form.image as img_field %}
-          {{ img_field|attr:"accept:image/*"|add_class:"hidden" }}
-          <label for="{{ img_field.id_for_label }}" class="mt-6 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 active:scale-95 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 9.5L7.5 18.5M7.5 9.5L16.5 18.5" />
-=======
-    <form action="{% url 'products:add_product' %}" method="post" enctype="multipart/form-data" class="grid lg:grid-cols-2 gap-14">
-      {% csrf_token %}
-      <div class="flex flex-col items-center">
-        <div class="relative w-72 h-72 rounded-2xl border-2 border-dashed border-gray-300/70 flex items-center justify-center overflow-hidden">
-          <img id="preview" src="{% static 'images/img/placeholder.webp' %}" alt="Vista previa"  class="object-cover w-full h-full transition-opacity duration-300">
-        </div>
-        {% with form.image as img_field %}
-          {{ img_field|attr:"accept:image/*"|add_class:"hidden" }}
-          <label for="{{ img_field.id_for_label }}" class="mt-6 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary text-white font-medium hover:bg-primary/90 active:scale-95 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"  d="M16.5 9.5L7.5 18.5M7.5 9.5L16.5 18.5" />
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
-            </svg>
-            Seleccionar imagen
+<div class=" mx-auto bg-white/95 p-8 rounded-3xl shadow-2xl border border-gray-200 backdrop-blur-lg">
+  <h2 class="text-4xl font-extrabold mb-1 text-[#093f62] flex items-center gap-3 drop-shadow-sm">
+    <span class="material-icons-outlined text-5xl text-[#C5A46B]">add_box</span>
+    Añadir Producto
+  </h2>
+  <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-3 gap-10">
+    {% csrf_token %}
+    <!-- Columna 1 -->
+    <div class="space-y-7 md:col-span-1">
+      <div>
+        <label for="{{ form.name.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">Nombre<span class="text-red-500">*</span></label>
+        {% render_field form.name class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition placeholder-gray-400 text-gray-800" %}
+        {% for error in form.name.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+      <div>
+        <label for="{{ form.category.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">Categoria<span class="text-red-500">*</span></label>
+        {% render_field form.category class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800" %}
+        {% for error in form.category.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+      <div>
+        <label for="{{ form.stock.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">{{ form.stock.label }}<span class="text-red-500">*</span></label>
+        {% render_field form.stock class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800" %}
+        {% for error in form.stock.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="flex gap-4 items-end">
+        <div class="w-1/2 flex items-center">
+          <label for="{{ form.featured.id_for_label }}" class="flex items-center gap-3 cursor-pointer select-none whitespace-nowrap">
+            <span class="relative">
+              {% render_field form.featured class="sr-only peer" %}
+              <span class="w-11 h-6 bg-gray-200 rounded-full shadow-inner peer-checked:bg-[#C5A46B] transition-colors block"></span>
+              <span class="absolute left-0 top-0 w-6 h-6 bg-white border border-gray-300 rounded-full shadow peer-checked:translate-x-5 transition-transform"></span>
+            </span>
+            <span class="text-base font-semibold text-gray-700 whitespace-nowrap">Destacar Producto</span>
           </label>
-          {% for err in img_field.errors %}
-            <p class="mt-2 text-sm text-rose-600">{{ err }}</p>
-          {% endfor %}
-        {% endwith %}
-      </div>
-
-<<<<<<< HEAD
-      <!-- Columna 2: Campos nombre, precio, stock, is_active -->
-      <div class="space-y-7">
-        {% for field in form %}
-          {% if field.name in "name price stock is_active" %}
-=======
-
-      <div class="space-y-7">
-        {% for field in form %}
-          {% if field.name != 'image' %}
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
-            <div>
-              <label for="{{ field.id_for_label }}" class="block mb-1 text-sm font-medium text-gray-700">
-                {{ field.label }}
-              </label>
-
-              {% if field.field.widget.input_type == "checkbox" %}
-                <div class="flex items-center gap-3">
-<<<<<<< HEAD
-                  {{ field|add_class:"h-5 w-5 rounded-md text-blue-600 focus:ring-2 focus:ring-blue-400" }}
-                  <span class="text-gray-600 text-sm">Activo</span>
-                </div>
-              {% else %}
-                {{ field|add_class:"w-full rounded-xl border border-gray-300/70 bg-white px-4 py-3 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition shadow-sm placeholder-gray-400" }}
-=======
-                  {{ field|add_class:"h-5 w-5 rounded-md text-primary focus:ring-2 focus:ring-primary/60"}}
-                  <span class="text-gray-600 text-sm">Activo</span>
-                </div>
-
-              {% elif field.field.widget.input_type == "select" %}
-                {{ field | add_class:"w-full rounded-xl border border-gray-300/70 bg-white px-4 py-2.5 focus:border-primary focus:ring-2 focus:ring-primary/50 transition shadow-sm"}}
-
-              {% elif field.field.widget.input_type == "textarea" %}
-                {{ field | add_class:"w-full rounded-xl border border-gray-300/70 bg-white px-4 py-3  focus:border-primary focus:ring-2 focus:ring-primary/50 transition shadow-sm resize-none placeholder-gray-400"}}
-
-              {% else %}
-                {{ field | add_class:"w-full rounded-xl border border-gray-300/70 bg-white px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/50 transition shadow-sm placeholder-gray-400"}}
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
-              {% endif %}
-
-              {% for err in field.errors %}
-                <p class="mt-1 text-sm text-rose-600">{{ err }}</p>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endfor %}
-<<<<<<< HEAD
-      </div>
-
-      <!-- Columna 3: categoría, descripción y botones -->
-      <div class="flex flex-col justify-between h-full space-y-7">
-        {% for field in form %}
-          {% if field.name == "category" %}
-            <div>
-              <label for="{{ field.id_for_label }}" class="block mb-1 text-sm font-medium text-gray-700">
-                {{ field.label }}
-              </label>
-              {{ field|add_class:"w-full rounded-xl border border-gray-300/70 bg-white px-4 py-2.5 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition shadow-sm" }}
-              {% for err in field.errors %}
-                <p class="mt-1 text-sm text-rose-600">{{ err }}</p>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endfor %}
-
-        {% with form.description as desc_field %}
-          <div>
-            <label for="{{ desc_field.id_for_label }}" class="block mb-1 text-sm font-medium text-gray-700">
-              {{ desc_field.label }}
-            </label>
-            {{ desc_field|add_class:"w-full h-44 rounded-xl border border-gray-300/70 bg-white px-4 py-3 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition shadow-sm resize-none placeholder-gray-400" }}
-            {% for err in desc_field.errors %}
-              <p class="mt-1 text-sm text-rose-600">{{ err }}</p>
-            {% endfor %}
-          </div>
-        {% endwith %}
-=======
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
-
-        {% if form.non_field_errors %}
-          <div class="text-rose-600 text-sm">{{ form.non_field_errors }}</div>
-        {% endif %}
-
-<<<<<<< HEAD
-        <div class="flex justify-end gap-4 pt-4 mt-auto">
-          <a href="{% url 'products:list_product' %}" class="px-6 py-2.5 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-50 transition">Cancelar</a>
-          <button type="submit" class="px-7 py-2.5 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 active:scale-95 shadow-md shadow-blue-400/20 transition">
-            Agregar
-          </button>
+          {% for error in form.featured.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
         </div>
-=======
-        <a href="{% url 'products:list_product' %}" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300 transition">
-          {% trans "Cancelar" %}
-        </a>
-        <button type="submit"
-                class="bg-violet-600 text-white px-6 py-2 rounded-full hover:bg-violet-700 transition">
-          {% trans "Agregar" %}
-        </button>
       </div>
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
+    </div>
+    <!-- Columna 2 -->
+    <div class="space-y-7 md:col-span-1">
+      <div>
+        <label for="{{ form.brand.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">Marca</label>
+        {% render_field form.brand class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800" %}
+        {% for error in form.brand.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
       </div>
-    </form>
-  </div>
+      <div>
+        <label for="{{ form.description.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">Descripción</label>
+        {% render_field form.description class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800 min-h-[222px] max-h-[120px] resize-none align-bottom" %}
+        {% for error in form.description.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+    </div>
+    <!-- Columna 3 -->
+    <div class="space-y-7 md:col-span-1">
+      <div class="flex gap-4">
+        <div class="w-1/2">
+          <label for="{{ form.discount.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">Descuento</label>
+          {% render_field form.discount class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800" %}
+          {% for error in form.discount.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="w-1/2">
+          <label for="{{ form.price.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">Precio<span class="text-red-500">*</span></label>
+          {% render_field form.price type="text" class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46L] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800" %}
+          {% for error in form.price.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+      <div class="relative flex flex-col items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-xl h-[250px] overflow-hidden shadow-inner cursor-pointer group transition-all">
+        <img id="preview-img" src="" class="h-[260px] w-64 object-contain mx-auto rounded-xl shadow hidden"/>
+        <span id="placeholder-icon" class="text-gray-400 material-icons-outlined text-7xl group-hover:text-[#C5A46B] transition">image</span>
+        <span id="placeholder-text" class="text-gray-500 mt-4 text-base group-hover:text-[#C5A46B] transition px-2 text-center">Haz clic aquí para subir una imagen</span>
+        <input type="file" id="image-upload-input" name="image" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10" />
+      </div>
+      <input type="hidden" name="image-clear" id="image-clear-flag" value="">
+      {% for error in form.image.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+    </div>
+    <div class="md:col-span-3 flex justify-end gap-3">
+      <a href="{% url 'products:list_product' %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
+        <span class="material-icons-outlined">arrow_back</span> Cancelar
+      </a>
+      <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#093f62] text-white font-semibold shadow-md hover:bg-[#C5A46B] hover:text-[#093f62] transition">
+        <span class="material-icons-outlined">save</span> Guardar
+      </button>
+    </div>
+  </form>
 </div>
-
-<<<<<<< HEAD
 <script>
-  const fileInput = document.getElementById('id_image');
-  const preview = document.getElementById('preview');
-=======
-<style>
-  :root { --twc-primary: #5747ff; }         /* ajusta el tono a tu branding */
-  .text-primary     { color: var(--twc-primary); }
-  .bg-primary       { background-color: var(--twc-primary); }
-  .shadow-primary\/20 { box-shadow: 0 2px 6px rgba(87,71,255,.2); }
-  .focus\:ring-primary\/50:focus { --tw-ring-color: rgba(87,71,255,.5); }
-  .focus\:ring-primary\/60:focus { --tw-ring-color: rgba(87,71,255,.6); }
-  .hover\:bg-primary\/90:hover   { background-color: rgba(87,71,255,.9); }
-</style>
+document.addEventListener('DOMContentLoaded', function() {
+  const previewImg = document.getElementById('preview-img');
+  const imageInput = document.getElementById('image-upload-input');
+  const placeholderIcon = document.getElementById('placeholder-icon');
+  const placeholderText = document.getElementById('placeholder-text');
 
-<script>
-  const fileInput = document.getElementById('id_image');
-  const preview   = document.getElementById('preview');
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
-
-  fileInput?.addEventListener('change', e => {
+  imageInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
-      preview.classList.add('opacity-0');
-      preview.onload = () => { preview.classList.remove('opacity-0'); };
-      preview.src = URL.createObjectURL(file);
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        previewImg.src = evt.target.result;
+        previewImg.classList.remove('hidden');
+        placeholderIcon.classList.add('hidden');
+        placeholderText.classList.add('hidden');
+      };
+      reader.readAsDataURL(file);
     } else {
-      preview.src = "{% static 'images/img/placeholder.webp' %}";
+      previewImg.src = '';
+      previewImg.classList.add('hidden');
+      placeholderIcon.classList.remove('hidden');
+      placeholderText.classList.remove('hidden');
     }
   });
+
+  // Formatear el campo de precio con separador de miles y mantener el cursor
+  const priceInput = document.getElementById('{{ form.price.id_for_label }}');
+  if (priceInput) {
+    priceInput.setAttribute('inputmode', 'numeric');
+    priceInput.addEventListener('input', function(e) {
+      const selectionStart = priceInput.selectionStart;
+      const oldLength = priceInput.value.length;
+      let value = priceInput.value.replace(/\D/g, '');
+      if (value) {
+        value = parseInt(value, 10).toLocaleString('es-CO');
+      }
+      priceInput.value = value;
+      // Ajustar la posición del cursor
+      const newLength = value.length;
+      priceInput.setSelectionRange(newLength, newLength);
+    });
+  }
+});
 </script>
 {% endblock %}

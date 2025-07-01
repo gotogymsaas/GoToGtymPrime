@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
-  <title>Dashboard Admin</title>
-  {% load static %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <title>Dashboard Admin</title>
+    {% load static %}
+   
 </head>
 
 <body class="bg-gray-100 font-sans" x-data="{ sidebarOpen: false }">
-  <div class="flex h-screen overflow-hidden">
-    <aside :class="sidebarOpen ? 'w-64' : 'w-16'" class="bg-[#093f62] text-white transition-all duration-300 h-full flex-shrink-0 relative" x-init="if (window.innerWidth >= 768) { sidebarOpen = true } ">
+    <div class="flex h-screen overflow-hidden">
+        <aside :class="sidebarOpen ? 'w-64' : 'w-16'" class="bg-[#093f62] text-white transition-all duration-300 h-full flex-shrink-0 relative" x-init="if (window.innerWidth >= 768) { sidebarOpen = true } ">
       <div class="flex items-center justify-between px-4 py-4">
         <h1 class="text-2xl font-bold" x-show="sidebarOpen">Panel Admin</h1>
         <button @click="sidebarOpen = !sidebarOpen" class="bg-white text-[#093f62] rounded-md p-1  flex items-center justify-center hover:bg-gray-200 transition">
@@ -38,41 +39,41 @@
             </a>
           </li>
           <li class="px-4 py-2 hover:bg-white/10 flex items-center">
-            <a href="#" class="flex items-center w-full text-white">
+            <a href="{% url 'configuracion_marca:paleta' %}" class="flex items-center w-full text-white">
               <span class="material-icons-outlined">settings</span>
               <span x-show="sidebarOpen" class="ml-4">Configuración Marca</span>
             </a>
           </li>
-          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+          {% comment %} <li class="px-4 py-2 hover:bg-white/10 flex items-center">
             <a href="{% url 'group_chart' %}" class="flex items-center w-full text-white">
               <span class="material-icons-outlined">timeline</span>
               <span x-show="sidebarOpen" class="ml-4">Línea Tendencia</span>
             </a>
-          </li>
-          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+          </li> {% endcomment %}
+          {% comment %} <li class="px-4 py-2 hover:bg-white/10 flex items-center">
             <a href="{% url 'nps_chart' %}" class="flex items-center w-full text-white">
               <span class="material-icons-outlined">thumbs_up_down</span>
               <span x-show="sidebarOpen" class="ml-4">Net Promoter Score</span>
             </a>
-          </li>
+          </li> {% endcomment %}
           <li class="px-4 py-2 hover:bg-white/10 flex items-center">
             <a href="#" class="flex items-center w-full text-white">
               <span class="material-icons-outlined">admin_panel_settings</span>
               <span x-show="sidebarOpen" class="ml-4">Crear Super Admin</span>
             </a>
           </li>
-          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+          {% comment %} <li class="px-4 py-2 hover:bg-white/10 flex items-center">
             <a href="#" class="flex items-center w-full text-white">
               <span class="material-icons-outlined">bar_chart</span>
               <span x-show="sidebarOpen" class="ml-4">Consolidados</span>
             </a>
-          </li>
-          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+          </li> {% endcomment %}
+          {% comment %} <li class="px-4 py-2 hover:bg-white/10 flex items-center">
             <a href="#" class="flex items-center w-full text-white">
               <span class="material-icons-outlined">search</span>
               <span x-show="sidebarOpen" class="ml-4">Buscador</span>
             </a>
-          </li>
+          </li> {% endcomment %}
           <li class="px-4 py-2 hover:bg-white/10 flex items-center">
             <a href="#" class="flex items-center w-full text-white">
               <span class="material-icons-outlined">edit</span>
@@ -80,9 +81,21 @@
             </a>
           </li>
           <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="{% url 'products:list_category' %}" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">category</span>
+              <span x-show="sidebarOpen" class="ml-4">Categorías</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
             <a href="{% url 'products:list_product' %}" class="flex items-center w-full text-white">
               <span class="material-icons-outlined">inventory_2</span>
               <span x-show="sidebarOpen" class="ml-4">Productos</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="{% url 'products:brand_list' %}" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">branding_watermark</span>
+              <span x-show="sidebarOpen" class="ml-4">Marcas</span>
             </a>
           </li>
           <li class="px-4 py-2 hover:bg-white/10 flex items-center">
@@ -93,9 +106,15 @@
             </form>
           </li>
           <li class="px-4 py-2 hover:bg-white/10 flex items-center">
-            <a href="{% url 'adminpanel:dashboard' %}" class="flex items-center w-full text-white">
+            {% comment %} <a href="{% url 'adminpaneldashboard' %}" class="flex items-center w-full text-white"> {% endcomment %}
               <span class="material-icons-outlined">article</span>
               <span x-show="sidebarOpen" class="ml-4">Gestionar Posts</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="{% url 'contabilidad:clientes' %}" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">account_balance</span>
+              <span x-show="sidebarOpen" class="ml-4">Contabilidad</span>
             </a>
           </li>
         </ul>
@@ -103,7 +122,31 @@
     </aside>
 
     <div class=" content-center flex-1 overflow-auto">
-      <main class="p-6 md:p-10">
+      <header class="flex justify-end items-center p-4 bg-white shadow-sm border-b border-gray-200">
+        {% if user.is_authenticated %}
+        <div class="relative" x-data="{ open: false }">
+          <button @click="open = !open" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#f3e9d2] text-[#093f62] font-bold hover:bg-[#e7c98a] focus:outline-none">
+            <span class="material-icons-outlined">account_circle</span>
+            <span>{{ user.get_full_name|default:user.username }}</span>
+            <span class="material-icons-outlined">expand_more</span>
+          </button>
+          <div x-show="open" @click.away="open = false" x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-[#e7c98a] z-50 transition-all duration-200" x-transition>
+            <a href="#" @click="open = false" class="block px-5 py-3 text-[#093f62] hover:bg-[#f3e9d2] hover:text-[#C5A46B] font-medium rounded-t-xl transition">Editar perfil</a>
+            {% if user.is_authenticated and user.influencer_profile %}
+            <a href="{% url 'influencer_dashboard' %}" @click="open = false" class="block px-5 py-3 text-[#C5A46B] hover:bg-[#f3e9d2] hover:text-[#093f62] font-semibold transition">Panel de Influencer</a>
+            {% endif %}
+            {% if user.is_superuser %}
+            <a href="/admin/" @click="open = false" class="block px-5 py-3 text-[#093f62] hover:bg-[#f3e9d2] hover:text-[#C5A46B] font-semibold transition">Dashboard Admin</a>
+            {% endif %}
+            <form action="{% url 'logout' %}" method="post">
+              {% csrf_token %}
+              <button type="submit" @click="open = false" class="w-full text-left px-5 py-3 text-[#c0392b] hover:bg-[#fbeee6] font-medium rounded-b-xl transition">Cerrar sesión</button>
+            </form>
+          </div>
+        </div>
+        {% endif %}
+      </header>
+      <main class="p-6 md:p-8">
         {% block content %}
         {% endblock content %}
       </main>
@@ -130,5 +173,3 @@
 
 </body>
 </html>
-
-

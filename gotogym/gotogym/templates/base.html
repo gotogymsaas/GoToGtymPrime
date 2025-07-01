@@ -1,353 +1,388 @@
 {% load i18n %}
 {% load static %}
-<<<<<<< HEAD
+{% if color_navbar %}
+  <style>
+    nav.backdrop-blur-md {
+      background: {{ color_navbar }} !important;
+      background-color: {{ color_navbar }} !important;
+      filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+    nav.backdrop-blur-md * {
+      color: #fff !important;
+    }
+  </style>
+{% endif %}
+{% if paleta_marca %}
+  <style>
+    :root {
+      {% for nombre, hex in paleta_marca.items %}
+        --{{ nombre }}: {{ hex }};
+      {% endfor %}
+    }
+  </style>
+{% endif %}
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
-=======
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="GoToGym - Ropa deportiva y bienestar con estilo.">
-<<<<<<< HEAD
   <title>{% block title %}GoToGym{% endblock %}</title>
-
-{% comment %} 
-  <link href="{% static 'css/tailwind.css' %}" rel="stylesheet" /> {% endcomment %}
-  {% comment %} <link href="{% static 'css/custom_styles.css' %}" rel="stylesheet" /> {% endcomment %}
-=======
-  <title>GoToGym - Lujo Deportivo y Bienestar</title>
-
-  <link href="{% static 'css/tailwind.css' %}" rel="stylesheet" />
-  <link href="{% static 'css/custom_styles.css' %}" rel="stylesheet" />
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
   <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap" rel="stylesheet">
-  <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
-
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined" rel="stylesheet">
   
+  <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    {% if color_body %}
+      body {
+        background-color: {{ color_body }} !important;
+      }
+      body.dark-mode {
+        background-color: #181A1B !important;
+      }
+    {% else %}
     body {
       font-family: 'Outfit', sans-serif;
       background-color: #F8F9FA;
-      margin: 0; 
+      margin: 0;
     }
     h1, h2, h3 {
       font-family: 'Poetsen One', serif;
     }
-    
-<<<<<<< HEAD
-    {% comment %} blockquote:hover {
-      transform: scale(1.02);
-      transition: all 0.3s ease-in-out;
-      color: #C5A46B;
-    } {% endcomment %}
-=======
-    blockquote:hover {
-      transform: scale(1.02);
-      transition: all 0.3s ease-in-out;
-      color: #C5A46B;
+    body.dark-mode {
+      background-color: #181A1B;
+      color: #F8F9FA;
     }
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
-  
+    body.dark-mode .bg-gradient-to-r {
+      background: linear-gradient(to right, #232526 70%, #232526 100%) !important;
+      color: #F8F9FA;
+    }
+    body.dark-mode nav, body.dark-mode .backdrop-blur-md {
+      background: linear-gradient(to right, #232526 70%, #232526 100%) !important;
+      color: #F8F9FA;
+    }
+    body.dark-mode .bg-white, body.dark-mode .bg-white\/10, body.dark-mode .bg-white\/30 {
+      background-color: #232526 !important;
+    }
+    body.dark-mode .border-[#C5A46L], body.dark-mode .border-[#C5A46B]\/70 {
+      border-color: #C5A46B !important;
+    }
+    body.dark-mode .hover\:bg-\[\#C5A46B\]\/10:hover {
+      background-color: #3a2e1a !important;
+    }
+    body.dark-mode .shadow-md, body.dark-mode .shadow-lg, body.dark-mode .shadow {
+      box-shadow: 0 2px 8px 0 rgba(0,0,0,0.7) !important;
+    }
+    body.dark-mode .bg-black {
+      background-color: #101214 !important;
+    }
+    body.dark-mode .text-white, body.dark-mode .text-white\/60, body.dark-mode .text-white\/70, body.dark-mode .text-white\/90 {
+      color: #F8F9FA !important;
+    }
+    body.dark-mode .hover\:text-\[\#C5A46B\]:hover {
+      color: #ffe6a0 !important;
+    }
+    body.dark-mode .bg-\[\#C5A46B\], body.dark-mode .bg-\[\#C5A46B\]\/10, body.dark-mode .bg-\[\#C5A46B\]\/20 {
+      background-color: #3a2e1a !important;
+    }
+    body.dark-mode .text-\[\#C5A46B\] {
+      color: #ffe6a0 !important;
+    }
+    body.dark-mode .hover\:bg-\[\#d7bb83\]:hover {
+      background-color: #bfa76a !important;
+    }
+    body.dark-mode .bg-gradient-to-r.from-black\/70.to-black\/60 {
+      background: linear-gradient(to right, #232526 70%, #232526 100%) !important;
+    }
+    body.dark-mode .rounded-lg, body.dark-mode .rounded-full {
+      border-radius: 0.75rem !important;
+    }
+    body.dark-mode .dropdown-menu, body.dark-mode #langDropdown {
+      background-color: #232526 !important;
+      color: #F8F9FA !important;
+    }
+    body.dark-mode select, body.dark-mode option {
+      background-color: #232526 !important;
+      color: #F8F9FA !important;
+    }
+    body.dark-mode input, body.dark-mode textarea {
+      background-color: #232526 !important;
+      color: #F8F9FA !important;
+    }
+    body.dark-mode p,
+    body.dark-mode h1,
+    body.dark-mode h2,
+    body.dark-mode h3,
+    body.dark-mode h4,
+    body.dark-mode h5,
+    body.dark-mode h6,
+    body.dark-mode span,
+    body.dark-mode li,
+    body.dark-mode blockquote,
+    body.dark-mode strong,
+    body.dark-mode em,
+    body.dark-mode td,
+    body.dark-mode th,
+    body.dark-mode a {
+      color: #fff !important;
+    }
+    {% endif %}
   </style>
 </head>
 <body class="text-[#101820]">
-
-  <nav class="bg-gradient-to-r from-black/70 to-black/60 backdrop-blur-md text-white sticky top-0 z-40 shadow-md">
-    <div class="container mx-auto flex items-center justify-between px-4 py-3">
-
-      <a href="/" class="flex items-center gap-2">
-        <img src="{% static 'images/Logo_GoToGym_Blanco.png' %}" alt="GoToGym" class="h-8" />
-      </a>
-
-        <ul id="desktop-menu" class="hidden md:flex space-x-6 text-sm font-medium items-center">
-          <li><a href="/" class="hover:text-[#C5A46B]">{% trans "Inicio" %}</a></li>
-          {% comment %} <li><a href="/productos/" class="hover:text-[#C5A46B]">Colección</a></li> {% endcomment %}
-<<<<<<< HEAD
-          {% comment %} <li><a href="/productos/" class="hover:text-[#C5A46B]">{% trans "Coleccion" %}</a></li> {% endcomment %}
-          <li><a href="/pedidos/" class="hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
-          <li><a href="/bienestar/" class="hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
-          {% comment %} <li><a href="/metricas/" class="hover:text-[#C5A46B]">{% trans "Tecnologia" %}</a></li> {% endcomment %}
-=======
-          <li><a href="/productos/" class="hover:text-[#C5A46B]">{% trans "Coleccion" %}</a></li>
-          <li><a href="/pedidos/" class="hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
-          <li><a href="/bienestar/" class="hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
-          <li><a href="/metricas/" class="hover:text-[#C5A46B]">{% trans "Tecnologia" %}</a></li>
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
-          <li><a href="/gestion/" class="hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
-          <li><a href="/blog/" class="hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
-          <li><a href="/tienda/" class="hover:text-[#C5A46B]">{% trans "Tienda" %}</a></li>
-          <li><a href="/carrito/" class="relative hover:opacity-80 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="h-6 w-6 text-[#C5A46B]" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13l1.2-6h9.8" />
-            </svg>
-            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
-              {{ request.session.cart_count|default:"0" }}
-            </span></a>
-          </li>
-
-        </ul>
-
-
-      {% if user.is_authenticated %}
-        <div class="hidden md:flex items-center gap-4">
-          <span class="text-sm">
-            {{ user.get_short_name|default:user.username }}
-            {% if user.is_superuser %}
-              <span class="ml-1 px-2 py-0.5 bg-[#C5A46B]/20 text-[#C5A46B] rounded-full text-xs">
-                {% trans "Administrador"%}
-              </span>
+  <nav class="backdrop-blur-md text-white sticky top-0 z-40 shadow-md">
+    <div class="container mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-3">
+      <div class="w-full flex items-center justify-between md:w-auto">
+        <a href="/" class="flex items-center gap-3 mr-4 md:gap-2 md:mr-0">
+          <img src="{% static 'images/Logo_GoToGym_Blanco.png' %}" alt="GoToGym" class="h-8 md:h-8 mr-14" />
+        </a>
+        <button class="md:hidden text-[#C5A46B] ml-2" onclick="toggleMobileMenu()">
+          <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+      <ul id="desktop-menu" class="hidden md:flex space-x-6 text-sm font-medium items-center mt-4 md:mt-0">
+        <li><a href="/" class="hover:text-[#C5A46B]">{% trans "Inicio" %}</a></li>
+        <li><a href="/pedidos/" class="hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
+        <li><a href="/bienestar/" class="hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
+        <li><a href="/gestion/" class="hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
+        <li><a href="/blog/" class="hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
+        <li><a href="/tienda/" class="hover:text-[#C5A46B]">{% trans "Tienda" %}</a></li>
+        <li><a href="/carrito/" class="relative hover:opacity-80 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="h-6 w-6 text-[#C5A46B]" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13l1.2-6h9.8" />
+          </svg>
+          <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
+            {{ cart_count|default:"0" }}
+          </span></a>
+        </li>
+      </ul>
+      <div class="hidden md:flex items-center gap-2 md:gap-3 ml-auto">
+        {% if user.is_authenticated %}
+        <div class="relative" id="userMenuWrapper">
+          <button id="userMenuBtn" type="button" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#f3e9d2] text-[#093f62] font-bold hover:bg-[#e7c98a] focus:outline-none" onclick="toggleUserMenu()">
+            <span class="material-icons-outlined">account_circle</span>
+            <span>{{ user.get_full_name|default:user.username }}</span>
+            <span class="material-icons-outlined">expand_more</span>
+          </button>
+          <div id="userDropdown" class="hidden absolute right-0 mt-2 w-56 rounded-xl shadow-2xl border border-[#e7c98a] z-50 transition-all duration-200" style="background:#232526; color:#fff;">
+            <a href="{% url 'edit_profile' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#F8F9FA] hover:bg-[#3a2e1a] hover:text-[#C5A46B] font-medium rounded-t-xl transition">Editar perfil</a>
+            {% if user.is_authenticated and user.influencer_profile %}
+            <a href="{% url 'influencer_dashboard' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#C5A46B] hover:bg-[#3a2e1a] hover:text-[#093f62] font-semibold transition">Panel de Influencer</a>
             {% endif %}
-          </span>
-          <a href="{% url 'logout' %}"
-            class="bg-[#C5A46B] px-4 py-2 rounded-lg text-black font-medium hover:bg-[#d7bb83] transition">
-            {% trans "Cerrar sesión"%}
-          </a>
+            {% if user.is_superuser %}
+            <a href="/admin/" onclick="closeUserMenu()" class="block px-5 py-3 text-[#F8F9FA] hover:bg-[#3a2e1a] hover:text-[#C5A46B] font-semibold transition">Dashboard Admin</a>
+            {% endif %}
+            <form action="{% url 'logout' %}" method="post">
+              {% csrf_token %}
+              <button type="submit" onclick="closeUserMenu()" class="w-full text-left px-5 py-3 text-[#c0392b] hover:bg-[#fbeee6] font-medium rounded-b-xl transition">Cerrar sesión</button>
+            </form>
+          </div>
         </div>
-      {% else %}
-        <div class="hidden md:flex space-x-3">
-          <a href="{% url 'login' %}" class="px-4 py-2 rounded-lg border border-[#C5A46B] text-[#C5A46B] hover:bg-[#C5A46B]/10 transition">
+        {% else %}
+          <a href="{% url 'login' %}" class="px-4 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold shadow-sm hover:bg-[#C5A46B] hover:text-black transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">
             {% trans "Iniciar sesión"%}
           </a>
-          <a href="{% url 'register' %}" class="px-4 py-2 rounded-lg bg-[#C5A46B] text-black font-medium hover:bg-[#d7bb83] transition">
+          <a href="{% url 'register' %}" class="px-4 py-2 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold shadow-md hover:from-[#e7c98a] hover:to-[#C5A46B] hover:text-[#101820] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">
             {% trans "Crear cuenta"%}
           </a>
+        {% endif %}
+        <div class="relative ml-2 flex items-center h-full">
+          <button id="langAbbrBtn" type="button" class="px-3 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold bg-white/10 shadow-sm hover:bg-[#C5A46B]/10 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2 transition-all duration-200 flex items-center gap-1" onclick="toggleLangDropdown()">
+            <span>{% get_current_language as CURRENT %}{{ CURRENT|upper }}</span>
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div id="langDropdown" class="hidden absolute right-0 top-full mt-3 w-36 bg-white rounded-lg shadow-lg z-50 py-2">
+            <form action="{% url 'set_language' %}" method="post" class="w-full flex flex-col">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <button type="submit" name="language" value="es" class="block w-full text-left px-4 py-2 hover:bg-[#C5A46B]/20 text-[#101820] {% if CURRENT == 'es' %}font-bold bg-[#C5A46B]/10{% endif %}">Español</button>
+              <button type="submit" name="language" value="en" class="block w-full text-left px-4 py-2 hover:bg-[#C5A46B]/20 text-[#101820] {% if CURRENT == 'en' %}font-bold bg-[#C5A46B]/10{% endif %}">English</button>
+              <button type="submit" name="language" value="pt" class="block w-full text-left px-4 py-2 hover:bg-[#C5A46B]/20 text-[#101820] {% if CURRENT == 'pt' %}font-bold bg-[#C5A46B]/10{% endif %}">Português</button>
+            </form>
+          </div>
         </div>
-      {% endif %}
-
-      <form action="{% url 'set_language' %}" method="post" class="hidden md:block ml-4">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <select name="language" onchange="this.form.submit()" class="px-3 py-1.5 pr-8 text-[#C5A46B] bg-transparent border border-[#C5A46B]/70 rounded-lg hover:bg-[#C5A46B]/10 transition">
-          {% get_current_language as CURRENT %}
-          {% get_available_languages as LANGS %}
-          {% for code, name in LANGS %}
-            <option value="{{ code }}" {% if code == CURRENT %}selected{% endif %}>{{ name }}</option>
-          {% endfor %}
-        </select>
-      </form>
-
-
-      <button class="md:hidden text-[#C5A46B]" onclick="toggleMobileMenu()">
-        <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
-<<<<<<< HEAD
-      <button id="darkModeToggle" class="ml-4 text-[#C5A46B] hover:opacity-80 transition" title="Modo oscuro">
-  <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
-  </svg>
-  <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.95l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.05l-.71-.71M12 5a7 7 0 100 14a7 7 0 000-14z" />
-  </svg>
-=======
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
+        <button id="darkModeToggle" class="ml-2 text-[#C5A46B] hover:opacity-90 transition flex items-center bg-transparent p-0 border-0 shadow-none rounded-none focus:outline-none" title="Modo oscuro" onclick="toggleDarkMode()">
+          <svg id="sliderIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1111.21 3A7 7 0 0021 12.79Z" fill="#333"/>
+          </svg>
+        </button>
+      </div>
     </div>
-
     <div id="mobile-menu" class="md:hidden hidden border-t border-white/10">
       <ul class="flex flex-col px-6 py-4 space-y-3 text-sm font-medium">
-        
         <li><a href="/" class="hover:text-[#C5A46B]">{% trans "Inicio" %}</a></li>
-          {% comment %} <li><a href="/productos/" class="hover:text-[#C5A46B]">Colección</a></li> {% endcomment %}
-          <li><a href="/productos/" class="hover:text-[#C5A46B]">{% trans "Coleccion" %}</a></li>
-          <li><a href="/pedidos/" class="hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
-          <li><a href="/bienestar/" class="hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
-          <li><a href="/metricas/" class="hover:text-[#C5A46B]">{% trans "Tecnologia" %}</a></li>
-          <li><a href="/gestion/" class="hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
-          <li><a href="/blog/" class="hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
-          <li><a href="/carrito/" class="relative hover:opacity-80 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="h-6 w-6 text-[#C5A46B]" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13l1.2-6h9.8" />
-            </svg>
-            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
-              {{ request.session.cart_count|default:"0" }}
-            </span></a>
-          </li>
-
+        <li><a href="/productos/" class="hover:text-[#C5A46B]">{% trans "Coleccion" %}</a></li>
+        <li><a href="/pedidos/" class="hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
+        <li><a href="/bienestar/" class="hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
+        <li><a href="/metricas/" class="hover:text-[#C5A46B]">{% trans "Tecnologia" %}</a></li>
+        <li><a href="/gestion/" class="hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
+        <li><a href="/blog/" class="hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
+        <li><a href="/carrito/" class="relative hover:opacity-80 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="h-6 w-6 text-[#C5A46B]" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13l1.2-6h9.8" />
+          </svg>
+          <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
+            {{ cart_count|default:"0" }}
+          </span></a>
+        </li>
         {% if user.is_authenticated %}
+          <li><a href="{% url 'edit_profile' %}" class="block w-full text-center px-4 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold shadow-sm hover:bg-[#C5A46B] hover:text-black transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">Editar perfil</a></li>
           <li><a href="{% url 'logout' %}" class="text-[#C5A46B]">{% trans "Cerrar sesión" %}</a></li>
         {% else %}
-          <li><a href="{% url 'login' %}" class="text-[#C5A46B]">{% trans "Iniciar sesión" %}</a></li>
-          <li><a href="{% url 'register' %}" class="text-[#C5A46B]">{% trans "Crear cuenta" %}</a></li>
+          <li><a href="{% url 'login' %}" class="block w-full text-center px-4 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold shadow-sm hover:bg-[#C5A46B] hover:text-black transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">{% trans "Iniciar sesión" %}</a></li>
+          <li><a href="{% url 'register' %}" class="block w-full text-center px-4 py-2 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold shadow-md hover:from-[#e7c98a] hover:to-[#C5A46B] hover:text-[#101820] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">{% trans "Crear cuenta" %}</a></li>
         {% endif %}
-<<<<<<< HEAD
-        
-</button>
-
+        <li>
+          <form action="{% url 'set_language' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <select name="language" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold bg-white/10 shadow-sm hover:bg-[#C5A46B]/10 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2 transition-all duration-200">
+              {% get_current_language as CURRENT %}
+              {% get_available_languages as LANGS %}
+              {% for code, name in LANGS %}
+                <option value="{{ code }}" {% if code == CURRENT %}selected{% endif %}>{{ name }}</option>
+              {% endfor %}
+            </select>
+          </form>
+        </li>
+        <li>
+          <button id="darkModeToggleMobile" class="w-full text-[#C5A46B] hover:opacity-90 transition flex items-center bg-transparent p-0 border-0 shadow-none rounded-none focus:outline-none" title="Modo oscuro" onclick="toggleDarkMode()">
+            <svg id="sliderIconMobile" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21 12.79A9 9 0 1111.21 3A7 7 0 0021 12.79Z" fill="#333"/>
+            </svg>
+          </button>
+        </li>
       </ul>
-      
     </div>
-
-</nav>
-
-=======
-      </ul>
+  </nav>
+  <main class="mx-auto">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="bg-black py-12 text-white ">
+    <div class="container mx-auto text-center px-4">
+      <div class="flex flex-wrap justify-center space-x-8 mb-6 text-sm">
+        <a href="/acerca-de" class="hover:text-[#D4B46A] transition">{% trans "Acerca de" %}</a>
+        <a href="/contacto" class="hover:text-[#D4B46A] transition">{% trans "Contacto" %}</a>
+        <a href="/politica-privacidad" class="hover:text-[#D4B46A] transition">{% trans "Privacidad" %}</a>
+        <a href="/terminos" class="hover:text-[#D4B46A] transition">{% trans "Términos" %}</a>
+      </div>
+      <p class="mb-4 text-sm text-white/70">{% trans "Únete a nuestra comunidad y descubre la revolución del bienestar." %}</p>
+      <div class="mb-6">
+        <p class="text-sm text-white/90">{% trans "Síguenos en redes sociales:" %}</p>
+        <div class="flex flex-wrap justify-center gap-4 mt-4">
+          <a href="https://www.facebook.com/Gotogym.Sportwear" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+            <img src="{% static 'images/facebook.png' %}" alt="Facebook" class="h-6 w-6">
+          </a>
+          <a href="https://twitter.com/GOTOGYM6" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+            <img src="{% static 'images/twitter.png' %}" alt="Twitter" class="h-6 w-6">
+          </a>
+          <a href="https://www.instagram.com/gotogym.sportwear" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+            <img src="{% static 'images/instagram.png' %}" alt="Instagram" class="h-6 w-6">
+          </a>
+          <a href="https://co.pinterest.com/gotogym_/" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+            <img src="{% static 'images/pinterest.png' %}" alt="Pinterest" class="h-6 w-6">
+          </a>
+          <a href="https://www.linkedin.com/company/33262154/" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+            <img src="{% static 'images/linkedin.png' %}" alt="LinkedIn" class="h-6 w-6">
+          </a>
+          <a href="https://www.youtube.com/channel/UCXRp8PgcE7L75jEewIixeXg" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+            <img src="{% static 'images/youtube.png' %}" alt="YouTube" class="h-6 w-6">
+          </a>
+          <a href="https://soundcloud.com/go-to-gym-sportswear-as-a-service" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+            <img src="{% static 'images/soundcloud.png' %}" alt="SoundCloud" class="h-6 w-6">
+          </a>
+          <a href="https://www.tiktok.com/@gotogym.sportwear" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+            <img src="{% static 'images/tiktok.png' %}" alt="TikTok" class="h-6 w-6">
+          </a>
+          <a href="https://github.com/gotogymsaas" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
+            <img src="{% static 'images/github.png' %}" alt="GitHub" class="h-6 w-6">
+          </a>
+        </div>
+      </div>
+      <p class="text-sm text-white/60">
+        © {% trans "2025 GoToGym. Todos los derechos reservados." %}
+      </p>
     </div>
-</nav>
-
-
-<script>
-function toggleMobileMenu () {
-  const menu = document.getElementById('mobile-menu');
-  menu.classList.toggle('hidden');
-}
-</script>
-
-
-
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
-<main class="mx-auto">
-  {% block content %}{% endblock %}
-</main>
-
-
-<footer class="bg-black py-12 text-white mt-10">
-  <div class="container mx-auto text-center px-4">
-
-    <div class="flex flex-wrap justify-center space-x-8 mb-6 text-sm">
-      <a href="/acerca-de" class="hover:text-[#D4B46A] transition">{% trans "Acerca de" %}</a>
-      <a href="/contacto" class="hover:text-[#D4B46A] transition">{% trans "Contacto" %}</a>
-      <a href="/politica-privacidad" class="hover:text-[#D4B46A] transition">{% trans "Privacidad" %}</a>
-      <a href="/terminos" class="hover:text-[#D4B46A] transition">{% trans "Términos" %}</a>
-    </div>
-    <p class="mb-4 text-sm text-white/70">{% trans "Únete a nuestra comunidad y descubre la revolución del bienestar." %}</p>
-
-
-<div class="mb-6">
-  <p class="text-sm text-white/90">{% trans "Síguenos en redes sociales:" %}</p>
-  <div class="flex flex-wrap justify-center gap-4 mt-4">
-    <a href="https://www.facebook.com/Gotogym.Sportwear" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-      <img src="{% static 'images/facebook.png' %}" alt="Facebook" class="h-6 w-6">
-    </a>
-    <a href="https://twitter.com/GOTOGYM6" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-      <img src="{% static 'images/twitter.png' %}" alt="Twitter" class="h-6 w-6">
-    </a>
-    <a href="https://www.instagram.com/gotogym.sportwear" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-      <img src="{% static 'images/instagram.png' %}" alt="Instagram" class="h-6 w-6">
-    </a>
-    <a href="https://co.pinterest.com/gotogym_/" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-      <img src="{% static 'images/pinterest.png' %}" alt="Pinterest" class="h-6 w-6">
-    </a>
-    <a href="https://www.linkedin.com/company/33262154/" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-      <img src="{% static 'images/linkedin.png' %}" alt="LinkedIn" class="h-6 w-6">
-    </a>
-    <a href="https://www.youtube.com/channel/UCXRp8PgcE7L75jEewIixeXg" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-      <img src="{% static 'images/youtube.png' %}" alt="YouTube" class="h-6 w-6">
-    </a>
-    <a href="https://soundcloud.com/go-to-gym-sportswear-as-a-service" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-      <img src="{% static 'images/soundcloud.png' %}" alt="SoundCloud" class="h-6 w-6">
-    </a>
-
-    <a href="https://www.tiktok.com/@gotogym.sportwear" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-      <img src="{% static 'images/tiktok.png' %}" alt="TikTok" class="h-6 w-6">
-    </a>
-    <a href="https://github.com/gotogymsaas" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-      <img src="{% static 'images/github.png' %}" alt="GitHub" class="h-6 w-6">
-    </a>
-  </div>
-</div>
-
-
-    <p class="text-sm text-white/60">
-      © {% trans "2025 GoToGym. Todos los derechos reservados." %}
-    </p>
-  </div>
-</footer>
-
+  </footer>
   <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
   <script>
     AOS.init({ duration: 1200, once: true });
     function toggleMobileMenu() {
       document.getElementById('mobile-menu').classList.toggle('hidden');
     }
-  </script>
-  {% block extra_head %}
-<script>
-
-document.addEventListener("DOMContentLoaded", () => {
-  const checkAll   = document.getElementById("checkAll");
-  const itemChks   = document.querySelectorAll(".itemChk");
-  const selTotal   = document.getElementById("selTotal");
-  const grandTotal = document.getElementById("grandTotal");
-
-  const fmt = (n) => new Intl.NumberFormat().format(n);
-
-  function calc() {
-    let total = 0;
-    itemChks.forEach(chk => {
-      if (chk.checked) {
-        const card      = chk.closest("article");
-        const subtotal  = parseFloat(card.dataset.subtotal);
-        total          += subtotal;
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+      updateDarkSlider();
+    }
+    function updateDarkSlider() {
+      const slider = document.getElementById('darkSlider');
+      const icon = document.getElementById('sliderIcon');
+      if(document.body.classList.contains('dark-mode')) {
+        slider.style.left = '32px';
+        icon.innerHTML = `<svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-gray-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z' /></svg>`;
+      } else {
+        slider.style.left = '4px';
+        icon.innerHTML = `<svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-yellow-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'><circle cx='12' cy='12' r='5' fill='currentColor' /></svg>`;
       }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+      }
+      updateDarkSlider();
     });
-    selTotal.textContent   = "$ " + fmt(total);
-    grandTotal.textContent = "$ " + fmt(total);   
-  }
-
-
-  checkAll.addEventListener("change", e => {
-    itemChks.forEach(c => c.checked = e.target.checked);
-    calc();
-  });
-
-
-  itemChks.forEach(chk => chk.addEventListener("change", () => {
-    if (!chk.checked) checkAll.checked = false;
-    else if ([...itemChks].every(c => c.checked)) checkAll.checked = true;
-    calc();
-  }));
-});
-</script>
-<<<<<<< HEAD
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const toggleBtn = document.getElementById("darkModeToggle");
-  const html = document.documentElement;
-  const sunIcon = document.getElementById("sunIcon");
-  const moonIcon = document.getElementById("moonIcon");
-
-  // Estado inicial desde localStorage
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "dark") {
-    html.classList.add("dark");
-    sunIcon.classList.add("hidden");
-    moonIcon.classList.remove("hidden");
-  }
-
-  toggleBtn.addEventListener("click", function () {
-    html.classList.toggle("dark");
-    const isDark = html.classList.contains("dark");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-
-    sunIcon.classList.toggle("hidden", isDark);
-    moonIcon.classList.toggle("hidden", !isDark);
-  });
-});
-</script>
-
-{% endblock %}
-
-
-=======
-{% endblock %}
-
-  
->>>>>>> 0e6e1bad419e6ab057c6fb7929bf260f07e3bd01
+    function toggleLangDropdown() {
+      const dropdown = document.getElementById('langDropdown');
+      const btn = document.getElementById('langAbbrBtn');
+      if (dropdown.classList.contains('hidden')) {
+        dropdown.classList.remove('hidden');
+        // Solo añadir el listener una vez
+        function handler(e) {
+          if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+            dropdown.classList.add('hidden');
+            document.removeEventListener('click', handler);
+          }
+        }
+        setTimeout(() => {
+          document.addEventListener('click', handler);
+        }, 0);
+      } else {
+        dropdown.classList.add('hidden');
+      }
+    }
+    function toggleUserMenu() {
+      const dropdown = document.getElementById('userDropdown');
+      const btn = document.getElementById('userMenuBtn');
+      if (dropdown.classList.contains('hidden')) {
+        dropdown.classList.remove('hidden');
+        function handler(e) {
+          if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+            dropdown.classList.add('hidden');
+            document.removeEventListener('click', handler);
+          }
+        }
+        setTimeout(() => {
+          document.addEventListener('click', handler);
+        }, 0);
+      } else {
+        dropdown.classList.add('hidden');
+      }
+    }
+    function closeUserMenu() {
+      document.getElementById('userDropdown').classList.add('hidden');
+    }
+  </script>
+  {% block extra_head %}{% endblock %}
 </body>
 </html>
-
-
-
-
-
