@@ -1,0 +1,46 @@
+{% extends '_base_dasboard.html' %}
+{% block title %}Clientes Alegra{% endblock %}
+{% load custom_filters %}
+{% block content %}
+<div class="max-w-5xl mx-auto mt-10 p-8 bg-white/90 dark:bg-[#232526] rounded-3xl shadow-2xl">
+  <h2 class="text-3xl font-extrabold text-[#C5A46B] dark:text-[#ffe6a0] mb-6 tracking-tight drop-shadow">Clientes de Alegra</h2>
+  <form method="get" class="mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+    <input type="text" name="filtro" value="{{ filtro }}" placeholder="Buscar por nombre o email..." class="w-full md:w-1/2 px-4 py-2 rounded-lg border-2 border-[#C5A46B]/40 bg-white dark:bg-[#232526] text-[#101820] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#C5A46B] text-lg" />
+    <button type="submit" class="rounded-lg bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold py-2 px-6 shadow hover:from-[#e7c98a] hover:to-[#C5A46B] hover:text-[#101820] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2 text-lg">Filtrar</button>
+  </form>
+  {% if error %}
+    <div class="bg-red-100 text-red-700 p-4 rounded mb-4">{{ error }}</div>
+  {% endif %}
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-[#C5A46B]/30">
+      <thead>
+        <tr class="bg-[#C5A46B]/10">
+          <th class="px-4 py-2 text-left">Nombre</th>
+          <th class="px-4 py-2 text-left">Email</th>
+          <th class="px-4 py-2 text-left">Teléfono</th>
+          <th class="px-4 py-2 text-left">Tipo</th>
+          <th class="px-4 py-2 text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cliente in clientes %}
+        <tr class="border-b border-[#C5A46B]/10 hover:bg-[#C5A46B]/5">
+          <td class="px-4 py-2">{{ cliente.name }}</td>
+          <td class="px-4 py-2">{{ cliente.email }}</td>
+          <td class="px-4 py-2">{{ cliente.phonePrimary }}</td>
+          <td class="px-4 py-2">{{ cliente.type|default:'-' }}</td>
+          <td class="px-4 py-2 text-center">
+            <a href="{% url 'contabilidad:facturas_cliente' cliente.id %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold shadow hover:from-[#e7c98a] hover:to-[#C5A46B] hover:text-[#101820] transition-all duration-200">
+              <span class="material-icons-outlined text-lg align-middle">receipt_long</span>
+              <span class="hidden md:inline">Ver facturas</span>
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center py-6 text-gray-400">No hay clientes para mostrar.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

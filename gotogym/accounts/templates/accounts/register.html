@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% block content %}
+<div class="max-w-3xl mx-auto mt-10 bg-white p-0 rounded-2xl shadow-xl border border-[#e7c98a] flex flex-col md:flex-row overflow-hidden">
+  <div class="md:w-1/2 flex flex-col items-center justify-center bg-gradient-to-b from-[#e7c98a]/40 to-white p-8">
+    <img src="{% static 'images/Logo GoToGym 2.png' %}" alt="GoToGym Logo" class="w-40 h-40 object-contain mb-4">
+    <h2 class="text-3xl font-extrabold mb-2 text-center text-[#093f62] tracking-tight">{% trans "Crear cuenta" %}</h2>
+    <p class="text-gray-500 text-center mb-2">¡Únete a la comunidad GoToGym!</p>
+  </div>
+  <div class="md:w-1/2 p-8">
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="first_name" class="block text-sm font-semibold text-[#093f62] mb-1">Nombre</label>
+          <input type="text" name="first_name" id="first_name" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#C5A46B]" required>
+        </div>
+        <div>
+          <label for="last_name" class="block text-sm font-semibold text-[#093f62] mb-1">Apellido</label>
+          <input type="text" name="last_name" id="last_name" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#C5A46B]" required>
+        </div>
+        <div>
+          <label for="age" class="block text-sm font-semibold text-[#093f62] mb-1">Edad</label>
+          <input type="number" name="age" id="age" min="10" max="120" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#C5A46B]" required>
+        </div>
+        <div>
+          <label for="email" class="block text-sm font-semibold text-[#093f62] mb-1">Correo electrónico</label>
+          <input type="email" name="email" id="email" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#C5A46B]" required>
+        </div>
+        <div>
+          <label for="password1" class="block text-sm font-semibold text-[#093f62] mb-1">Contraseña</label>
+          <input type="password" name="password1" id="password1" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#C5A46B]" required>
+        </div>
+        <div>
+          <label for="password2" class="block text-sm font-semibold text-[#093f62] mb-1">Confirmar contraseña</label>
+          <input type="password" name="password2" id="password2" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#C5A46B]" required>
+        </div>
+      </div>
+      <div class="flex items-center mb-2 mt-2">
+        <input type="checkbox" name="accepted_terms" id="accepted_terms" required class="mr-2 accent-[#C5A46B]">
+        <label for="accepted_terms" class="text-sm">Acepto los <button type="button" id="show-terms" class="text-[#C5A46B] underline hover:text-[#093f62] focus:outline-none">términos y condiciones</button></label>
+      </div>
+      <button type="submit" class="w-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold py-2 rounded-lg shadow hover:from-[#e7c98a] hover:to-[#C5A46B] transition-all">{% trans "Registrarse" %}</button>
+    </form>
+    <p class="mt-4 text-sm text-gray-600 text-center">{% trans "¿Ya tienes cuenta?" %} <a href="{% url 'login' %}" class="text-[#C5A46B] hover:underline">{% trans "Inicia sesión" %}</a></p>
+  </div>
+</div>
+
+<!-- Modal de Términos y Condiciones -->
+<div id="terms-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
+  <div class="bg-white max-w-2xl w-full rounded-2xl shadow-2xl p-8 relative border-2 border-[#C5A46B] overflow-y-auto max-h-[80vh]">
+    <button id="close-terms" class="absolute top-4 right-4 text-[#C5A46B] hover:text-[#093f62] text-2xl font-bold">&times;</button>
+    <h3 class="text-2xl font-bold mb-4 text-[#093f62]">Términos y Condiciones de GoToGym para Usuarios (Clientes)</h3>
+    <div class="prose prose-sm max-w-none text-justify text-gray-700" style="font-size:0.98rem">
+      {% include 'accounts/terms_and_conditions.html' %}
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('show-terms').addEventListener('click', function() {
+  document.getElementById('terms-modal').classList.remove('hidden');
+});
+document.getElementById('close-terms').addEventListener('click', function() {
+  document.getElementById('terms-modal').classList.add('hidden');
+});
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') document.getElementById('terms-modal').classList.add('hidden');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "_base_dasboard.html" %}
+{% load static %}
+{% load i18n %}
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <h1 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">
+        ¡Bienvenido, {{ request.user.get_full_name|default:request.user.username }}!
+    </h1>
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+        <form method="get" class="flex flex-wrap gap-2 items-center w-full">
+            <input type="text" name="q" placeholder="Buscar publicaciones..." value="{{ request.GET.q }}" class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 dark:border-gray-600 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"/>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">
+                Filtrar
+            </button>
+            <a href="/dashboard/" class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded transition">
+                Limpiar
+            </a>
+        </form>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col items-center">
+            <span class="material-icons-outlined text-blue-600 text-4xl mb-2">article</span>
+            <div class="text-2xl font-bold">{{ posts.count }}</div>
+            <div class="text-gray-500">Total de Publicaciones</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col items-center">
+            <span class="material-icons-outlined text-green-600 text-4xl mb-2">group</span>
+            <div class="text-2xl font-bold">{{ users_count }}</div>
+            <div class="text-gray-500">Usuarios Registrados</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col items-center">
+            <span class="material-icons-outlined text-yellow-600 text-4xl mb-2">visibility</span>
+            <div class="text-2xl font-bold">{{ visitas|default:0 }}</div>
+            <div class="text-gray-500">Visitas al Blog</div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6 mb-10">
+        <h2 class="text-xl font-semibold mb-4">Actividad de Publicaciones</h2>
+        <canvas id="postsChart" height="100"></canvas>
+    </div>
+
+    <div class="overflow-x-auto shadow-lg rounded-lg">
+        <table class="w-full table-auto bg-white dark:bg-gray-800 text-sm text-left text-gray-800 dark:text-gray-200">
+            <thead class="bg-blue-600 text-white dark:bg-blue-700">
+                <tr>
+                    <th class="px-6 py-3 w-10 text-left">#</th>
+                    <th class="px-6 py-3 w-1/4 text-left">Título</th>
+                    <th class="px-6 py-3 w-1/2 text-left">Contenido</th>
+                    <th class="px-6 py-3 w-1/4 text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in posts %}
+                <tr class="border-b hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    <td class="px-6 py-4">{{ forloop.counter }}</td>
+                    <td class="px-6 py-4 max-w-xs truncate" title="{{ post.title }}">{{ post.title }}</td>
+                    <td class="px-6 py-4 max-w-md truncate" title="{{ post.content }}">{{ post.content|truncatewords:15 }}</td>
+                    <td class="px-6 py-4 text-center flex justify-center gap-3">
+                        <a href="#" class="group relative p-2 rounded-full border transition duration-300 text-yellow-500 border-yellow-500 hover:bg-yellow-500 hover:text-white">
+                            <span class="material-icons-outlined">edit</span>
+                        </a>
+                        <a href="#" class="group relative p-2 rounded-full border transition duration-300 text-red-600 border-red-600 hover:bg-red-600 hover:text-white">
+                            <span class="material-icons-outlined">delete</span>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('postsChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: {{ chart_labels|safe }},
+        datasets: [{
+          label: 'Publicaciones',
+          data: {{ chart_data|safe }},
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37,99,235,0.1)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

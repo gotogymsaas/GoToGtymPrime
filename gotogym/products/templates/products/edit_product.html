@@ -1,0 +1,186 @@
+{% extends '_base_dasboard.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="mx-auto bg-white/95 p-8 rounded-3xl shadow-2xl border border-gray-200 backdrop-blur-lg">
+  <h2 class="text-4xl font-extrabold mb-1 text-[#093f62] flex items-center gap-3 drop-shadow-sm">
+    <span class="material-icons-outlined text-5xl text-[#C5A46B]">edit</span>
+    Editar Producto
+  </h2>
+  <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-3 gap-10">
+    {% csrf_token %}
+    <!-- Columna 1 -->
+    <div class="space-y-7 md:col-span-1">
+      <div>
+        <label for="{{ form.name.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">Nombre<span class="text-red-500">*</span></label>
+        {% render_field form.name class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition placeholder-gray-400 text-gray-800" %}
+        {% for error in form.name.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+      <div>
+        <label for="{{ form.category.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">Categoria<span class="text-red-500">*</span></label>
+        <div class="relative">
+          {% render_field form.category class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800 appearance-none pr-10" %}
+          <span class="pointer-events-none absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 material-icons-outlined">expand_more</span>
+        </div>
+        {% for error in form.category.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+      <div>
+        <label for="{{ form.stock.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">Stock<span class="text-red-500">*</span></label>
+        {% render_field form.stock class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800" %}
+        {% for error in form.stock.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="flex gap-4 items-end">
+        <div class="w-1/2 flex items-center">
+          <label for="{{ form.featured.id_for_label }}" class="flex items-center gap-3 cursor-pointer select-none whitespace-nowrap">
+            <span class="relative">
+              {% render_field form.featured class="sr-only peer" %}
+              <span class="w-11 h-6 bg-gray-200 rounded-full shadow-inner peer-checked:bg-[#C5A46B] transition-colors block"></span>
+              <span class="absolute left-0 top-0 w-6 h-6 bg-white border border-gray-300 rounded-full shadow peer-checked:translate-x-5 transition-transform"></span>
+            </span>
+            <span class="text-base font-semibold text-gray-700 whitespace-nowrap">Destacar Producto</span>
+          </label>
+          {% for error in form.featured.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+    </div>
+    <!-- Columna 2 -->
+    <div class="space-y-7 md:col-span-1">
+      <div>
+        <label for="{{ form.brand.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">Marca</label>
+        <div class="relative">
+          {% render_field form.brand class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800 appearance-none pr-10" %}
+          <span class="pointer-events-none absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 material-icons-outlined">expand_more</span>
+        </div>
+        {% for error in form.brand.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+      <div>
+        <label for="{{ form.description.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">Descripción</label>
+        {% render_field form.description class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800 min-h-[222px] max-h-[120px] resize-none align-bottom" %}
+        {% for error in form.description.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+    </div>
+    <!-- Columna 3 -->
+    <div class="space-y-7 md:col-span-1">
+      <div class="flex gap-4">
+        <div class="w-1/2">
+          <label for="{{ form.discount.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">Descuento</label>
+          {% render_field form.discount class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800" %}
+          {% for error in form.discount.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="w-1/2">
+          <label for="{{ form.price.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">Precio<span class="text-red-500">*</span></label>
+          {% render_field form.price type="text" class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46L] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800" %}
+          {% for error in form.price.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+      <div class="relative flex flex-col items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-xl h-[250px] overflow-hidden shadow-inner cursor-pointer group transition-all">
+        <img id="preview-img" src="{% if product.image %}{{ product.image.url }}{% endif %}" class="h-[260px] w-64 object-contain mx-auto rounded-xl shadow {% if not product.image %}hidden{% endif %}"/>
+        <button type="button" id="removeImageBtn" class="absolute top-2 right-2 bg-white/80 hover:bg-red-100 text-red-500 rounded-full p-1 shadow transition z-20 {% if not product.image %}hidden{% endif %}" title="Eliminar imagen">
+          <span class="material-icons-outlined text-lg">close</span>
+        </button>
+        <span id="placeholder-icon" class="text-gray-400 material-icons-outlined text-7xl group-hover:text-[#C5A46B] transition {% if product.image %}hidden{% endif %}">image</span>
+        <span id="placeholder-text" class="text-gray-500 mt-4 text-base group-hover:text-[#C5A46B] transition px-2 text-center {% if product.image %}hidden{% endif %}">Haz clic aquí para subir una imagen</span>
+        <input type="file" id="image-upload-input" name="image" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10" />
+      </div>
+      <input type="hidden" name="image-clear" id="image-clear-flag" value="">
+      {% for error in form.image.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+    </div>
+    <div class="md:col-span-3 flex justify-end gap-3 pt-4">
+      <a href="{% url 'products:list_product' %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
+        <span class="material-icons-outlined">arrow_back</span> Cancelar
+      </a>
+      <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#093f62] text-white font-semibold shadow-md hover:bg-[#C5A46B] hover:text-[#093f62] transition">
+        <span class="material-icons-outlined">save</span> Guardar
+      </button>
+    </div>
+  </form>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const previewImg = document.getElementById('preview-img');
+  const imageInput = document.getElementById('image-upload-input');
+  const removeBtn = document.getElementById('removeImageBtn');
+  const clearFlag = document.getElementById('image-clear-flag');
+  const placeholderIcon = document.getElementById('placeholder-icon');
+  const placeholderText = document.getElementById('placeholder-text');
+  const deleteImageUrl = "{% url 'products:delete_product_image' product.pk %}";
+
+  imageInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        previewImg.src = evt.target.result;
+        previewImg.classList.remove('hidden');
+        removeBtn.classList.remove('hidden');
+        placeholderIcon.classList.add('hidden');
+        placeholderText.classList.add('hidden');
+        clearFlag.value = '';
+      };
+      reader.readAsDataURL(file);
+    } else {
+      previewImg.src = '';
+      previewImg.classList.add('hidden');
+      removeBtn.classList.add('hidden');
+      placeholderIcon.classList.remove('hidden');
+      placeholderText.classList.remove('hidden');
+    }
+  });
+
+  removeBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    fetch(deleteImageUrl, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      }
+    }).then(res => res.json()).then(data => {
+      if (data.success) {
+        previewImg.src = '';
+        previewImg.classList.add('hidden');
+        removeBtn.classList.add('hidden');
+        placeholderIcon.classList.remove('hidden');
+        placeholderText.classList.remove('hidden');
+        clearFlag.value = '1';
+        imageInput.value = '';
+        showMessage('Imagen eliminada correctamente.', 'success');
+      } else {
+        showMessage('Error al eliminar la imagen.', 'error');
+      }
+    }).catch(() => {
+      showMessage('Error de red al eliminar la imagen.', 'error');
+    });
+  });
+
+  function showMessage(msg, type) {
+    let msgDiv = document.getElementById('image-msg');
+    if (!msgDiv) {
+      msgDiv = document.createElement('div');
+      msgDiv.id = 'image-msg';
+      msgDiv.className = 'mt-2 text-sm';
+      previewImg.parentNode.parentNode.appendChild(msgDiv);
+    }
+    msgDiv.textContent = msg;
+    msgDiv.className = 'mt-2 text-sm ' + (type === 'success' ? 'text-green-600' : 'text-red-600');
+    setTimeout(() => { msgDiv.textContent = ''; }, 3000);
+  }
+
+  // Formatear el campo de precio con separador de miles y mantener el cursor
+  const priceInput = document.getElementById('{{ form.price.id_for_label }}');
+  if (priceInput) {
+    priceInput.setAttribute('inputmode', 'numeric');
+    priceInput.addEventListener('input', function(e) {
+      const selectionStart = priceInput.selectionStart;
+      const oldLength = priceInput.value.length;
+      let value = priceInput.value.replace(/\D/g, '');
+      if (value) {
+        value = parseInt(value, 10).toLocaleString('es-CO');
+      }
+      priceInput.value = value;
+      // Ajustar la posición del cursor
+      const newLength = value.length;
+      priceInput.setSelectionRange(newLength, newLength);
+    });
+  }
+});
+</script>
+{% endblock %}
