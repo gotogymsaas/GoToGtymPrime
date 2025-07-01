@@ -1,0 +1,31 @@
+{% extends '_base_dasboard.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="max-w-xl mx-auto mt-14 bg-white/90 p-10 rounded-3xl shadow-2xl border border-gray-200 backdrop-blur-lg">
+  <h2 class="text-3xl font-extrabold mb-8 text-indigo-800 flex items-center gap-3">
+    <span class="material-icons-outlined text-4xl text-indigo-400">edit</span>
+    Editar Categoría
+  </h2>
+  <form method="post" class="space-y-6">
+    {% csrf_token %}
+    <div>
+      <label for="id_name" class="block text-sm font-semibold text-gray-700 mb-1">Nombre<span class="text-red-500">*</span></label>
+      {{ form.name|add_class:'w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 bg-white shadow-sm transition placeholder-gray-400 text-gray-800' }}
+      {% for error in form.name.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+    </div>
+    <div>
+      <label for="id_description" class="block text-sm font-semibold text-gray-700 mb-1">Descripción</label>
+      {{ form.description|add_class:'w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 bg-white shadow-sm transition text-gray-800 min-h-[80px] max-h-[120px] resize-none' }}
+      {% for error in form.description.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+    </div>
+    <div class="flex justify-end pt-4">
+      <a href="{% url 'products:list_category' %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
+        <span class="material-icons-outlined">arrow_back</span> Cancelar
+      </a>
+      <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-indigo-600 text-white font-semibold shadow-md hover:bg-indigo-700 transition ml-3">
+        <span class="material-icons-outlined">save</span> Guardar
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

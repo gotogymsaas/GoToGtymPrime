@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-7xl mx-auto mt-10 bg-gradient-to-br from-[#fffbe6] via-[#f3e9d2] to-[#f8f6f0] p-12 rounded-3xl shadow-2xl border-2 border-[#e7c98a]">
+  <h2 class="text-4xl font-extrabold mb-6 text-[#093f62] text-center">Panel de Influencer</h2>
+  <div class="flex flex-col items-center justify-center mb-10">
+    <div class="flex flex-row items-center gap-4 bg-gradient-to-r from-[#C5A46B]/90 to-[#e7c98a]/90 rounded-2xl px-8 py-5 shadow-lg border border-[#C5A46B]">
+      <span class="text-xs text-[#093f62] uppercase tracking-widest font-bold mr-4">Tu código de referido</span>
+      <span class="text-2xl md:text-3xl font-mono font-extrabold text-[#093f62] bg-[#fffbe6] px-6 py-3 rounded-xl border-2 border-[#C5A46B] shadow-inner tracking-widest select-all break-all text-center" style="letter-spacing:2px;">{{ profile.referral_code }}</span>
+      <button onclick="navigator.clipboard.writeText('{{ profile.referral_code }}');this.innerText='¡Copiado!';setTimeout(()=>this.innerText='Copiar',1500);" class="ml-4 bg-[#C5A46B] text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-[#e7c98a] hover:text-[#093f62] transition-all">Copiar</button>
+    </div>
+    <div class="text-xs text-gray-600 mt-2">Comparte este código para ganar comisiones</div>
+  </div>
+  <div class="flex flex-col md:flex-row gap-12">
+    <aside class="md:w-1/4 mb-6 md:mb-0">
+      <nav class="flex flex-col gap-2">
+        <a href="{% url 'influencer_dashboard' %}" class="block py-2 px-4 rounded-lg hover:bg-[#C5A46B]/20 font-semibold text-[#093f62]">Resumen</a>
+        <a href="{% url 'influencer_compras_referidas' %}" class="block py-2 px-4 rounded-lg hover:bg-[#C5A46B]/20 font-semibold text-[#093f62]">Compras referidas</a>
+        <form method="post" action="{% url 'influencer_solicitar_retiro' %}">{% csrf_token %}
+          <button type="submit" class="w-full py-2 px-4 rounded-lg bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold shadow hover:from-[#e7c98a] hover:to-[#C5A46B] transition-all mt-2">Solicitar retiro</button>
+        </form>
+        <form method="post" action="{% url 'influencer_quitar_suscripcion' %}">{% csrf_token %}
+          <button type="submit" class="w-full py-2 px-4 rounded-lg bg-red-100 text-red-700 font-bold shadow hover:bg-red-200 transition-all mt-2">Quitar suscripción</button>
+        </form>
+      </nav>
+    </aside>
+    <main class="md:w-3/4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
+        <div class="bg-white rounded-2xl p-8 text-center shadow border border-[#e7c98a]">
+          <div class="text-lg font-semibold text-[#093f62] mb-2">Personas referidas</div>
+          <div class="text-4xl font-bold text-[#C5A46B]">{{ profile.total_referred }}</div>
+        </div>
+        <div class="bg-white rounded-2xl p-8 text-center shadow border border-[#e7c98a]">
+          <div class="text-lg font-semibold text-[#093f62] mb-2">Ventas generadas</div>
+          <div class="text-4xl font-bold text-[#C5A46B]">${{ profile.total_sales }}</div>
+        </div>
+        <div class="bg-white rounded-2xl p-8 text-center shadow border border-[#e7c98a]">
+          <div class="text-lg font-semibold text-[#093f62] mb-2">Comisión disponible</div>
+          <div class="text-4xl font-bold text-[#C5A46B]">${{ profile.commission_balance }}</div>
+        </div>
+      </div>
+      <div class="bg-white border rounded-2xl p-10 shadow text-center">
+        <h3 class="text-2xl font-bold mb-2 text-[#093f62]">¡Comparte tu código y gana comisiones!</h3>
+        <p class="text-gray-700 text-lg">Comparte tu código de referido con tus amigos y seguidores. Cada compra que realicen usando tu código te sumará comisiones y beneficios exclusivos.</p>
+      </div>
+    </main>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Shopping Cart{% endblock %}
+{% block content %}
+<div class="container mx-auto py-8 px-2 sm:px-4">
+  <div class="flex flex-col lg:flex-row gap-8">
+    <div class="w-full lg:w-2/3">
+      <h2 class="text-2xl font-bold mb-4">Shopping Cart <span class="text-base font-normal text-gray-500">{{ num_items }} items</span></h2>
+      <div class="bg-white rounded-xl shadow p-4">
+        {% for item in items %}
+        <div class="flex flex-col sm:flex-row items-center justify-between border-b py-4 last:border-b-0 gap-4">
+          <div class="flex items-center gap-4 w-full sm:w-auto">
+            <img src="{{ item.producto.image.url }}" alt="{{ item.producto.name }}" class="w-16 h-16 object-contain rounded"/>
+            <div>
+              <div class="font-semibold">{{ item.producto.name }}</div>
+              <div class="text-gray-500 text-sm">{{ item.producto.description|truncatechars:30 }}</div>
+            </div>
+          </div>
+          <form method="post" action="{% url 'carrito:update_cart' item.producto.id %}" class="flex items-center gap-2">
+            {% csrf_token %}
+            <button type="submit" name="cantidad" value="{{ item.cantidad|add:'-1' }}" class="px-2 py-1 border rounded">-</button>
+            <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" class="w-12 text-center border rounded"/>
+            <button type="submit" name="cantidad" value="{{ item.cantidad|add:'1' }}" class="px-2 py-1 border rounded">+</button>
+          </form>
+          <div class="font-semibold">€ {{ item.subtotal|floatformat:2 }}</div>
+          <a href="{% url 'carrito:remove_from_cart' item.producto.id %}" class="text-gray-400 hover:text-red-500 text-xl">&times;</a>
+        </div>
+        {% empty %}
+        <div class="text-center text-gray-500 py-8">El carrito está vacío.</div>
+        {% endfor %}
+      </div>
+      <a href="/tienda/" class="mt-4 inline-block text-gray-600 hover:underline">&larr; Back to shop</a>
+    </div>
+    <div class="w-full lg:w-1/3">
+      <div class="bg-gray-100 rounded-xl p-6">
+        <h3 class="font-bold text-lg mb-4">Summary</h3>
+        <div class="flex justify-between mb-2">
+          <span>ITEMS {{ num_items }}</span>
+          <span>€ {{ total|floatformat:2 }}</span>
+        </div>
+        <div class="mb-2">
+          <span class="block mb-1">SHIPPING</span>
+          <select class="w-full border rounded px-2 py-1">
+            <option>Standard Delivery - € {{ shipping|floatformat:2 }}</option>
+          </select>
+        </div>
+        <div class="mb-2">
+          <span class="block mb-1">GIVE CODE</span>
+          <form class="flex">
+            <input type="text" class="flex-1 border rounded-l px-2 py-1" placeholder="Enter your code"/>
+            <button type="submit" class="bg-white border border-l-0 rounded-r px-3">→</button>
+          </form>
+        </div>
+        <div class="flex justify-between font-bold text-lg mt-4 mb-4">
+          <span>TOTAL PRICE</span>
+          <span>€ {{ total_price|floatformat:2 }}</span>
+        </div>
+        <form method="post" action="{% url 'carrito:checkout' %}">
+          {% csrf_token %}
+          <button type="submit" class="w-full bg-black text-white py-2 rounded font-bold mt-2">CHECKOUT</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

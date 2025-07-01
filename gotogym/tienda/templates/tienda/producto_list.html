@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}Tienda{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-8">
+
+  {#–––––––––––– Banner superior ––––––––––––#}
+  <div class="mb-8">
+    <img src="{% static 'images/BannerDestacados.png' %}"
+         alt="Productos Destacados"
+         class="w-full rounded-2xl shadow-xl object-cover max-h-[300px] md:max-h-[370px]" />
+  </div>
+
+  {#–––––––––––– Slider de productos destacados ––––––––––––#}
+  <div class="mb-10">
+    <h2 class="text-2xl font-bold text-[#093f62] mb-3">Productos Destacados</h2>
+
+    <div class="flex items-center justify-center gap-4">
+
+      {# Flecha izquierda #}
+      <button id="slider-prev"
+              class="bg-[#C5A46B] text-white rounded-full w-10 h-10 flex items-center justify-center shadow hover:bg-[#093f62] transition disabled:opacity-0 disabled:pointer-events-none">
+        <span class="material-icons-outlined">chevron_left</span>
+      </button>
+
+      {# Wrapper con overflow oculto #}
+      <div id="slider-wrapper" class="overflow-hidden">
+        <div id="featured-slider" class="flex gap-6 transition-all duration-300">
+          {% for producto in featured_products %}
+          <div class="featured-card min-w-[220px] max-w-[240px] bg-white rounded-xl shadow p-4 flex flex-col items-center">
+            <img src="{{ producto.image.url }}" alt="{{ producto.name }}" class="h-32 object-contain mb-2 rounded" />
+            <div class="font-semibold text-center text-[#093f62]">{{ producto.name }}</div>
+            <div class="text-[#C5A46B] font-bold text-lg mb-2">${{ producto.price|floatformat:0 }}</div>
+            <a href="{% url 'tienda:producto_detail' producto.id %}"
+               class="mt-auto inline-block px-4 py-1 rounded-full bg-[#C5A46B] text-white font-semibold text-sm hover:bg-[#093f62] hover:text-[#C5A46B] transition">
+              Ver detalles
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {# Flecha derecha #}
+      <button id="slider-next"
+              class="bg-[#C5A46B] text-white rounded-full w-10 h-10 flex items-center justify-center shadow hover:bg-[#093f62] transition disabled:opacity-0 disabled:pointer-events-none">
+        <span class="material-icons-outlined">chevron_right</span>
+      </button>
+
+    </div>
+  </div>
+
+  {#–––––––––––– Filtros horizontales ––––––––––––#}
+  <form method="get" id="horizontal-filter-form"
+        class="flex flex-wrap items-center justify-between gap-4 bg-white rounded-2xl shadow-lg px-8 py-5 mb-8 border border-[#e7c98a]">
+    <div class="flex items-center gap-2 flex-1 min-w-[250px] order-1">
+      <span class="material-icons-outlined text-[#C5A46B] text-2xl">search</span>
+      <input type="text" name="filtro" value="{{ filtro }}" placeholder="Buscar por nombre o precio..."
+             class="px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] bg-white/80 w-full"
+             id="search-input" autocomplete="off" />
+    </div>
+    <div class="flex items-center gap-2 min-w-[160px] order-2">
+      <span class="material-icons-outlined text-[#C5A46B] text-2xl">sort</span>
+      <select name="orden" id="orden-select"
+              class="px-3 py-2 rounded-xl border border-gray-300 bg-white/80 focus:ring-2 focus:ring-[#C5A46B] min-w-[140px]">
+        <option value="">Ordenar por</option>
+        <option value="precio_asc">Precio: Menor a mayor</option>
+        <option value="precio_desc">Precio: Mayor a menor</option>
+        <option value="nombre_asc">Nombre: A-Z</option>
+        <option value="nombre_desc">Nombre: Z-A</option>
+      </select>
+    </div>
+    <button type="submit"
+            class="hidden sm:inline-flex items-center gap-2 bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold py-2 px-6 rounded-xl shadow hover:from-[#e7c98a] hover:to-[#C5A46B] transition-all order-3">
+      <span class="material-icons-outlined">filter_alt</span> Filtrar
+    </button>
+  </form>
+
+  {#–––––––––––– Cuerpo principal – sidebar de filtros + productos ––––––––––––#}
+  <div class="flex flex-col md:flex-row gap-8">
+
+    {#----------- Sidebar filtros -----------#}
+    <aside class="w-full md:w-1/4 bg-white rounded-xl shadow p-6 mb-6 md:mb-0">
+      <form method="get" class="space-y-4" id="sidebar-filter-form">
+        {# Precio #}
+        <div>
+          <label class="font-bold">Precio</label>
+          <div class="flex gap-2 mt-1">
+            <input type="number" name="precio_min" placeholder="Min"
+                   class="w-1/2 px-2 py-1 border rounded">
+            <input type="number" name="precio_max" placeholder="Max"
+                   class="w-1/2 px-2 py-1 border rounded">
+          </div>
+        </div>
+
+        {# Categoría #}
+        <div>
+          <label class="font-bold">Categoría</label>
+          <select name="categoria" class="w-full px-2 py-1 border rounded">
+            <option value="">Todas</option>
+            {% for cat in categorias %}
+            <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        {# Rating #}
+        <div>
+          <label class="font-bold flex items-center gap-2">
+            <span class="material-icons-outlined text-[#C5A46B]">star</span>Rating
+          </label>
+          <div class="flex gap-1 mt-2 items-center" id="rating-filter">
+            {% for i in "12345" %}
+            <button type="button" class="star-rating-btn focus:outline-none" data-value="{{ i }}">
+              <span class="material-icons-outlined text-2xl star-icon
+                  {% if request.GET.rating and request.GET.rating|add:'0' >= i|add:'0' %}
+                       text-[#C5A46B]{% else %}text-gray-300{% endif %}">
+                star
+              </span>
+            </button>
+            {% endfor %}
+            <button type="button" class="star-rating-btn focus:outline-none ml-2" data-value="">
+              <span class="material-icons-outlined text-2xl star-icon
+                    {% if not request.GET.rating %}text-[#C5A46B]{% else %}text-gray-300{% endif %}">
+                star
+              </span>
+              <span class="ml-1 text-xs text-gray-500">Cualquier</span>
+            </button>
+            <input type="hidden" name="rating" id="rating-hidden-input"
+                   value="{{ request.GET.rating|default:'' }}">
+          </div>
+        </div>
+
+        
+        <div>
+          <label class="font-bold">Disponibilidad</label>
+          <select name="disponibilidad" class="w-full px-2 py-1 border rounded">
+            <option value="">Todas</option>
+            <option value="en_stock">En stock</option>
+            <option value="agotado">Agotado</option>
+          </select>
+        </div>
+
+        
+        <div>
+          <label class="font-bold">Marca</label>
+          <select name="marca" class="w-full px-2 py-1 border rounded">
+            <option value="">Todas</option>
+            {% for marca in marcas %}
+            <option value="{{ marca.id }}">{{ marca.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label class="font-bold">Descuento</label>
+          <select name="descuento" class="w-full px-2 py-1 border rounded">
+            <option value="">Todos</option>
+            <option value="10">10% o más</option>
+            <option value="20">20% o más</option>
+            <option value="30">30% o más</option>
+            <option value="50">50% o más</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <input type="checkbox" name="destacado" id="destacado" value="1" class="form-checkbox h-4 w-4 text-[#C5A46B] border-gray-300 rounded" {% if request.GET.destacado %}checked{% endif %}>
+          <label for="destacado" class="font-bold">Solo destacados</label>
+        </div>
+
+        <button type="submit"
+                class="w-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold py-2 rounded-lg shadow hover:from-[#e7c98a] hover:to-[#C5A46B] transition-all">
+          Filtrar
+        </button>
+      </form>
+    </aside>
+
+
+    <main class="flex-1">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for producto in productos %}
+        <div class="bg-white rounded-xl shadow hover:shadow-lg transition-all p-4 flex flex-col group relative">
+          <div class="relative mb-4">
+            {% if producto.image %}
+            <img src="{{ producto.image.url }}" alt="{{ producto.name }}" class="w-full h-40 object-contain rounded">
+            {% else %}
+            <div class="w-full h-40 bg-gray-100 flex items-center justify-center rounded text-gray-400">
+              Sin imagen
+            </div>
+            {% endif %}
+            <button 
+              class="absolute top-1/2 right-4 -translate-y-1/2 bg-[#C5A46B] text-white rounded-full p-3 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 focus:outline-none z-10 add-to-cart-btn"
+              data-product-id="{{ producto.id }}"
+              title="Añadir al carrito"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M7 18c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm10 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zM7.334 16h9.332c.828 0 1.554-.522 1.847-1.303l2.666-6.666A1 1 0 0 0 20.334 6H6.21l-.94-2.342A1 1 0 0 0 4.334 3H2.334v2h1.334l3.6 8.59-1.35 2.44C5.16 16.37 5.92 18 7.334 18zm0-2l1.1-2h7.132l1.1 2H7.334z"/>
+              </svg>
+            </button>
+          </div>
+          <h3 class="font-bold text-lg mb-1">{{ producto.name }}</h3>
+          <div class="text-[#C5A46B] font-bold text-xl mb-1">${{ producto.price }}</div>
+          <div class="mb-2 text-sm text-gray-500">Categoría: {{ producto.category.name }}</div>
+          <a href="{% url 'tienda:producto_detail' producto.id %}" class="mt-auto inline-block bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold py-2 px-4 rounded-lg shadow hover:from-[#e7c98a] hover:to-[#C5A46B] transition-all text-center">
+            Ver detalles
+          </a>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center text-gray-400 py-8">No hay productos para mostrar.</div>
+        {% endfor %}
+      </div>
+      <div class="flex justify-center mt-8">
+        <nav class="inline-flex rounded-md shadow">
+          {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 bg-white border border-gray-300 rounded-l hover:bg-[#C5A46B]/10">&laquo;</a>
+          {% else %}
+          <span class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-l text-gray-400">&laquo;</span>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+          <span class="px-3 py-2 bg-[#C5A46B] text-white font-bold">{{ num }}</span>
+          {% else %}
+          <a href="?page={{ num }}" class="px-3 py-2 bg-white border border-gray-300 hover:bg-[#C5A46B]/10">{{ num }}</a>
+          {% endif %}
+          {% endfor %}
+          {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 bg-white border border-gray-300 rounded-r hover:bg-[#C5A46B]/10">&raquo;</a>
+          {% else %}
+          <span class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-r text-gray-400">&raquo;</span>
+          {% endif %}
+        </nav>
+      </div>
+    </main>
+  </div>  
+
+</div> 
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const slider   = document.getElementById('featured-slider');
+  const wrapper  = document.getElementById('slider-wrapper');
+  const cards    = Array.from(slider.querySelectorAll('.featured-card'));
+  if (!cards.length) return;
+
+  const prevBtn  = document.getElementById('slider-prev');
+  const nextBtn  = document.getElementById('slider-next');
+  const gap      = parseInt(getComputedStyle(slider).gap) || 24;
+
+  let cardW, maxOffset, totalPages, current = 0;
+
+  const recalc = () => {
+    cardW      = cards[0].offsetWidth + gap;
+    maxOffset  = Math.max(0, slider.scrollWidth - wrapper.offsetWidth);
+    totalPages = maxOffset ? Math.floor(maxOffset / cardW) : 0;
+    prevBtn.disabled = nextBtn.disabled = !totalPages;
+    if (current > totalPages) current = 0;
+  };
+
+  const move = (animate = true) => {
+    const offset = Math.min(current * cardW, maxOffset);
+    slider.style.transition = animate ? 'transform .3s ease' : 'none';
+    slider.style.transform  = `translateX(-${offset}px)`;
+  };
+
+  const step = dir => {
+    if (!totalPages) return;
+    current = (current + dir + totalPages + 1) % (totalPages + 1);
+    move();
+  };
+
+  prevBtn.addEventListener('click', () => step(-1));
+  nextBtn.addEventListener('click', () => step(+1));
+
+  window.addEventListener('resize', () => {
+    recalc();
+    current = 0;
+    move(false);
+  });
+
+  let auto = setInterval(() => step(+1), 4000);
+  [slider, prevBtn, nextBtn].forEach(el => {
+    el.addEventListener('mouseenter', () => clearInterval(auto));
+    el.addEventListener('mouseleave', () => auto = setInterval(() => step(+1), 4000));
+  });
+
+  recalc();
+  move(false);
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const form  = document.getElementById('horizontal-filter-form');
+  const q     = document.getElementById('search-input');
+  const orden = document.getElementById('orden-select');
+  let t;
+  q.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => form.submit(), 400); });
+  orden.addEventListener('change', () => form.submit());
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const btns  = document.querySelectorAll('.star-rating-btn');
+  const input = document.getElementById('rating-hidden-input');
+  const form  = document.getElementById('sidebar-filter-form');
+  btns.forEach(b => b.addEventListener('click', e => {
+    e.preventDefault();
+    input.value = b.dataset.value;
+    form.submit();
+  }));
+});
+</script>
+<script src="{% static 'tienda/add_to_cart.js' %}"></script>
+{% endblock %}

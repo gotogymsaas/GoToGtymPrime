@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-[#C5A46B]/10 relative">
+  {% if show_logo %}
+  <div id="logo-fullscreen" class="fixed inset-0 z-50 flex items-center justify-center bg-white/90 dark:bg-[#232526] transition-opacity duration-700">
+    <img src="{% static 'images/Logo GoToGym 2.png' %}" alt="Logo GoToGym" class="w-64 h-64 md:w-96 md:h-96 object-contain animate-logo-big-in" />
+  </div>
+  {% endif %}
+  <div class="bg-white/90 dark:bg-[#232526] p-8 rounded-2xl shadow-2xl w-full max-w-md relative animate-fade-in-scale flex flex-col items-center">
+    <div id="logo-anim" class="relative flex justify-center items-center mb-2 opacity-0 pointer-events-none transition-all duration-500" style="top:0; left:0; transform:none;">
+      <img src="{% static 'images/Logo GoToGym 2.png' %}" alt="Logo GoToGym" class="mx-auto w-20 h-20 object-contain" />
+    </div>
+    <div id="login-form-wrapper" class="opacity-0 pointer-events-none transition-opacity duration-500 w-full">
+      <h2 class="text-3xl font-bold text-center text-indigo-700 dark:text-white mb-8 mt-6 tracking-tight drop-shadow">{% trans "Iniciar sesión" %}</h2>
+      {% if error_message %}
+        <div class="mb-4 text-center text-red-600 dark:text-red-400 font-semibold animate-pulse">{{ error_message }}</div>
+      {% endif %}
+      <form method="post" class="space-y-6">
+        {% csrf_token %}
+        <div class="space-y-4">
+          <label for="id_username" class="block text-sm font-medium text-gray-700 dark:text-gray-200">{% trans "Usuario o Email" %}</label>
+          <input type="text" name="username" id="id_username" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#232526] text-[#101820] dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-400" required autofocus>
+          <label for="id_password" class="block text-sm font-medium text-gray-700 dark:text-gray-200">{% trans "Contraseña" %}</label>
+          <input type="password" name="password" id="id_password" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#232526] text-[#101820] dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-400" required>
+        </div>
+        <div class="flex justify-end mt-2">
+          <a href="{% url 'password_reset_form' %}" class="text-sm text-indigo-600 dark:text-[#C5A46B] hover:underline">{% trans "¿Olvidaste tu contraseña?" %}</a>
+        </div>
+        <button
+          type="submit"
+          class="w-full rounded-lg bg-indigo-600 px-5 py-3 text-white font-semibold shadow-lg hover:bg-indigo-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200"
+        >
+          {% trans "Ingresar" %}
+        </button>
+      </form>
+      <p class="mt-8 text-center text-sm text-gray-500 dark:text-gray-300">
+        {% trans "¿No tienes una cuenta?" %}
+        <a href="{% url 'register' %}" class="text-indigo-600 dark:text-white hover:underline font-medium transition">{% trans "Regístrate" %}</a>
+      </p>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const showLogo = {{ show_logo|yesno:'true,false' }};
+  const logoFullscreen = document.getElementById('logo-fullscreen');
+  const logoAnim = document.getElementById('logo-anim');
+  const form = document.getElementById('login-form-wrapper');
+  if (showLogo && logoFullscreen) {
+    setTimeout(() => {
+      logoFullscreen.classList.add('opacity-0');
+      setTimeout(() => {
+        logoFullscreen.style.display = 'none';
+        logoAnim.classList.remove('opacity-0', 'pointer-events-none');
+        logoAnim.classList.add('opacity-100', 'animate-logo-small');
+        setTimeout(() => {
+          form.classList.remove('opacity-0', 'pointer-events-none');
+          form.classList.add('opacity-100');
+        }, 600);
+      }, 700);
+    }, 1200);
+  } else {
+    // Si no hay logo fullscreen, mostrar logo pequeño y formulario de inmediato
+    logoAnim.classList.remove('opacity-0', 'pointer-events-none');
+    logoAnim.classList.add('opacity-100');
+    form.classList.remove('opacity-0', 'pointer-events-none');
+    form.classList.add('opacity-100');
+  }
+});
+</script>
+<style>
+@keyframes fade-in-scale {
+  0% { opacity: 0; transform: scale(0.92) translateY(40px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-fade-in-scale {
+  animation: fade-in-scale 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+@keyframes logo-big-in {
+  0% { opacity: 0; transform: scale(0.3); }
+  60% { opacity: 1; transform: scale(1.3); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-logo-big-in {
+  animation: logo-big-in 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+}
+@keyframes logo-small {
+  0% { transform: scale(1); }
+  100% { transform: scale(0.8); }
+}
+.animate-logo-small {
+  animation: logo-small 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+#logo-fullscreen {
+  opacity: 1;
+  transition: opacity 0.7s;
+}
+</style>
+{% endblock %}
