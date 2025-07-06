@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ post.title }} | GoToGym{% endblock %}
+
+{% block content %}
+<section class="bg-white py-12">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    {% if post.featured %}
+    <div class="mb-6">
+      <img src="{{ post.featured.url }}" alt="{{ post.title }}" class="rounded-xl w-full h-80 object-cover shadow-md">
+    </div>
+    {% endif %}
+
+    <div class="text-center mb-10">
+      <p class="text-sm uppercase tracking-widest text-green-600 font-semibold mb-2">Blog de Bienestar</p>
+      <h1 class="text-4xl font-bold text-gray-800 leading-tight mb-4">{{ post.title }}</h1>
+      <p class="text-lg text-gray-600">{{ post.excerpt }}</p>
+    </div>
+
+    <article class="prose max-w-none lg:prose-lg prose-green prose-img:rounded-xl prose-headings:text-gray-800 mx-auto">
+      {{ post.content|linebreaks }}
+    </article>
+
+    <div class="mt-12 flex flex-col md:flex-row justify-between items-center border-t pt-6">
+      <div class="flex items-center space-x-4">
+        <img src="{% static 'images/avatar_default.webp' %}" alt="Autor" class="w-14 h-14 rounded-full object-cover shadow">
+        <div>
+          <p class="text-gray-800 font-semibold">{{ post.author.username }}</p>
+          <p class="text-sm text-gray-500">{{ post.published|date:"d M Y" }}</p>
+        </div>
+      </div>
+      <a href="{% url 'blog:post_list' %}" class="mt-6 md:mt-0 inline-flex items-center text-green-700 hover:underline text-sm">
+        ← Volver al blog
+      </a>
+    </div>
+
+    <div class="bg-gray-100 p-6 rounded-lg mt-12 shadow-md text-center">
+      <h3 class="text-lg font-semibold text-gray-800 mb-2">¿Te gustó el artículo?</h3>
+      <p class="text-sm text-gray-600 mb-4">Suscríbete para recibir más contenido sobre entrenamiento, salud y bienestar.</p>
+      <a href="#" class="inline-block bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition">
+        Suscribirme
+      </a>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

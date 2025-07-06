@@ -7,6 +7,10 @@
   <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
   <style>
     #influencer-modal { z-index: 9999; }
+    body {
+      {% if color %}--main-color: {{ color }};{% endif %}
+      {% if font %}font-family: {{ font }}, sans-serif;{% endif %}
+    }
   </style>
 {% endblock %}
 
@@ -25,7 +29,7 @@
   </div>
 </div>
 {% endif %}
-<section class="relative h-screen bg-cover bg-center flex items-center justify-center" style="background-image:url('{% static 'images/img/hero.webp' %}');">
+<section class="relative h-screen bg-cover bg-center flex items-center justify-center" style="background-image:url('{% if image %}{{ image }}{% else %}{% static 'images/img/hero.webp' %}{% endif %}');">
   <span class="absolute inset-0 bg-black/50"></span>
   <div class="relative z-10 text-center px-4" data-aos="fade-up">
     <h1 class="text-6xl md:text-7xl font-bold text-white dark:text-white drop-shadow-xl">{% trans "Innovación Cuántica y Bienestar Personalizado" %}</h1>
@@ -55,7 +59,7 @@
         <p class="mt-4 text-lg text-[#101820cc] dark:text-white">
           {% trans "Presentamos una colección que redefine la moda deportiva fusionando la alta costura con la más avanzada tecnología textil." %}
         </p>
-        {% comment %} <a href="{% url 'products:list_product' %}" class="mt-6 inline-block bg-[#C5A46B] text-white px-6 py-3 rounded-full hover:shadow-xl transition">
+        {% comment %} <a href="{% url 'products:list_product' %}" class="mt-6 inline-block bg-[#C5A46L] text-white px-6 py-3 rounded-full hover:shadow-xl transition">
           {% trans "Descubrir colección" %}
         </a> {% endcomment %}
       </div>

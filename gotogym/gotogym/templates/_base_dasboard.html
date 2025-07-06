@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
     <title>Dashboard Admin</title>
     {% load static %}
-   
 </head>
 
 <body class="bg-gray-100 font-sans" x-data="{ sidebarOpen: false }">
@@ -80,23 +79,33 @@
               <span x-show="sidebarOpen" class="ml-4">Editar Páginas Web</span>
             </a>
           </li>
-          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
-            <a href="{% url 'products:list_category' %}" class="flex items-center w-full text-white">
-              <span class="material-icons-outlined">category</span>
-              <span x-show="sidebarOpen" class="ml-4">Categorías</span>
-            </a>
-          </li>
-          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
-            <a href="{% url 'products:list_product' %}" class="flex items-center w-full text-white">
-              <span class="material-icons-outlined">inventory_2</span>
-              <span x-show="sidebarOpen" class="ml-4">Productos</span>
-            </a>
-          </li>
-          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
-            <a href="{% url 'products:brand_list' %}" class="flex items-center w-full text-white">
-              <span class="material-icons-outlined">branding_watermark</span>
-              <span x-show="sidebarOpen" class="ml-4">Marcas</span>
-            </a>
+          <li class="hover:bg-white/10" x-data="{ open: false }" @click.away="open = false">
+            <div class="flex items-center px-4 py-2">
+              <button @click="open = !open" class="flex items-center w-full text-white focus:outline-none">
+                <span class="material-icons-outlined">menu_book</span>
+                <span x-show="sidebarOpen" class="ml-4">Catálogo</span>
+                <span class="material-icons-outlined ml-auto" x-show="sidebarOpen">expand_more</span>
+              </button>
+            </div>
+            <template x-if="open && sidebarOpen">
+              <ul class="pl-12">
+                <li>
+                  <a href="{% url 'products:brand_list' %}" @click="open = false" class="flex items-center text-white hover:text-[#C5A46B] py-1">
+                    <span class="material-icons-outlined text-sm mr-2">branding_watermark</span> Marcas
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'products:list_category' %}" @click="open = false" class="flex items-center text-white hover:text-[#C5A46B] py-1">
+                    <span class="material-icons-outlined text-sm mr-2">category</span> Categorías
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'products:list_product' %}" @click="open = false" class="flex items-center text-white hover:text-[#C5A46B] py-1">
+                    <span class="material-icons-outlined text-sm mr-2">inventory_2</span> Productos
+                  </a>
+                </li>
+              </ul>
+            </template>
           </li>
           <li class="px-4 py-2 hover:bg-white/10 flex items-center">
             <form action="{% url 'logout' %}" method="post" class="w-full flex items-center">
@@ -106,22 +115,46 @@
             </form>
           </li>
           <li class="px-4 py-2 hover:bg-white/10 flex items-center">
-            {% comment %} <a href="{% url 'adminpaneldashboard' %}" class="flex items-center w-full text-white"> {% endcomment %}
+            <a href="{% url 'blog:dashboard' %}" class="flex items-center w-full text-white" @click="$dispatch('close-catalogo')">
               <span class="material-icons-outlined">article</span>
               <span x-show="sidebarOpen" class="ml-4">Gestionar Posts</span>
             </a>
           </li>
           <li class="px-4 py-2 hover:bg-white/10 flex items-center">
-            <a href="{% url 'contabilidad:clientes' %}" class="flex items-center w-full text-white">
+            <a href="{% url 'contabilidad:clientes' %}" class="flex items-center w-full text-white" @click="$dispatch('close-catalogo')">
               <span class="material-icons-outlined">account_balance</span>
               <span x-show="sidebarOpen" class="ml-4">Contabilidad</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="{% url 'web:config' %}" class="flex items-center w-full text-white" @click="$dispatch('close-catalogo')">
+              <span class="material-icons-outlined">palette</span>
+              <span x-show="sidebarOpen" class="ml-4">Configurar Web</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="{% url 'blog:categorias_dashboard' %}" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">category</span>
+              <span x-show="sidebarOpen" class="ml-4">Categorías Publicaciones</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="{% url 'crm:dashboard' %}" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">hub</span>
+              <span x-show="sidebarOpen" class="ml-4">CRM (HubSpot)</span>
+            </a>
+          </li>
+          <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="{% url 'metricas:metricas_dashboard' %}" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">bar_chart</span>
+              <span x-show="sidebarOpen" class="ml-4">Métricas</span>
             </a>
           </li>
         </ul>
       </nav>
     </aside>
 
-    <div class=" content-center flex-1 overflow-auto">
+    <div class=" flex-1 overflow-auto">
       <header class="flex justify-end items-center p-4 bg-white shadow-sm border-b border-gray-200">
         {% if user.is_authenticated %}
         <div class="relative" x-data="{ open: false }">
@@ -170,6 +203,25 @@
       modal.classList.add('hidden');
     }
   </script>
+  <script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('catalogoMenu', () => ({
+      open: false,
+      init() {
+        this.$watch('open', value => {
+          if (value) {
+            window.addEventListener('close-catalogo', this.closeMenu)
+          } else {
+            window.removeEventListener('close-catalogo', this.closeMenu)
+          }
+        })
+      },
+      closeMenu() {
+        this.open = false;
+      }
+    }))
+  })
+</script>
 
 </body>
 </html>

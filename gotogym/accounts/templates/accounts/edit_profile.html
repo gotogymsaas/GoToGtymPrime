@@ -7,15 +7,20 @@
 {% block content %}
 <div class="max-w-lg mx-auto mt-10 bg-white dark:bg-[#232526] rounded-xl shadow-lg p-8">
   <h2 class="text-2xl font-bold mb-6 text-center text-[#093f62] dark:text-white">{% trans "Editar Perfil" %}</h2>
+  {% if force_edit %}
+    <div class="mb-4 p-3 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
+      <strong>¡Atención!</strong> Debes completar tu nombre y apellido para continuar.
+    </div>
+  {% endif %}
   <form method="post" enctype="multipart/form-data" class="space-y-5">
     {% csrf_token %}
     <div>
       <label for="id_first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-200">{% trans "Nombre" %}</label>
-      <input type="text" name="first_name" id="id_first_name" value="{{ user.first_name }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#C5A46B] focus:ring-[#C5A46B] dark:bg-[#232526] dark:text-white" required>
+      <input type="text" name="first_name" id="id_first_name" value="{{ user.first_name }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#C5A46B] focus:ring-[#C5A46B] dark:bg-[#232526] dark:text-white" {% if force_edit %}required{% endif %}>
     </div>
     <div>
       <label for="id_last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-200">{% trans "Apellido" %}</label>
-      <input type="text" name="last_name" id="id_last_name" value="{{ user.last_name }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#C5A46B] focus:ring-[#C5A46B] dark:bg-[#232526] dark:text-white" required>
+      <input type="text" name="last_name" id="id_last_name" value="{{ user.last_name }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#C5A46B] focus:ring-[#C5A46B] dark:bg-[#232526] dark:text-white" {% if force_edit %}required{% endif %}>
     </div>
     <div>
       <label for="id_email" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Email</label>

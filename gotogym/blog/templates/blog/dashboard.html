@@ -1,0 +1,217 @@
+{% extends "_base_dasboard.html" %}
+{% load static %}
+{% load i18n %}
+{% block content %}
+<div class="container mx-auto px-4 py-10">
+  <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-10 gap-4">
+    <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#C5A46B] to-[#093f62] drop-shadow mb-4 md:mb-0 tracking-tight">
+      <span class="inline-flex items-center gap-2">
+        <span class="material-icons-outlined text-5xl align-middle text-[#C5A46B]">article</span>
+        Panel de Publicaciones
+      </span>
+    </h1>
+    <div class="flex gap-3">
+      <a href="{% url 'blog:add_post' %}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#C5A46B] to-[#093f62] hover:from-[#093f62] hover:to-[#C5A46B] text-white font-bold rounded-full shadow-lg transition-all text-lg">
+        <span class="material-icons-outlined mr-2">add_circle</span> Nuevo Post
+      </a>
+      <button type="button" onclick="openCategoryModal()" class="inline-flex items-center px-6 py-3 bg-white border-2 border-[#C5A46B] text-[#093f62] font-bold rounded-full shadow-lg transition-all text-lg hover:bg-[#C5A46B] hover:text-white">
+        <span class="material-icons-outlined mr-2">category</span> Nueva Categoría
+      </button>
+    </div>
+  </div>
+  <form method="get" class="flex flex-wrap gap-4 items-center bg-white/80 dark:bg-[#232526] p-6 rounded-2xl shadow-xl mb-10 border border-[#C5A46B]/40">
+    <input type="text" name="q" placeholder="Buscar por título..." value="{{ request.GET.q }}" class="flex-1 min-w-[200px] px-5 py-3 border border-[#C5A46B] rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C5A46B] dark:bg-gray-800 dark:text-white text-lg"/>
+    <button type="submit" class="bg-[#C5A46B] hover:bg-[#093f62] text-white px-6 py-3 rounded-full font-semibold shadow transition text-lg">
+      <span class="material-icons-outlined align-middle mr-1">search</span> Buscar
+    </button>
+    <a href="{% url 'blog:dashboard' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-full font-semibold shadow transition text-lg">Limpiar</a>
+  </form>
+  <div id="categoryModalContainer"></div>
+  {% include 'blog/modals_categorias.html' %}
+  {% if posts %}
+  <div class="overflow-x-auto shadow-2xl rounded-3xl border border-[#C5A46B]/40 bg-white/90 dark:bg-[#232526]">
+    <table class="w-full table-auto text-base text-left text-gray-800 dark:text-gray-200">
+      <thead class="bg-gradient-to-r from-[#C5A46B] to-[#093f62] text-white">
+        <tr>
+          <th class="px-8 py-4 w-10 text-left rounded-tl-3xl">#</th>
+          <th class="px-8 py-4 w-1/4 text-left">Título</th>
+          <th class="px-8 py-4 w-1/2 text-left">Contenido</th>
+          <th class="px-8 py-4 w-1/4 text-center rounded-tr-3xl">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for post in posts %}
+        <tr class="border-b border-[#C5A46B]/20 hover:bg-[#f3e9d2]/40 dark:hover:bg-[#093f62]/20 transition">
+          <td class="px-8 py-4 font-bold text-[#C5A46B]">{{ forloop.counter }}</td>
+          <td class="px-8 py-4 max-w-xs truncate font-semibold" title="{{ post.title }}">{{ post.title }}</td>
+          <td class="px-8 py-4 max-w-md truncate" title="{{ post.body }}">{{ post.body|truncatewords:15 }}</td>
+          <td class="px-8 py-4 text-center flex justify-center gap-4">
+            <a href="{% url 'blog:edit_post' pk=post.pk %}" class="group relative p-2 rounded-full border-2 border-yellow-500 text-yellow-600 hover:bg-yellow-500 hover:text-white dark:text-yellow-300 dark:border-yellow-300 dark:hover:bg-yellow-400 dark:hover:text-black transition">
+              <span class="material-icons-outlined">edit</span>
+              <span class="absolute -top-9 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-all bg-black text-white text-xs rounded px-2 py-1 pointer-events-none z-50 dark:bg-gray-700">Editar publicación</span>
+            </a>
+            <button type="button" onclick="openDeletePostModal({{ post.pk }}, '{{ post.title|escapejs }}')" class="group relative p-2 rounded-full border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white dark:text-red-400 dark:border-red-400 dark:hover:bg-red-500 dark:hover:text-white transition">
+              <span class="material-icons-outlined">delete</span>
+              <span class="absolute -top-9 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-all bg-black text-white text-xs rounded px-2 py-1 pointer-events-none z-50 dark:bg-gray-700">Eliminar publicación</span>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center mt-16 text-gray-500 dark:text-gray-400 text-xl font-semibold">
+    No hay publicaciones disponibles.
+  </div>
+  {% endif %}
+</div>
+<!-- MODAL ELIMINAR POST -->
+<div id="modalDeletePost" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
+  <div class="bg-white/90 rounded-3xl shadow-2xl p-8 max-w-lg w-full border border-red-200 relative animate-fade-in overflow-hidden">
+    <button onclick="closeDeletePostModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-600 text-3xl transition">
+      <span class="material-icons-outlined">close</span>
+    </button>
+    <div class="flex items-center gap-3 mb-6">
+      <span class="material-icons-outlined text-4xl text-red-600">delete</span>
+      <h2 class="text-2xl font-extrabold text-red-600 tracking-tight">Eliminar Publicación</h2>
+    </div>
+    <p class="mb-8 text-lg text-gray-700">¿Estás seguro que deseas eliminar el post <strong id="deletePostTitle" class="text-red-600"></strong>?</p>
+    <form id="deletePostForm" method="post" class="space-y-6">
+      {% csrf_token %}
+      <div class="flex justify-end gap-3 mt-8">
+        <button type="button" onclick="closeDeletePostModal()" class="px-6 py-2.5 rounded-full border-2 border-gray-300 text-gray-700 bg-white hover:bg-gray-100 font-semibold shadow transition">Cancelar</button>
+        <button type="submit" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-red-500 to-red-700 text-white font-bold shadow-lg hover:from-red-700 hover:to-red-500 transition">Eliminar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div id="postSuccessMsg" class="fixed top-8 right-8 z-50 hidden bg-green-500 text-white px-6 py-4 rounded-xl shadow-2xl text-lg font-semibold flex items-center gap-2 animate__animated animate__fadeInDown">
+  <span class="material-icons-outlined">check_circle</span>
+  <span id="postSuccessMsgText"></span>
+</div>
+<div id="postDeleteMsg" class="fixed top-8 right-8 z-50 hidden bg-red-500 text-white px-6 py-4 rounded-xl shadow-2xl text-lg font-semibold flex items-center gap-2 animate__animated animate__fadeInDown">
+  <span class="material-icons-outlined">delete</span>
+  ¡Post eliminado exitosamente!
+</div>
+<script>
+function openCategoryModal() {
+  document.getElementById('modalCategoria').classList.remove('hidden');
+}
+function closeCategoriaModal() {
+  document.getElementById('modalCategoria').classList.add('hidden');
+}
+// Manejo AJAX para crear categoría sin recargar ni redirigir
+const categoriaForm = document.querySelector('#modalCategoria form');
+if (categoriaForm) {
+  categoriaForm.onsubmit = async function(e) {
+    e.preventDefault();
+    const formData = new FormData(categoriaForm);
+    const response = await fetch(categoriaForm.action, {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      body: formData
+    });
+    if (response.ok) {
+      const data = await response.json();
+      closeCategoriaModal();
+      categoriaForm.reset();
+      // Mostrar mensaje de éxito
+      const msg = document.getElementById('categorySuccessMsg');
+      msg.classList.remove('hidden');
+      msg.classList.add('animate__fadeInDown');
+      setTimeout(() => {
+        msg.classList.add('animate__fadeOutUp');
+        setTimeout(() => {
+          msg.classList.add('hidden');
+          msg.classList.remove('animate__fadeInDown', 'animate__fadeOutUp');
+        }, 800);
+      }, 2000);
+      // Actualizar lista de categorías si existe el contenedor
+      if (data.tbody && document.getElementById('categoriasTbody')) {
+        document.getElementById('categoriasTbody').innerHTML = data.tbody;
+      }
+    } else {
+      // Opcional: mostrar error
+    }
+  }
+}
+
+function openDeletePostModal(id, title) {
+  document.getElementById('modalDeletePost').classList.remove('hidden');
+  document.getElementById('deletePostTitle').textContent = title;
+  document.getElementById('deletePostForm').action = `/blog/delete/${id}/`;
+}
+function closeDeletePostModal() {
+  document.getElementById('modalDeletePost').classList.add('hidden');
+}
+document.getElementById('modalDeletePost').onclick = function(e) {
+  if (e.target === this) closeDeletePostModal();
+};
+
+const deletePostForm = document.getElementById('deletePostForm');
+if (deletePostForm) {
+  deletePostForm.onsubmit = async function(e) {
+    e.preventDefault();
+    const formData = new FormData(deletePostForm);
+    const action = deletePostForm.action;
+    const response = await fetch(action, {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      body: formData
+    });
+    if (response.ok) {
+      closeDeletePostModal();
+      const msg = document.getElementById('postDeleteMsg');
+      msg.classList.remove('hidden');
+      msg.classList.add('animate__fadeInDown');
+      setTimeout(() => {
+        msg.classList.add('animate__fadeOutUp');
+        setTimeout(() => {
+          msg.classList.add('hidden');
+          msg.classList.remove('animate__fadeInDown', 'animate__fadeOutUp');
+          window.location.reload();
+        }, 800);
+      }, 2000);
+    } else {
+      // Opcional: mostrar error
+    }
+  }
+}
+
+{% if request.GET.success == 'add' %}
+<script>
+window.onload = function() {
+  const msg = document.getElementById('postSuccessMsg');
+  document.getElementById('postSuccessMsgText').textContent = '¡Post añadido exitosamente!';
+  msg.classList.remove('hidden');
+  msg.classList.add('animate__fadeInDown');
+  setTimeout(() => {
+    msg.classList.add('animate__fadeOutUp');
+    setTimeout(() => {
+      msg.classList.add('hidden');
+      msg.classList.remove('animate__fadeInDown', 'animate__fadeOutUp');
+    }, 800);
+  }, 2000);
+}
+</script>
+{% elif request.GET.success == 'edit' %}
+<script>
+window.onload = function() {
+  const msg = document.getElementById('postSuccessMsg');
+  document.getElementById('postSuccessMsgText').textContent = '¡Post actualizado exitosamente!';
+  msg.classList.remove('hidden');
+  msg.classList.add('animate__fadeInDown');
+  setTimeout(() => {
+    msg.classList.add('animate__fadeOutUp');
+    setTimeout(() => {
+      msg.classList.add('hidden');
+      msg.classList.remove('animate__fadeInDown', 'animate__fadeOutUp');
+    }, 800);
+  }, 2000);
+}
+</script>
+{% endif %}
+{% endblock %}

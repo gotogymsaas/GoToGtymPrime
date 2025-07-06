@@ -1,0 +1,19 @@
+{% for categoria in categorias %}
+<tr class="hover:bg-[#f3e9d2]/60 transition">
+  <td class="px-6 py-4 whitespace-nowrap text-lg text-[#093f62]">{{ categoria.name }}</td>
+  <td class="px-6 py-4 text-center">
+    <div class="flex flex-row justify-center items-center gap-2 min-w-[90px]">
+      <button onclick="openEditModal({{ categoria.id }}, '{{ categoria.name }}')" class="inline-flex items-center justify-center text-yellow-600 hover:text-yellow-800 bg-yellow-50 hover:bg-yellow-100 rounded-full p-2 transition" title="Editar">
+        <span class="material-icons-outlined align-middle">edit</span>
+      </button>
+      <button onclick="openDeleteModal({{ categoria.id }}, '{{ categoria.name }}')" class="inline-flex items-center justify-center text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 rounded-full p-2 transition" title="Eliminar">
+        <span class="material-icons-outlined align-middle">delete</span>
+      </button>
+    </div>
+  </td>
+</tr>
+{% empty %}
+<tr>
+  <td colspan="2" class="px-6 py-8 text-center text-gray-400 text-lg">No hay categorías registradas.</td>
+</tr>
+{% endfor %}

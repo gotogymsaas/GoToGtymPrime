@@ -1,0 +1,148 @@
+    <div id="modalCategoria" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none hidden">
+        <div class="fixed inset-0 -z-10 pointer-events-none" style="background: rgba(0,0,0,0.4); left: 256px;"></div>
+      <div class="bg-white/90 rounded-3xl shadow-2xl p-8 max-w-lg w-full border border-gray-200  relative animate-fade-in pointer-events-auto ">
+        
+    <button onclick="closeCategoriaModal()" class="absolute top-4 right-4 text-gray-400 hover:text-[#C5A46B] text-3xl transition">
+      <span class="material-icons-outlined">close</span>
+    </button>
+    <div class="flex items-center gap-3 mb-6">
+      <span class="material-icons-outlined text-4xl text-[#C5A46B]">category</span>
+      <h2 class="text-2xl font-extrabold text-[#093f62] dark:text-[#ffe6a0] tracking-tight">Nueva Categoría</h2>
+    </div>
+    <form method="post" action="{% url 'blog:crear_categoria' %}" class="space-y-6">
+      {% csrf_token %}
+      <div>
+        <label for="nombre" class="block text-sm font-semibold text-[#093f62] dark:text-[#ffe6a0] mb-2">Nombre de la categoria<span class="text-red-500">*</span></label>
+        <input type="text" name="nombre" id="nombre" class="w-full px-4 py-3 rounded-xl border-2 border-[#C5A46B]/40 bg-white dark:bg-[#232526] text-[#101820] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#C5A46B] text-lg shadow-sm" required>
+      </div>
+      <div class="flex justify-end gap-3 mt-8">
+        <button type="button" onclick="closeCategoriaModal()" class="px-6 py-2.5 rounded-full border-2 border-gray-300 text-gray-700 bg-white hover:bg-gray-100 font-semibold shadow transition">Cancelar</button>
+        <button type="submit" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#093f62] text-white font-bold shadow-lg hover:from-[#093f62] hover:to-[#C5A46B] transition">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<div id="modalEditCategoria" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none hidden">
+ <div class="fixed inset-0 -z-10 pointer-events-none" style="background: rgba(0,0,0,0.4); left: 256px;"></div>
+      <div class="bg-white/90 rounded-3xl shadow-2xl p-8 max-w-lg w-full border border-gray-200  relative animate-fade-in pointer-events-auto ">
+    <button onclick="closeEditModal()" class="absolute top-4 right-4 text-gray-400 hover:text-[#C5A46B] text-3xl transition">
+      <span class="material-icons-outlined">close</span>
+    </button>
+    <div class="flex items-center gap-3 mb-6">
+      <span class="material-icons-outlined text-4xl text-yellow-500">edit</span>
+      <h2 class="text-2xl font-extrabold text-[#093f62] dark:text-[#ffe6a0] tracking-tight">Editar Categoría</h2>
+    </div>
+    <form id="editCategoriaForm" method="post" class="space-y-6">
+      {% csrf_token %}
+      <div>
+        <label for="edit_nombre" class="block text-sm font-semibold text-[#093f62] dark:text-[#ffe6a0] mb-2">Nombre<span class="text-red-500">*</span></label>
+        <input type="text" name="nombre" id="edit_nombre" class="w-full px-4 py-3 rounded-xl border-2 border-[#C5A46B]/40 bg-white dark:bg-[#232526] text-[#101820] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#C5A46B] text-lg shadow-sm" required>
+      </div>
+      <div class="flex justify-end gap-3 mt-8">
+        <button type="button" onclick="closeEditModal()" class="px-6 py-2.5 rounded-full border-2 border-gray-300 text-gray-700 bg-white hover:bg-gray-100 font-semibold shadow transition">Cancelar</button>
+        <button type="submit" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#093f62] text-white font-bold shadow-lg hover:from-[#093f62] hover:to-[#C5A46B] transition">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<div id="modalDeleteCategoria" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none hidden">
+  <div class="fixed inset-0 -z-10 pointer-events-none" style="background: rgba(0,0,0,0.4); left: 256px;"></div>
+      <div class="bg-white/90 rounded-3xl shadow-2xl p-8 max-w-lg w-full border border-gray-200  relative animate-fade-in pointer-events-auto ">
+    <button onclick="closeDeleteModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-600 text-3xl transition">
+      <span class="material-icons-outlined">close</span>
+    </button>
+    <div class="flex items-center gap-3 mb-6">
+      <span class="material-icons-outlined text-4xl text-red-600">delete</span>
+      <h2 class="text-2xl font-extrabold text-red-600 dark:text-red-300 tracking-tight">Eliminar Categoría</h2>
+    </div>
+    <p class="mb-8 text-lg text-gray-700 dark:text-gray-200">¿Estás seguro que deseas eliminar la categoría <strong id="deleteCategoriaName" class="text-red-600 dark:text-red-300"></strong>?</p>
+    <form id="deleteCategoriaForm" method="post" class="space-y-6">
+      {% csrf_token %}
+      <div class="flex justify-end gap-3 mt-8">
+        <button type="button" onclick="closeDeleteModal()" class="px-6 py-2.5 rounded-full border-2 border-gray-300 text-gray-700 bg-white hover:bg-gray-100 font-semibold shadow transition">Cancelar</button>
+        <button type="submit" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-red-500 to-red-700 text-white font-bold shadow-lg hover:from-red-700 hover:to-red-500 transition">Eliminar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="categoryDeleteMsg" class="fixed top-8 right-8 z-50 hidden bg-red-500 text-white px-6 py-4 rounded-xl shadow-2xl text-lg font-semibold flex items-center gap-2 animate__animated animate__fadeInDown">
+  <span class="material-icons-outlined">delete</span>
+  ¡Categoría eliminada exitosamente!
+</div>
+
+<script>
+
+const deleteCategoriaForm = document.getElementById('deleteCategoriaForm');
+if (deleteCategoriaForm) {
+    deleteCategoriaForm.onsubmit = async function(e) {
+        e.preventDefault();
+        const formData = new FormData(deleteCategoriaForm);
+        const action = deleteCategoriaForm.action;
+        const response = await fetch(action, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+        });
+        if (response.ok) {
+            closeDeleteModal();
+            const msg = document.getElementById('categoryDeleteMsg');
+            msg.classList.remove('hidden');
+            msg.classList.add('animate__fadeInDown');
+            setTimeout(() => {
+                msg.classList.add('animate__fadeOutUp');
+                setTimeout(() => {
+                msg.classList.add('hidden');
+                msg.classList.remove('animate__fadeInDown', 'animate__fadeOutUp');
+                }, 800);
+            }, 2000);
+
+            const data = await response.json();
+            if (data.tbody) {
+                document.getElementById('categoriasTbody').innerHTML = data.tbody;
+            }
+        } else {
+        // Opcional: mostrar error
+        }
+    }
+}
+
+// --- MODALES COMO EN brand_list.html ---
+function openCategoriaModal() {
+  document.getElementById('modalCategoria').classList.remove('hidden');
+}
+function closeCategoriaModal() {
+  document.getElementById('modalCategoria').classList.add('hidden');
+}
+document.getElementById('modalCategoria').onclick = function(e) {
+  if (e.target === this) closeCategoriaModal();
+};
+
+function openEditModal(id, name) {
+  document.getElementById('modalEditCategoria').classList.remove('hidden');
+  document.getElementById('edit_nombre').value = name;
+  document.getElementById('editCategoriaForm').action = `/es/blog/categorias/${id}/editar/`;
+}
+function closeEditModal() {
+  document.getElementById('modalEditCategoria').classList.add('hidden');
+}
+document.getElementById('modalEditCategoria').onclick = function(e) {
+  if (e.target === this) closeEditModal();
+};
+
+function openDeleteModal(id, name) {
+  document.getElementById('modalDeleteCategoria').classList.remove('hidden');
+  document.getElementById('deleteCategoriaName').textContent = name;
+  document.getElementById('deleteCategoriaForm').action = `/es/blog/categorias/${id}/eliminar/`;
+}
+function closeDeleteModal() {
+  document.getElementById('modalDeleteCategoria').classList.add('hidden');
+}
+document.getElementById('modalDeleteCategoria').onclick = function(e) {
+  if (e.target === this) closeDeleteModal();
+};
+</script>

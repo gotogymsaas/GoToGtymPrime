@@ -1,0 +1,103 @@
+{% extends '_base_dasboard.html' %}
+{% block content %}
+<div class="container mx-auto p-4">
+    <h2 class="text-2xl font-bold mb-4">Cuadro de mando - Métricas</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Usuarios creados -->
+        <div class="bg-white p-4 rounded shadow flex flex-col justify-between">
+            <h3 class="text-lg font-semibold">Usuarios creados</h3>
+            <p class="text-3xl">{{ total_usuarios }}</p>
+        </div>
+        <!-- Productos en catálogo -->
+        <div class="bg-gradient-to-r from-green-300 to-yellow-200 p-4 rounded shadow flex flex-col justify-between">
+            <h3 class="text-lg font-semibold">Productos en catálogo</h3>
+            <p class="text-3xl">{{ total_productos }}</p>
+            <span class="text-xs text-gray-600">Actualizado hoy</span>
+        </div>
+        <!-- Publicaciones en el blog -->
+        <div class="bg-white p-4 rounded shadow flex flex-col justify-between">
+            <h3 class="text-lg font-semibold">Posts en el blog</h3>
+            <p class="text-3xl">{{ total_posts }}</p>
+        </div>
+        <!-- Influencers activos -->
+        <div class="bg-white p-4 rounded shadow flex flex-col justify-between">
+            <h3 class="text-lg font-semibold">Influencers activos</h3>
+            <p class="text-3xl">{{ influencers_activos }}</p>
+        </div>
+        <!-- Gráfico de líneas (placeholder) -->
+        <div class="bg-white p-4 rounded shadow col-span-1 md:col-span-2">
+            <h3 class="text-lg font-semibold mb-2">Actividad anual (visitas de ejemplo)</h3>
+            <canvas id="lineChart" height="80"></canvas>
+        </div>
+        <!-- Métrica de tareas completadas (placeholder) -->
+        <div class="bg-white p-4 rounded shadow flex flex-col justify-between">
+            <h3 class="text-lg font-semibold">Tareas completadas</h3>
+            <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+                <div class="bg-blue-400 h-4 rounded-full" style="width: 87.3%"></div>
+            </div>
+            <span class="text-2xl font-bold text-blue-500">87.3%</span>
+        </div>
+        <!-- Tabla de órdenes (placeholder) -->
+        <div class="bg-white p-4 rounded shadow col-span-1 md:col-span-3">
+            <h3 class="text-lg font-semibold mb-2">Órdenes recientes</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-xs">
+                    <thead>
+                        <tr>
+                            <th class="px-2 py-1">Cliente</th>
+                            <th class="px-2 py-1"># Orden</th>
+                            <th class="px-2 py-1">Fecha</th>
+                            <th class="px-2 py-1">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mr. Dan</td><td>4EX3456N</td><td>12-10-2019</td><td><span class="text-green-600">Completada</span></td>
+                        </tr>
+                        <tr>
+                            <td>Mr. Dan</td><td>4EX3456N</td><td>12-10-2019</td><td><span class="text-yellow-600">En progreso</span></td>
+                        </tr>
+                        <tr>
+                            <td>Mr. Dan</td><td>4EX3456N</td><td>12-10-2019</td><td><span class="text-green-600">Completada</span></td>
+                        </tr>
+                        <tr>
+                            <td>Mr. Dan</td><td>4EX3456N</td><td>12-10-2019</td><td><span class="text-red-600">Cancelada</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Gráfico de líneas de ejemplo
+        document.addEventListener('DOMContentLoaded', function() {
+            var ctx = document.getElementById('lineChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    datasets: [
+                        {
+                            label: 'Visitas',
+                            data: [120, 190, 300, 500, 200, 300, 400, 600, 700, 800, 900, 1000],
+                            borderColor: '#f59e42',
+                            backgroundColor: 'rgba(245, 158, 66, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        });
+    </script>
+</div>
+{% endblock %}

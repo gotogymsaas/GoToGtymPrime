@@ -1,0 +1,33 @@
+{% extends '_base_dasboard.html' %}
+{% block content %}
+<div class="container mx-auto p-4">
+    <h2 class="text-2xl font-bold mb-4">CRM - Contactos de HubSpot</h2>
+    {% if error %}
+        <div class="bg-red-100 text-red-700 p-2 mb-4 rounded">{{ error }}</div>
+    {% endif %}
+    {% if contacts and contacts|length > 0 %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200 rounded">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4 border-b">Email</th>
+                        <th class="py-2 px-4 border-b">Nombre</th>
+                        <th class="py-2 px-4 border-b">Apellido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contact in contacts %}
+                        <tr>
+                            <td class="py-2 px-4 border-b">{{ contact.properties.email }}</td>
+                            <td class="py-2 px-4 border-b">{{ contact.properties.firstname }}</td>
+                            <td class="py-2 px-4 border-b">{{ contact.properties.lastname }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No hay contactos disponibles.</p>
+    {% endif %}
+</div>
+{% endblock %}

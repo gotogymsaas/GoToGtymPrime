@@ -1,0 +1,12 @@
+{% extends '_base_dasboard.html' %}
+{% load static %}
+{% block content %}
+<div class="max-w-xl mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg">
+  <h2 class="text-2xl font-bold mb-6 text-[#093f62]">Configurar Home</h2>
+  <form method="post" enctype="multipart/form-data" class="space-y-5">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="px-6 py-2 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold shadow-md hover:from-[#e7c98a] hover:to-[#C5A46B] hover:text-[#101820] transition-all">Guardar cambios</button>
+  </form>
+</div>
+{% endblock %}

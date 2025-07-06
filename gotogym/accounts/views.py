@@ -12,6 +12,7 @@ from .models import User
 import os
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
+from django.urls import reverse
 
 TERMS_PATH = Path(__file__).resolve().parent / 'templates' / 'accounts' / 'terms_and_conditions.html'
 
@@ -28,7 +29,8 @@ def register_view(request):
         last_name = request.POST.get('last_name')
         age = request.POST.get('age')
         email = request.POST.get('email')
-        username = email  # O puedes pedir username aparte si lo deseas
+        # Autocompletar username con la parte antes del @
+        username = email.split('@')[0] if email else ''
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
         accepted_terms = request.POST.get('accepted_terms')
@@ -39,6 +41,8 @@ def register_view(request):
             messages.error(request, 'Las contraseñas no coinciden.')
         elif User.objects.filter(email=email).exists():
             messages.error(request, 'El correo ya está registrado.')
+        elif User.objects.filter(username=username).exists():
+            messages.error(request, 'El nombre de usuario ya está registrado.')
         else:
             terms_text = TERMS_PATH.read_text(encoding='utf-8')
             user = User.objects.create_user(
@@ -52,7 +56,7 @@ def register_view(request):
                 terms_accepted_at=timezone.now(),
                 terms_hash=hashlib.sha512(terms_text.encode()).hexdigest(),
             )
-            messages.success(request, 'Registro exitoso. Ahora puedes iniciar sesión.')
+            messages.success(request, f'Registro exitoso. Tu usuario es: {username}. Ahora puedes iniciar sesión.')
             return redirect('login')
     return render(request, 'accounts/register.html')
 
@@ -63,15 +67,22 @@ def login_view(request):
     if request.method == 'POST':
         username_or_email = request.POST.get('username')
         password = request.POST.get('password')
-        user = authenticate(request, username=username_or_email, password=password)
-        if user is None:
-            # Intentar autenticación por email
+        # Buscar usuario por username o email
+        try:
+            user_obj = User.objects.get(username=username_or_email)
+        except User.DoesNotExist:
             try:
                 user_obj = User.objects.get(email=username_or_email)
-                user = authenticate(request, username=user_obj.email, password=password)
             except User.DoesNotExist:
-                user = None
+                user_obj = None
+        user = None
+        if user_obj:
+            user = authenticate(request, username=user_obj.email, password=password)
         if user is not None:
+            # Si es admin y le falta nombre o apellido, redirigir a editar perfil
+            if user.is_superuser and (not user.first_name or not user.last_name or user.first_name == 'None' or user.last_name == 'None'):
+                login(request, user)
+                return redirect(reverse('edit_profile'))
             login(request, user)
             return redirect('/')
         else:
@@ -81,6 +92,10 @@ def login_view(request):
 @login_required
 def edit_profile(request):
     user = request.user
+    force_edit = False
+    if user.is_superuser and (not user.first_name or not user.last_name or user.first_name == 'None' or user.last_name == 'None'):
+        force_edit = True
+        messages.warning(request, 'Por favor, completa tu nombre y apellido para continuar.')
     if request.method == 'POST':
         first_name = request.POST.get('first_name', '').strip()
         last_name = request.POST.get('last_name', '').strip()
@@ -106,4 +121,4 @@ def edit_profile(request):
         else:
             messages.info(request, 'No se realizaron cambios.')
         return redirect('edit_profile')
-    return render(request, 'accounts/edit_profile.html', {'user': user})
+    return render(request, 'accounts/edit_profile.html', {'user': user, 'force_edit': force_edit})

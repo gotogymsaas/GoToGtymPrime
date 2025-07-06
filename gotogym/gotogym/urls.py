@@ -47,6 +47,8 @@ urlpatterns += i18n_patterns(
     path('tienda/', include('tienda.urls', namespace='tienda')),
     path('carrito/', include('carrito.urls', namespace='carrito')),
     path('crm/', include('crm.urls')),
+    path('web/', include('web.urls', namespace='web')),
+    path('metricas/', include('metricas.urls', namespace='metricas')),
 )
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

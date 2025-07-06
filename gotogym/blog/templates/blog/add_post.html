@@ -1,0 +1,99 @@
+{% extends "_base_dasboard.html" %}
+{% load static %}
+{% load i18n %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="max-w-5xl mx-auto bg-white/95 p-8 rounded-3xl shadow-2xl border border-gray-200 mt-10">
+  <h2 class="text-3xl font-extrabold mb-6 text-[#093f62] flex items-center gap-3 drop-shadow-sm">
+    <span class="material-icons-outlined text-4xl text-[#C5A46B]">add_circle</span>
+    {% trans "Nuevo Artículo" %}
+  </h2>
+  <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    {% csrf_token %}
+    <!-- Columna 1 -->
+    <div class="space-y-6">
+      <div>
+        <label for="{{ form.title.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">{% trans "Título" %}<span class="text-red-500">*</span></label>
+        {% render_field form.title class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition placeholder-gray-400 text-gray-800" %}
+        {% for error in form.title.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+      <div>
+        <label for="{{ form.author.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">{% trans "Autor" %}</label>
+        {% render_field form.author class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800" %}
+        {% for error in form.author.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+      <div>
+        <label for="{{ form.category.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">{% trans "Categoría" %}</label>
+        {% render_field form.category class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800" %}
+        {% for error in form.category.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+    </div>
+    <!-- Columna 2 -->
+    <div class="space-y-6 flex flex-col justify-between">
+      <div>
+        <label for="{{ form.excerpt.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">{% trans "Resumen" %}</label>
+        {% render_field form.excerpt class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800 min-h-[60px] resize-none" %}
+        {% for error in form.excerpt.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+      <div>
+        <label for="{{ form.content.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">{% trans "Contenido" %}</label>
+        {% render_field form.content class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800 min-h-[120px] resize-y" %}
+        {% for error in form.content.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+    </div>
+    <!-- Columna 3 -->
+    <div class="space-y-6 flex flex-col justify-between">
+      <div>
+        <label class="block text-base font-semibold text-gray-700 mb-1">Slug</label>
+        <input type="text" class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed" value="(se genera automáticamente)" readonly>
+      </div>
+      <div>
+        <label for="id_featured" class="block text-base font-semibold text-gray-700 mb-1">{% trans "Imagen destacada" %}</label>
+        <div class="relative flex flex-col items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-xl h-48 overflow-hidden shadow-inner cursor-pointer group transition-all">
+          <img id="imagePreview" src="{% static 'images/placeholder.webp' %}" class="h-44 w-44 object-contain mx-auto rounded-xl shadow {% if not form.featured.value %}hidden{% endif %}" />
+          <span id="placeholder-icon" class="text-gray-400 material-icons-outlined text-5xl group-hover:text-[#C5A46B] transition">image</span>
+          <span id="placeholder-text" class="text-gray-500 mt-2 text-sm group-hover:text-[#C5A46B] transition px-2 text-center">Haz clic aquí para subir una imagen</span>
+          {% render_field form.featured class="absolute inset-0 opacity-0 cursor-pointer z-10" %}
+        </div>
+        {% for error in form.featured.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+    </div>
+    <div class="md:col-span-3 flex justify-end gap-3 mt-8">
+      <a href="{% url 'blog:dashboard' %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
+        <span class="material-icons-outlined">arrow_back</span> {% trans "Cancelar" %}
+      </a>
+      <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#093f62] text-white font-semibold shadow-md hover:bg-[#C5A46B] hover:text-[#093f62] transition">
+        <span class="material-icons-outlined">save</span> {% trans "Guardar" %}
+      </button>
+    </div>
+  </form>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const previewImg = document.getElementById('imagePreview');
+  const imageInput = document.getElementById('id_featured');
+  const placeholderIcon = document.getElementById('placeholder-icon');
+  const placeholderText = document.getElementById('placeholder-text');
+  if (imageInput) {
+    imageInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          previewImg.src = evt.target.result;
+          previewImg.classList.remove('hidden');
+          placeholderIcon.classList.add('hidden');
+          placeholderText.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        previewImg.src = '';
+        previewImg.classList.add('hidden');
+        placeholderIcon.classList.remove('hidden');
+        placeholderText.classList.remove('hidden');
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

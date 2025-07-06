@@ -57,9 +57,9 @@
         </div>
       
     </div>
-    <!-- Modal para añadir marca -->
+
     <div id="addBrandModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
-      <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full border border-gray-200 text-center relative animate-fade-in">
+      <div class="bg-white/90 rounded-3xl shadow-2xl p-8 max-w-lg w-full border border-gray-200 text-center relative animate-fade-in ">
         <button id="closeAddBrandModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition text-2xl">
           <span class="material-icons-outlined">close</span>
         </button>
@@ -73,7 +73,7 @@
         </form>
       </div>
     </div>
-    <!-- Modal para previsualizar marca -->
+
     <div id="previewBrandModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
       <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full border border-gray-200 text-center relative animate-fade-in">
         <button id="closePreviewBrandModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition text-2xl">
@@ -88,7 +88,7 @@
         </div>
       </div>
     </div>
-    <!-- Modal para editar marca -->
+
     <div id="editBrandModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
       <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full border border-gray-200 text-center relative animate-fade-in">
         <button id="closeEditBrandModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition text-2xl">
@@ -105,19 +105,19 @@
         </form>
       </div>
     </div>
-    <!-- Notificación de éxito/error -->
+
     <div id="brandNotification" class="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 hidden">
       <div id="brandNotificationContent" class="px-6 py-3 rounded-xl shadow-lg font-semibold text-white flex items-center gap-2"></div>
     </div>
     <script>
-      // Modal añadir marca
+
       const openAddBrandModalBtn = document.getElementById('openAddBrandModal');
       const addBrandModal = document.getElementById('addBrandModal');
       const closeAddBrandModalBtn = document.getElementById('closeAddBrandModal');
       openAddBrandModalBtn.onclick = function() { addBrandModal.classList.remove('hidden'); };
       closeAddBrandModalBtn.onclick = function() { addBrandModal.classList.add('hidden'); };
       addBrandModal.onclick = function(e) { if (e.target === addBrandModal) addBrandModal.classList.add('hidden'); };
-      // Modal previsualizar marca
+
       const previewBrandModal = document.getElementById('previewBrandModal');
       const closePreviewBrandModalBtn = document.getElementById('closePreviewBrandModal');
       const previewBrandBtns = document.querySelectorAll('.preview-brand-btn');
@@ -130,7 +130,8 @@
       });
       closePreviewBrandModalBtn.onclick = function() { previewBrandModal.classList.add('hidden'); };
       previewBrandModal.onclick = function(e) { if (e.target === previewBrandModal) previewBrandModal.classList.add('hidden'); };
-      // Modal editar marca
+
+
       const editBrandModal = document.getElementById('editBrandModal');
       const closeEditBrandModalBtn = document.getElementById('closeEditBrandModal');
       const editBrandBtns = document.querySelectorAll('.edit-brand-btn');
@@ -155,7 +156,8 @@
         notif.classList.remove('hidden');
         setTimeout(() => notif.classList.add('hidden'), 1500);
       }
-      // Enviar formulario de edición por AJAX
+
+      
       editBrandForm.onsubmit = function(e) {
         e.preventDefault();
         const brandId = editBrandIdInput.value;
@@ -176,7 +178,7 @@
           }
         }).catch(() => showBrandNotification('Error de red', 'error'));
       };
-      // Enviar formulario de añadir por AJAX
+
       const addBrandForm = addBrandModal.querySelector('form');
       addBrandForm.onsubmit = function(e) {
         e.preventDefault();

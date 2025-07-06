@@ -171,7 +171,20 @@
         <div class="relative" id="userMenuWrapper">
           <button id="userMenuBtn" type="button" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#f3e9d2] text-[#093f62] font-bold hover:bg-[#e7c98a] focus:outline-none" onclick="toggleUserMenu()">
             <span class="material-icons-outlined">account_circle</span>
-            <span>{{ user.get_full_name|default:user.username }}</span>
+            <span>
+              {% if user.is_superuser %}
+                {% if user.first_name %}{% if user.last_name %}
+                  {{ user.get_full_name|default:user.username }}
+                {% else %}
+                  {{ user.username }}
+                {% endif %}
+                {% else %}
+                  {{ user.username }}
+                {% endif %}
+              {% else %}
+                {{ user.get_full_name|default:user.username }}
+              {% endif %}
+            </span>
             <span class="material-icons-outlined">expand_more</span>
           </button>
           <div id="userDropdown" class="hidden absolute right-0 mt-2 w-56 rounded-xl shadow-2xl border border-[#e7c98a] z-50 transition-all duration-200" style="background:#232526; color:#fff;">
@@ -180,7 +193,7 @@
             <a href="{% url 'influencer_dashboard' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#C5A46B] hover:bg-[#3a2e1a] hover:text-[#093f62] font-semibold transition">Panel de Influencer</a>
             {% endif %}
             {% if user.is_superuser %}
-            <a href="/admin/" onclick="closeUserMenu()" class="block px-5 py-3 text-[#F8F9FA] hover:bg-[#3a2e1a] hover:text-[#C5A46B] font-semibold transition">Dashboard Admin</a>
+            <a href="dashboard" onclick="closeUserMenu()" class="block px-5 py-3 text-[#F8F9FA] hover:bg-[#3a2e1a] hover:text-[#C5A46B] font-semibold transition">Dashboard Admin</a>
             {% endif %}
             <form action="{% url 'logout' %}" method="post">
               {% csrf_token %}

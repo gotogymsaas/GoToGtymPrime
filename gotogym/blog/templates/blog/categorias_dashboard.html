@@ -1,0 +1,156 @@
+{% extends '_base_dasboard.html' %}
+{% block content %}
+<div class="min-h-screen flex items-start justify-center">
+  <div class="w-full max-w-4xl bg-white/80 backdrop-blur border border-[#e7c98a] shadow-2xl rounded-3xl px-10 py-12">
+    <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between mb-8">
+      <h1 class="text-3xl font-extrabold text-[#093f62] flex items-center gap-3 tracking-tight drop-shadow-sm">
+        <span class="material-icons-outlined text-4xl text-[#C5A46B]">category</span>
+        Categorías de publicaciones
+      </h1>
+      <a href="#" onclick="openCategoriaModal()" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#093f62] text-white font-bold hover:bg-[#0d527a] active:scale-95 transition shadow-[#C5A46B]/20 shadow-md text-lg">
+        <span class="material-icons-outlined">add</span>
+        Nueva categoría
+      </a>
+    </div>
+    <div class="overflow-x-auto rounded-2xl border border-[#e7c98a]">
+      <table class="min-w-full divide-y divide-[#e7c98a] text-sm">
+        <thead class="bg-[#f3e9d2] text-[#093f62] uppercase tracking-wide text-xs">
+          <tr>
+            <th class="px-6 py-4 text-left w-2/3 rounded-tl-2xl">Nombre</th>
+            <th class="px-6 py-4 text-center w-1/3 rounded-tr-2xl">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="categoriasTbody" class="bg-white divide-y divide-[#f3e9d2]">
+          {% include 'blog/_categorias_tbody.html' with categorias=categorias %}
+        </tbody>
+      </table>
+    </div>
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center mt-8">
+      <nav class="inline-flex rounded-md shadow-sm" aria-label="Pagination">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 rounded-l-md border border-[#e7c98a] bg-white text-[#093f62] hover:bg-[#f3e9d2]">&laquo;</a>
+        {% else %}
+          <span class="px-3 py-2 rounded-l-md border border-[#e7c98a] bg-[#f3e9d2] text-gray-300">&laquo;</span>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <span class="px-3 py-2 border-t border-b border-[#e7c98a] bg-[#C5A46B]/20 text-[#093f62] font-bold">{{ num }}</span>
+          {% else %}
+            <a href="?page={{ num }}" class="px-3 py-2 border-t border-b border-[#e7c98a] bg-white text-[#093f62] hover:bg-[#f3e9d2]">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 rounded-r-md border border-[#e7c98a] bg-white text-[#093f62] hover:bg-[#f3e9d2]">&raquo;</a>
+        {% else %}
+          <span class="px-3 py-2 rounded-r-md border border-[#e7c98a] bg-[#f3e9d2] text-gray-300">&raquo;</span>
+        {% endif %}
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% include 'blog/modals_categorias.html' %}
+
+<div id="categorySuccessMsg" class="fixed top-8 right-8 z-50 hidden bg-green-500 text-white px-6 py-4 rounded-xl shadow-2xl text-lg font-semibold flex items-center gap-2 animate__animated animate__fadeInDown">
+  <span class="material-icons-outlined">check_circle</span>
+  ¡Categoría creada exitosamente!
+</div>
+
+<script>
+function openCategoriaModal() {
+  document.getElementById('modalCategoria').classList.remove('hidden');
+}
+function closeCategoriaModal() {
+  document.getElementById('modalCategoria').classList.add('hidden');
+}
+function openEditModal(id, name) {
+  document.getElementById('modalEditCategoria').classList.remove('hidden');
+  document.getElementById('edit_nombre').value = name;
+  document.getElementById('editCategoriaForm').action = `/es/blog/categorias/${id}/editar/`;
+}
+function closeEditModal() {
+  document.getElementById('modalEditCategoria').classList.add('hidden');
+}
+function openDeleteModal(id, name) {
+  document.getElementById('modalDeleteCategoria').classList.remove('hidden');
+  document.getElementById('deleteCategoriaName').textContent = name;
+  document.getElementById('deleteCategoriaForm').action = `/es/blog/categorias/${id}/eliminar/`;
+}
+function closeDeleteModal() {
+  document.getElementById('modalDeleteCategoria').classList.add('hidden');
+}
+// Manejo AJAX para crear categoría sin recargar ni redirigir
+const categoriaForm = document.querySelector('#modalCategoria form');
+if (categoriaForm) {
+  categoriaForm.onsubmit = async function(e) {
+    e.preventDefault();
+    const formData = new FormData(categoriaForm);
+    const response = await fetch(categoriaForm.action, {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      body: formData
+    });
+    if (response.ok) {
+      closeCategoriaModal();
+      categoriaForm.reset();
+      // Mostrar mensaje de éxito
+      const msg = document.getElementById('categorySuccessMsg');
+      msg.classList.remove('hidden');
+      msg.classList.add('animate__fadeInDown');
+      setTimeout(() => {
+        msg.classList.add('animate__fadeOutUp');
+        setTimeout(() => {
+          msg.classList.add('hidden');
+          msg.classList.remove('animate__fadeInDown', 'animate__fadeOutUp');
+        }, 800);
+      }, 2000);
+      // Actualizar lista de categorías dinámicamente
+      const data = await response.json();
+      if (data.tbody) {
+        document.getElementById('categoriasTbody').innerHTML = data.tbody;
+      }
+    } else {
+      // Opcional: mostrar error
+    }
+  }
+}
+</script>
+<script>
+(function() {
+  // Solo ejecuta el ajuste de page_size si NO hay page_size en la URL y no se ha ajustado antes
+  const pageSizeKey = 'categorias_dashboard_page_size_set_v1';
+  const urlParams = new URLSearchParams(window.location.search);
+  if (!urlParams.has('page_size') && !localStorage.getItem(pageSizeKey)) {
+    function getPageSize() {
+      const rowHeight = 78;
+      const headerHeight = 120;
+      const available = window.innerHeight - headerHeight - 300;
+      let rows = Math.floor(available / rowHeight);
+      if (rows < 3) rows = 3;
+      if (rows > 30) rows = 30;
+      return rows;
+    }
+    function setPageSizeAndReload() {
+      const pageSize = getPageSize();
+      const url = new URL(window.location.href);
+      url.searchParams.set('page_size', pageSize);
+      url.searchParams.set('page', 1);
+      localStorage.setItem(pageSizeKey, window.innerHeight);
+      window.location.href = url.toString();
+    }
+    setTimeout(setPageSizeAndReload, 100);
+  }
+  // Recalcula automáticamente si el usuario cambia mucho el tamaño de pantalla
+  let lastHeight = parseInt(localStorage.getItem(pageSizeKey) || window.innerHeight);
+  window.addEventListener('resize', function() {
+    const diff = Math.abs(window.innerHeight - lastHeight);
+    if (diff > 78) { // Si cambia más de 120px, se considera un cambio relevante
+      localStorage.removeItem(pageSizeKey);
+      location.reload();
+    }
+  });
+})();
+</script>
+{% endblock %}
