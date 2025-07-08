@@ -200,8 +200,7 @@
             <span class="material-icons-outlined">expand_more</span>
           </button>
           <div id="userDropdown" class="hidden absolute right-0 mt-2 w-56 rounded-xl shadow-2xl border border-[#e7c98a] z-50 transition-all duration-200" style="background:#232526; color:#fff;">
-            <a href="{% url 'accounts:profile' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#0ff0b3] hover:bg-[#101820] hover:text-white font-medium rounded-t-xl transition">Perfil</a>
-            <a href="{% url 'edit_profile' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#F8F9FA] hover:bg-[#3a2e1a] hover:text-[#C5A46B] font-medium transition">Editar perfil</a>
+            <a href="{% url 'edit_profile' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#F8F9FA] hover:bg-[#3a2e1a] hover:text-[#C5A46B] font-medium rounded-t-xl transition">Editar perfil</a>
             {% if user.is_authenticated and user.influencer_profile %}
             <a href="{% url 'influencer_dashboard' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#C5A46B] hover:bg-[#3a2e1a] hover:text-[#093f62] font-semibold transition">Panel de Influencer</a>
             <a href="{% url 'blog:add_post' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#C5A46B] hover:bg-[#3a2e1a] hover:text-[#093f62] font-semibold transition">Escribir en el blog</a>

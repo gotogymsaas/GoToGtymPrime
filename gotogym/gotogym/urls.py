@@ -32,7 +32,7 @@ urlpatterns = [
 urlpatterns += i18n_patterns(
     path('', views.home, name='home'),
     path('admin/', admin.site.urls),
-    path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
+    path('accounts/', include('accounts.urls')),
     path('influencer/', include('influencer.urls')),
     # Password reset URLs
     path('accounts/password_reset/', auth_views.PasswordResetView.as_view(template_name='accounts/password_reset_form.html'), name='password_reset'),
