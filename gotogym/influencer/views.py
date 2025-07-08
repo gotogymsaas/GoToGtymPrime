@@ -31,7 +31,22 @@ def dashboard(request):
     if not profile:
         return redirect('influencer_suscribete')
     compras = get_compras_referidas(profile)
-    return render(request, 'influencer/dashboard.html', {'profile': profile, 'compras': compras})
+    # Simulación de retiros
+    retiros = [
+        {'fecha': '2025-06-10', 'monto': 100, 'estado': 'aprobado'},
+        {'fecha': '2025-06-20', 'monto': 50, 'estado': 'pendiente'},
+    ]
+    # Calcular porcentaje de progreso
+    objetivo = 1000
+    progreso = min(int((float(profile.total_sales) / objetivo) * 100), 100) if profile.total_sales else 0
+    return render(request, 'influencer/dashboard.html', {
+        'profile': profile,
+        'compras': compras,
+        'retiros': retiros,
+        'progreso': progreso,
+        'objetivo': objetivo,
+        'referral_code': profile.referral_code,
+    })
 
 @login_required
 def compras_referidas(request):
@@ -46,7 +61,7 @@ def solicitar_retiro(request):
     profile = getattr(request.user, 'influencer_profile', None)
     if not profile:
         return redirect('influencer_suscribete')
-    # Aquí puedes agregar lógica para procesar la solicitud de retiro
+    
     messages.success(request, 'Solicitud de retiro enviada. Pronto nos pondremos en contacto.')
     return redirect('influencer_dashboard')
 

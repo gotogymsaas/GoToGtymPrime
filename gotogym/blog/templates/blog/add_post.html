@@ -1,4 +1,4 @@
-{% extends "_base_dasboard.html" %}
+{% extends template_extends %}
 {% load static %}
 {% load i18n %}
 {% load widget_tweaks %}
@@ -19,7 +19,16 @@
       </div>
       <div>
         <label for="{{ form.author.id_for_label }}" class="block text-base font-semibold text-gray-700 mb-1">{% trans "Autor" %}</label>
-        {% render_field form.author class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800" %}
+        {% if is_influencer and not is_admin %}
+          <input type="text" class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed" value="{{ user.get_full_name|default:user.username }}" readonly>
+          <input type="hidden" name="author" value="{{ user.pk }}">
+        {% else %}
+          <select name="author" id="id_author" class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-[#C5A46B] focus:ring-2 focus:ring-[#C5A46B]/30 bg-white shadow-sm transition text-gray-800">
+            {% for u in form.fields.author.queryset %}
+              <option value="{{ u.pk }}" {% if form.initial.author == u.pk or user.pk == u.pk %}selected{% endif %}>{{ u.get_full_name|default:u.username }}</option>
+            {% endfor %}
+          </select>
+        {% endif %}
         {% for error in form.author.errors %}<p class="text-xs text-red-500 mt-1">{{ error }}</p>{% endfor %}
       </div>
       <div>
@@ -59,7 +68,7 @@
       </div>
     </div>
     <div class="md:col-span-3 flex justify-end gap-3 mt-8">
-      <a href="{% url 'blog:dashboard' %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
+      <a href="{% if is_admin %}{% url 'blog:dashboard' %}{% else %}{% url 'blog:post_list' %}{% endif %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
         <span class="material-icons-outlined">arrow_back</span> {% trans "Cancelar" %}
       </a>
       <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#093f62] text-white font-semibold shadow-md hover:bg-[#C5A46B] hover:text-[#093f62] transition">

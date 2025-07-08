@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Estado del Pago{% endblock %}
+{% block content %}
+<div class="max-w-lg mx-auto mt-16 bg-white rounded-xl shadow-lg p-8 text-center">
+  <h2 class="text-2xl font-bold mb-6">Estado del Pago</h2>
+  {% if status == 'approved' %}
+    <div class="text-green-600 text-xl font-bold mb-4">¡Pago aprobado! 🎉</div>
+    <div class="mb-2">Tu pago fue procesado correctamente.</div>
+  {% elif status == 'pending' %}
+    <div class="text-yellow-600 text-xl font-bold mb-4">Pago pendiente</div>
+    <div class="mb-2">Tu pago está pendiente de acreditación. Te notificaremos cuando se confirme.</div>
+  {% elif status == 'rejected' %}
+    <div class="text-red-600 text-xl font-bold mb-4">Pago rechazado</div>
+    <div class="mb-2">El pago fue rechazado. Intenta nuevamente o usa otro método.</div>
+  {% else %}
+    <div class="text-gray-600 text-xl font-bold mb-4">Estado desconocido</div>
+    <div class="mb-2">No pudimos obtener el estado del pago.</div>
+  {% endif %}
+  <div class="mt-6 text-sm text-gray-500">
+    <div><b>ID de pago:</b> {{ payment_id|default:'-' }}</div>
+    <div><b>Orden:</b> {{ merchant_order_id|default:'-' }}</div>
+  </div>
+  <a href="{% url 'carrito:cart_detail' %}" class="mt-8 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-all">Volver al carrito</a>
+</div>
+{% endblock %}

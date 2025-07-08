@@ -36,7 +36,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined" rel="stylesheet">
+  
   
   <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -136,6 +138,15 @@
     }
     {% endif %}
   </style>
+  <link rel="manifest" href="{% static 'frontend/webapp/manifest.json' %}">
+  <meta name="theme-color" content="#1976d2">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('{% static 'frontend/webapp/service-worker.js' %}');
+      });
+    }
+  </script>
 </head>
 <body class="text-[#101820]">
   <nav class="backdrop-blur-md text-white sticky top-0 z-40 shadow-md">
@@ -157,6 +168,7 @@
         <li><a href="/gestion/" class="hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
         <li><a href="/blog/" class="hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
         <li><a href="/tienda/" class="hover:text-[#C5A46B]">{% trans "Tienda" %}</a></li>
+        <li><a href="/planes/" class="hover:text-[#C5A46B]">Planes de Suscripción</a></li>
         <li><a href="/carrito/" class="relative hover:opacity-80 transition">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="h-6 w-6 text-[#C5A46B]" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13l1.2-6h9.8" />
@@ -188,9 +200,11 @@
             <span class="material-icons-outlined">expand_more</span>
           </button>
           <div id="userDropdown" class="hidden absolute right-0 mt-2 w-56 rounded-xl shadow-2xl border border-[#e7c98a] z-50 transition-all duration-200" style="background:#232526; color:#fff;">
-            <a href="{% url 'edit_profile' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#F8F9FA] hover:bg-[#3a2e1a] hover:text-[#C5A46B] font-medium rounded-t-xl transition">Editar perfil</a>
+            <a href="{% url 'accounts:profile' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#0ff0b3] hover:bg-[#101820] hover:text-white font-medium rounded-t-xl transition">Perfil</a>
+            <a href="{% url 'edit_profile' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#F8F9FA] hover:bg-[#3a2e1a] hover:text-[#C5A46B] font-medium transition">Editar perfil</a>
             {% if user.is_authenticated and user.influencer_profile %}
             <a href="{% url 'influencer_dashboard' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#C5A46B] hover:bg-[#3a2e1a] hover:text-[#093f62] font-semibold transition">Panel de Influencer</a>
+            <a href="{% url 'blog:add_post' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#C5A46B] hover:bg-[#3a2e1a] hover:text-[#093f62] font-semibold transition">Escribir en el blog</a>
             {% endif %}
             {% if user.is_superuser %}
             <a href="dashboard" onclick="closeUserMenu()" class="block px-5 py-3 text-[#F8F9FA] hover:bg-[#3a2e1a] hover:text-[#C5A46B] font-semibold transition">Dashboard Admin</a>
@@ -240,6 +254,7 @@
         <li><a href="/metricas/" class="hover:text-[#C5A46B]">{% trans "Tecnologia" %}</a></li>
         <li><a href="/gestion/" class="hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
         <li><a href="/blog/" class="hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
+        <li><a href="/planes/" class="hover:text-[#C5A46B]">Planes de Suscripción</a></li>
         <li><a href="/carrito/" class="relative hover:opacity-80 transition">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="h-6 w-6 text-[#C5A46B]" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13l1.2-6h9.8" />

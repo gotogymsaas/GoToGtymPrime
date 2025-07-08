@@ -35,7 +35,8 @@
         <tr>
           <th class="px-8 py-4 w-10 text-left rounded-tl-3xl">#</th>
           <th class="px-8 py-4 w-1/4 text-left">Título</th>
-          <th class="px-8 py-4 w-1/2 text-left">Contenido</th>
+          <th class="px-8 py-4 w-1/4 text-left">Autor</th>
+          <th class="px-8 py-4 w-1/4 text-left">Categoría</th>
           <th class="px-8 py-4 w-1/4 text-center rounded-tr-3xl">Acciones</th>
         </tr>
       </thead>
@@ -44,13 +45,14 @@
         <tr class="border-b border-[#C5A46B]/20 hover:bg-[#f3e9d2]/40 dark:hover:bg-[#093f62]/20 transition">
           <td class="px-8 py-4 font-bold text-[#C5A46B]">{{ forloop.counter }}</td>
           <td class="px-8 py-4 max-w-xs truncate font-semibold" title="{{ post.title }}">{{ post.title }}</td>
-          <td class="px-8 py-4 max-w-md truncate" title="{{ post.body }}">{{ post.body|truncatewords:15 }}</td>
+          <td class="px-8 py-4 max-w-xs truncate" title="{{ post.author.get_full_name|default:post.author.username }}">{{ post.author.get_full_name|default:post.author.username }}</td>
+          <td class="px-8 py-4 max-w-xs truncate" title="{{ post.category.name }}">{{ post.category.name }}</td>
           <td class="px-8 py-4 text-center flex justify-center gap-4">
             <a href="{% url 'blog:edit_post' pk=post.pk %}" class="group relative p-2 rounded-full border-2 border-yellow-500 text-yellow-600 hover:bg-yellow-500 hover:text-white dark:text-yellow-300 dark:border-yellow-300 dark:hover:bg-yellow-400 dark:hover:text-black transition">
               <span class="material-icons-outlined">edit</span>
               <span class="absolute -top-9 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-all bg-black text-white text-xs rounded px-2 py-1 pointer-events-none z-50 dark:bg-gray-700">Editar publicación</span>
             </a>
-            <button type="button" onclick="openDeletePostModal({{ post.pk }}, '{{ post.title|escapejs }}')" class="group relative p-2 rounded-full border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white dark:text-red-400 dark:border-red-400 dark:hover:bg-red-500 dark:hover:text-white transition">
+            <button type="button" data-post-id="{{ post.pk }}" data-post-title="{{ post.title|escapejs }}" data-delete-url="{% url 'blog:delete_post' pk=post.pk %}" class="btn-delete-post group relative p-2 rounded-full border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white dark:text-red-400 dark:border-red-400 dark:hover:bg-red-500 dark:hover:text-white transition">
               <span class="material-icons-outlined">delete</span>
               <span class="absolute -top-9 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-all bg-black text-white text-xs rounded px-2 py-1 pointer-events-none z-50 dark:bg-gray-700">Eliminar publicación</span>
             </button>
@@ -69,7 +71,7 @@
 <!-- MODAL ELIMINAR POST -->
 <div id="modalDeletePost" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
   <div class="bg-white/90 rounded-3xl shadow-2xl p-8 max-w-lg w-full border border-red-200 relative animate-fade-in overflow-hidden">
-    <button onclick="closeDeletePostModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-600 text-3xl transition">
+    <button type="button" onclick="closeDeletePostModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-600 text-3xl transition">
       <span class="material-icons-outlined">close</span>
     </button>
     <div class="flex items-center gap-3 mb-6">
@@ -139,48 +141,65 @@ if (categoriaForm) {
   }
 }
 
-function openDeletePostModal(id, title) {
+function openDeletePostModal(id, title, url) {
   document.getElementById('modalDeletePost').classList.remove('hidden');
   document.getElementById('deletePostTitle').textContent = title;
-  document.getElementById('deletePostForm').action = `/blog/delete/${id}/`;
+  document.getElementById('deletePostForm').action = url;
 }
 function closeDeletePostModal() {
   document.getElementById('modalDeletePost').classList.add('hidden');
 }
-document.getElementById('modalDeletePost').onclick = function(e) {
-  if (e.target === this) closeDeletePostModal();
-};
 
-const deletePostForm = document.getElementById('deletePostForm');
-if (deletePostForm) {
-  deletePostForm.onsubmit = async function(e) {
-    e.preventDefault();
-    const formData = new FormData(deletePostForm);
-    const action = deletePostForm.action;
-    const response = await fetch(action, {
-      method: 'POST',
-      headers: { 'X-Requested-With': 'XMLHttpRequest' },
-      body: formData
+window.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.btn-delete-post').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      const id = btn.getAttribute('data-post-id');
+      const title = btn.getAttribute('data-post-title');
+      const url = btn.getAttribute('data-delete-url');
+      openDeletePostModal(id, title, url);
+      e.preventDefault();
     });
-    if (response.ok) {
-      closeDeletePostModal();
-      const msg = document.getElementById('postDeleteMsg');
-      msg.classList.remove('hidden');
-      msg.classList.add('animate__fadeInDown');
-      setTimeout(() => {
-        msg.classList.add('animate__fadeOutUp');
-        setTimeout(() => {
-          msg.classList.add('hidden');
-          msg.classList.remove('animate__fadeInDown', 'animate__fadeOutUp');
-          window.location.reload();
-        }, 800);
-      }, 2000);
-    } else {
-      // Opcional: mostrar error
+  });
+
+  const deletePostForm = document.getElementById('deletePostForm');
+  if (deletePostForm) {
+    deletePostForm.onsubmit = async function(e) {
+      e.preventDefault();
+      const formData = new FormData(deletePostForm);
+      const action = deletePostForm.action;
+      try {
+        const response = await fetch(action, {
+          method: 'POST',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+          },
+          body: formData
+        });
+        if (response.ok) {
+          closeDeletePostModal();
+          const msg = document.getElementById('postDeleteMsg');
+          msg.classList.remove('hidden');
+          msg.classList.add('animate__fadeInDown');
+          setTimeout(() => {
+            msg.classList.add('animate__fadeOutUp');
+            setTimeout(() => {
+              msg.classList.add('hidden');
+              msg.classList.remove('animate__fadeInDown', 'animate__fadeOutUp');
+              window.location.reload();
+            }, 800);
+          }, 2000);
+        } else {
+          const errorText = await response.text();
+          alert('Error al eliminar el post.\n' + errorText);
+        }
+      } catch (err) {
+        alert('Error de red o servidor: ' + err);
+      }
     }
   }
-}
-
+});
+</script>
 {% if request.GET.success == 'add' %}
 <script>
 window.onload = function() {

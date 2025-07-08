@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="flex justify-center items-center min-h-[80vh] bg-[#101820]">
+  <div class="bg-[#181A1B] rounded-3xl shadow-2xl px-8 py-10 w-full max-w-sm flex flex-col items-center border border-[#0ff0b3]/30">
+    <div class="relative mb-4">
+      {% if user.profile_photo %}
+        <img src="{{ user.profile_photo.url }}" alt="Foto de perfil" class="w-28 h-28 rounded-full border-4 border-[#0ff0b3] object-cover shadow-lg bg-gray-800">
+      {% else %}
+        <img src="{% static 'images/placeholder.webp' %}" alt="Foto de perfil por defecto" class="w-28 h-28 rounded-full border-4 border-[#0ff0b3] object-cover shadow-lg bg-gray-800">
+      {% endif %}
+    </div>
+    <h2 class="text-2xl font-bold text-white text-center">{{ user.get_full_name|default:user.username }}</h2>
+    <div class="text-[#0ff0b3] text-base text-center mb-2">{{ user.profession }}</div>
+    <div class="w-16 h-1 bg-[#0ff0b3] rounded-full mb-6"></div>
+    <div class="flex justify-center gap-8 mb-6">
+      <div class="flex flex-col items-center">
+        <span class="text-2xl font-bold text-white">{{ user.weight }}</span>
+        <span class="text-[#0ff0b3] text-xs font-semibold">kg</span>
+        <span class="text-[#0ff0b3] text-xs">Peso</span>
+      </div>
+      <div class="flex flex-col items-center">
+        <span class="text-2xl font-bold text-white">{{ user.age }}</span>
+        <span class="text-[#0ff0b3] text-xs">Edad</span>
+      </div>
+      <div class="flex flex-col items-center">
+        <span class="text-2xl font-bold text-white">{{ user.height }}</span>
+        <span class="text-[#0ff0b3] text-xs font-semibold">m</span>
+        <span class="text-[#0ff0b3] text-xs">Altura</span>
+      </div>
+    </div>
+    <div class="text-white text-sm mb-2">Índice de felicidad</div>
+    <div class="relative flex items-center justify-center mb-6">
+      <svg width="120" height="120" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="54" stroke="#0ff0b3" stroke-width="3" fill="none" />
+        <path d="M30 80 Q60 110 90 80" stroke="#0ff0b3" stroke-width="2" fill="none" />
+        <path d="M40 60 Q60 80 80 60" stroke="#0ff0b3" stroke-width="2" fill="none" />
+      </svg>
+      <span class="absolute text-3xl font-bold text-[#0ff0b3]">{{ user.happiness_index|default:'80%' }}</span>
+    </div>
+    <a href="{% url 'accounts:edit_profile' %}" class="mt-4 px-8 py-2 rounded-full border border-[#0ff0b3] text-[#0ff0b3] font-semibold hover:bg-[#0ff0b3] hover:text-[#181A1B] transition">Editar</a>
+  </div>
+</div>
+{% endblock %}

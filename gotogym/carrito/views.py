@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
+from django.contrib import messages
 from products.models import Product
 
 # Añadir producto al carrito
@@ -45,6 +46,18 @@ def cart_detail(request):
         total += subtotal
     shipping = 5 if items else 0
     total_price = total + shipping
+
+    # Mostrar estado de pago de MercadoPago si viene en la URL
+    payment_status = request.GET.get('collection_status')
+    if payment_status == 'approved':
+        messages.success(request, '¡Pago aprobado! Gracias por tu compra.')
+        # Limpiar carrito si el pago fue exitoso
+        request.session['cart'] = {}
+    elif payment_status == 'pending':
+        messages.info(request, 'El pago está pendiente. Te notificaremos cuando se acredite.')
+    elif payment_status == 'rejected':
+        messages.error(request, 'El pago fue rechazado. Intenta nuevamente.')
+
     return render(request, 'carrito/cart_detail.html', {
         'items': items,
         'total': total,

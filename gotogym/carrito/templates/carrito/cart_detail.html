@@ -35,12 +35,12 @@
         <h3 class="font-bold text-lg mb-4">Summary</h3>
         <div class="flex justify-between mb-2">
           <span>ITEMS {{ num_items }}</span>
-          <span>€ {{ total|floatformat:2 }}</span>
+          <span>$ {{ total|floatformat:4 }}</span>
         </div>
         <div class="mb-2">
           <span class="block mb-1">SHIPPING</span>
           <select class="w-full border rounded px-2 py-1">
-            <option>Standard Delivery - € {{ shipping|floatformat:2 }}</option>
+            <option>Standard Delivery - $ {{ shipping|floatformat:2 }}</option>
           </select>
         </div>
         <div class="mb-2">
@@ -54,10 +54,17 @@
           <span>TOTAL PRICE</span>
           <span>€ {{ total_price|floatformat:2 }}</span>
         </div>
+        {% if num_items > 0 %}
         <form method="post" action="{% url 'carrito:checkout' %}">
           {% csrf_token %}
-          <button type="submit" class="w-full bg-black text-white py-2 rounded font-bold mt-2">CHECKOUT</button>
+          <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white py-3 rounded-xl font-bold mt-4 text-lg flex items-center justify-center gap-2 shadow-lg hover:from-blue-700 hover:to-cyan-500 transition-all">
+            <img src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.22.7/mercadopago/logo__large_plus.png" alt="MercadoPago" class="h-7 inline-block"/>
+            Pagar con MercadoPago
+          </button>
         </form>
+        {% else %}
+        <div class="text-center text-gray-400 py-4 font-semibold">Agrega productos al carrito para pagar con MercadoPago.</div>
+        {% endif %}
       </div>
     </div>
   </div>

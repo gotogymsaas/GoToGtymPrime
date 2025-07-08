@@ -1,148 +1,215 @@
-{% extends "base.html" %}
+{% extends template_extends %}
 {% load static i18n %}
 
 {% block title %}Blog | GoToGym{% endblock %}
 
 {% block content %}
-{# ─── HERO ─────────────────────────────────────────── #}
-<section class="bg-gray-100 py-12">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <h1 class="text-4xl font-extrabold text-[#C5A46B] drop-shadow mb-3">
-      Nuestro blog
+
+<section class="relative h-[260px] flex items-center justify-center mb-10 shadow-xl overflow-hidden ">
+  <img src="{% static 'images/blog.jpg' %}" alt="Banner Blog" class="absolute inset-0 w-full h-full object-cover object-center z-0"/>
+  <div class="absolute inset-0 bg-gradient-to-b from-gray-900/90 via-gray-700/80 to-gray-800/80 "></div>
+  <div class="relative z-20 flex flex-col items-center text-center w-full px-4">
+    <h1 class="text-5xl md:text-6xl font-extrabold text-white drop-shadow-lg tracking-tight mb-3 animate-fade-in">
+      Nuestro Blog
     </h1>
-    <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+    <p class="text-lg md:text-2xl text-white/90 max-w-2xl mx-auto animate-fade-in delay-100">
       Consejos, rutinas y nutrición para un estilo de vida fitness
     </p>
   </div>
 </section>
-
-{# ─── FILTROS ───────────────────────────────────────── #}
-<form method="get"
-      class="bg-white/90 backdrop-blur border border-white/40
-             p-6 rounded-3xl shadow-xl mt-8 mb-14 max-w-6xl mx-auto">
+<form method="get" class="bg-white/90 backdrop-blur border border-white/40 p-8 rounded-3xl shadow-2xl -mt-16 mb-16 max-w-6xl mx-auto animate-fade-in">
   <div class="grid gap-6 md:grid-cols-4 items-end">
-
-    
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
-      <input name="search" placeholder="Título o contenido"
-             value="{{ request.GET.search }}"
-             class="w-full rounded-full border border-gray-300 px-4 py-2
-                    focus:ring-2 focus:ring-[#C5A46B]/60 focus:border-[#C5A46B]">
+      <label class="block text-sm font-semibold text-[#4b2067] mb-1">Buscar</label>
+      <input name="search" placeholder="Título o contenido" value="{{ request.GET.search }}" class="w-full rounded-full border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-[#C5A46B]/60 focus:border-[#C5A46B]">
     </div>
-
-    {# Categoría #}
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
-      <select name="category"
-              class="w-full rounded-full border border-gray-300 px-4 py-2
-                     focus:ring-2 focus:ring-[#C5A46B]/60 focus:border-[#C5A46B]">
+      <label class="block text-sm font-semibold text-[#4b2067] mb-1">Categoría</label>
+      <select name="category" class="w-full rounded-full border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-[#C5A46B]/60 focus:border-[#C5A46B]">
         <option value="">Todas</option>
         {% for c in categories %}
-          <option value="{{ c.id }}"
-                  {% if request.GET.category == c.id|stringformat:"s" %}selected{% endif %}>
-            {{ c.name }}
-          </option>
+          <option value="{{ c.id }}" {% if request.GET.category == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
         {% endfor %}
       </select>
     </div>
-
-    {# Autor #}
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Autor</label>
-      <select name="author"
-              class="w-full rounded-full border border-gray-300 px-4 py-2
-                     focus:ring-2 focus:ring-[#C5A46B]/60 focus:border-[#C5A46B]">
+      <label class="block text-sm font-semibold text-[#4b2067] mb-1">Autor</label>
+      <select name="author" class="w-full rounded-full border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-[#C5A46B]/60 focus:border-[#C5A46B]">
         <option value="">Todos</option>
         {% for a in authors %}
-          <option value="{{ a.id }}"
-                  {% if request.GET.author == a.id|stringformat:"s" %}selected{% endif %}>
-            {{ a.get_full_name|default:a.username }}
-          </option>
+          <option value="{{ a.id }}" {% if request.GET.author == a.id|stringformat:"s" %}selected{% endif %}>{{ a.get_full_name|default:a.username }}</option>
         {% endfor %}
       </select>
     </div>
-
-
-    <div class="flex  gap-3">
-      <button type="submit" class="w-full bg-[#C5A46B] hover:bg-[#d7bb83] text-black font-semibold py-2 rounded-full transition">
-        Aplicar filtros
-      </button>
-      <a href="{% url 'blog:post_list' %}" class="w-full text-center bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-full transition">
-        Limpiar
-      </a>
+    <div class="flex gap-3">
+      <button type="submit" class="w-full bg-[#C5A46B] hover:bg-[#d7bb83] text-black font-semibold py-2 rounded-full transition shadow">Aplicar filtros</button>
+      <a href="{% url 'blog:post_list' %}" class="w-full text-center bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-full transition shadow">Limpiar</a>
     </div>
   </div>
 </form>
-
-{# ─── LISTA DE POSTS ───────────────────────────────── #}
-<section class="py-12 bg-white">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8
-              grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-
-    {% for post in posts %}
-    <article class="bg-white rounded-3xl shadow-lg overflow-hidden
-                    hover:shadow-xl hover:-translate-y-1 transition flex flex-col">
-      <a href="{% url 'blog:post_detail' slug=post.slug %}"
-         class="block relative aspect-[4/3] overflow-hidden">
-        {% if post.featured %}
-          <img src="{{ post.featured.url }}" alt="{{ post.title }}"
-               class="absolute inset-0 w-full h-full object-cover
-                      group-hover:scale-105 transition-transform">
+<section class="max-w-7xl mx-auto px-4 pb-8 sm:px-6 lg:px-8 grid gap-8 grid-cols-1 md:grid-cols-3 auto-rows-[minmax(180px,auto)]">
+  {% if posts|length > 3 %}
+    <article class="md:col-span-2 md:row-1-span-2 bg-white rounded-3xl shadow-xl flex flex-col md:flex-row overflow-hidden">
+      <a href="{% url 'blog:post_detail' slug=posts.0.slug %}" class="md:w-1/2 h-64 md:h-auto relative group">
+        {% if posts.0.featured %}
+          <img src="{{ posts.0.featured.url }}" alt="{{ posts.0.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
         {% else %}
-          <img src="{% static 'images/placehorder.webp' %}" alt=""
-               class="absolute inset-0 w-full h-full object-cover opacity-60">
+          <img src="{% static 'images/placehorder.webp' %}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-60">
         {% endif %}
       </a>
-
-      <div class="flex flex-col flex-1 p-6 gap-3">
-        <span class="uppercase text-[10px] font-bold tracking-widest text-gray-500">
-          {{ post.category.name }}
-        </span>
-
-        <h2 class="text-lg font-semibold line-clamp-2">
-          {{ post.title }}
-        </h2>
-
-        <p class="text-gray-600 text-sm line-clamp-3 flex-1">
-          {{ post.excerpt|truncatewords:35 }}
-        </p>
-
-        <div class="text-xs text-gray-400">
-          {{ post.published|date:"d M Y" }} — {{ post.reading_time }} min
+      <div class="flex-1 p-8 flex flex-col justify-center">
+        <span class="inline-block bg-[#fbbf24] text-[#92400e] text-xs font-bold px-4 py-1 rounded-full mb-3">{{ posts.0.category.name }}</span>
+        <h2 class="text-3xl font-extrabold text-[#093f62] mb-2 line-clamp-2">{{ posts.0.title }}</h2>
+        <p class="text-gray-700 text-base mb-4 line-clamp-3">{{ posts.0.excerpt|truncatewords:35 }}</p>
+        <div class="flex items-center gap-4 text-xs text-gray-500 mb-2">
+          <span class="flex items-center gap-1"><span class="material-icons text-base align-middle">person</span> {{ posts.0.author.get_full_name|default:posts.0.author.username }}</span>
+          <span class="flex items-center gap-1"><span class="material-icons text-base align-middle">calendar_today</span> {{ posts.0.published|date:"d M Y" }}</span>
         </div>
-
-        <a href="{% url 'blog:post_detail' slug=post.slug %}"
-           class="mt-2 inline-block bg-[#C5A46B] hover:bg-[#d7bb83] text-black
-                  font-medium px-5 py-2 rounded-full self-start transition">
-          Leer más
-        </a>
+        {% if is_admin or posts.0.author == user %}
+        <div class="flex gap-2 mt-2">
+          <a href="{% url 'blog:edit_post' pk=posts.0.pk %}" class="inline-flex items-center gap-1 px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-xs font-semibold hover:bg-yellow-300 transition"><span class="material-icons text-base align-middle">edit</span> Editar</a>
+          <button type="button" onclick="openDeletePostModal({{ posts.0.pk }}, '{{ posts.0.title|escapejs }}', '{% url 'blog:delete_post' pk=posts.0.pk %}')" class="inline-flex items-center gap-1 px-3 py-1 bg-red-200 text-red-800 rounded-full text-xs font-semibold hover:bg-red-300 transition"><span class="material-icons text-base align-middle">delete</span> Eliminar</button>
+        </div>
+        {% endif %}
+        <a href="{% url 'blog:post_detail' slug=posts.0.slug %}" class="mt-2 inline-flex items-center gap-2 bg-[#C5A46B] hover:bg-[#d7bb83] text-[#093f62] font-semibold px-6 py-2 rounded-full self-start transition shadow">Leer más <span class="material-icons text-base align-middle">arrow_forward</span></a>
       </div>
     </article>
-    {% empty %}
-      <p class="col-span-full text-center text-gray-500">
-        No hay publicaciones con esos filtros.
-      </p>
-    {% endfor %}
-  </div>
-
-  {# ─── PAGINACIÓN ─── #}
-  {% if is_paginated %}
-    <div class="mt-14 flex justify-center gap-4">
-      {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}&{{ params }}"
-           class="w-10 h-10 flex items-center justify-center
-                  rounded-full border hover:bg-gray-100">‹</a>
-      {% endif %}
-      <span class="self-center text-sm">
-        {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
-      </span>
-      {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}&{{ params }}"
-           class="w-10 h-10 flex items-center justify-center
-                  rounded-full bg-[#C5A46B] text-black hover:bg-[#d7bb83]">›</a>
-      {% endif %}
-    </div>
+    <article class="md:col-span-1 row-span-1 bg-white rounded-3xl shadow flex flex-col overflow-hidden h-full min-h-[260px]">
+      <a href="{% url 'blog:post_detail' slug=posts.1.slug %}" class="h-48 relative group">
+        {% if posts.1.featured %}
+          <img src="{{ posts.1.featured.url }}" alt="{{ posts.1.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+        {% else %}
+          <img src="{% static 'images/placehorder.webp' %}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-60">
+        {% endif %}
+      </a>
+      <div class="flex-1 p-6 flex flex-col justify-center">
+        <span class="inline-block bg-[#bae6fd] text-[#0369a1] text-xs font-bold px-4 py-1 rounded-full mb-2">{{ posts.1.category.name }}</span>
+        <h2 class="text-xl font-bold text-[#093f62] mb-1 line-clamp-2">{{ posts.1.title }}</h2>
+        <p class="text-gray-600 text-sm mb-2 line-clamp-3">{{ posts.1.excerpt|truncatewords:20 }}</p>
+        <div class="flex items-center gap-3 text-xs text-gray-500 mb-2">
+          <span class="flex items-center gap-1"><span class="material-icons text-base align-middle">person</span> {{ posts.1.author.get_full_name|default:posts.1.author.username }}</span>
+          <span class="flex items-center gap-1"><span class="material-icons text-base align-middle">calendar_today</span> {{ posts.1.published|date:"d M Y" }}</span>
+        </div>
+        {% if is_admin or posts.1.author == user %}
+        <div class="flex gap-2 mt-2">
+          <a href="{% url 'blog:edit_post' pk=posts.1.pk %}" class="inline-flex items-center gap-1 px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-xs font-semibold hover:bg-yellow-300 transition"><span class="material-icons text-base align-middle">edit</span> Editar</a>
+          <button type="button" onclick="openDeletePostModal({{ posts.1.pk }}, '{{ posts.1.title|escapejs }}', '{% url 'blog:delete_post' pk=posts.1.pk %}')" class="inline-flex items-center gap-1 px-3 py-1 bg-red-200 text-red-800 rounded-full text-xs font-semibold hover:bg-red-300 transition"><span class="material-icons text-base align-middle">delete</span> Eliminar</button>
+        </div>
+        {% endif %}
+        <a href="{% url 'blog:post_detail' slug=posts.1.slug %}" class="mt-1 inline-flex items-center gap-2 bg-[#C5A46B] hover:bg-[#d7bb83] text-[#093f62] font-semibold px-4 py-1.5 rounded-full self-start transition shadow">Leer más <span class="material-icons text-base align-middle">arrow_forward</span></a>
+      </div>
+    </article>
+    <article class="md:col-span-1 row-span-1 bg-white rounded-3xl shadow flex flex-col overflow-hidden h-full min-h-[260px]">
+      <a href="{% url 'blog:post_detail' slug=posts.2.slug %}" class="h-48 relative group">
+        {% if posts.2.featured %}
+          <img src="{{ posts.2.featured.url }}" alt="{{ posts.2.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+        {% else %}
+          <img src="{% static 'images/placehorder.webp' %}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-60">
+        {% endif %}
+      </a>
+      <div class="flex-1 p-6 flex flex-col justify-center">
+        <span class="inline-block bg-[#bae6fd] text-[#0369a1] text-xs font-bold px-4 py-1 rounded-full mb-2">{{ posts.2.category.name }}</span>
+        <h2 class="text-xl font-bold text-[#093f62] mb-1 line-clamp-2">{{ posts.2.title }}</h2>
+        <p class="text-gray-600 text-sm mb-2 line-clamp-3">{{ posts.2.excerpt|truncatewords:20 }}</p>
+        <div class="flex items-center gap-3 text-xs text-gray-500 mb-2">
+          <span class="flex items-center gap-1"><span class="material-icons text-base align-middle">person</span> {{ posts.2.author.get_full_name|default:posts.2.author.username }}</span>
+          <span class="flex items-center gap-1"><span class="material-icons text-base align-middle">calendar_today</span> {{ posts.2.published|date:"d M Y" }}</span>
+        </div>
+        {% if is_admin or posts.2.author == user %}
+        <div class="flex gap-2 mt-2">
+          <a href="{% url 'blog:edit_post' pk=posts.2.pk %}" class="inline-flex items-center gap-1 px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-xs font-semibold hover:bg-yellow-300 transition"><span class="material-icons text-base align-middle">edit</span> Editar</a>
+          <button type="button" onclick="openDeletePostModal({{ posts.2.pk }}, '{{ posts.2.title|escapejs }}', '{% url 'blog:delete_post' pk=posts.2.pk %}')" class="inline-flex items-center gap-1 px-3 py-1 bg-red-200 text-red-800 rounded-full text-xs font-semibold hover:bg-red-300 transition"><span class="material-icons text-base align-middle">delete</span> Eliminar</button>
+        </div>
+        {% endif %}
+        <a href="{% url 'blog:post_detail' slug=posts.2.slug %}" class="mt-1 inline-flex items-center gap-2 bg-[#C5A46B] hover:bg-[#d7bb83] text-[#093f62] font-semibold px-4 py-1.5 rounded-full self-start transition shadow">Leer más <span class="material-icons text-base align-middle">arrow_forward</span></a>
+      </div>
+    </article>
+    <article class="md:col-span-2 md:row-1-span-2 bg-white rounded-3xl shadow-xl flex flex-col md:flex-row overflow-hidden">
+      <div class="flex-1 p-8 flex flex-col justify-center">
+        <span class="inline-block bg-[#fbbf24] text-[#92400e] text-xs font-bold px-4 py-1 rounded-full mb-3">{{ posts.3.category.name }}</span>
+        <h2 class="text-3xl font-extrabold text-[#093f62] mb-2 line-clamp-2">{{ posts.3.title }}</h2>
+        <p class="text-gray-700 text-base mb-4 line-clamp-3">{{ posts.3.excerpt|truncatewords:35 }}</p>
+        <div class="flex items-center gap-4 text-xs text-gray-500 mb-2">
+          <span class="flex items-center gap-1"><span class="material-icons text-base align-middle">person</span> {{ posts.3.author.get_full_name|default:posts.3.author.username }}</span>
+          <span class="flex items-center gap-1"><span class="material-icons text-base align-middle">calendar_today</span> {{ posts.3.published|date:"d M Y" }}</span>
+        </div>
+        {% if is_admin or posts.3.author == user %}
+        <div class="flex gap-2 mt-2">
+          <a href="{% url 'blog:edit_post' pk=posts.3.pk %}" class="inline-flex items-center gap-1 px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-xs font-semibold hover:bg-yellow-300 transition"><span class="material-icons text-base align-middle">edit</span> Editar</a>
+          <button type="button" onclick="openDeletePostModal({{ posts.3.pk }}, '{{ posts.3.title|escapejs }}', '{% url 'blog:delete_post' pk=posts.3.pk %}')" class="inline-flex items-center gap-1 px-3 py-1 bg-red-200 text-red-800 rounded-full text-xs font-semibold hover:bg-red-300 transition"><span class="material-icons text-base align-middle">delete</span> Eliminar</button>
+        </div>
+        {% endif %}
+        <a href="{% url 'blog:post_detail' slug=posts.3.slug %}" class="mt-2 inline-flex items-center gap-2 bg-[#C5A46B] hover:bg-[#d7bb83] text-[#093f62] font-semibold px-6 py-2 rounded-full self-start transition shadow">Leer más <span class="material-icons text-base align-middle">arrow_forward</span></a>
+      </div>
+      <a href="{% url 'blog:post_detail' slug=posts.3.slug %}" class="md:w-1/2 h-64 md:h-auto relative group">
+        {% if posts.3.featured %}
+          <img src="{{ posts.3.featured.url }}" alt="{{ posts.3.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+        {% else %}
+          <img src="{% static 'images/placehorder.webp' %}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-60">
+        {% endif %}
+      </a>
+    </article>
   {% endif %}
+  <!-- Resto de publicaciones -->
+  {% for post in posts|slice:"4:" %}
+    <article class="bg-white rounded-3xl shadow flex flex-col overflow-hidden">
+      <a href="{% url 'blog:post_detail' slug=post.slug %}" class="h-48 relative group">
+        {% if post.featured %}
+          <img src="{{ post.featured.url }}" alt="{{ post.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+        {% else %}
+          <img src="{% static 'images/placehorder.webp' %}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-60">
+        {% endif %}
+      </a>
+      <div class="flex-1 p-6 flex flex-col justify-center">
+        <span class="inline-block bg-[#bae6fd] text-[#0369a1] text-xs font-bold px-4 py-1 rounded-full mb-2">{{ post.category.name }}</span>
+        <h2 class="text-xl font-bold text-[#093f62] mb-1 line-clamp-2">{{ post.title }}</h2>
+        <p class="text-gray-600 text-sm mb-2 line-clamp-3">{{ post.excerpt|truncatewords:20 }}</p>
+        <div class="flex items-center gap-3 text-xs text-gray-500 mb-2">
+          <span class="flex items-center gap-1"><span class="material-icons text-base align-middle">person</span> {{ post.author.get_full_name|default:post.author.username }}</span>
+          <span class="flex items-center gap-1"><span class="material-icons text-base align-middle">calendar_today</span> {{ post.published|date:"d M Y" }}</span>
+        </div>
+        {% if is_admin or post.author == user %}
+        <div class="flex gap-2 mt-2">
+          <a href="{% url 'blog:edit_post' pk=post.pk %}" class="inline-flex items-center gap-1 px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-xs font-semibold hover:bg-yellow-300 transition"><span class="material-icons text-base align-middle">edit</span> Editar</a>
+          <button type="button" onclick="openDeletePostModal({{ post.pk }}, '{{ post.title|escapejs }}', '{% url 'blog:delete_post' pk=post.pk %}')" class="inline-flex items-center gap-1 px-3 py-1 bg-red-200 text-red-800 rounded-full text-xs font-semibold hover:bg-red-300 transition"><span class="material-icons text-base align-middle">delete</span> Eliminar</button>
+        </div>
+        {% endif %}
+        <a href="{% url 'blog:post_detail' slug=post.slug %}" class="mt-1 inline-flex items-center gap-2 bg-[#C5A46B] hover:bg-[#d7bb83] text-[#093f62] font-semibold px-4 py-1.5 rounded-full self-start transition shadow">Leer más <span class="material-icons text-base align-middle">arrow_forward</span></a>
+      </div>
+    </article>
+  {% endfor %}
 </section>
+<!-- MODAL ELIMINAR POST -->
+<div id="modalDeletePost" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
+  <div class="bg-white/90 rounded-3xl shadow-2xl p-8 max-w-lg w-full border border-red-200 relative animate-fade-in overflow-hidden">
+    <button type="button" onclick="closeDeletePostModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-600 text-3xl transition">
+      <span class="material-icons-outlined">close</span>
+    </button>
+    <div class="flex items-center gap-3 mb-6">
+      <span class="material-icons-outlined text-4xl text-red-600">delete</span>
+      <h2 class="text-2xl font-extrabold text-red-600 tracking-tight">Eliminar Publicación</h2>
+    </div>
+    <p class="mb-8 text-lg text-gray-700">¿Estás seguro que deseas eliminar el post <strong id="deletePostTitle" class="text-red-600"></strong>?</p>
+    <form id="deletePostForm" method="post" class="space-y-6">
+      {% csrf_token %}
+      <div class="flex justify-end gap-3 mt-8">
+        <button type="button" onclick="closeDeletePostModal()" class="px-6 py-2.5 rounded-full border-2 border-gray-300 text-gray-700 bg-white hover:bg-gray-100 font-semibold shadow transition">Cancelar</button>
+        <button type="submit" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-red-500 to-red-700 text-white font-bold shadow-lg hover:from-red-700 hover:to-red-500 transition">Eliminar</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+function openDeletePostModal(id, title, url) {
+  document.getElementById('modalDeletePost').classList.remove('hidden');
+  document.getElementById('deletePostTitle').textContent = title;
+  document.getElementById('deletePostForm').action = url;
+}
+function closeDeletePostModal() {
+  document.getElementById('modalDeletePost').classList.add('hidden');
+}
+window.addEventListener('DOMContentLoaded', function() {
+  // Eliminar submit AJAX si lo deseas, aquí solo modal
+});
+</script>
 {% endblock %}

@@ -33,6 +33,11 @@ class User(AbstractUser):
     terms_accepted_at = models.DateTimeField(null=True, blank=True)
     terms_hash = models.CharField(max_length=128, blank=True)
     show_influencer_modal = models.BooleanField(default=True)  # Nuevo campo
+    height = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True, help_text="Altura en metros")
+    weight = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, help_text="Peso en kg")
+    profession = models.CharField(max_length=100, blank=True, null=True)
+    profile_photo = models.ImageField(upload_to='accounts/profile_photos/', blank=True, null=True)
+    happiness_index = models.CharField(max_length=10, blank=True, null=True, help_text="Índice de felicidad (ej: 80%)")
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

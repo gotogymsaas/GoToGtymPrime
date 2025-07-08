@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <title>Dashboard Admin</title>
     {% load static %}
 </head>
@@ -150,6 +151,12 @@
               <span x-show="sidebarOpen" class="ml-4">Métricas</span>
             </a>
           </li>
+          {# <li class="px-4 py-2 hover:bg-white/10 flex items-center">
+            <a href="{% url 'planes_list' %}" class="flex items-center w-full text-white">
+              <span class="material-icons-outlined">workspace_premium</span>
+              <span x-show="sidebarOpen" class="ml-4">Planes de Suscripción</span>
+            </a>
+          </li> #}
         </ul>
       </nav>
     </aside>

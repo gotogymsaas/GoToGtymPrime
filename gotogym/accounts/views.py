@@ -122,3 +122,7 @@ def edit_profile(request):
             messages.info(request, 'No se realizaron cambios.')
         return redirect('edit_profile')
     return render(request, 'accounts/edit_profile.html', {'user': user, 'force_edit': force_edit})
+
+@login_required
+def profile_view(request):
+    return render(request, 'accounts/profile_view.html', {'user': request.user})

@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mx-auto py-10 px-4">
+  <h2 class="text-4xl font-extrabold text-center mb-10 text-[#093f62] drop-shadow">Planes de Suscripción</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 justify-center">
+    <!-- CHISPA ZERO -->
+    <div class="bg-white rounded-2xl shadow-xl border-2 border-blue-200 flex flex-col items-center px-6 py-8 min-w-[320px] max-w-[350px] mx-auto animate-fade-in-up" style="animation-delay:0ms">
+      <div class="uppercase text-xs tracking-widest text-gray-500 mb-2">SPORTSWEAR STORE</div>
+      <h3 class="text-3xl font-extrabold mb-1 text-[#101820]">CHISPA ZERO</h3>
+      <div class="text-sm font-semibold text-gray-500 mb-4">SUBSCRIPTION PLAN BROCHURE</div>
+      <div class="flex w-full mb-4">
+        <div class="flex-1 text-center font-bold text-[#101820] border-b-2 border-[#C5A46B] pb-1">CHISPA ZERO</div>
+        <div class="flex-1 text-center font-bold text-gray-400 border-b-2 border-gray-200 pb-1">BOOST ACTIVE</div>
+      </div>
+      <ul class="w-full text-sm text-gray-700 mb-6 space-y-3">
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">bolt</span> Flash Discount: <span class="font-bold ml-auto">5.0%</span></li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">card_giftcard</span> Free Discount: <span class="font-bold ml-auto">$0.99</span></li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">local_shipping</span> Free Delivery: <span class="font-bold ml-auto">1x/yr</span></li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">check_circle</span> Free Sampling: <span class="font-bold ml-auto">1x/yr</span></li>
+      </ul>
+      <button class="mt-auto px-6 py-2 rounded-full bg-[#C5A46B] text-white font-semibold shadow hover:bg-[#093f62] hover:text-[#C5A46B] transition">Suscribirme</button>
+    </div>
+    <!-- BOOST ACTIVE -->
+    <div class="bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl shadow-xl border-2 border-blue-300 flex flex-col items-center px-6 py-8 min-w-[320px] max-w-[350px] mx-auto relative animate-fade-in-up" style="animation-delay:150ms">
+      <div class="uppercase text-xs tracking-widest text-gray-500 mb-2">SPORTSWEAR STORE</div>
+      <h3 class="text-3xl font-extrabold mb-1 text-[#C5A46B]">BOOST ACTIVE</h3>
+      <div class="text-sm font-semibold text-gray-500 mb-4">SUBSCRIPTION PLAN BROCHURE</div>
+      <div class="flex w-full mb-4">
+        <div class="flex-1 text-center font-bold text-[#C5A46B] border-b-2 border-[#C5A46B] pb-1">BOOST ACTIVE</div>
+        <div class="flex-1 text-center font-bold text-gray-400 border-b-2 border-gray-200 pb-1">PEAK PRO</div>
+      </div>
+      <ul class="w-full text-sm text-gray-700 mb-6 space-y-3">
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">local_shipping</span> Free Shipping: <span class="font-bold ml-auto">$50+</span></li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">percent</span> 20% Permanent Discount</li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">access_time</span> Early Access: <span class="font-bold ml-auto">48h</span></li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">redeem</span> Free Kit: <span class="font-bold ml-auto">1x/yr</span></li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46L]">star</span> Double Points</li>
+      </ul>
+      <button class="mt-auto px-6 py-2 rounded-full bg-[#C5A46B] text-white font-semibold shadow hover:bg-[#093f62] hover:text-[#C5A46B] transition">Suscribirme</button>
+      <span class="absolute top-0 right-0 bg-[#C5A46B] text-white text-xs font-bold px-3 py-1 rounded-bl-2xl rounded-tr-2xl shadow">Popular</span>
+    </div>
+    <!-- PEAK PRO -->
+    <div class="bg-gradient-to-br from-blue-800 to-blue-900 rounded-2xl shadow-xl border-2 border-blue-900 flex flex-col items-center px-6 py-8 min-w-[320px] max-w-[350px] mx-auto animate-fade-in-up" style="animation-delay:300ms">
+      <div class="uppercase text-xs tracking-widest text-gray-500 mb-2">SPORTSWEAR STORE</div>
+      <h3 class="text-3xl font-extrabold mb-1 text-white">PEAK <span class="text-[#C5A46B]">PRO</span></h3>
+      <div class="text-sm font-semibold text-gray-500 mb-4">SUBSCRIPTION PLAN BROCHURE</div>
+      <div class="flex w-full mb-4">
+        <div class="flex-1 text-center font-bold text-[#C5A46B] border-b-2 border-[#C5A46B] pb-1">PEAK PRO</div>
+        <div class="flex-1 text-center font-bold text-gray-400 border-b-2 border-gray-200 pb-1">LEGEND INFINITY</div>
+      </div>
+      <ul class="w-full text-sm text-white mb-6 space-y-3">
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">star</span> Double Points: <span class="font-bold ml-auto">x3</span></li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">percent</span> 30% Discount</li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">lock</span> Secret Products</li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">event</span> VIP Events</li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">redeem</span> Pro Kit: <span class="font-bold ml-auto">1x/quarter</span></li>
+      </ul>
+      <button class="mt-auto px-6 py-2 rounded-full bg-white text-blue-900 font-semibold shadow hover:bg-[#C5A46B] hover:text-white transition">Suscribirme</button>
+    </div>
+    <!-- LEGEND INFINITY -->
+    <div class="bg-[#101820] rounded-2xl shadow-2xl border-2 border-[#101820] flex flex-col items-center px-6 py-8 min-w-[320px] max-w-[350px] mx-auto relative animate-fade-in-up" style="animation-delay:450ms">
+      <div class="uppercase text-xs tracking-widest text-gray-500 mb-2">SPORTSWEAR STORE</div>
+      <h3 class="text-3xl font-extrabold mb-1 text-white">LEGEND <span class="text-[#C5A46B]">INFINITY</span></h3>
+      <div class="text-sm font-semibold text-gray-500 mb-4">SUBSCRIPTION PLAN BROCHURE</div>
+      <div class="flex w-full mb-4">
+        <div class="flex-1 text-center font-bold text-[#C5A46B] border-b-2 border-[#C5A46B] pb-1">LEGEND INFINITY</div>
+        <div class="flex-1 text-center font-bold text-gray-400 border-b-2 border-gray-200 pb-1">ULTIMATE</div>
+      </div>
+      <ul class="w-full text-sm text-white mb-6 space-y-3">
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">workspace_premium</span> 40% Unlimited Discount</li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">monetization_on</span> 15% Annual Cashback</li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">person</span> Personal Shopper</li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">flight</span> Elite Travel Discounts</li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">festival</span> Epic Experiences 50% Off</li>
+        <li class="flex items-center gap-2"><span class="material-icons-outlined text-[#C5A46B]">backpack</span> Legend Kit: Wearable Tech + Backpack</li>
+      </ul>
+      <button class="mt-auto px-6 py-2 rounded-full bg-white text-[#101820] font-semibold shadow hover:bg-[#C5A46B] hover:text-[#101820] transition">Suscribirme</button>
+      <span class="absolute top-0 right-0 bg-white text-[#101820] text-xs font-bold px-3 py-1 rounded-bl-2xl rounded-tr-2xl shadow">Ultimate</span>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(40px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+</style>
+{% endblock %}
