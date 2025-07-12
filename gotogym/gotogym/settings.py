@@ -164,7 +164,7 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
-
+#dadsd
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
