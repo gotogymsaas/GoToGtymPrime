@@ -1,0 +1,297 @@
+{% extends '_base_dasboard.html' %}
+{% block content %}
+<div class="container mx-auto p-4">
+    <h2 class="text-3xl font-extrabold mb-8 text-[#093f62] flex items-center gap-3 drop-shadow-sm">
+        <span class="material-icons-outlined text-4xl text-[#C5A46B]">insights</span>
+        Dashboard de Métricas
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Usuarios -->
+        <div class="bg-gradient-to-br from-blue-100 to-blue-300 p-6 rounded-2xl shadow-lg flex flex-col items-center">
+            <span class="material-icons-outlined text-5xl text-blue-500 mb-2">group</span>
+            <h3 class="text-lg font-semibold mb-1">Usuarios totales</h3>
+            <p class="text-3xl font-bold">{{ total_usuarios }}</p>
+            <div class="w-full flex flex-col items-center">
+                <canvas id="usuariosBarChart" width="180" height="80" class="my-2"></canvas>
+                <div class="flex flex-wrap justify-center gap-2 mt-2 text-xs">
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-sm inline-block mr-1" style="background:#3b82f6"></span>Admins (<b>{{ total_admins }}</b>)</span>
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-sm inline-block mr-1" style="background:#6366f1"></span>Influencers (<b>{{ total_influencers }}</b>)</span>
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-sm inline-block mr-1" style="background:#a21caf"></span>Admins+Influencers (<b>{{ total_admins_influencers }}</b>)</span>
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-sm inline-block mr-1" style="background:#f59e42"></span>Superusers (<b>{{ total_superusers }}</b>)</span>
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-sm inline-block mr-1" style="background:#10b981"></span>Normales (<b>{{ total_usuarios_normales }}</b>)</span>
+                </div>
+            </div>
+        </div>
+        <!-- Productos -->
+        <div class="bg-gradient-to-br from-green-100 to-green-300 p-6 rounded-2xl shadow-lg flex flex-col items-center">
+            <span class="material-icons-outlined text-5xl text-green-500 mb-2">inventory_2</span>
+            <h3 class="text-lg font-semibold mb-1">Productos en catálogo</h3>
+            <p class="text-3xl font-bold">{{ total_productos }}</p>
+            <div class="w-full flex flex-col items-center">
+                <canvas id="productosBarChart" width="180" height="80" class="my-2"></canvas>
+                <div class="flex flex-wrap justify-center gap-2 mt-2 text-xs">
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-sm inline-block mr-1" style="background:#10b981"></span>Totales (<b>{{ total_productos }}</b>)</span>
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-sm inline-block mr-1" style="background:#fbbf24"></span>Destacados (<b>{{ productos_destacados }}</b>)</span>
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-sm inline-block mr-1" style="background:#ef4444"></span>Sin stock (<b>{{ productos_sin_stock }}</b>)</span>
+                </div>
+            </div>
+        </div>
+        <!-- Posts -->
+        <div class="bg-gradient-to-br from-yellow-100 to-yellow-300 p-6 rounded-2xl shadow-lg flex flex-col items-center">
+            <span class="material-icons-outlined text-5xl text-yellow-600 mb-2">article</span>
+            <h3 class="text-lg font-semibold mb-1">Posts en el blog</h3>
+            <p class="text-3xl font-bold">{{ total_posts }}</p>
+            <div class="w-full flex flex-col items-center">
+                <canvas id="postsBarChart" width="180" height="80" class="my-2"></canvas>
+                <div class="flex flex-wrap justify-center gap-2 mt-2 text-xs">
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-sm inline-block mr-1" style="background:#fbbf24"></span>Influencers (<b>{{ posts_por_influencers }}</b>)</span>
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-sm inline-block mr-1" style="background:#f59e42"></span>Admins (<b>{{ posts_por_admins }}</b>)</span>
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-sm inline-block mr-1" style="background:#f472b6"></span>Admins+Influencers (<b>{{ posts_por_admins_influencers }}</b>)</span>
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-sm inline-block mr-1" style="background:#10b981"></span>Publicados (<b>{{ posts_publicados }}</b>)</span>
+                </div>
+            </div>
+        </div>
+        <!-- Influencers activos -->
+        <div class="bg-gradient-to-br from-pink-100 to-pink-300 p-6 rounded-2xl shadow-lg flex flex-col items-center">
+            <span class="material-icons-outlined text-5xl text-pink-500 mb-2">star</span>
+            <h3 class="text-lg font-semibold mb-1">Influencers activos</h3>
+            <p class="text-3xl font-bold">{{ total_influencers }}</p>
+            <div class="w-full flex flex-col items-center">
+                <canvas id="influencersBarChart" width="180" height="80" class="my-2"></canvas>
+                <div class="flex flex-wrap justify-center gap-2 mt-2 text-xs">
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-sm inline-block mr-1" style="background:#6366f1"></span>Influencers (<b>{{ total_influencers }}</b>)</span>
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-sm inline-block mr-1" style="background:#a21caf"></span>Admins+Influencers (<b>{{ total_admins_influencers }}</b>)</span>
+                </div>
+            </div>
+            <span class="text-xs text-gray-700">Incluye admins+influencers</span>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Gráfico de líneas (placeholder) -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg col-span-1">
+            <h3 class="text-lg font-semibold mb-2">Actividad anual (visitas de ejemplo)</h3>
+            <canvas id="lineChart" height="80"></canvas>
+        </div>
+        <!-- Métrica de tareas completadas (placeholder) -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg flex flex-col justify-between">
+            <h3 class="text-lg font-semibold">Tareas completadas</h3>
+            <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+                <div class="bg-blue-400 h-4 rounded-full" style="width: 87.3%"></div>
+            </div>
+            <span class="text-2xl font-bold text-blue-500">87.3%</span>
+        </div>
+    </div>
+    <div class="bg-white p-6 rounded-2xl shadow-lg mt-8">
+        <h3 class="text-lg font-semibold mb-2">Órdenes recientes (placeholder)</h3>
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-xs">
+                <thead>
+                    <tr>
+                        <th class="px-2 py-1">Cliente</th>
+                        <th class="px-2 py-1"># Orden</th>
+                        <th class="px-2 py-1">Fecha</th>
+                        <th class="px-2 py-1">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mr. Dan</td><td>4EX3456N</td><td>12-10-2019</td><td><span class="text-green-600">Completada</span></td>
+                    </tr>
+                    <tr>
+                        <td>Mr. Dan</td><td>4EX3456N</td><td>12-10-2019</td><td><span class="text-yellow-600">En progreso</span></td>
+                    </tr>
+                    <tr>
+                        <td>Mr. Dan</td><td>4EX3456N</td><td>12-10-2019</td><td><span class="text-green-600">Completada</span></td>
+                    </tr>
+                    <tr>
+                        <td>Mr. Dan</td><td>4EX3456N</td><td>12-10-2019</td><td><span class="text-red-600">Cancelada</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        // Gráfico de líneas
+        document.addEventListener('DOMContentLoaded', function() {
+            var ctx = document.getElementById('lineChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    datasets: [
+                        {
+                            label: 'Visitas',
+                            data: [120, 190, 300, 500, 200, 300, 400, 600, 700, 800, 900, 1000],
+                            borderColor: '#f59e42',
+                            backgroundColor: 'rgba(245, 158, 66, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Gráfico de barras para posts
+            var postsBar = document.getElementById('postsBarChart').getContext('2d');
+            new Chart(postsBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Influencers', 'Admins', 'Admins+Influencers', 'Publicados'],
+                    datasets: [{
+                        label: 'Posts',
+                        data: [{{ posts_por_influencers }}, {{ posts_por_admins }}, {{ posts_por_admins_influencers }}, {{ posts_publicados }}],
+                        backgroundColor: [
+                            '#fbbf24', '#f59e42', '#f472b6', '#10b981'
+                        ],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'bottom',
+                            color: '#222',
+                            font: { weight: 'bold', size: 14 },
+                            offset: -2, // Aumentado para que los números estén más arriba
+                            borderRadius: 4,
+                            padding: 4,
+                            formatter: function(value) { return value; }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    },
+                    responsive: false,
+                    maintainAspectRatio: false
+                },
+                plugins: [ChartDataLabels]
+            });
+
+            // Gráfico de barras para usuarios
+            var usuariosBar = document.getElementById('usuariosBarChart').getContext('2d');
+            new Chart(usuariosBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Admins', 'Influencers', 'Admins+Influencers', 'Superusers', 'Normales'],
+                    datasets: [{
+                        label: 'Usuarios',
+                        data: [{{ total_admins }}, {{ total_influencers }}, {{ total_admins_influencers }}, {{ total_superusers }}, {{ total_usuarios_normales }}],
+                        backgroundColor: [
+                            '#3b82f6', '#6366f1', '#a21caf', '#f59e42', '#10b981'
+                        ],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'bottom',
+                            color: '#222',
+                            font: { weight: 'bold', size: 14 },
+                            offset: -18,
+                            borderRadius: 4,
+                            padding: 4,
+                            formatter: function(value) { return value; }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    },
+                    responsive: false,
+                    maintainAspectRatio: false
+                },
+                plugins: [ChartDataLabels]
+            });
+
+            // Gráfico de barras para productos
+            var productosBar = document.getElementById('productosBarChart').getContext('2d');
+            new Chart(productosBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Totales', 'Destacados', 'Sin stock'],
+                    datasets: [{
+                        label: 'Productos',
+                        data: [{{ total_productos }}, {{ productos_destacados }}, {{ productos_sin_stock }}],
+                        backgroundColor: [
+                            '#10b981', '#fbbf24', '#ef4444'
+                        ],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'bottom',
+                            color: '#222',
+                            font: { weight: 'bold', size: 14 },
+                            offset: -18,
+                            borderRadius: 4,
+                            padding: 4,
+                            formatter: function(value) { return value; }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    },
+                    responsive: false,
+                    maintainAspectRatio: false
+                },
+                plugins: [ChartDataLabels]
+            });
+
+            // Gráfico de barras para influencers activos
+            var influencersBar = document.getElementById('influencersBarChart').getContext('2d');
+            new Chart(influencersBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Influencers', 'Admins+Influencers'],
+                    datasets: [{
+                        label: 'Influencers',
+                        data: [{{ total_influencers }}, {{ total_admins_influencers }}],
+                        backgroundColor: [
+                            '#6366f1', '#a21caf'
+                        ],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'bottom',
+                            color: '#222',
+                            font: { weight: 'bold', size: 14 },
+                            offset: -18,
+                            borderRadius: 4,
+                            padding: 4,
+                            formatter: function(value) { return value; }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    },
+                    responsive: false,
+                    maintainAspectRatio: false
+                },
+                plugins: [ChartDataLabels]
+            });
+        });
+    </script>
+</div>
+{% endblock %}
