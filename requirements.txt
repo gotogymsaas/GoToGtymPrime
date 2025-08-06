@@ -6,12 +6,11 @@ django-widget-tweaks
 django-taggit
 django-modelcluster
 Pillow
-mysqlclient
+mysql-connector-python
 djangorestframework
 djangorestframework-simplejwt
 django-cors-headers
 psycopg2-binary
 requests
-python-oqs
 cryptography>=42.0.0
 mercadopago>=2.1
