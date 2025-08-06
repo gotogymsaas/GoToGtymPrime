@@ -6,8 +6,8 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    #os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gotogym.settings')
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wellness_monitor.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gotogym.settings')
+    
 
     try:
         from django.core.management import execute_from_command_line
