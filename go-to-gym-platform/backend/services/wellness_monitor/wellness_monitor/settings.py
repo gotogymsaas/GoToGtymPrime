@@ -52,16 +52,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'wellness_monitor.wsgi.application'
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': os.environ.get('POSTGRES_DB', 'gotogym'),
+#        'USER': os.environ.get('POSTGRES_USER', 'gotogym'),
+#        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'gotogym'),
+#        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
+#        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+#    }
+#}
+
+
+# SE ADICIONA ESTAS LINEAS PARA SABER QUE SE USA MYSQL ALVARO URREGO VIANA 05/08/2025
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'gotogym'),
-        'USER': os.environ.get('POSTGRES_USER', 'gotogym'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'gotogym'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
-        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('MYSQL_DATABASE', 'gotogym_bd'),
+        'USER': os.environ.get('MYSQL_USER', 'gotogym_user'),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD', '123Margarita6'),
+        'HOST': os.environ.get('MYSQL_HOST', 'servergotogym.mysql.database.azure.com'),
+        'PORT': os.environ.get('MYSQL_PORT', '3306'),
     }
 }
+
 
 AUTH_PASSWORD_VALIDATORS = []
 
