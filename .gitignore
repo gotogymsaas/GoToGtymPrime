@@ -1,17 +1,49 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*$py.class
+
+# C extensions
+*.so
 
 # Django stuff
 *.sqlite3
 *.log
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+media/
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv
 
 # Node modules
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Environment variables
 .env
+.env.local
 
 # Build
 build/
+dist/
 
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Settings (may contain sensitive data)
+gotogym/gotogym/settings.py

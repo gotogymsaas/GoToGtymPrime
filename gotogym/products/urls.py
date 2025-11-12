@@ -4,6 +4,7 @@ from . import views
 app_name = 'products'
 
 urlpatterns = [
+    path('', views.list_product, name='products_home'),  # Ruta raíz para /products/
     path('add-category/', views.add_category, name='add_category'),
     path('add-product/', views.add_product, name='add_product'),
     path('categories/', views.list_category, name='list_category'),
