@@ -1,0 +1,445 @@
+# 🚀 Guía de Despliegue Local - GoToGymPrime
+
+## 📋 Requisitos Previos
+
+- **Python:** 3.10 o superior
+- **pip:** Gestor de paquetes de Python
+- **Git:** Para clonar el repositorio
+- **SQLite:** Ya incluido en Python (para desarrollo)
+- **MySQL Client:** Solo si vas a usar MySQL
+
+---
+
+## 🔧 Instalación en Local (Windows/Mac/Linux)
+
+### 1. Clonar el Repositorio
+
+```bash
+git clone https://github.com/gotogymsaas/GoToGtymPrime.git
+cd GoToGtymPrime
+```
+
+### 2. Crear Entorno Virtual
+
+**En Linux/Mac:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+**En Windows:**
+```cmd
+python -m venv venv
+venv\Scripts\activate
+```
+
+### 3. Instalar Dependencias
+
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Instalar driver MySQL (opcional, solo si usarás MySQL)
+pip install mysqlclient
+```
+
+**⚠️ Problemas con mysqlclient en Windows:**
+```cmd
+# Si falla mysqlclient, usa PyMySQL como alternativa:
+pip install PyMySQL
+```
+
+### 4. Configurar Base de Datos Local
+
+El proyecto incluye configuración automática para SQLite (desarrollo local):
+
+```bash
+cd gotogym
+
+# Crear base de datos y aplicar migraciones
+python manage.py migrate --settings=gotogym.settings_local
+
+# Verificar que se creó la base de datos
+ls -lh db_local.sqlite3
+```
+
+### 5. Crear Usuario Administrador
+
+```bash
+python manage.py createsuperuser --settings=gotogym.settings_local
+
+# Se te pedirá:
+# - Email (ej: admin@ejemplo.com)
+# - Username (ej: admin)
+# - Password (crea una contraseña segura)
+```
+
+### 6. Cargar Datos de Ejemplo (Opcional)
+
+```bash
+python manage.py shell --settings=gotogym.settings_local
+```
+
+Luego copia y pega este código:
+
+```python
+from products.models import Product, ProductCategory, Brand
+from decimal import Decimal
+
+# Crear categorías
+cat_ropa, _ = ProductCategory.objects.get_or_create(
+    name="Ropa Deportiva",
+    defaults={'description': 'Ropa para entrenar'}
+)
+cat_acces, _ = ProductCategory.objects.get_or_create(
+    name="Accesorios",
+    defaults={'description': 'Accesorios de gym'}
+)
+
+# Crear marca
+brand, _ = Brand.objects.get_or_create(name="GoToGym")
+
+# Crear productos
+products = [
+    {"name": "Camiseta Deportiva", "category": cat_ropa, "price": "29.99", "stock": 50},
+    {"name": "Pantalón de Yoga", "category": cat_ropa, "price": "39.99", "stock": 30},
+    {"name": "Botella de Agua", "category": cat_acces, "price": "12.99", "stock": 100},
+    {"name": "Toalla de Gym", "category": cat_acces, "price": "15.99", "stock": 75},
+    {"name": "Guantes de Entrenamiento", "category": cat_acces, "price": "19.99", "stock": 40},
+]
+
+for data in products:
+    Product.objects.get_or_create(
+        name=data['name'],
+        defaults={
+            'category': data['category'],
+            'brand': brand,
+            'price': Decimal(data['price']),
+            'stock': data['stock'],
+            'description': f"Producto de alta calidad: {data['name']}"
+        }
+    )
+
+print(f"✅ Productos creados: {Product.objects.count()}")
+exit()
+```
+
+### 7. Iniciar el Servidor
+
+```bash
+python manage.py runserver --settings=gotogym.settings_local
+```
+
+**Salida esperada:**
+```
+✅ Usando configuración LOCAL (SQLite)
+📁 Base de datos: /ruta/a/db_local.sqlite3
+Performing system checks...
+
+System check identified no issues (0 silenced).
+Django version 6.0.2, using settings 'gotogym.settings_local'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.
+```
+
+### 8. Abrir en el Navegador
+
+```
+🌐 Página principal: http://localhost:8000/
+🔐 Panel Admin: http://localhost:8000/admin/
+```
+
+---
+
+## 🎯 Script de Inicio Rápido
+
+El proyecto incluye un script que automatiza todo:
+
+**Linux/Mac:**
+```bash
+cd GoToGtymPrime
+./start.sh
+```
+
+**Windows (PowerShell):**
+```powershell
+cd GoToGtymPrime\gotogym
+python manage.py migrate --settings=gotogym.settings_local
+python manage.py runserver --settings=gotogym.settings_local
+```
+
+---
+
+## 🔍 Verificar Instalación
+
+### Comprobar Python y pip:
+```bash
+python --version   # Debe ser 3.10+
+pip --version
+```
+
+### Comprobar base de datos:
+```bash
+cd gotogym
+python manage.py shell --settings=gotogym.settings_local
+>>> from accounts.models import User
+>>> User.objects.count()
+>>> exit()
+```
+
+### Ver logs del servidor:
+```bash
+# El servidor muestra logs en la consola en tiempo real
+# Presiona Ctrl+C para detener
+```
+
+---
+
+## 🛠️ Configuración Avanzada
+
+### Usar MySQL en lugar de SQLite
+
+1. **Editar `gotogym/settings_local.py`:**
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'gotogym_local',
+        'USER': 'tu_usuario',
+        'PASSWORD': 'tu_password',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
+```
+
+2. **Crear base de datos MySQL:**
+
+```sql
+CREATE DATABASE gotogym_local CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON gotogym_local.* TO 'tu_usuario'@'localhost';
+```
+
+3. **Migrar:**
+
+```bash
+python manage.py migrate --settings=gotogym.settings_local
+```
+
+### Variables de Entorno (Opcional)
+
+Crea un archivo `.env` en la raíz del proyecto:
+
+```bash
+# Django
+DJANGO_SECRET_KEY=tu-clave-secreta-aleatoria-muy-larga
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Base de datos (si usas MySQL)
+MYSQL_DATABASE=gotogym_local
+MYSQL_USER=tu_usuario
+MYSQL_PASSWORD=tu_password
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+
+# Integraciones (opcional para desarrollo)
+MERCADOPAGO_ACCESS_TOKEN=tu_token
+ALEGRA_EMAIL=tu_email
+ALEGRA_TOKEN=tu_token
+HUBSPOT_PRIVATE_TOKEN=tu_token
+```
+
+Luego instala python-decouple:
+```bash
+pip install python-decouple
+```
+
+---
+
+## 📝 Archivos de Configuración
+
+### `gotogym/settings.py`
+Configuración principal del proyecto (apunta a MySQL Azure por defecto)
+
+### `gotogym/settings_local.py` ⭐
+Configuración para desarrollo local (usa SQLite, DEBUG=True)
+
+### `gotogym/settings_test.py`
+Configuración para ejecutar tests
+
+---
+
+## 🚨 Solución de Problemas
+
+### Error: "No module named 'MySQLdb'"
+```bash
+pip install mysqlclient
+# O en Windows:
+pip install PyMySQL
+```
+
+### Error: "Port already in use"
+```bash
+# Detener procesos usando el puerto 8000
+# Linux/Mac:
+lsof -ti:8000 | xargs kill -9
+
+# Windows:
+netstat -ano | findstr :8000
+taskkill /PID <numero_pid> /F
+```
+
+### Error 404 en /admin/
+```bash
+# Asegúrate de usar settings_local:
+python manage.py runserver --settings=gotogym.settings_local
+
+# Verifica que las URLs no tengan prefijo /es/:
+http://localhost:8000/admin/  ✅
+http://localhost:8000/es/admin/  ❌
+```
+
+### Base de datos bloqueada (SQLite)
+```bash
+# Detén el servidor (Ctrl+C)
+# Reinicia
+python manage.py runserver --settings=gotogym.settings_local
+```
+
+### Migraciones inconsistentes
+```bash
+# Resetear base de datos local:
+cd gotogym
+rm db_local.sqlite3
+python manage.py migrate --settings=gotogym.settings_local
+python manage.py createsuperuser --settings=gotogym.settings_local
+```
+
+---
+
+## 🧪 Ejecutar Tests
+
+```bash
+cd gotogym
+
+# Todos los tests
+python manage.py test --settings=gotogym.settings_test
+
+# Un app específica
+python manage.py test accounts --settings=gotogym.settings_test
+
+# Test de integración Alegra
+cd ..
+DJANGO_SETTINGS_MODULE=gotogym.settings_test \
+python -m unittest integrations.alegra.tests.test_client -v
+```
+
+---
+
+## 📱 URLs Importantes
+
+Una vez que el servidor esté corriendo en `http://localhost:8000/`:
+
+| URL | Descripción |
+|-----|-------------|
+| `/` | Página principal (auto-redirige según idioma) |
+| `/admin/` | Panel de administración Django |
+| `/accounts/login/` | Login de usuarios |
+| `/accounts/register/` | Registro de nuevos usuarios |
+| `/products/` | Catálogo de productos |
+| `/carrito/` | Carrito de compras |
+| `/tienda/` | Tienda online |
+| `/blog/` | Blog |
+| `/dashboard/` | Dashboard (requiere login) |
+| `/configuracion-marca/` | Configuración de marca |
+| `/crm/` | CRM / HubSpot integration |
+| `/setlang/` | Cambiar idioma (es/en/pt) |
+
+---
+
+## 🌍 Soporte Multi-idioma
+
+El proyecto soporta 3 idiomas:
+- 🇪🇸 Español (por defecto)
+- 🇬🇧 English
+- 🇧🇷 Português
+
+Para cambiar idioma, usa el selector en la interfaz o visita `/setlang/`
+
+---
+
+## 📦 Estructura del Proyecto
+
+```
+GoToGtymPrime/
+├── gotogym/                    # Proyecto Django principal
+│   ├── manage.py              # Comando principal Django
+│   ├── db_local.sqlite3       # Base de datos local (se crea al migrar)
+│   ├── gotogym/               # Configuración del proyecto
+│   │   ├── settings.py        # Settings producción
+│   │   ├── settings_local.py  # Settings desarrollo ⭐
+│   │   ├── settings_test.py   # Settings para tests
+│   │   └── urls.py            # Rutas principales
+│   ├── accounts/              # App de usuarios
+│   ├── products/              # App de productos
+│   ├── carrito/               # App carrito de compras
+│   ├── tienda/                # App tienda
+│   ├── blog/                  # App blog
+│   └── ... (otras apps)
+├── integrations/              # Integraciones externas
+│   ├── alegra/               # Contabilidad
+│   ├── mercadopago/          # Pagos
+│   └── hubspot/              # CRM
+├── requirements.txt           # Dependencias Python
+└── start.sh                   # Script de inicio rápido
+```
+
+---
+
+## ✅ Checklist de Instalación
+
+- [ ] Python 3.10+ instalado
+- [ ] Repositorio clonado
+- [ ] Entorno virtual creado y activado
+- [ ] Dependencias instaladas (`pip install -r requirements.txt`)
+- [ ] Migraciones aplicadas (`python manage.py migrate --settings=gotogym.settings_local`)
+- [ ] Superusuario creado (`python manage.py createsuperuser --settings=gotogym.settings_local`)
+- [ ] Servidor iniciado (`python manage.py runserver --settings=gotogym.settings_local`)
+- [ ] Navegador abierto en `http://localhost:8000/`
+- [ ] Login en admin exitoso (`http://localhost:8000/admin/`)
+
+---
+
+## 🎓 Próximos Pasos
+
+1. Explora el panel de administración
+2. Crea productos, categorías y marcas
+3. Prueba el flujo de registro/login
+4. Agrega productos al carrito
+5. Revisa la documentación de cada app
+6. Comienza a desarrollar nuevas funcionalidades
+
+---
+
+## 📚 Documentación Adicional
+
+- [ANALISIS_ESTRUCTURA.md](docs/ANALISIS_ESTRUCTURA.md) - Análisis completo del proyecto
+- [CORRECCIONES.md](CORRECCIONES.md) - Historial de correcciones
+- [GUIA_ACCESO.md](GUIA_ACCESO.md) - Guía de acceso y bases de datos
+- [README.md](README.md) - Información general del proyecto
+
+---
+
+## 🆘 Soporte
+
+Si encuentras problemas:
+1. Revisa la sección "Solución de Problemas" arriba
+2. Ejecuta `./verificar_db.sh` para ver el estado del sistema
+3. Revisa los logs del servidor en la consola
+4. Consulta la documentación de Django: https://docs.djangoproject.com/
+
+---
+
+**¡Listo para desarrollar! 🚀**

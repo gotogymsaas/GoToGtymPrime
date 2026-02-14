@@ -18,12 +18,22 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
-    'monitor',
+    'accounts',
+    'blog',
+    'products',
+    'configuracion_marca',
+    'contabilidad',
+    'influencer',
+    'tienda',
+    'carrito',
+    'crm',
+    'metricas',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -32,7 +42,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'wellness_monitor.urls'
+ROOT_URLCONF = 'gotogym.urls'
 
 TEMPLATES = [
     {
@@ -50,7 +60,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'wellness_monitor.wsgi.application'
+WSGI_APPLICATION = 'gotogym.wsgi.application'
 
 #DATABASES = {
 #    'default': {
@@ -79,8 +89,21 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = []
 
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+# Internacionalización
+from django.utils.translation import gettext_lazy as _
+
+LANGUAGES = [
+    ('es', _('Español')),
+    ('en', _('English')),
+    ('pt', _('Português')),
+]
+
+LANGUAGE_CODE = 'es'
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+
+TIME_ZONE = 'America/Bogota'
 USE_I18N = True
 USE_TZ = True
 
@@ -102,3 +125,8 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
 }
+
+AUTH_USER_MODEL = 'accounts.User'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
