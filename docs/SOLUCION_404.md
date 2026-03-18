@@ -194,11 +194,11 @@ python manage.py shell --settings=gotogym.settings_local
 ## 📖 Documentación Actualizada
 
 Todos los documentos han sido actualizados con las URLs correctas:
-- ✅ [README.md](README.md)
+- ✅ [README.md](../README.md)
 - ✅ [DESPLIEGUE_LOCAL.md](DESPLIEGUE_LOCAL.md)
 - ✅ [GUIA_ACCESO.md](GUIA_ACCESO.md)
 - ✅ [CORRECCIONES.md](CORRECCIONES.md)
-- ✅ [docs/ANALISIS_ESTRUCTURA.md](docs/ANALISIS_ESTRUCTURA.md)
+- ✅ [ANALISIS_ESTRUCTURA.md](ANALISIS_ESTRUCTURA.md)
 
 ---
 

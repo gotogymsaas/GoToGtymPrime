@@ -27,16 +27,16 @@ python manage.py migrate
 python manage.py runserver 0.0.0.0:8000
 ```
 
-**📖 Guía completa:** Ver [DESPLIEGUE_LOCAL.md](DESPLIEGUE_LOCAL.md)
+**📖 Guía completa:** Ver [docs/DESPLIEGUE_LOCAL.md](docs/DESPLIEGUE_LOCAL.md)
 
 ---
 
 ## 📋 Documentación
 
-- **[DESPLIEGUE_LOCAL.md](DESPLIEGUE_LOCAL.md)** - Instrucciones detalladas de instalación local
-- **[GUIA_ACCESO.md](GUIA_ACCESO.md)** - Guía de acceso y bases de datos
+- **[docs/DESPLIEGUE_LOCAL.md](docs/DESPLIEGUE_LOCAL.md)** - Instrucciones detalladas de instalación local
+- **[docs/GUIA_ACCESO.md](docs/GUIA_ACCESO.md)** - Guía de acceso y bases de datos
 - **[docs/ANALISIS_ESTRUCTURA.md](docs/ANALISIS_ESTRUCTURA.md)** - Análisis completo del proyecto
-- **[CORRECCIONES.md](CORRECCIONES.md)** - Historial de cambios y correcciones
+- **[docs/CORRECCIONES.md](docs/CORRECCIONES.md)** - Historial de cambios y correcciones
 
 ---
 

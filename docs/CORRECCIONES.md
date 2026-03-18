@@ -92,7 +92,7 @@ python manage.py runserver 0.0.0.0:8000
 
 ## 📁 Documentación Completa
 
-Ver: `/workspaces/GoToGtymPrime/docs/ANALISIS_ESTRUCTURA.md`
+Ver: `ANALISIS_ESTRUCTURA.md`
 
 ---
 

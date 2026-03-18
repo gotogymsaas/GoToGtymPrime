@@ -68,4 +68,5 @@ jobs:
         with:
           app-name: 'gotogymweb'
           slot-name: 'Production'
+          startup-command: "gunicorn --chdir gotogym gotogym.wsgi --bind=0.0.0.0 --timeout 600 --access-logfile '-' --error-logfile '-'"
           

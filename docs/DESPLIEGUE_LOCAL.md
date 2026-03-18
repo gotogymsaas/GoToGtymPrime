@@ -1,5 +1,44 @@
 # 🚀 Guía de Despliegue Local - GoToGymPrime
 
+## 🧭 Checklist Maestro de Ejecución (Azure)
+
+Este documento será la bitácora oficial hasta completar el objetivo de release.
+
+### Reglas operativas activas
+
+1. Documentar cada avance, decisión y validación en este archivo.
+2. Hacer commit + push en cada respuesta para asegurar trazabilidad continua.
+3. No ejecutar cambios destructivos sin aprobación explícita.
+4. No avanzar de fase sin criterio de salida cumplido.
+
+### Estado por fases
+
+| Fase | Objetivo | Estado | Criterio de salida |
+|------|----------|--------|--------------------|
+| F0 | Definir entorno único de release | ✅ Completada (inicial) | RG y recursos objetivo definidos |
+| F1 | Estabilización P0 (arranque/seguridad base) | 🔄 En progreso | App inicia y configuración crítica saneada |
+| F2 | Infra mínima Azure lista | ⏳ Pendiente | App Service + variables + logs listos |
+| F3 | Pipeline de despliegue validado | ⏳ Pendiente | Build/deploy con fallas bloqueantes |
+| F4 | Primer despliegue controlado | ⏳ Pendiente | Health/login/catálogo/checkout OK |
+| F5 | Cierre de release y rollback | ⏳ Pendiente | Checklist final + plan rollback validado |
+
+### Bitácora de ejecución
+
+#### 2026-03-18 — Fase 0 (definición de entorno)
+
+- Suscripción evaluada: `92b318a9-86bc-4734-9cc9-821767f6084f`.
+- Entorno objetivo seleccionado para este release: `gotogymweb`.
+- Justificación: es el entorno ya cableado al workflow actual y minimiza riesgo de cambio simultáneo.
+- Recursos asociados detectados:
+    - Resource Group: `gotogymweb`
+    - Web App: `gotogymweb`
+    - App Service Plan: `ASP-gotogymweb-9d8a`
+    - MySQL Flexible Server relacionado: `gotogymwebserver`
+- Gap identificado para fases siguientes:
+    - no se detectó slot `staging` en la suscripción actual.
+
+---
+
 ## 📋 Requisitos Previos
 
 - **Python:** 3.10 o superior
@@ -398,6 +437,61 @@ GoToGtymPrime/
 
 ---
 
+## 🔎 Diagnóstico Técnico Actual (Marzo 2026)
+
+Este diagnóstico resume el estado real del repositorio para evitar diferencias
+entre documentación y código en ejecución.
+
+### 1. Arquitectura realmente activa
+
+- Monolito Django en `gotogym/` como núcleo principal.
+- Renderizado web con Django Templates (SSR) y apps por dominio.
+- Base de datos:
+    - Desarrollo local: SQLite (`settings_local.py`).
+    - Entornos conectados: MySQL (`settings.py`), orientado a Azure MySQL.
+- Docker Compose actual levanta solo el servicio web (no incluye servicio de
+    base de datos local en `docker-compose.yml`).
+
+### 2. Servicios funcionales disponibles
+
+- **accounts**: registro, login, logout, recuperación de contraseña,
+    actualización de perfil.
+- **products**: CRUD de categorías, productos y marcas para operación interna.
+- **tienda**: catálogo público con filtros y detalle de producto.
+- **carrito**: agregar, quitar, actualizar productos y checkout.
+- **blog**: listado de posts publicados con búsqueda y paginación.
+- **contabilidad**: consulta de clientes y facturas vía Alegra.
+- **influencer**: activación de perfil, dashboard y simulación de compras
+    referidas.
+- **configuracion_marca**: administración de paleta/identidad de marca.
+- **crm**: endpoint de salud (`/crm/healthz`) activo.
+
+### 3. Integraciones externas
+
+- **Mercado Pago**: checkout redirige al `init_point` de la preferencia.
+- **Alegra**: clientes y facturas disponibles desde la app de contabilidad.
+- **HubSpot**: cliente base existe, pero creación/sincronización completa aún
+    está en estado parcial (stub).
+
+### 4. Hallazgos técnicos relevantes
+
+- El comando de `gunicorn` en Docker apunta a `gotogym.wsgi:application`, pero
+    la estructura actual resuelve correctamente `gotogym.gotogym.wsgi`.
+- Existe inconsistencia de variables para Alegra entre `ALEGRA_TOKEN` y
+    `ALEGRA_API_TOKEN`.
+- DRF/JWT está instalado y configurado, pero no hay una superficie de API REST
+    pública consolidada en rutas del proyecto.
+- La cobertura de pruebas es baja en apps Django (varios `tests.py` vacíos).
+
+### 5. Recomendación de estabilización (prioridad alta)
+
+1. Corregir módulo WSGI del Dockerfile para despliegue estable.
+2. Unificar variables de entorno de Alegra y documentarlas en un solo formato.
+3. Definir qué endpoints CRM/HubSpot deben quedar expuestos en producción.
+4. Agregar smoke tests mínimos en CI antes del despliegue a Azure Web App.
+
+---
+
 ## ✅ Checklist de Instalación
 
 - [ ] Python 3.10+ instalado
@@ -425,10 +519,10 @@ GoToGtymPrime/
 
 ## 📚 Documentación Adicional
 
-- [ANALISIS_ESTRUCTURA.md](docs/ANALISIS_ESTRUCTURA.md) - Análisis completo del proyecto
+- [ANALISIS_ESTRUCTURA.md](ANALISIS_ESTRUCTURA.md) - Análisis completo del proyecto
 - [CORRECCIONES.md](CORRECCIONES.md) - Historial de correcciones
 - [GUIA_ACCESO.md](GUIA_ACCESO.md) - Guía de acceso y bases de datos
-- [README.md](README.md) - Información general del proyecto
+- [README.md](../README.md) - Información general del proyecto
 
 ---
 
