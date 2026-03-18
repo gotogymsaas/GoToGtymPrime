@@ -138,6 +138,29 @@ Este documento será la bitácora oficial hasta completar el objetivo de release
 - Pendiente para cierre F3:
     - observar una ejecución real del workflow en GitHub Actions para confirmar semáforo verde end-to-end.
 
+#### 2026-03-18 — Continuidad de implementación (iteración actual)
+
+- Calidad de build:
+    - se agregan tests mínimos de humo en `gotogym/accounts/tests.py` para evitar pipeline con `NO TESTS RAN`.
+    - cobertura mínima validada sobre rutas críticas: home, login y healthz CRM.
+    - resultado validado: `Found 3 test(s)` y `OK` en `environments/backend/run_backend_checks.sh`.
+- Fase 2 operativa:
+    - se agrega `environments/azure/.env.release.example` como plantilla de configuración de release.
+    - se agrega `environments/azure/apply_fase2_config.sh` para:
+        - crear slot staging (si no existe),
+        - configurar startup command,
+        - aplicar app settings críticas,
+        - habilitar logging básico de App Service.
+    - el script trabaja en `DRY_RUN=true` por defecto para ejecución segura.
+    - ejecución actual: bloqueada por estado de suscripción `Warned`.
+        - salida: `habilita la suscripción antes de aplicar configuración Fase 2`.
+- Operación local de pruebas:
+    - se agrega `environments/run_all_checks.sh` para ejecutar backend + frontend en una sola corrida.
+    - resultado de la corrida integrada:
+        - backend: `manage.py check` sin issues y suite con `Found 3 test(s)` / `OK`.
+        - frontend smoke: respuestas `HTTP 302` esperadas en `/`, `/accounts/login/`, `/tienda/`, `/products/products/`, `/blog/`.
+        - cierre: `[all-checks] Backend + frontend validados correctamente.`
+
 ---
 
 ## 📋 Requisitos Previos

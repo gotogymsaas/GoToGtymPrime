@@ -41,6 +41,12 @@ bash environments/frontend/run_frontend_smoke.sh
 3. Ejecutar smoke frontend.
 4. Registrar resultados en `docs/DESPLIEGUE_LOCAL.md`.
 
+Atajo (todo en uno):
+
+```bash
+bash environments/run_all_checks.sh
+```
+
 ## 3) Azure preflight (Fase 2)
 
 Archivo:
@@ -59,3 +65,23 @@ Variables opcionales:
 - `AZURE_RELEASE_RESOURCE_GROUP`
 - `AZURE_RELEASE_WEBAPP`
 - `AZURE_RELEASE_SLOT`
+
+## 4) Azure apply (Fase 2)
+
+Archivos:
+
+- `environments/azure/.env.release.example`
+- `environments/azure/apply_fase2_config.sh`
+
+Uso seguro (dry-run por defecto):
+
+```bash
+cp environments/azure/.env.release.example environments/azure/.env.release
+bash environments/azure/apply_fase2_config.sh
+```
+
+Ejecucion real (solo cuando la suscripcion este Enabled):
+
+```bash
+DRY_RUN=false bash environments/azure/apply_fase2_config.sh
+```
