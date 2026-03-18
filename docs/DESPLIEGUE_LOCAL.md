@@ -37,6 +37,26 @@ Este documento será la bitácora oficial hasta completar el objetivo de release
 - Gap identificado para fases siguientes:
     - no se detectó slot `staging` en la suscripción actual.
 
+#### 2026-03-18 — Fase 1 (estabilización P0) progreso inicial
+
+- Ajustes aplicados:
+    - Corrección de arranque Gunicorn en Docker con `--chdir gotogym` y logs a stdout/stderr.
+    - Endurecimiento inicial de `settings.py` para producción:
+        - `DEBUG` por defecto en `false`.
+        - `ALLOWED_HOSTS` desde variable de entorno (sin `*` por defecto).
+        - `CORS_ALLOW_ALL_ORIGINS` desactivado por defecto y lista de orígenes explícita.
+        - eliminación de password MySQL hardcodeada por defecto.
+    - Variables críticas expuestas en settings para runtime:
+        - `MERCADOPAGO_ACCESS_TOKEN`
+        - `HUBSPOT_PRIVATE_TOKEN`
+        - `ALEGRA_API_TOKEN` con fallback a `ALEGRA_TOKEN`.
+    - Workflow de GitHub Actions actualizado con `startup-command` explícito para App Service Linux.
+- Validación ejecutada:
+    - `python -m py_compile gotogym/gotogym/settings.py` ✅
+    - `python manage.py check --settings=gotogym.settings_local` ⚠️ bloqueado en este entorno por falta de dependencias (`ModuleNotFoundError: No module named 'django'`).
+- Estado F1:
+    - sigue en progreso hasta validar arranque funcional con dependencias instaladas y completar checklist P0.
+
 ---
 
 ## 📋 Requisitos Previos
