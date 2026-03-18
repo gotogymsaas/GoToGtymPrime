@@ -16,9 +16,9 @@ Este documento será la bitácora oficial hasta completar el objetivo de release
 | Fase | Objetivo | Estado | Criterio de salida |
 |------|----------|--------|--------------------|
 | F0 | Definir entorno único de release | ✅ Completada (inicial) | RG y recursos objetivo definidos |
-| F1 | Estabilización P0 (arranque/seguridad base) | 🔄 En progreso | App inicia y configuración crítica saneada |
-| F2 | Infra mínima Azure lista | ⏳ Pendiente | App Service + variables + logs listos |
-| F3 | Pipeline de despliegue validado | ⏳ Pendiente | Build/deploy con fallas bloqueantes |
+| F1 | Estabilización P0 (arranque/seguridad base) | ✅ Completada | App inicia y configuración crítica saneada |
+| F2 | Infra mínima Azure lista | 🔄 En progreso | App Service + variables + logs listos |
+| F3 | Pipeline de despliegue validado | 🔄 En progreso | Build/deploy con fallas bloqueantes |
 | F4 | Primer despliegue controlado | ⏳ Pendiente | Health/login/catálogo/checkout OK |
 | F5 | Cierre de release y rollback | ⏳ Pendiente | Checklist final + plan rollback validado |
 
@@ -105,6 +105,38 @@ Este documento será la bitácora oficial hasta completar el objetivo de release
     - rutas validadas: `/`, `/accounts/login/`, `/tienda/`, `/products/products/`, `/blog/`
 - Nota de arquitectura:
     - el frontend actual del repositorio es SSR con templates Django; no hay app Node/Next.js activa en este checkout.
+
+#### 2026-03-18 — Fase 2 (infra mínima Azure) avance
+
+- Se agrega preflight ejecutable para infraestructura objetivo:
+    - `environments/azure/run_fase2_preflight.sh`
+- Cobertura del preflight:
+    - estado de suscripción
+    - estado/configuración del Web App
+    - verificación de slot staging
+    - policy assignments y locks
+    - presencia de app settings críticas
+- Objetivo inmediato:
+    - correr este preflight antes de cualquier intento de despliegue final y registrar salida en esta bitácora.
+- Resultado de ejecución del preflight:
+    - suscripción detectada en estado `Warned`.
+    - operaciones sobre Web App con error `ReadOnlyDisabledSubscription`.
+    - slot `staging` no existe actualmente.
+    - policy assignment activo confirmado: `SecurityCenterBuiltIn`.
+    - listado de app settings críticas no disponible por restricción actual de suscripción/permisos.
+- Implicación de release:
+    - Fase 2 no puede cerrarse hasta habilitar suscripción y completar configuración de settings en App Service.
+
+#### 2026-03-18 — Fase 3 (pipeline) avance
+
+- Workflow `main_gotogymweb.yml` actualizado con quality gates en build:
+    - ejecución de `environments/backend/run_backend_checks.sh`
+    - `migrate` + `collectstatic` con `settings_local`
+    - smoke tests frontend con `environments/frontend/run_frontend_smoke.sh`
+- Condición de avance:
+    - el deploy se ejecuta solo si build valida backend/frontend correctamente.
+- Pendiente para cierre F3:
+    - observar una ejecución real del workflow en GitHub Actions para confirmar semáforo verde end-to-end.
 
 ---
 

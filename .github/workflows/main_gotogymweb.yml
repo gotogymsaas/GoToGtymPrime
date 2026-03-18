@@ -27,15 +27,28 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Create and start virtual environment
+      - name: Run backend validation suite
+        run: bash environments/backend/run_backend_checks.sh
+
+      - name: Prepare static artifacts
         run: |
-          python -m venv venv
-          source venv/bin/activate
-      
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+          set -euo pipefail
+          source .venv-backend-test/bin/activate
+          cd gotogym
+          python manage.py migrate --settings=gotogym.settings_local
+          python manage.py collectstatic --noinput --settings=gotogym.settings_local
+
+      - name: Run frontend smoke checks
+        run: |
+          set -euo pipefail
+          source .venv-backend-test/bin/activate
+          cd gotogym
+          python manage.py runserver 127.0.0.1:8000 --settings=gotogym.settings_local > /tmp/django-ci.log 2>&1 &
+          DJANGO_PID=$!
+          trap 'kill $DJANGO_PID || true' EXIT
+          sleep 6
+          cd ..
+          bash environments/frontend/run_frontend_smoke.sh
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
@@ -44,6 +57,7 @@ jobs:
           path: |
             .
             !venv/
+            !.venv-backend-test/
 
   deploy:
     runs-on: ubuntu-latest

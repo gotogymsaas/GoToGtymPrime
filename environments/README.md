@@ -40,3 +40,22 @@ bash environments/frontend/run_frontend_smoke.sh
 2. Levantar app local (`python manage.py runserver --settings=gotogym.settings_local`).
 3. Ejecutar smoke frontend.
 4. Registrar resultados en `docs/DESPLIEGUE_LOCAL.md`.
+
+## 3) Azure preflight (Fase 2)
+
+Archivo:
+
+- `environments/azure/run_fase2_preflight.sh`
+
+Uso:
+
+```bash
+bash environments/azure/run_fase2_preflight.sh
+```
+
+Variables opcionales:
+
+- `AZURE_SUBSCRIPTION_ID`
+- `AZURE_RELEASE_RESOURCE_GROUP`
+- `AZURE_RELEASE_WEBAPP`
+- `AZURE_RELEASE_SLOT`
