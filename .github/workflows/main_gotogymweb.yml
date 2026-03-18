@@ -4,6 +4,9 @@
 
 name: Build and deploy Python app to Azure Web App - gotogymweb
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches:
@@ -62,11 +65,21 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_DA5825539E7141EDABB69A0832504733 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4E77D74CD1BA467A9DC68287BC4147CA }}
 
+      - name: Preflight Azure deployment access
+        run: |
+          set -euo pipefail
+          az account show --query "{name:name,id:id,state:state}" -o table
+          if ! az webapp deployment list-publishing-profiles --name gotogymweb --resource-group gotogymweb -o none; then
+            echo "::error::No se pudo obtener el publishing profile de gotogymweb. Verifica que la suscripcion este habilitada (no ReadOnlyDisabledSubscription) y que la identidad OIDC tenga permisos Contributor sobre el Web App o su Resource Group."
+            exit 1
+          fi
+
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: 'gotogymweb'
           slot-name: 'Production'
+          package: .
           startup-command: "gunicorn --chdir gotogym gotogym.wsgi --bind=0.0.0.0 --timeout 600 --access-logfile '-' --error-logfile '-'"
           

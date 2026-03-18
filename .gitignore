@@ -11,6 +11,10 @@ node_modules/
 
 # Environment variables
 .env
+environments/**/.env.test
+
+# Local test virtualenv
+.venv-backend-test/
 
 # Build
 build/

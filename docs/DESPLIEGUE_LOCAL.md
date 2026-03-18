@@ -53,9 +53,58 @@ Este documento será la bitácora oficial hasta completar el objetivo de release
     - Workflow de GitHub Actions actualizado con `startup-command` explícito para App Service Linux.
 - Validación ejecutada:
     - `python -m py_compile gotogym/gotogym/settings.py` ✅
-    - `python manage.py check --settings=gotogym.settings_local` ⚠️ bloqueado en este entorno por falta de dependencias (`ModuleNotFoundError: No module named 'django'`).
+    - `bash environments/backend/run_backend_checks.sh` ✅
+        - crea `.venv-backend-test`
+        - instala dependencias desde `requirements.txt`
+        - ejecuta `python manage.py check --settings=gotogym.settings_local` sin errores
+        - ejecuta suite de tests actual (`NO TESTS RAN`, cobertura pendiente)
 - Estado F1:
     - sigue en progreso hasta validar arranque funcional con dependencias instaladas y completar checklist P0.
+
+#### 2026-03-18 — Auditoría Azure RBAC/Gobernanza + GitHub/Extensiones
+
+- Azure RBAC (suscripción `92b318a9-86bc-4734-9cc9-821767f6084f`):
+    - Se detectaron asignaciones con `roleDefinitionId` `de139f84-1756-47ae-9be6-808fbbe84772` en recursos `gotogymweb` y `gotogym-prod-rg`.
+    - El ID corresponde al rol **Website Contributor** (validado por `az role definition list`).
+    - Consulta completa de role assignments quedó parcialmente bloqueada por token de Graph en Cloud Shell (`Timeout waiting for token from portal`).
+- Gobernanza:
+    - Policy assignment activo: `SecurityCenterBuiltIn` (ASC Default) a nivel suscripción, enforcement `Default`.
+    - No se observaron locks en la consulta actual (`az lock list` sin salida).
+    - Hallazgo operativo: la suscripción aparece en estado de solo lectura para algunas operaciones (`ReadOnlyDisabledSubscription`).
+- Integración GitHub <-> Azure detectada en `gotogymweb`:
+    - `isGitHubAction: true`
+    - `repoUrl: https://github.com/gotogymsaas/GoToGtymPrime`
+    - Rama: `main`
+    - Auth type: `oidc`
+    - Runtime: `python 3.13`
+- Integraciones de aplicación detectadas en código:
+    - `integrations/alegra` (facturación/contabilidad)
+    - `integrations/mercadopago` (checkout/pagos)
+    - `integrations/hubspot` (CRM, implementación parcial)
+- GitHub CLI local:
+    - `gh` instalado, pero no autenticado (`gh auth status` solicita login).
+- Extensiones instaladas relevantes para operación:
+    - `github.copilot-chat`
+    - `ms-azuretools.azure-dev`
+    - `ms-azuretools.vscode-azure-github-copilot`
+    - `ms-azuretools.vscode-azure-mcp-server`
+    - `ms-azuretools.vscode-azureresourcegroups`
+    - `ms-azuretools.vscode-containers`
+
+#### 2026-03-18 — Entornos de pruebas backend/frontend (implementación)
+
+- Se crea carpeta `environments/` con separación explícita:
+    - `environments/backend/` para validaciones Django y pruebas backend.
+    - `environments/frontend/` para smoke tests de vistas frontend (templates Django).
+- Entregables de esta fase:
+    - plantillas `.env.test.example` backend/frontend.
+    - scripts `run_backend_checks.sh` y `run_frontend_smoke.sh`.
+    - guía de ejecución de entornos en `environments/README.md`.
+- Validación de ejecución:
+    - smoke frontend ejecutado con backend local levantado: ✅
+    - rutas validadas: `/`, `/accounts/login/`, `/tienda/`, `/products/products/`, `/blog/`
+- Nota de arquitectura:
+    - el frontend actual del repositorio es SSR con templates Django; no hay app Node/Next.js activa en este checkout.
 
 ---
 
