@@ -161,6 +161,102 @@ Este documento será la bitácora oficial hasta completar el objetivo de release
         - frontend smoke: respuestas `HTTP 302` esperadas en `/`, `/accounts/login/`, `/tienda/`, `/products/products/`, `/blog/`.
         - cierre: `[all-checks] Backend + frontend validados correctamente.`
 
+#### 2026-03-26 — Plan de ajuste de despliegue (actualizado)
+
+- Resultado de verificación en entorno Azure actual (CLI local):
+    - suscripción visible: `Azure subscription 1` (tenant `ed18f421-bdd4-4536-ac49-cc48eb76e01f`).
+    - resource groups visibles: `rg-gotogym-app`, `rg-gotogym-data`, `rg-gotogym-ai`, `rg-gotogym-observability`, entre otros.
+    - Web App visible para despliegue: `app-gotogym-api-green-pnvfv3` en `rg-gotogym-app`.
+    - no se encontraron en este contexto los recursos `gotogymweb` / `gotogymweb` definidos originalmente.
+- Implicación operativa:
+    - F2/F3 siguen bloqueadas por desalineación entre recursos objetivo documentados y recursos reales del tenant activo.
+
+### Plan de implementación propuesto (F2 -> F4)
+
+1. Alinear objetivo de release al entorno Azure activo
+    - Confirmar si el release final será sobre:
+        - opción A: recuperar acceso a suscripción/recurso `gotogymweb` original, o
+        - opción B: mover release al Web App `app-gotogym-api-green-pnvfv3` en `rg-gotogym-app`.
+    - Criterio de cierre: suscripción, RG y Web App definitivos aprobados en esta bitácora.
+
+2. Ajustar parámetros de infraestructura en scripts Fase 2
+    - Actualizar defaults o variables de entorno en:
+        - `environments/azure/run_fase2_preflight.sh`
+        - `environments/azure/apply_fase2_config.sh`
+    - Variables mínimas: `AZURE_SUBSCRIPTION_ID`, `AZURE_RELEASE_RESOURCE_GROUP`, `AZURE_RELEASE_WEBAPP`, `AZURE_RELEASE_SLOT`.
+    - Criterio de cierre: preflight apunta al recurso correcto y responde sin `ResourceGroupNotFound`.
+
+3. Completar configuración de App Settings para arranque real
+    - Críticas ya contempladas en scripts:
+        - `DJANGO_SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, `MERCADOPAGO_ACCESS_TOKEN`, `ALEGRA_API_TOKEN`.
+    - Faltantes de base de datos para producción (según `settings.py`):
+        - `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_HOST`, `MYSQL_PORT`.
+    - Criterio de cierre: app settings completas y sin secretos hardcodeados.
+
+4. Validar permisos OIDC del workflow de GitHub Actions
+    - Revisar que la identidad de `azure/login@v2` tenga permisos efectivos sobre RG/Web App objetivo.
+    - Criterio de cierre: paso "Preflight Azure deployment access" exitoso en GitHub Actions.
+
+5. Ejecutar secuencia operativa de despliegue
+    - `bash environments/run_all_checks.sh` (validación local integrada).
+    - `bash environments/azure/run_fase2_preflight.sh` (preflight infraestructura).
+    - `DRY_RUN=true bash environments/azure/apply_fase2_config.sh` (simulación segura).
+    - `DRY_RUN=false bash environments/azure/apply_fase2_config.sh` (aplicación real).
+    - Lanzar workflow de deploy y validar salud funcional.
+    - Criterio de cierre: despliegue verde y verificaciones de login/catálogo/checkout correctas.
+
+6. Cerrar fases y rollback
+    - Cerrar F2 cuando infraestructura/settings/logs estén listos.
+    - Cerrar F3 cuando pipeline complete build+deploy en verde.
+    - Ejecutar F4 validando smoke productivo.
+    - Documentar plan de rollback de F5 (slot swap inverso o redeploy de artefacto previo).
+
+#### 2026-03-26 — Implementación Opción B (entorno Azure activo)
+
+- Cambios aplicados para alinear despliegue al entorno activo:
+    - `environments/azure/.env.release.example` actualizado con:
+        - `AZURE_SUBSCRIPTION_ID=c6015f72-55d5-4282-ba0b-f02152d798f7`
+        - `AZURE_RELEASE_RESOURCE_GROUP=rg-gotogym-app`
+        - `AZURE_RELEASE_WEBAPP=app-gotogym-api-green-pnvfv3`
+        - host de `ALLOWED_HOSTS/CORS_ALLOWED_ORIGINS` al dominio real del Web App.
+        - incorporación de variables MySQL (`MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_HOST`, `MYSQL_PORT`).
+    - `environments/azure/run_fase2_preflight.sh`:
+        - defaults de suscripción/RG/WebApp actualizados al entorno activo.
+        - validación de app settings extendida para incluir variables MySQL.
+    - `environments/azure/apply_fase2_config.sh`:
+        - defaults de suscripción/RG/WebApp actualizados al entorno activo.
+        - variables requeridas extendidas para incluir MySQL.
+        - aplicación de app settings MySQL en `az webapp config appsettings set`.
+    - workflow `.github/workflows/main_gotogymweb.yml`:
+        - parametrización con `AZURE_WEBAPP_NAME` y `AZURE_RESOURCE_GROUP`.
+        - preflight y deploy ajustados al Web App real.
+
+- Validación ejecutada posterior a cambios:
+    - `bash environments/azure/run_fase2_preflight.sh` ✅
+        - Web App objetivo encontrado y en estado `Running`.
+        - startup actual detectado en App Service.
+        - hallazgos pendientes: slot `staging` inexistente y app settings faltantes (`MERCADOPAGO_ACCESS_TOKEN`, `ALEGRA_API_TOKEN`, variables MySQL).
+    - `DRY_RUN=true bash environments/azure/apply_fase2_config.sh` ✅ (guardrail)
+        - falla controlada por variables faltantes en `.env.release` (comportamiento esperado de seguridad).
+
+- Próximo paso operativo inmediato:
+    - crear `environments/azure/.env.release` desde la plantilla y completar secretos reales.
+    - reintentar `DRY_RUN=true` y luego `DRY_RUN=false` para cerrar Fase 2.
+
+#### 2026-03-26 — Retarget operativo final a gotogym-prime
+
+- Ajuste de objetivo confirmado en operación:
+    - Web App objetivo: `gotogym-prime`
+    - Resource Group: `rg-gotogym-prime`
+    - Host esperado: `gotogym-prime.azurewebsites.net`
+- Alineación aplicada en scripts/plantilla:
+    - `environments/azure/.env.release.example`
+    - `environments/azure/run_fase2_preflight.sh`
+    - `environments/azure/apply_fase2_config.sh`
+- Estado actual:
+    - Web App `gotogym-prime` validado en `Running`.
+    - pendiente completar secretos reales para ejecutar `apply_fase2_config.sh` en modo real (`DRY_RUN=false`).
+
 ---
 
 ## 📋 Requisitos Previos
