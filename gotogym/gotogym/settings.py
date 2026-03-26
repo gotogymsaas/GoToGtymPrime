@@ -1,4 +1,5 @@
 import os
+import urllib.parse
 from pathlib import Path
 from datetime import timedelta
 
@@ -85,16 +86,32 @@ WSGI_APPLICATION = 'gotogym.wsgi.application'
 
 
 # SE ADICIONA ESTAS LINEAS PARA SABER QUE SE USA MYSQL ALVARO URREGO VIANA 05/08/2025
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('MYSQL_DATABASE', 'gotogym_bd'),
-        'USER': os.environ.get('MYSQL_USER', 'gotogym_user'),
-        'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
-        'HOST': os.environ.get('MYSQL_HOST', 'servergotogym.mysql.database.azure.com'),
-        'PORT': os.environ.get('MYSQL_PORT', '3306'),
+# DATABASE_URL tiene prioridad (PostgreSQL Azure), fallback a MYSQL_* vars
+_db_url = os.environ.get('DATABASE_URL', '')
+if _db_url:
+    _p = urllib.parse.urlparse(_db_url)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': _p.path.lstrip('/'),
+            'USER': urllib.parse.unquote(_p.username or ''),
+            'PASSWORD': urllib.parse.unquote(_p.password or ''),
+            'HOST': _p.hostname,
+            'PORT': str(_p.port or 5432),
+            'OPTIONS': {'sslmode': 'require'},
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('MYSQL_DATABASE', 'gotogym_bd'),
+            'USER': os.environ.get('MYSQL_USER', 'gotogym_user'),
+            'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
+            'HOST': os.environ.get('MYSQL_HOST', 'servergotogym.mysql.database.azure.com'),
+            'PORT': os.environ.get('MYSQL_PORT', '3306'),
+        }
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = []
@@ -118,11 +135,21 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = _as_bool(os.environ.get('CORS_ALLOW_ALL_ORIGINS'), False)
 CORS_ALLOWED_ORIGINS = _split_csv(os.environ.get('CORS_ALLOWED_ORIGINS', ''))
+
+CSRF_TRUSTED_ORIGINS = _split_csv(os.environ.get('CSRF_TRUSTED_ORIGINS', ''))
+
+# Requerido para que Django confíe en HTTPS detrás del proxy de Azure App Service
+if _as_bool(os.environ.get('SECURE_PROXY_SSL_HEADER'), False):
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = _as_bool(os.environ.get('SECURE_SSL_REDIRECT'), False)
+SESSION_COOKIE_SECURE = _as_bool(os.environ.get('SESSION_COOKIE_SECURE'), False)
+CSRF_COOKIE_SECURE = _as_bool(os.environ.get('CSRF_COOKIE_SECURE'), False)
 
 # Variables críticas de integraciones para runtime.
 MERCADOPAGO_ACCESS_TOKEN = os.environ.get('MERCADOPAGO_ACCESS_TOKEN', '')
