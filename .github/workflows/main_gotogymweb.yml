@@ -2,10 +2,11 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-name: Build and deploy Python app to Azure Web App - gotogymweb
+name: Build and deploy Python app to Azure Web App - gotogym-prime
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  AZURE_WEBAPP_NAME: gotogym-prime
 
 on:
   push:
@@ -17,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +26,7 @@ jobs:
       - name: Set up Python version
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.12'
 
       - name: Run backend validation suite
         run: bash environments/backend/run_backend_checks.sh
@@ -63,37 +64,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: python-app
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B63C0C34367A489A85841AE4AF1CF80C }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_DA5825539E7141EDABB69A0832504733 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4E77D74CD1BA467A9DC68287BC4147CA }}
 
-      - name: Preflight Azure deployment access
-        run: |
-          set -euo pipefail
-          az account show --query "{name:name,id:id,state:state}" -o table
-          if ! az webapp deployment list-publishing-profiles --name gotogymweb --resource-group gotogymweb -o none; then
-            echo "::error::No se pudo obtener el publishing profile de gotogymweb. Verifica que la suscripcion este habilitada (no ReadOnlyDisabledSubscription) y que la identidad OIDC tenga permisos Contributor sobre el Web App o su Resource Group."
-            exit 1
-          fi
-
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: 'gotogymweb'
-          slot-name: 'Production'
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: Production
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: .
-          startup-command: "gunicorn --chdir gotogym gotogym.wsgi --bind=0.0.0.0 --timeout 600 --access-logfile '-' --error-logfile '-'"
-          
