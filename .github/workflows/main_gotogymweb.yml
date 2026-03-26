@@ -72,11 +72,28 @@ jobs:
         with:
           name: python-app
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          slot-name: Production
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: .
+      - name: Deploy to Azure Web App via Kudu Zip Deploy
+        env:
+          SCM_USER: ${{ secrets.AZURE_SCM_USER }}
+          SCM_PASS: ${{ secrets.AZURE_SCM_PASS }}
+          APP_NAME: ${{ env.AZURE_WEBAPP_NAME }}
+        run: |
+          set -euo pipefail
+          echo "Comprimiendo artefactos..."
+          zip -r deploy.zip . -x "*.pyc" -x ".venv*" -x "venv/*" -x "__pycache__/*" -x ".git/*"
+          echo "Tamaño del paquete: $(du -sh deploy.zip | cut -f1)"
+          echo "Enviando a Kudu zipdeploy..."
+          HTTP_STATUS=$(curl -s -o /tmp/deploy_response.txt -w "%{http_code}" \
+            -X POST \
+            "https://${APP_NAME}.scm.azurewebsites.net/api/zipdeploy" \
+            -u "${SCM_USER}:${SCM_PASS}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @deploy.zip)
+          echo "Respuesta HTTP: $HTTP_STATUS"
+          cat /tmp/deploy_response.txt || true
+          if [[ "$HTTP_STATUS" -ge 200 && "$HTTP_STATUS" -lt 300 ]]; then
+            echo "Deploy exitoso."
+          else
+            echo "ERROR: Deploy falló con HTTP $HTTP_STATUS"
+            exit 1
+          fi
