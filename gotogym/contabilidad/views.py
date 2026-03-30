@@ -3,14 +3,14 @@ from .alegra import AlegraAPI
 from django.conf import settings
 
 def clientes(request):
-    api = AlegraAPI(
-        email=getattr(settings, 'ALEGRA_EMAIL', None),
-        api_token=getattr(settings, 'ALEGRA_API_TOKEN', None)
-    )
     clientes = []
     error = None
     filtro = request.GET.get('filtro', '').lower()
     try:
+        api = AlegraAPI(
+            email=getattr(settings, 'ALEGRA_EMAIL', None),
+            api_token=getattr(settings, 'ALEGRA_API_TOKEN', None)
+        )
         clientes = api.get_clients()
         if filtro:
             clientes = [c for c in clientes if filtro in c.get('name', '').lower() or filtro in c.get('email', '').lower()]
@@ -23,15 +23,15 @@ def clientes(request):
     })
 
 def facturas_cliente(request, cliente_id):
-    api = AlegraAPI(
-        email=getattr(settings, 'ALEGRA_EMAIL', None),
-        api_token=getattr(settings, 'ALEGRA_API_TOKEN', None)
-    )
     cliente = None
     facturas = []
     error = None
     filtro_factura = request.GET.get('filtro_factura', '').lower()
     try:
+        api = AlegraAPI(
+            email=getattr(settings, 'ALEGRA_EMAIL', None),
+            api_token=getattr(settings, 'ALEGRA_API_TOKEN', None)
+        )
         clientes = api.get_clients()
         cliente = next((c for c in clientes if str(c['id']) == str(cliente_id)), None)
         facturas = [f for f in api.get_invoices() if f.get('client', {}).get('id') == str(cliente_id)]

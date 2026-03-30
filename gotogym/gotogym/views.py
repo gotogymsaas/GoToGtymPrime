@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from blog.models import Post
 from django.contrib.auth import get_user_model
@@ -40,3 +40,40 @@ def dashboard(request):
         'chart_data': json.dumps(chart_data),
     }
     return render(request, 'dashboard.html', context)
+
+
+def pedidos(request):
+    return redirect('carrito:cart_detail')
+
+
+def bienestar(request):
+    return redirect('blog:post_list')
+
+
+def gestion(request):
+    return redirect('contacto')
+
+
+def acerca_de(request):
+    return render(request, 'static_pages/simple_page.html', {
+        'title': 'Acerca de GoToGym',
+        'subtitle': 'Tecnologia textil, bienestar y alto rendimiento en una sola experiencia.',
+    })
+
+
+def contacto(request):
+    return render(request, 'static_pages/simple_page.html', {
+        'title': 'Contacto',
+        'subtitle': 'Escribenos por nuestros canales oficiales y te responderemos pronto.',
+    })
+
+
+def politica_privacidad(request):
+    return render(request, 'static_pages/simple_page.html', {
+        'title': 'Politica de privacidad',
+        'subtitle': 'Protegemos tus datos y los tratamos bajo principios de seguridad y transparencia.',
+    })
+
+
+def terminos(request):
+    return render(request, 'accounts/terms_and_conditions.html')

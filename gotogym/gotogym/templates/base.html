@@ -165,13 +165,13 @@
         </button>
       </div>
       <ul id="desktop-menu" class="hidden md:flex space-x-6 text-sm font-medium items-center mt-4 md:mt-0">
-        <li><a href="/" class="hover:text-[#C5A46B]">{% trans "Inicio" %}</a></li>
-        <li><a href="/pedidos/" class="hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
-        <li><a href="/bienestar/" class="hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
-        <li><a href="/gestion/" class="hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
-        <li><a href="/blog/" class="hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
-        <li><a href="/tienda/" class="hover:text-[#C5A46B]">{% trans "Tienda" %}</a></li>
-        <li><a href="/carrito/" class="relative hover:opacity-80 transition">
+        <li><a href="{% url 'home' %}" class="hover:text-[#C5A46B]">{% trans "Inicio" %}</a></li>
+        <li><a href="{% url 'pedidos' %}" class="hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
+        <li><a href="{% url 'bienestar' %}" class="hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
+        <li><a href="{% url 'gestion' %}" class="hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
+        <li><a href="{% url 'blog:post_list' %}" class="hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
+        <li><a href="{% url 'tienda:producto_list' %}" class="hover:text-[#C5A46B]">{% trans "Tienda" %}</a></li>
+        <li><a href="{% url 'carrito:cart_detail' %}" class="relative hover:opacity-80 transition">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="h-6 w-6 text-[#C5A46B]" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13l1.2-6h9.8" />
           </svg>
@@ -234,14 +234,14 @@
     </div>
     <div id="mobile-menu" class="md:hidden hidden border-t border-white/10">
       <ul class="flex flex-col px-6 py-4 space-y-3 text-sm font-medium">
-        <li><a href="/" class="hover:text-[#C5A46B]">{% trans "Inicio" %}</a></li>
-        <li><a href="/productos/" class="hover:text-[#C5A46B]">{% trans "Coleccion" %}</a></li>
-        <li><a href="/pedidos/" class="hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
-        <li><a href="/bienestar/" class="hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
-        <li><a href="/metricas/" class="hover:text-[#C5A46B]">{% trans "Tecnologia" %}</a></li>
-        <li><a href="/gestion/" class="hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
-        <li><a href="/blog/" class="hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
-        <li><a href="/carrito/" class="relative hover:opacity-80 transition">
+        <li><a href="{% url 'home' %}" class="hover:text-[#C5A46B]">{% trans "Inicio" %}</a></li>
+        <li><a href="{% url 'tienda:producto_list' %}" class="hover:text-[#C5A46B]">{% trans "Coleccion" %}</a></li>
+        <li><a href="{% url 'pedidos' %}" class="hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
+        <li><a href="{% url 'bienestar' %}" class="hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
+        <li><a href="{% url 'metricas:metricas_dashboard' %}" class="hover:text-[#C5A46B]">{% trans "Tecnologia" %}</a></li>
+        <li><a href="{% url 'gestion' %}" class="hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
+        <li><a href="{% url 'blog:post_list' %}" class="hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
+        <li><a href="{% url 'carrito:cart_detail' %}" class="relative hover:opacity-80 transition">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="h-6 w-6 text-[#C5A46B]" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13l1.2-6h9.8" />
           </svg>
@@ -285,10 +285,10 @@
   <footer class="bg-black py-12 text-white ">
     <div class="container mx-auto text-center px-4">
       <div class="flex flex-wrap justify-center space-x-8 mb-6 text-sm">
-        <a href="/acerca-de" class="hover:text-[#D4B46A] transition">{% trans "Acerca de" %}</a>
-        <a href="/contacto" class="hover:text-[#D4B46A] transition">{% trans "Contacto" %}</a>
-        <a href="/politica-privacidad" class="hover:text-[#D4B46A] transition">{% trans "Privacidad" %}</a>
-        <a href="/terminos" class="hover:text-[#D4B46A] transition">{% trans "Términos" %}</a>
+        <a href="{% url 'acerca_de' %}" class="hover:text-[#D4B46A] transition">{% trans "Acerca de" %}</a>
+        <a href="{% url 'contacto' %}" class="hover:text-[#D4B46A] transition">{% trans "Contacto" %}</a>
+        <a href="{% url 'politica_privacidad' %}" class="hover:text-[#D4B46A] transition">{% trans "Privacidad" %}</a>
+        <a href="{% url 'terminos' %}" class="hover:text-[#D4B46A] transition">{% trans "Términos" %}</a>
       </div>
       <p class="mb-4 text-sm text-white/70">{% trans "Únete a nuestra comunidad y descubre la revolución del bienestar." %}</p>
       <div class="mb-6">

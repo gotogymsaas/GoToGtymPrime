@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 from .models import Post, Category
 from django.contrib.auth import get_user_model
@@ -37,3 +37,19 @@ def post_list(request):
         'params': params,
     }
     return render(request, 'blog/post_list.html', context)
+
+
+def post_detail(request, slug):
+    post = get_object_or_404(
+        Post.objects.select_related('category', 'author').filter(is_published=True),
+        slug=slug,
+    )
+    related_posts = (
+        Post.objects.filter(is_published=True, category=post.category)
+        .exclude(id=post.id)
+        .order_by('-published')[:3]
+    )
+    return render(request, 'blog/post_detail.html', {
+        'post': post,
+        'related_posts': related_posts,
+    })

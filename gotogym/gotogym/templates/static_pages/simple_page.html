@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="min-h-[60vh] flex items-center justify-center px-4 py-16 bg-gradient-to-b from-white to-[#f3e9d2]">
+  <div class="max-w-3xl w-full text-center bg-white/90 rounded-3xl shadow-xl border border-[#e7c98a] p-10">
+    <h1 class="text-4xl md:text-5xl font-bold text-[#093f62]">{{ title }}</h1>
+    <p class="mt-5 text-lg text-[#101820]">{{ subtitle }}</p>
+    <a href="{% url 'home' %}" class="mt-8 inline-block px-6 py-3 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold shadow hover:from-[#e7c98a] hover:to-[#C5A46B] transition-all">
+      {% trans "Volver al inicio" %}
+    </a>
+  </div>
+</section>
+{% endblock %}

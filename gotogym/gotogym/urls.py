@@ -31,6 +31,13 @@ urlpatterns = [
 
 urlpatterns += i18n_patterns(
     path('', views.home, name='home'),
+    path('pedidos/', views.pedidos, name='pedidos'),
+    path('bienestar/', views.bienestar, name='bienestar'),
+    path('gestion/', views.gestion, name='gestion'),
+    path('acerca-de/', views.acerca_de, name='acerca_de'),
+    path('contacto/', views.contacto, name='contacto'),
+    path('politica-privacidad/', views.politica_privacidad, name='politica_privacidad'),
+    path('terminos/', views.terminos, name='terminos'),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('influencer/', include('influencer.urls')),
@@ -44,6 +51,7 @@ urlpatterns += i18n_patterns(
     path('products/', include('products.urls', namespace='products')),
     path('configuracion-marca/', include('configuracion_marca.urls', namespace='configuracion_marca')),
     path('contabilidad/', include('contabilidad.urls', namespace='contabilidad')),
+    path('metricas/', include('metricas.urls', namespace='metricas')),
     path('tienda/', include('tienda.urls', namespace='tienda')),
     path('carrito/', include('carrito.urls', namespace='carrito')),
     path('crm/', include('crm.urls')),
