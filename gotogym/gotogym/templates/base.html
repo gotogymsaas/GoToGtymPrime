@@ -54,6 +54,19 @@
       background-color: #F8F9FA;
       margin: 0;
     }
+    nav.backdrop-blur-md {
+      background: linear-gradient(90deg, #0f2233 0%, #093f62 65%, #0f2233 100%);
+      color: #F8F9FA;
+    }
+    nav.backdrop-blur-md a,
+    nav.backdrop-blur-md button,
+    nav.backdrop-blur-md span,
+    nav.backdrop-blur-md svg {
+      color: inherit;
+    }
+    nav.backdrop-blur-md a:hover {
+      color: #C5A46B;
+    }
     h1, h2, h3 {
       font-family: 'Poetsen One', serif;
     }
@@ -142,7 +155,8 @@
     <div class="container mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-3">
       <div class="w-full flex items-center justify-between md:w-auto">
         <a href="/" class="flex items-center gap-3 mr-4 md:gap-2 md:mr-0">
-          <img src="{% static 'images/Logo_GoToGym_Blanco.png' %}" alt="GoToGym" class="h-8 md:h-8 mr-14" />
+          <img src="{% static 'images/Logo_GoToGym_Blanco.png' %}" alt="GoToGym" class="h-8 md:h-8 mr-14" onerror="this.style.display='none';this.nextElementSibling.classList.remove('hidden');" />
+          <span class="hidden h-8 mr-14 text-lg font-extrabold tracking-wide text-[#C5A46B]">GoToGym</span>
         </a>
         <button class="md:hidden text-[#C5A46B] ml-2" onclick="toggleMobileMenu()">
           <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

@@ -1,0 +1,31 @@
+/* Global fallback tokens and baseline UI styles. */
+:root {
+  --brand-primary: #093f62;
+  --brand-accent: #c5a46b;
+  --brand-accent-light: #e7c98a;
+  --text-primary: #101820;
+  --bg-default: #f8f9fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-default);
+  color: var(--text-primary);
+}
+
+a,
+button {
+  transition: all 0.2s ease;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--brand-accent);
+  outline-offset: 2px;
+}

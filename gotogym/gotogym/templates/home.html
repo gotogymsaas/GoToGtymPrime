@@ -7,6 +7,15 @@
   <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
   <style>
     #influencer-modal { z-index: 9999; }
+    .hero-bg {
+      background-color: #0f2233;
+      background-image:
+        linear-gradient(120deg, rgba(7, 24, 36, 0.5), rgba(9, 63, 98, 0.35)),
+        url('{% static 'images/img/hero.webp' %}');
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
   </style>
 {% endblock %}
 
@@ -25,12 +34,15 @@
   </div>
 </div>
 {% endif %}
-<section class="relative h-screen bg-cover bg-center flex items-center justify-center" style="background-image:url('{% static 'images/img/hero.webp' %}');">
-  <span class="absolute inset-0 bg-black/50"></span>
+<section class="relative min-h-[82vh] md:h-screen flex items-center justify-center hero-bg">
+  <span class="absolute inset-0 bg-black/35"></span>
   <div class="relative z-10 text-center px-4" data-aos="fade-up">
-    <h1 class="text-6xl md:text-7xl font-bold text-white dark:text-white drop-shadow-xl">{% trans "Innovación Cuántica y Bienestar Personalizado" %}</h1>
-    <p class="mt-4 text-xl md:text-2xl text-gray-200 dark:text-white max-w-3xl mx-auto">{% trans "Descubre la elegancia del lujo deportivo combinado con tecnología avanzada." %}</p>
-    {% comment %} <a href="{% url 'products:list_product' %}" class="mt-8 inline-block bg-gradient-to-r from-[#C5A46B] to-[#003057] text-white font-semibold px-10 py-4 rounded-full drop-shadow-md hover:scale-105 transition">{% trans "Explorar ahora" %}</a> {% endcomment %}
+    <h1 class="text-4xl md:text-6xl font-bold text-white dark:text-white drop-shadow-xl max-w-5xl mx-auto leading-tight">{% trans "Innovación Cuántica y Bienestar Personalizado" %}</h1>
+    <p class="mt-5 text-lg md:text-2xl text-gray-100 dark:text-white max-w-3xl mx-auto">{% trans "Descubre la elegancia del lujo deportivo combinado con tecnología avanzada." %}</p>
+    <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="/tienda/" class="inline-block bg-gradient-to-r from-[#C5A46B] to-[#AF8C4F] text-[#101820] font-bold px-8 py-3 rounded-full shadow-lg hover:scale-105 transition">{% trans "Explorar tienda" %}</a>
+      <a href="/tecnologia/" class="inline-block border-2 border-[#C5A46B] text-white font-semibold px-8 py-3 rounded-full bg-black/20 hover:bg-[#C5A46B]/20 transition">{% trans "Conocer tecnología" %}</a>
+    </div>
   </div>
 </section>
 <div class="flex flex-col md:flex-row justify-center items-center gap-6 mt-8 mb-8" data-aos="zoom-in">
