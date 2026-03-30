@@ -31,6 +31,7 @@ urlpatterns = [
 
 urlpatterns += i18n_patterns(
     path('', views.home, name='home'),
+    path('tecnologia/', views.tecnologia, name='tecnologia'),
     path('pedidos/', views.pedidos, name='pedidos'),
     path('bienestar/', views.bienestar, name='bienestar'),
     path('gestion/', views.gestion, name='gestion'),

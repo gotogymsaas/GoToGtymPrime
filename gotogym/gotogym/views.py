@@ -54,6 +54,10 @@ def gestion(request):
     return redirect('contacto')
 
 
+def tecnologia(request):
+    return redirect('metricas:metricas_dashboard')
+
+
 def acerca_de(request):
     return render(request, 'static_pages/simple_page.html', {
         'title': 'Acerca de GoToGym',
