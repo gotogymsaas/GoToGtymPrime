@@ -118,11 +118,24 @@
     body.dark-mode .rounded-lg, body.dark-mode .rounded-full {
       border-radius: 0.75rem !important;
     }
-    body.dark-mode #darkModeToggle,
-    body.dark-mode #darkModeToggleMobile {
-      background: #fff !important;
+    body.dark-mode #darkModeToggle svg,
+    body.dark-mode #darkModeToggleMobile svg {
+      fill: #fff !important;
+      color: #fff !important;
+    }
+    #darkModeToggle svg,
+    #darkModeToggleMobile svg {
+      fill: #000 !important;
+      color: #000 !important;
+    }
+    #darkModeToggle,
+    #darkModeToggleMobile {
+      background: transparent !important;
       border-radius: 50% !important;
       padding: 4px !important;
+    }
+    #langDropdown button {
+      color: #101820 !important;
     }
     body.dark-mode #langDropdown button {
       color: #F8F9FA !important;
@@ -192,7 +205,7 @@
       <div class="hidden md:flex items-center gap-2 md:gap-3 ml-auto">
         {% if user.is_authenticated %}
         <div class="relative" id="userMenuWrapper">
-          <button id="userMenuBtn" type="button" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#f3e9d2] text-[#093f62] font-bold hover:bg-[#e7c98a] focus:outline-none" onclick="toggleUserMenu()">
+          <button id="userMenuBtn" type="button" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#f3e9d2] text-[#666666] font-bold hover:bg-[#e7c98a] focus:outline-none" onclick="toggleUserMenu()">
             <span class="material-icons-outlined">account_circle</span>
             <span>{{ user.get_full_name|default:user.username }}</span>
             <span class="material-icons-outlined">expand_more</span>
