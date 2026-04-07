@@ -118,6 +118,15 @@
     body.dark-mode .rounded-lg, body.dark-mode .rounded-full {
       border-radius: 0.75rem !important;
     }
+    body.dark-mode #darkModeToggle,
+    body.dark-mode #darkModeToggleMobile {
+      background: #fff !important;
+      border-radius: 50% !important;
+      padding: 4px !important;
+    }
+    body.dark-mode #langDropdown button {
+      color: #F8F9FA !important;
+    }
     body.dark-mode .dropdown-menu, body.dark-mode #langDropdown {
       background-color: #232526 !important;
       color: #F8F9FA !important;
@@ -340,15 +349,13 @@
       updateDarkSlider();
     }
     function updateDarkSlider() {
+      const isDark = document.body.classList.contains('dark-mode');
       const slider = document.getElementById('darkSlider');
-      const icon = document.getElementById('sliderIcon');
-      if(document.body.classList.contains('dark-mode')) {
-        slider.style.left = '32px';
-        icon.innerHTML = `<svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-gray-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z' /></svg>`;
-      } else {
-        slider.style.left = '4px';
-        icon.innerHTML = `<svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-yellow-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'><circle cx='12' cy='12' r='5' fill='currentColor' /></svg>`;
-      }
+      const btn = document.getElementById('darkModeToggle');
+      const btnMobile = document.getElementById('darkModeToggleMobile');
+      if (btn) btn.title = isDark ? 'Modo oscuro' : 'Modo claro';
+      if (btnMobile) btnMobile.title = isDark ? 'Modo oscuro' : 'Modo claro';
+      if (slider) slider.style.left = isDark ? '32px' : '4px';
     }
     document.addEventListener('DOMContentLoaded', function() {
       if (localStorage.getItem('darkMode') === 'true') {
