@@ -14,7 +14,7 @@
 
 <body class="bg-gray-100 font-sans" x-data="{ sidebarOpen: false }">
     <div class="flex h-screen overflow-hidden">
-        <aside :class="sidebarOpen ? 'w-64' : 'w-16'" class="bg-[#093f62] text-white transition-all duration-300 h-full flex-shrink-0 relative" x-init="if (window.innerWidth >= 768) { sidebarOpen = true } ">
+        <aside :class="sidebarOpen ? 'w-64' : 'w-16'" class="bg-[#093f62] text-white transition-all duration-300 h-full flex-shrink-0 relative flex flex-col overflow-y-auto" x-init="if (window.innerWidth >= 768) { sidebarOpen = true } ">
       <div class="flex items-center justify-between px-4 py-4">
         <h1 class="text-2xl font-bold" x-show="sidebarOpen">Panel Admin</h1>
         <button @click="sidebarOpen = !sidebarOpen" class="bg-white text-[#093f62] rounded-md p-1  flex items-center justify-center hover:bg-gray-200 transition">
@@ -24,7 +24,7 @@
       </div>
       
 
-      <nav class="mt-4">
+      <nav class="mt-4 flex-1 overflow-y-auto pb-4">
         <ul>
           <li class="px-4 py-2 hover:bg-white/10 flex items-center">
             <a href="{% url 'home' %}" class="flex items-center w-full text-white">
@@ -121,7 +121,7 @@
       </nav>
     </aside>
 
-    <div class=" content-center flex-1 overflow-auto">
+    <div class="content-center flex-1 min-h-0 overflow-y-auto">
       <header class="flex justify-end items-center p-4 bg-white shadow-sm border-b border-gray-200">
         {% if user.is_authenticated %}
         <div class="relative" x-data="{ open: false }">
