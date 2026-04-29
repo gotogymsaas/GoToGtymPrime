@@ -17,7 +17,11 @@ if [[ -z "${MAX_HEX_IN_TEMPLATES:-}" ]]; then
   exit 1
 fi
 
-CURRENT_COUNT="$(rg -n "#[0-9A-Fa-f]{3,6}" "${ROOT_DIR}/gotogym/accounts/templates" "${ROOT_DIR}/gotogym/products/templates" "${ROOT_DIR}/gotogym/gotogym/templates" -g '*.html' | wc -l | tr -d ' ')"
+if command -v rg >/dev/null 2>&1; then
+  CURRENT_COUNT="$(rg -n "#[0-9A-Fa-f]{3,6}" "${ROOT_DIR}/gotogym/accounts/templates" "${ROOT_DIR}/gotogym/products/templates" "${ROOT_DIR}/gotogym/gotogym/templates" -g '*.html' | wc -l | tr -d ' ')"
+else
+  CURRENT_COUNT="$(grep -REn --include='*.html' "#[0-9A-Fa-f]{3,6}" "${ROOT_DIR}/gotogym/accounts/templates" "${ROOT_DIR}/gotogym/products/templates" "${ROOT_DIR}/gotogym/gotogym/templates" | wc -l | tr -d ' ')"
+fi
 
 echo "[design-governance] Baseline permitido: ${MAX_HEX_IN_TEMPLATES}"
 echo "[design-governance] Conteo actual: ${CURRENT_COUNT}"
