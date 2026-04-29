@@ -2,14 +2,14 @@
 {% block title %}Marcas{% endblock %}
 {% block content %}
 <div class="min-h-screen flex items-start justify-center">
-  <div class="w-full max-w-5xl bg-white/80 backdrop-blur border border-gray-200 shadow-xl rounded-3xl px-10 py-12">
+  <div class="w-full max-w-5xl gtg-card backdrop-blur shadow-xl rounded-3xl px-10 py-12">
     <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between mb-8">
-      <h1 class="text-3xl font-semibold text-gray-800 flex items-center gap-3">
-        <span class="material-icons-outlined text-[#C5A46B] text-4xl">branding_watermark</span>
+      <h1 class="text-3xl font-semibold text-white flex items-center gap-3">
+        <span class="material-icons-outlined text-[#0fbfb0] text-4xl">branding_watermark</span>
         Gestión de Marcas
       </h1>
       <div class="flex flex-wrap gap-3">
-        <button id="openAddBrandModal" type="button" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold shadow hover:from-[#e7c98a] hover:to-[#C5A46B] transition-all">
+        <button id="openAddBrandModal" type="button" class="gtg-btn gtg-btn-primary inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-bold shadow transition-all">
           <span class="material-icons-outlined">add</span> Añadir Marca
         </button>
       </div>
@@ -18,31 +18,31 @@
       <!-- Tabla de marcas a la izquierda (más ancha) -->
       
         
-        <div class="overflow-x-auto rounded-xl border border-gray-200">
+        <div class="overflow-x-auto rounded-xl border border-gray-700">
           <table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-100 text-gray-700 uppercase tracking-wide text-xs">
+            <thead class="bg-[#0f141a] text-gray-200 uppercase tracking-wide text-xs">
               <tr>
                 <th class="px-6 py-3 text-left">ID</th>
                 <th class="px-6 py-3 text-left">Nombre</th>
                 <th class="px-6 py-3 text-center w-40">Acciones</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-gray-800 text-gray-200">
               {% for b in marcas %}
-              <tr class="hover:bg-gray-50 transition">
-                <td class="px-6 py-3 font-medium text-gray-800 whitespace-nowrap">{{ b.id }}</td>
+              <tr class="hover:bg-white/5 transition">
+                <td class="px-6 py-3 font-medium text-gray-100 whitespace-nowrap">{{ b.id }}</td>
                 <td class="px-6 py-3">{{ b.name }}</td>
                 <td class="px-6 py-3 text-center w-40">
                   <div class="flex flex-row justify-center items-center gap-2 min-w-[90px]">
-                    <button type="button" class="inline-flex items-center justify-center text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 rounded-full p-2 transition preview-brand-btn" title="Visualizar" data-id="{{ b.id }}" data-name="{{ b.name }}">
+                    <button type="button" class="inline-flex items-center justify-center text-cyan-400 hover:text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 rounded-full p-2 transition preview-brand-btn" title="Visualizar" data-id="{{ b.id }}" data-name="{{ b.name }}">
                       <span class="material-icons-outlined align-middle">visibility</span>
                     </button>
-                    <button type="button" class="inline-flex items-center justify-center text-yellow-600 hover:text-yellow-800 bg-yellow-50 hover:bg-yellow-100 rounded-full p-2 transition edit-brand-btn" title="Editar" data-id="{{ b.id }}" data-name="{{ b.name }}">
+                    <button type="button" class="inline-flex items-center justify-center text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 rounded-full p-2 transition edit-brand-btn" title="Editar" data-id="{{ b.id }}" data-name="{{ b.name }}">
                       <span class="material-icons-outlined align-middle">edit</span>
                     </button>
                     <form method="post" action="{% url 'products:brand_delete' b.id %}" class="delete-brand-form" data-id="{{ b.id }}" style="display:inline;">
                       {% csrf_token %}
-                      <button type="submit" class="inline-flex items-center justify-center text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 rounded-full p-2 transition" title="Eliminar" onclick="return confirm('¿Seguro que deseas eliminar esta marca?');">
+                      <button type="submit" class="inline-flex items-center justify-center text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-full p-2 transition" title="Eliminar" onclick="return confirm('¿Seguro que deseas eliminar esta marca?');">
                         <span class="material-icons-outlined align-middle">delete</span>
                       </button>
                     </form>
@@ -59,15 +59,15 @@
     </div>
     <!-- Modal para añadir marca -->
     <div id="addBrandModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
-      <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full border border-gray-200 text-center relative animate-fade-in">
+      <div class="gtg-card rounded-3xl shadow-2xl p-8 max-w-md w-full text-center relative animate-fade-in">
         <button id="closeAddBrandModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition text-2xl">
           <span class="material-icons-outlined">close</span>
         </button>
         <h2 class="text-xl font-bold mb-4">Añadir nueva marca</h2>
         <form method="post" action="{% url 'products:brand_add' %}" class="flex flex-col gap-4">
           {% csrf_token %}
-          <input type="text" name="name" placeholder="Nombre de la marca" class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C5A46B] bg-gray-50" required />
-          <button type="submit" class="w-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold py-2.5 rounded-xl shadow hover:from-[#e7c98a] hover:to-[#C5A46B] transition-all">
+          <input type="text" name="name" placeholder="Nombre de la marca" class="gtg-input" required />
+          <button type="submit" class="gtg-btn gtg-btn-primary w-full py-2.5 rounded-xl shadow transition-all">
             Añadir
           </button>
         </form>
@@ -75,11 +75,11 @@
     </div>
     <!-- Modal para previsualizar marca -->
     <div id="previewBrandModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
-      <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full border border-gray-200 text-center relative animate-fade-in">
+      <div class="gtg-card rounded-3xl shadow-2xl p-8 max-w-md w-full text-center relative animate-fade-in">
         <button id="closePreviewBrandModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition text-2xl">
           <span class="material-icons-outlined">close</span>
         </button>
-        <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 justify-center"><span class="material-icons-outlined text-[#C5A46B]">branding_watermark</span> Marca</h2>
+        <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 justify-center"><span class="material-icons-outlined text-[#0fbfb0]">branding_watermark</span> Marca</h2>
         <div class="mb-4">
           <span class="font-bold">ID:</span> <span id="previewBrandId"></span>
         </div>
@@ -90,7 +90,7 @@
     </div>
     <!-- Modal para editar marca -->
     <div id="editBrandModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
-      <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full border border-gray-200 text-center relative animate-fade-in">
+      <div class="gtg-card rounded-3xl shadow-2xl p-8 max-w-md w-full text-center relative animate-fade-in">
         <button id="closeEditBrandModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition text-2xl">
           <span class="material-icons-outlined">close</span>
         </button>
@@ -98,8 +98,8 @@
         <form id="editBrandForm" method="post" class="flex flex-col gap-4">
           {% csrf_token %}
           <input type="hidden" name="brand_id" id="editBrandIdInput" />
-          <input type="text" name="name" id="editBrandNameInput" placeholder="Nombre de la marca" class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C5A46B] bg-gray-50" required />
-          <button type="submit" class="w-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold py-2.5 rounded-xl shadow hover:from-[#e7c98a] hover:to-[#C5A46B] transition-all">
+          <input type="text" name="name" id="editBrandNameInput" placeholder="Nombre de la marca" class="gtg-input" required />
+          <button type="submit" class="gtg-btn gtg-btn-primary w-full py-2.5 rounded-xl shadow transition-all">
             Actualizar
           </button>
         </form>

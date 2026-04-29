@@ -40,6 +40,7 @@
   
   <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  {% block extra_head %}{% endblock %}
   <style>
     {% if color_body %}
       body {
@@ -172,8 +173,8 @@
     {% endif %}
   </style>
 </head>
-<body class="text-[#101820]">
-  <nav class="backdrop-blur-md text-white sticky top-0 z-40 shadow-md">
+<body class="gtg-theme text-white">
+  <nav class="gtg-navbar backdrop-blur-md text-white sticky top-0 z-40 shadow-md">
     <div class="container mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-3">
       <div class="w-full flex items-center justify-between md:w-auto">
         <a href="/" class="flex items-center gap-3 mr-4 md:gap-2 md:mr-0">
@@ -187,12 +188,12 @@
         </button>
       </div>
       <ul id="desktop-menu" class="hidden md:flex space-x-6 text-sm font-medium items-center mt-4 md:mt-0">
-        <li><a href="{% url 'home' %}" class="hover:text-[#C5A46B]">{% trans "Inicio" %}</a></li>
-        <li><a href="{% url 'pedidos' %}" class="hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
-        <li><a href="{% url 'bienestar' %}" class="hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
-        <li><a href="{% url 'gestion' %}" class="hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
-        <li><a href="{% url 'blog:post_list' %}" class="hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
-        <li><a href="{% url 'tienda:producto_list' %}" class="hover:text-[#C5A46B]">{% trans "Tienda" %}</a></li>
+        <li><a href="{% url 'home' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Inicio" %}</a></li>
+        <li><a href="{% url 'pedidos' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
+        <li><a href="{% url 'bienestar' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
+        <li><a href="{% url 'gestion' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
+        <li><a href="{% url 'blog:post_list' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
+        <li><a href="{% url 'tienda:producto_list' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Tienda" %}</a></li>
         <li><a href="{% url 'carrito:cart_detail' %}" class="relative hover:opacity-80 transition">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="h-6 w-6 text-[#C5A46B]" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13l1.2-6h9.8" />
@@ -225,10 +226,10 @@
           </div>
         </div>
         {% else %}
-          <a href="{% url 'login' %}" class="px-4 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold shadow-sm hover:bg-[#C5A46B] hover:text-black transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">
+          <a href="{% url 'login' %}" class="gtg-btn gtg-btn-outline px-4 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold shadow-sm hover:bg-[#C5A46B] hover:text-black transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">
             {% trans "Iniciar sesión"%}
           </a>
-          <a href="{% url 'register' %}" class="px-4 py-2 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold shadow-md hover:from-[#e7c98a] hover:to-[#C5A46B] hover:text-[#101820] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">
+          <a href="{% url 'register' %}" class="gtg-btn gtg-btn-primary px-4 py-2 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold shadow-md hover:from-[#e7c98a] hover:to-[#C5A46B] hover:text-[#101820] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">
             {% trans "Crear cuenta"%}
           </a>
         {% endif %}
@@ -256,13 +257,13 @@
     </div>
     <div id="mobile-menu" class="md:hidden hidden border-t border-white/10">
       <ul class="flex flex-col px-6 py-4 space-y-3 text-sm font-medium">
-        <li><a href="{% url 'home' %}" class="hover:text-[#C5A46B]">{% trans "Inicio" %}</a></li>
-        <li><a href="{% url 'tienda:producto_list' %}" class="hover:text-[#C5A46B]">{% trans "Coleccion" %}</a></li>
-        <li><a href="{% url 'pedidos' %}" class="hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
-        <li><a href="{% url 'bienestar' %}" class="hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
-        <li><a href="{% url 'metricas:metricas_dashboard' %}" class="hover:text-[#C5A46B]">{% trans "Tecnologia" %}</a></li>
-        <li><a href="{% url 'gestion' %}" class="hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
-        <li><a href="{% url 'blog:post_list' %}" class="hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
+        <li><a href="{% url 'home' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Inicio" %}</a></li>
+        <li><a href="{% url 'tienda:producto_list' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Coleccion" %}</a></li>
+        <li><a href="{% url 'pedidos' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
+        <li><a href="{% url 'bienestar' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
+        <li><a href="{% url 'metricas:metricas_dashboard' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Tecnologia" %}</a></li>
+        <li><a href="{% url 'gestion' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
+        <li><a href="{% url 'blog:post_list' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
         <li><a href="{% url 'carrito:cart_detail' %}" class="relative hover:opacity-80 transition">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="h-6 w-6 text-[#C5A46B]" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13l1.2-6h9.8" />
@@ -272,11 +273,11 @@
           </span></a>
         </li>
         {% if user.is_authenticated %}
-          <li><a href="{% url 'edit_profile' %}" class="block w-full text-center px-4 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold shadow-sm hover:bg-[#C5A46B] hover:text-black transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">Editar perfil</a></li>
+          <li><a href="{% url 'edit_profile' %}" class="gtg-btn gtg-btn-outline block w-full text-center px-4 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold shadow-sm hover:bg-[#C5A46B] hover:text-black transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">Editar perfil</a></li>
           <li><a href="{% url 'logout' %}" class="text-[#C5A46B]">{% trans "Cerrar sesión" %}</a></li>
         {% else %}
-          <li><a href="{% url 'login' %}" class="block w-full text-center px-4 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold shadow-sm hover:bg-[#C5A46B] hover:text-black transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">{% trans "Iniciar sesión" %}</a></li>
-          <li><a href="{% url 'register' %}" class="block w-full text-center px-4 py-2 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold shadow-md hover:from-[#e7c98a] hover:to-[#C5A46B] hover:text-[#101820] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">{% trans "Crear cuenta" %}</a></li>
+          <li><a href="{% url 'login' %}" class="gtg-btn gtg-btn-outline block w-full text-center px-4 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold shadow-sm hover:bg-[#C5A46B] hover:text-black transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">{% trans "Iniciar sesión" %}</a></li>
+          <li><a href="{% url 'register' %}" class="gtg-btn gtg-btn-primary block w-full text-center px-4 py-2 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold shadow-md hover:from-[#e7c98a] hover:to-[#C5A46B] hover:text-[#101820] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">{% trans "Crear cuenta" %}</a></li>
         {% endif %}
         <li>
           <form action="{% url 'set_language' %}" method="post">
@@ -301,10 +302,10 @@
       </ul>
     </div>
   </nav>
-  <main class="mx-auto">
+  <main class="gtg-page mx-auto">
     {% block content %}{% endblock %}
   </main>
-  <footer class="bg-black py-12 text-white ">
+  <footer class="gtg-footer bg-black py-12 text-white ">
     <div class="container mx-auto text-center px-4">
       <div class="flex flex-wrap justify-center space-x-8 mb-6 text-sm">
         <a href="{% url 'acerca_de' %}" class="hover:text-[#D4B46A] transition">{% trans "Acerca de" %}</a>
@@ -417,6 +418,5 @@
       document.getElementById('userDropdown').classList.add('hidden');
     }
   </script>
-  {% block extra_head %}{% endblock %}
 </body>
 </html>

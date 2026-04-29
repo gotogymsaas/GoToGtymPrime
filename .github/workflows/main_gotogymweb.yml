@@ -31,6 +31,12 @@ jobs:
       - name: Run backend validation suite
         run: bash environments/backend/run_backend_checks.sh
 
+      - name: Enforce design governance baseline
+        run: |
+          set -euo pipefail
+          chmod +x environments/frontend/check_design_governance.sh
+          bash environments/frontend/check_design_governance.sh
+
       - name: Prepare static artifacts
         run: |
           set -euo pipefail

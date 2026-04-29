@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% block content %}
-<h2>{% trans "Has cerrado sesión correctamente." %}</h2>
-<a href="/">{% trans "Volver al inicio" %}</a>
+<div class="gtg-auth-page py-12 px-4">
+	<div class="gtg-auth-card p-8 text-center">
+		<h2 class="text-2xl font-bold text-white mb-4">{% trans "Has cerrado sesión correctamente." %}</h2>
+		<a href="/" class="gtg-btn gtg-btn-primary">{% trans "Volver al inicio" %}</a>
+	</div>
+</div>
 {% endblock %}

@@ -1,18 +1,46 @@
-/* Global fallback tokens and baseline UI styles. */
+/* Design system baseline: semantic tokens + reusable components. */
 :root {
-  --brand-primary: #093f62;
-  --brand-accent: #c5a46b;
-  --brand-accent-light: #e7c98a;
-  --text-primary: #101820;
-  --bg-default: #f8f9fa;
+  --bg-page: #101012;
+  --bg-surface: #15171a;
+  --bg-elevated: #1d2126;
+  --text-primary: #ffffff;
+  --text-muted: #a1a1aa;
+  --text-subtle: #4e4e4e;
+  --accent-primary: #0fbfb0;
+  --accent-primary-hover: #14d8c8;
+  --accent-contrast: #031615;
+  --border-soft: #2a2d31;
+  --focus-ring: #0fbfb0;
+  --danger: #ff6b6b;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.25);
+
+  /* Backward aliases to keep current templates stable while migrating. */
+  --brand-primary: var(--bg-page);
+  --brand-accent: var(--accent-primary);
+  --brand-accent-light: var(--accent-primary-hover);
+  --bg-default: var(--bg-page);
 }
 
 * {
   box-sizing: border-box;
 }
 
-body {
-  background: var(--bg-default);
+body.gtg-theme {
+  background: var(--bg-page);
   color: var(--text-primary);
 }
 
@@ -26,6 +54,134 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--brand-accent);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
+}
+
+.gtg-surface {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+}
+
+.gtg-card {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.gtg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.gtg-btn-primary {
+  background: var(--accent-primary);
+  color: var(--accent-contrast);
+}
+
+.gtg-btn-primary:hover {
+  background: var(--accent-primary-hover);
+}
+
+.gtg-btn-outline {
+  background: transparent;
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+.gtg-btn-outline:hover {
+  background: rgba(15, 191, 176, 0.12);
+}
+
+.gtg-link-accent:hover {
+  color: var(--accent-primary);
+}
+
+.gtg-muted {
+  color: var(--text-muted);
+}
+
+/* Governance rule: use these semantic classes/tokens in templates. */
+.gtg-page {
+  background: var(--bg-page);
+}
+
+.gtg-navbar {
+  background: linear-gradient(90deg, #0f1418 0%, #111820 55%, #0f1418 100%);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.gtg-footer {
+  background: #0c0e11;
+  border-top: 1px solid var(--border-soft);
+}
+
+.gtg-auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 20% 10%, #202a33 0%, #101012 45%, #0b0d10 100%);
+}
+
+.gtg-auth-card {
+  width: 100%;
+  max-width: 32rem;
+  background: rgba(21, 23, 26, 0.9);
+  border: 1px solid var(--border-soft);
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  color: var(--text-primary);
+}
+
+.gtg-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.gtg-input {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-soft);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  padding: 10px 14px;
+}
+
+.gtg-input::placeholder {
+  color: var(--text-muted);
+}
+
+.gtg-input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.gtg-admin-shell {
+  background: #0e1116;
+}
+
+.gtg-admin-sidebar {
+  background: #131a22;
+  border-right: 1px solid var(--border-soft);
+}
+
+.gtg-admin-header {
+  background: #131a22;
+  border-bottom: 1px solid var(--border-soft);
 }
