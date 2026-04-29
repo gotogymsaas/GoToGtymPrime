@@ -3,7 +3,111 @@
 {% load i18n %}
 {% block title %}Tienda{% endblock %}
 
+{% block extra_head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/home_figma.css' %}">
+<style>
+  .shop-shell {
+    background: #ffffff;
+    border-radius: 32px 32px 0 0;
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+  }
+  .shop-shell .shop-title {
+    color: #0f2233;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
+<main class="figma-home">
+  <section class="figma-hero">
+    <div class="figma-hero__overlay"></div>
+    <div class="figma-hero__content container mx-auto">
+      <h1>{% trans "Entrena con lo último en" %} <strong>{% trans "tecnología deportiva" %}</strong></h1>
+      <a href="#catalogo" class="gtg-btn-primary">{% trans "Conoce más" %}</a>
+      <div class="figma-hero__dots" aria-label="Indicadores del slider">
+        <span class="is-active"></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="figma-influencer container mx-auto">
+    <div class="figma-influencer__copy">
+      <h2>{% trans "Accede a tus beneficios como" %} <span>{% trans "influencer" %}</span></h2>
+      <form method="post" action="{% url 'login' %}" class="figma-login-card">
+        {% csrf_token %}
+        <h3>{% trans "Inicia sesión" %}</h3>
+        <input type="text" name="username" placeholder="{% trans 'Tu usuario o email' %}" autocomplete="username">
+        <input type="password" name="password" placeholder="{% trans 'Tu contraseña' %}" autocomplete="current-password">
+        <button type="submit" class="gtg-btn-primary">{% trans "Iniciar sesión" %}</button>
+        <p>
+          <a href="{% url 'register' %}">{% trans "¿No tienes cuenta? Crear cuenta" %}</a>
+        </p>
+      </form>
+    </div>
+    <div class="figma-influencer__media">
+      <img src="{% static 'images/img/Imagen Home 3.jpg' %}" alt="Influencer GoToGym">
+    </div>
+  </section>
+
+  <section class="figma-products container mx-auto">
+    <h2>{% trans "Nuestros productos" %}</h2>
+    <div class="figma-products__grid">
+      {% for producto in featured_products|slice:":4" %}
+      <a href="{% url 'tienda:producto_detail' producto.id %}" class="figma-product-card">
+        <img src="{{ producto.image.url }}" alt="{{ producto.name }}">
+        <span>{{ producto.name }}</span>
+      </a>
+      {% empty %}
+      <a href="#catalogo" class="figma-product-card">
+        <img src="{% static 'images/img/Imagen Home 1.jpg' %}" alt="Camisetas">
+        <span>{% trans "Camisetas" %}</span>
+      </a>
+      <a href="#catalogo" class="figma-product-card">
+        <img src="{% static 'images/img/Imagen Slider 1.jpg' %}" alt="Sets">
+        <span>{% trans "Sets" %}</span>
+      </a>
+      <a href="#catalogo" class="figma-product-card">
+        <img src="{% static 'images/cat_tech.webp' %}" alt="Tops">
+        <span>{% trans "Tops" %}</span>
+      </a>
+      <a href="#catalogo" class="figma-product-card">
+        <img src="{% static 'images/cat_wellness.webp' %}" alt="Leggings">
+        <span>{% trans "Leggings" %}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="figma-newsletter container mx-auto">
+    <div class="figma-newsletter__brand">
+      <img src="{% static 'images/Logo_GoToGym_Blanco.png' %}" alt="GoToGym">
+      <span>GoToGym</span>
+    </div>
+    <form class="figma-newsletter__form" method="post" action="{% url 'contacto' %}">
+      {% csrf_token %}
+      <label for="newsletter-email">{% trans "Mantenerme informado" %}</label>
+      <div>
+        <input id="newsletter-email" name="email" type="email" placeholder="{% trans 'Tu correo electrónico' %}">
+        <button type="submit">{% trans "Suscribirme" %}</button>
+      </div>
+    </form>
+    <div class="figma-newsletter__links">
+      <a href="{% url 'acerca_de' %}">{% trans "Acerca de" %}</a>
+      <a href="{% url 'terminos' %}">{% trans "Términos" %}</a>
+      <a href="{% url 'politica_privacidad' %}">{% trans "Privacidad" %}</a>
+    </div>
+  </section>
+</main>
+
+<div id="catalogo" class="container mx-auto py-8 shop-shell">
+
 <div class="container mx-auto py-8">
 
   {#–––––––––––– Banner superior ––––––––––––#}
@@ -15,7 +119,7 @@
 
   {#–––––––––––– Slider de productos destacados ––––––––––––#}
   <div class="mb-10">
-    <h2 class="text-2xl font-bold text-[#093f62] mb-3">Productos Destacados</h2>
+    <h2 class="text-2xl font-bold text-[#093f62] mb-3 shop-title">Productos Destacados</h2>
 
     <div class="flex items-center justify-center gap-4">
 
@@ -234,7 +338,8 @@
     </main>
   </div>  
 
-</div> 
+</div>
+</div>
 <script>
 
 document.addEventListener('DOMContentLoaded', () => {
