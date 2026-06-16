@@ -1,22 +1,45 @@
-/* Design system baseline: semantic tokens + reusable components. */
-:root {
-  --bg-page: #101012;
-  --bg-surface: #15171a;
-  --bg-elevated: #1d2126;
-  --text-primary: #ffffff;
-  --text-muted: #a1a1aa;
-  --text-subtle: #4e4e4e;
-  --accent-primary: #0fbfb0;
-  --accent-primary-hover: #14d8c8;
-  --accent-contrast: #031615;
-  --border-soft: #2a2d31;
-  --focus-ring: #0fbfb0;
-  --danger: #ff6b6b;
+@font-face {
+  font-family: "TT Norms GoToGym";
+  src: url("../Tipografia/Cuerpo de Mensaje/TT Norms Pro Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
-  --radius-pill: 999px;
+@font-face {
+  font-family: "TT Norms GoToGym";
+  src: url("../Tipografia/Titulo/TT Norms Pro ExtraBold.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --color-bg-base: #0d0d0f;
+  --color-bg-elevated: #141416;
+  --color-bg-card: #222225;
+  --color-bg-overlay: rgba(0, 0, 0, 0.62);
+  --color-accent: #00d4c7;
+  --color-accent-hover: #00b8ad;
+  --color-accent-soft: rgba(0, 212, 199, 0.16);
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #b8b8b8;
+  --color-text-muted: #808080;
+  --color-border: #2e2e32;
+  --color-border-subtle: #1e1e1f;
+  --color-gold: #d4b46a;
+  --shadow-card: 0 24px 70px rgba(0, 0, 0, 0.45);
+
+  --font-display: "TT Norms GoToGym", "Outfit", system-ui, sans-serif;
+  --font-body: "TT Norms GoToGym", "Outfit", system-ui, sans-serif;
+
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 28px;
+  --font-size-2xl: 40px;
+  --font-size-3xl: 56px;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -25,28 +48,52 @@
   --space-5: 24px;
   --space-6: 32px;
   --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
 
-  --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.25);
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
 
-  /* Backward aliases to keep current templates stable while migrating. */
-  --brand-primary: var(--bg-page);
-  --brand-accent: var(--accent-primary);
-  --brand-accent-light: var(--accent-primary-hover);
-  --bg-default: var(--bg-page);
+  --bg-page: var(--color-bg-base);
+  --bg-surface: var(--color-bg-elevated);
+  --bg-elevated: var(--color-bg-card);
+  --text-primary: var(--color-text-primary);
+  --text-muted: var(--color-text-secondary);
+  --accent-primary: var(--color-accent);
+  --accent-primary-hover: var(--color-accent-hover);
+  --accent-contrast: #031615;
+  --border-soft: var(--color-border);
+  --focus-ring: var(--color-accent);
 }
 
 * {
   box-sizing: border-box;
 }
 
-body.gtg-theme {
-  background: var(--bg-page);
-  color: var(--text-primary);
+html {
+  background: var(--color-bg-base);
 }
 
-a,
-button {
-  transition: all 0.2s ease;
+body.gtg-theme {
+  margin: 0;
+  background: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  letter-spacing: 0;
+}
+
+body.gtg-theme a {
+  color: inherit;
+  text-decoration: none;
+}
+
+body.gtg-theme button,
+body.gtg-theme input,
+body.gtg-theme select,
+body.gtg-theme textarea {
+  font: inherit;
 }
 
 button:focus-visible,
@@ -58,74 +105,307 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
-.gtg-surface {
-  background: var(--bg-surface);
-  color: var(--text-primary);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-lg);
-}
-
-.gtg-card {
-  background: var(--bg-surface);
-  color: var(--text-primary);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-}
-
-.gtg-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  padding: 10px 20px;
-  border-radius: var(--radius-pill);
-  font-weight: 600;
-  text-decoration: none;
-  border: 1px solid transparent;
-  cursor: pointer;
-}
-
-.gtg-btn-primary {
-  background: var(--accent-primary);
-  color: var(--accent-contrast);
-}
-
-.gtg-btn-primary:hover {
-  background: var(--accent-primary-hover);
-}
-
-.gtg-btn-outline {
-  background: transparent;
-  color: var(--accent-primary);
-  border-color: var(--accent-primary);
-}
-
-.gtg-btn-outline:hover {
-  background: rgba(15, 191, 176, 0.12);
-}
-
-.gtg-link-accent:hover {
-  color: var(--accent-primary);
-}
-
-.gtg-muted {
-  color: var(--text-muted);
-}
-
-/* Governance rule: use these semantic classes/tokens in templates. */
 .gtg-page {
-  background: var(--bg-page);
+  min-height: 50vh;
+  background: var(--color-bg-base);
 }
 
 .gtg-navbar {
-  background: linear-gradient(90deg, #0f1418 0%, #111820 55%, #0f1418 100%);
-  border-bottom: 1px solid var(--border-soft);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(13, 13, 15, 0.92);
+  backdrop-filter: blur(16px);
+}
+
+.gtg-nav-wrap {
+  width: min(100% - 32px, 1120px);
+  min-height: 112px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.gtg-brand {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--color-text-primary);
+}
+
+.gtg-nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(40px, 6vw, 76px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 22px;
+  color: var(--color-text-primary);
+}
+
+.gtg-nav-links a:hover,
+.gtg-mobile-menu a:hover {
+  color: var(--color-accent);
+}
+
+.gtg-nav-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-4);
+}
+
+.gtg-icon-button,
+.gtg-menu-toggle {
+  position: relative;
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.gtg-icon-button:hover,
+.gtg-menu-toggle:hover,
+.gtg-icon-button.is-accent {
+  color: var(--color-accent);
+}
+
+.gtg-cart-link #cart-count {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 17px;
+  height: 17px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: #001a18;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.gtg-menu-toggle {
+  display: none;
+  justify-self: end;
+}
+
+.gtg-user-menu {
+  position: relative;
+}
+
+.gtg-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: 210px;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: #171719;
+  box-shadow: var(--shadow-card);
+}
+
+.gtg-dropdown a,
+.gtg-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.gtg-dropdown a:hover,
+.gtg-dropdown button:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.gtg-mobile-menu {
+  width: min(100% - 32px, 1120px);
+  margin: 0 auto;
+  padding: 0 0 var(--space-5);
+  display: grid;
+  gap: var(--space-3);
+}
+
+.gtg-mobile-menu a,
+.gtg-mobile-menu button {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: transparent;
+  color: var(--color-text-primary);
+  padding: var(--space-3) 0;
+  text-align: left;
+}
+
+.gtg-btn,
+.gtg-btn-primary,
+.gtg-btn-ghost,
+.gtg-btn-outline {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 10px 24px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.gtg-btn-primary {
+  background: var(--color-accent);
+  color: #ffffff;
+}
+
+.gtg-btn-primary:hover {
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+
+.gtg-btn-outline {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  background: transparent;
+}
+
+.gtg-btn-outline:hover {
+  background: var(--color-accent-soft);
+}
+
+.gtg-btn-ghost {
+  background: #efefef;
+  color: #111113;
+}
+
+.gtg-surface,
+.gtg-card {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-card);
+}
+
+.gtg-muted {
+  color: var(--color-text-secondary);
 }
 
 .gtg-footer {
-  background: #0c0e11;
-  border-top: 1px solid var(--border-soft);
+  background: var(--color-bg-base);
+  color: var(--color-text-primary);
+  padding: 90px 0 76px;
+}
+
+.gtg-footer-wrap {
+  width: min(100% - 32px, 1120px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1fr;
+  align-items: end;
+  gap: var(--space-8);
+}
+
+.gtg-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--color-gold);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.gtg-footer-brand img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+}
+
+.gtg-footer-newsletter {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+}
+
+.gtg-footer-newsletter label {
+  font-size: 18px;
+  color: var(--color-text-primary);
+}
+
+.gtg-footer-newsletter div {
+  width: min(100%, 420px);
+  display: grid;
+  grid-template-columns: 1fr 130px;
+  gap: var(--space-3);
+}
+
+.gtg-footer-newsletter input,
+.gtg-footer-newsletter button {
+  height: 42px;
+  border: 0;
+  border-radius: var(--radius-sm);
+}
+
+.gtg-footer-newsletter input {
+  background: #151518;
+  color: var(--color-text-primary);
+  padding: 0 var(--space-4);
+  box-shadow: 0 15px 36px rgba(0, 0, 0, 0.32);
+}
+
+.gtg-footer-newsletter input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.gtg-footer-newsletter button {
+  background: #18181b;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.gtg-footer-newsletter button:hover {
+  background: var(--color-accent);
+}
+
+.gtg-footer-links {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.gtg-socials {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.gtg-socials a {
+  font-weight: 800;
+}
+
+.gtg-footer-links a:hover {
+  color: var(--color-accent);
 }
 
 .gtg-auth-page {
@@ -163,25 +443,56 @@ textarea:focus-visible {
   padding: 10px 14px;
 }
 
-.gtg-input::placeholder {
-  color: var(--text-muted);
-}
-
-.gtg-input:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
-}
-
 .gtg-admin-shell {
   background: #0e1116;
 }
 
-.gtg-admin-sidebar {
-  background: #131a22;
-  border-right: 1px solid var(--border-soft);
-}
-
+.gtg-admin-sidebar,
 .gtg-admin-header {
   background: #131a22;
-  border-bottom: 1px solid var(--border-soft);
+  border-color: var(--border-soft);
+}
+
+@media (max-width: 900px) {
+  .gtg-nav-wrap {
+    min-height: 84px;
+    grid-template-columns: 1fr auto auto;
+    gap: var(--space-4);
+  }
+
+  .gtg-nav-links {
+    display: none;
+  }
+
+  .gtg-menu-toggle {
+    display: inline-flex;
+  }
+
+  .gtg-nav-actions {
+    gap: var(--space-2);
+  }
+
+  .gtg-footer-wrap {
+    grid-template-columns: 1fr;
+    text-align: center;
+    justify-items: center;
+  }
+
+  .gtg-footer-links {
+    justify-items: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .gtg-brand {
+    font-size: 30px;
+  }
+
+  .gtg-nav-actions .gtg-icon-button:first-child {
+    display: none;
+  }
+
+  .gtg-footer-newsletter div {
+    grid-template-columns: 1fr;
+  }
 }

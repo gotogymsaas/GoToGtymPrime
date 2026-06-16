@@ -4,7 +4,7 @@ from django.core.paginator import Paginator
 from django.db.models import F
 
 def producto_list(request):
-    productos = Product.objects.all()
+    productos = Product.objects.all().order_by('id')
     categorias = ProductCategory.objects.all()
     marcas = Brand.objects.all()
     filtro = request.GET.get('filtro', '')

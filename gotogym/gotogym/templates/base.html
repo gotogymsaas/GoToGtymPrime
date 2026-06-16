@@ -1,404 +1,135 @@
 {% load i18n %}
 {% load static %}
-{% if color_navbar %}
-  <style>
-    nav.backdrop-blur-md {
-      background: {{ color_navbar }} !important;
-      background-color: {{ color_navbar }} !important;
-      filter: none !important;
-      -webkit-backdrop-filter: none !important;
-      backdrop-filter: none !important;
-    }
-    nav.backdrop-blur-md * {
-      color: #fff !important;
-    }
-  </style>
-{% endif %}
-{% if paleta_marca %}
-  <style>
-    :root {
-      {% for nombre, hex in paleta_marca.items %}
-        --{{ nombre }}: {{ hex }};
-      {% endfor %}
-    }
-  </style>
-{% endif %}
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
-
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="GoToGym - Ropa deportiva y bienestar con estilo.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="GoToGym - Ropa deportiva, tecnologia textil y bienestar.">
   <title>{% block title %}GoToGym{% endblock %}</title>
-  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined" rel="stylesheet">
-  
   <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
   {% block extra_head %}{% endblock %}
+  {% if paleta_marca %}
   <style>
-    {% if color_body %}
-      body {
-        background-color: {{ color_body }} !important;
-      }
-      body.dark-mode {
-        background-color: #181A1B !important;
-      }
-    {% else %}
-    body {
-      font-family: 'Outfit', sans-serif;
-      background-color: #F8F9FA;
-      margin: 0;
+    :root {
+      {% for nombre, hex in paleta_marca.items %}
+      --{{ nombre }}: {{ hex }};
+      {% endfor %}
     }
-    nav.backdrop-blur-md {
-      background: linear-gradient(90deg, #0f2233 0%, #093f62 65%, #0f2233 100%);
-      color: #F8F9FA;
-    }
-    nav.backdrop-blur-md a,
-    nav.backdrop-blur-md button,
-    nav.backdrop-blur-md span,
-    nav.backdrop-blur-md svg {
-      color: inherit;
-    }
-    nav.backdrop-blur-md a:hover {
-      color: #C5A46B;
-    }
-    h1, h2, h3 {
-      font-family: 'Poetsen One', serif;
-    }
-    body.dark-mode {
-      background-color: #181A1B;
-      color: #F8F9FA;
-    }
-    body.dark-mode .bg-gradient-to-r {
-      background: linear-gradient(to right, #232526 70%, #232526 100%) !important;
-      color: #F8F9FA;
-    }
-    body.dark-mode nav, body.dark-mode .backdrop-blur-md {
-      background: linear-gradient(to right, #232526 70%, #232526 100%) !important;
-      color: #F8F9FA;
-    }
-    body.dark-mode .bg-white, body.dark-mode .bg-white\/10, body.dark-mode .bg-white\/30 {
-      background-color: #232526 !important;
-    }
-    body.dark-mode .border-[#C5A46L], body.dark-mode .border-[#C5A46B]\/70 {
-      border-color: #C5A46B !important;
-    }
-    body.dark-mode .hover\:bg-\[\#C5A46B\]\/10:hover {
-      background-color: #3a2e1a !important;
-    }
-    body.dark-mode .shadow-md, body.dark-mode .shadow-lg, body.dark-mode .shadow {
-      box-shadow: 0 2px 8px 0 rgba(0,0,0,0.7) !important;
-    }
-    body.dark-mode .bg-black {
-      background-color: #101214 !important;
-    }
-    body.dark-mode .text-white, body.dark-mode .text-white\/60, body.dark-mode .text-white\/70, body.dark-mode .text-white\/90 {
-      color: #F8F9FA !important;
-    }
-    body.dark-mode .hover\:text-\[\#C5A46B\]:hover {
-      color: #ffe6a0 !important;
-    }
-    body.dark-mode .bg-\[\#C5A46B\], body.dark-mode .bg-\[\#C5A46B\]\/10, body.dark-mode .bg-\[\#C5A46B\]\/20 {
-      background-color: #3a2e1a !important;
-    }
-    body.dark-mode .text-\[\#C5A46B\] {
-      color: #ffe6a0 !important;
-    }
-    body.dark-mode .hover\:bg-\[\#d7bb83\]:hover {
-      background-color: #bfa76a !important;
-    }
-    body.dark-mode .bg-gradient-to-r.from-black\/70.to-black\/60 {
-      background: linear-gradient(to right, #232526 70%, #232526 100%) !important;
-    }
-    body.dark-mode .rounded-lg, body.dark-mode .rounded-full {
-      border-radius: 0.75rem !important;
-    }
-    body.dark-mode #darkModeToggle svg,
-    body.dark-mode #darkModeToggleMobile svg {
-      fill: #fff !important;
-      color: #fff !important;
-    }
-    #darkModeToggle svg,
-    #darkModeToggleMobile svg {
-      fill: #000 !important;
-      color: #000 !important;
-    }
-    #darkModeToggle,
-    #darkModeToggleMobile {
-      background: transparent !important;
-      border-radius: 50% !important;
-      padding: 4px !important;
-    }
-    #langDropdown button {
-      color: #101820 !important;
-    }
-    body.dark-mode #langDropdown button {
-      color: #F8F9FA !important;
-    }
-    body.dark-mode .dropdown-menu, body.dark-mode #langDropdown {
-      background-color: #232526 !important;
-      color: #F8F9FA !important;
-    }
-    body.dark-mode select, body.dark-mode option {
-      background-color: #232526 !important;
-      color: #F8F9FA !important;
-    }
-    body.dark-mode input, body.dark-mode textarea {
-      background-color: #232526 !important;
-      color: #F8F9FA !important;
-    }
-    body.dark-mode p,
-    body.dark-mode h1,
-    body.dark-mode h2,
-    body.dark-mode h3,
-    body.dark-mode h4,
-    body.dark-mode h5,
-    body.dark-mode h6,
-    body.dark-mode span,
-    body.dark-mode li,
-    body.dark-mode blockquote,
-    body.dark-mode strong,
-    body.dark-mode em,
-    body.dark-mode td,
-    body.dark-mode th,
-    body.dark-mode a {
-      color: #fff !important;
-    }
-    {% endif %}
   </style>
+  {% endif %}
 </head>
-<body class="gtg-theme text-white">
-  <nav class="gtg-navbar backdrop-blur-md text-white sticky top-0 z-40 shadow-md">
-    <div class="container mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-3">
-      <div class="w-full flex items-center justify-between md:w-auto">
-        <a href="/" class="flex items-center gap-3 mr-4 md:gap-2 md:mr-0">
-          <img src="{% static 'images/Logo_GoToGym_Blanco.png' %}" alt="GoToGym" class="h-8 md:h-8 mr-14" onerror="this.style.display='none';this.nextElementSibling.classList.remove('hidden');" />
-          <span class="hidden h-8 mr-14 text-lg font-extrabold tracking-wide text-[#C5A46B]">GoToGym</span>
-        </a>
-        <button class="md:hidden text-[#C5A46B] ml-2" onclick="toggleMobileMenu()">
-          <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-      </div>
-      <ul id="desktop-menu" class="hidden md:flex space-x-6 text-sm font-medium items-center mt-4 md:mt-0">
-        <li><a href="{% url 'home' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Inicio" %}</a></li>
-        <li><a href="{% url 'pedidos' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
-        <li><a href="{% url 'bienestar' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
-        <li><a href="{% url 'gestion' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
-        <li><a href="{% url 'blog:post_list' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
-        <li><a href="{% url 'tienda:producto_list' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Tienda" %}</a></li>
-        <li><a href="{% url 'carrito:cart_detail' %}" class="relative hover:opacity-80 transition">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="h-6 w-6 text-[#C5A46B]" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13l1.2-6h9.8" />
-          </svg>
-          <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
-            {{ cart_count|default:"0" }}
-          </span></a>
-        </li>
+<body class="gtg-theme">
+  <nav class="gtg-navbar">
+    <div class="gtg-nav-wrap">
+      <a href="{% url 'home' %}" class="gtg-brand" aria-label="GoToGym inicio">GoToGym</a>
+
+      <button class="gtg-menu-toggle" type="button" aria-label="Abrir menu" onclick="toggleMobileMenu()">
+        <span class="material-icons-outlined">menu</span>
+      </button>
+
+      <ul id="desktop-menu" class="gtg-nav-links">
+        <li><a href="{% url 'tienda:producto_list' %}">{% trans "Tienda" %}</a></li>
+        <li><a href="{% url 'blog:post_list' %}">{% trans "Blog" %}</a></li>
+        <li><a href="{% url 'contacto' %}">{% trans "Contacto" %}</a></li>
       </ul>
-      <div class="hidden md:flex items-center gap-2 md:gap-3 ml-auto">
+
+      <div class="gtg-nav-actions">
+        <a href="{% url 'tienda:producto_list' %}" class="gtg-icon-button" aria-label="Buscar productos">
+          <span class="material-icons-outlined">search</span>
+        </a>
         {% if user.is_authenticated %}
-        <div class="relative" id="userMenuWrapper">
-          <button id="userMenuBtn" type="button" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#f3e9d2] text-[#666666] font-bold hover:bg-[#e7c98a] focus:outline-none" onclick="toggleUserMenu()">
+        <div class="gtg-user-menu" id="userMenuWrapper">
+          <button id="userMenuBtn" type="button" class="gtg-icon-button is-accent" aria-label="Menu de usuario" onclick="toggleUserMenu()">
             <span class="material-icons-outlined">account_circle</span>
-            <span>{{ user.get_full_name|default:user.username }}</span>
-            <span class="material-icons-outlined">expand_more</span>
           </button>
-          <div id="userDropdown" class="hidden absolute right-0 mt-2 w-56 rounded-xl shadow-2xl border border-[#e7c98a] z-50 transition-all duration-200" style="background:#232526; color:#fff;">
-            <a href="{% url 'edit_profile' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#F8F9FA] hover:bg-[#3a2e1a] hover:text-[#C5A46B] font-medium rounded-t-xl transition">Editar perfil</a>
+          <div id="userDropdown" class="gtg-dropdown hidden">
+            <a href="{% url 'edit_profile' %}" onclick="closeUserMenu()">{% trans "Editar perfil" %}</a>
             {% if user.is_authenticated and user.influencer_profile %}
-            <a href="{% url 'influencer_dashboard' %}" onclick="closeUserMenu()" class="block px-5 py-3 text-[#C5A46B] hover:bg-[#3a2e1a] hover:text-[#093f62] font-semibold transition">Panel de Influencer</a>
+            <a href="{% url 'influencer_dashboard' %}" onclick="closeUserMenu()">{% trans "Panel influencer" %}</a>
             {% endif %}
             {% if user.is_superuser %}
-            <a href="/admin/" onclick="closeUserMenu()" class="block px-5 py-3 text-[#F8F9FA] hover:bg-[#3a2e1a] hover:text-[#C5A46B] font-semibold transition">Dashboard Admin</a>
+            <a href="/admin/" onclick="closeUserMenu()">{% trans "Admin" %}</a>
             {% endif %}
             <form action="{% url 'logout' %}" method="post">
               {% csrf_token %}
-              <button type="submit" onclick="closeUserMenu()" class="w-full text-left px-5 py-3 text-[#c0392b] hover:bg-[#fbeee6] font-medium rounded-b-xl transition">Cerrar sesión</button>
+              <button type="submit" onclick="closeUserMenu()">{% trans "Cerrar sesion" %}</button>
             </form>
           </div>
         </div>
         {% else %}
-          <a href="{% url 'login' %}" class="gtg-btn gtg-btn-outline px-4 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold shadow-sm hover:bg-[#C5A46B] hover:text-black transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">
-            {% trans "Iniciar sesión"%}
-          </a>
-          <a href="{% url 'register' %}" class="gtg-btn gtg-btn-primary px-4 py-2 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold shadow-md hover:from-[#e7c98a] hover:to-[#C5A46B] hover:text-[#101820] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">
-            {% trans "Crear cuenta"%}
-          </a>
+        <a href="{% url 'login' %}" class="gtg-icon-button is-accent" aria-label="Iniciar sesion">
+          <span class="material-icons-outlined">account_circle</span>
+        </a>
         {% endif %}
-        <div class="relative ml-2 flex items-center h-full">
-          <button id="langAbbrBtn" type="button" class="px-3 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold bg-white/10 shadow-sm hover:bg-[#C5A46B]/10 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2 transition-all duration-200 flex items-center gap-1" onclick="toggleLangDropdown()">
-            <span>{% get_current_language as CURRENT %}{{ CURRENT|upper }}</span>
-            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-          </button>
-          <div id="langDropdown" class="hidden absolute right-0 top-full mt-3 w-36 bg-white rounded-lg shadow-lg z-50 py-2">
-            <form action="{% url 'set_language' %}" method="post" class="w-full flex flex-col">
-              {% csrf_token %}
-              <input type="hidden" name="next" value="{{ request.get_full_path }}">
-              <button type="submit" name="language" value="es" class="block w-full text-left px-4 py-2 hover:bg-[#C5A46B]/20 text-[#101820] {% if CURRENT == 'es' %}font-bold bg-[#C5A46B]/10{% endif %}">Español</button>
-              <button type="submit" name="language" value="en" class="block w-full text-left px-4 py-2 hover:bg-[#C5A46B]/20 text-[#101820] {% if CURRENT == 'en' %}font-bold bg-[#C5A46B]/10{% endif %}">English</button>
-              <button type="submit" name="language" value="pt" class="block w-full text-left px-4 py-2 hover:bg-[#C5A46B]/20 text-[#101820] {% if CURRENT == 'pt' %}font-bold bg-[#C5A46B]/10{% endif %}">Português</button>
-            </form>
-          </div>
-        </div>
-        <button id="darkModeToggle" class="ml-2 text-[#C5A46B] hover:opacity-90 transition flex items-center bg-transparent p-0 border-0 shadow-none rounded-none focus:outline-none" title="Modo oscuro" onclick="toggleDarkMode()">
-          <svg id="sliderIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M21 12.79A9 9 0 1111.21 3A7 7 0 0021 12.79Z" fill="#333"/>
-          </svg>
-        </button>
+        <a href="{% url 'carrito:cart_detail' %}" class="gtg-icon-button gtg-cart-link" aria-label="Carrito">
+          <span class="material-icons-outlined">shopping_cart</span>
+          <span id="cart-count">{{ cart_count|default:"0" }}</span>
+        </a>
       </div>
     </div>
-    <div id="mobile-menu" class="md:hidden hidden border-t border-white/10">
-      <ul class="flex flex-col px-6 py-4 space-y-3 text-sm font-medium">
-        <li><a href="{% url 'home' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Inicio" %}</a></li>
-        <li><a href="{% url 'tienda:producto_list' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Coleccion" %}</a></li>
-        <li><a href="{% url 'pedidos' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Pedidos" %}</a></li>
-        <li><a href="{% url 'bienestar' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Bienestar" %}</a></li>
-        <li><a href="{% url 'metricas:metricas_dashboard' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Tecnologia" %}</a></li>
-        <li><a href="{% url 'gestion' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Contacto" %}</a></li>
-        <li><a href="{% url 'blog:post_list' %}" class="gtg-link-accent hover:text-[#C5A46B]">{% trans "Blog" %}</a></li>
-        <li><a href="{% url 'carrito:cart_detail' %}" class="relative hover:opacity-80 transition">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="h-6 w-6 text-[#C5A46B]" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13l1.2-6h9.8" />
-          </svg>
-          <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
-            {{ cart_count|default:"0" }}
-          </span></a>
-        </li>
-        {% if user.is_authenticated %}
-          <li><a href="{% url 'edit_profile' %}" class="gtg-btn gtg-btn-outline block w-full text-center px-4 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold shadow-sm hover:bg-[#C5A46B] hover:text-black transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">Editar perfil</a></li>
-          <li><a href="{% url 'logout' %}" class="text-[#C5A46B]">{% trans "Cerrar sesión" %}</a></li>
-        {% else %}
-          <li><a href="{% url 'login' %}" class="gtg-btn gtg-btn-outline block w-full text-center px-4 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold shadow-sm hover:bg-[#C5A46B] hover:text-black transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">{% trans "Iniciar sesión" %}</a></li>
-          <li><a href="{% url 'register' %}" class="gtg-btn gtg-btn-primary block w-full text-center px-4 py-2 rounded-full bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold shadow-md hover:from-[#e7c98a] hover:to-[#C5A46B] hover:text-[#101820] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2">{% trans "Crear cuenta" %}</a></li>
-        {% endif %}
-        <li>
-          <form action="{% url 'set_language' %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <select name="language" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-full border-2 border-[#C5A46B] text-[#C5A46B] font-semibold bg-white/10 shadow-sm hover:bg-[#C5A46B]/10 focus:outline-none focus:ring-2 focus:ring-[#C5A46B] focus:ring-offset-2 transition-all duration-200">
-              {% get_current_language as CURRENT %}
-              {% get_available_languages as LANGS %}
-              {% for code, name in LANGS %}
-                <option value="{{ code }}" {% if code == CURRENT %}selected{% endif %}>{{ name }}</option>
-              {% endfor %}
-            </select>
-          </form>
-        </li>
-        <li>
-          <button id="darkModeToggleMobile" class="w-full text-[#C5A46B] hover:opacity-90 transition flex items-center bg-transparent p-0 border-0 shadow-none rounded-none focus:outline-none" title="Modo oscuro" onclick="toggleDarkMode()">
-            <svg id="sliderIconMobile" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M21 12.79A9 9 0 1111.21 3A7 7 0 0021 12.79Z" fill="#333"/>
-            </svg>
-          </button>
-        </li>
-      </ul>
+
+    <div id="mobile-menu" class="gtg-mobile-menu hidden">
+      <a href="{% url 'tienda:producto_list' %}">{% trans "Tienda" %}</a>
+      <a href="{% url 'blog:post_list' %}">{% trans "Blog" %}</a>
+      <a href="{% url 'contacto' %}">{% trans "Contacto" %}</a>
+      <a href="{% url 'carrito:cart_detail' %}">{% trans "Carrito" %}</a>
+      {% if user.is_authenticated %}
+      <a href="{% url 'edit_profile' %}">{% trans "Editar perfil" %}</a>
+      <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">{% trans "Cerrar sesion" %}</button>
+      </form>
+      {% else %}
+      <a href="{% url 'login' %}">{% trans "Iniciar sesion" %}</a>
+      <a href="{% url 'register' %}">{% trans "Crear cuenta" %}</a>
+      {% endif %}
     </div>
   </nav>
-  <main class="gtg-page mx-auto">
+
+  <main class="gtg-page">
     {% block content %}{% endblock %}
   </main>
-  <footer class="gtg-footer bg-black py-12 text-white ">
-    <div class="container mx-auto text-center px-4">
-      <div class="flex flex-wrap justify-center space-x-8 mb-6 text-sm">
-        <a href="{% url 'acerca_de' %}" class="hover:text-[#D4B46A] transition">{% trans "Acerca de" %}</a>
-        <a href="{% url 'contacto' %}" class="hover:text-[#D4B46A] transition">{% trans "Contacto" %}</a>
-        <a href="{% url 'politica_privacidad' %}" class="hover:text-[#D4B46A] transition">{% trans "Privacidad" %}</a>
-        <a href="{% url 'terminos' %}" class="hover:text-[#D4B46A] transition">{% trans "Términos" %}</a>
+
+  <footer class="gtg-footer">
+    <div class="gtg-footer-wrap">
+      <div class="gtg-footer-brand">
+        <img src="{% static 'images/Logo_GoToGym_Blanco.png' %}" alt="GoToGym">
+        <span>GoToGym</span>
       </div>
-      <p class="mb-4 text-sm text-white/70">{% trans "Únete a nuestra comunidad y descubre la revolución del bienestar." %}</p>
-      <div class="mb-6">
-        <p class="text-sm text-white/90">{% trans "Síguenos en redes sociales:" %}</p>
-        <div class="flex flex-wrap justify-center gap-4 mt-4">
-          <a href="https://www.facebook.com/Gotogym.Sportwear" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-            <img src="{% static 'images/facebook.png' %}" alt="Facebook" class="h-6 w-6">
-          </a>
-          <a href="https://twitter.com/GOTOGYM6" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-            <img src="{% static 'images/twitter.png' %}" alt="Twitter" class="h-6 w-6">
-          </a>
-          <a href="https://www.instagram.com/gotogym.sportwear" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-            <img src="{% static 'images/instagram.png' %}" alt="Instagram" class="h-6 w-6">
-          </a>
-          <a href="https://co.pinterest.com/gotogym_/" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-            <img src="{% static 'images/pinterest.png' %}" alt="Pinterest" class="h-6 w-6">
-          </a>
-          <a href="https://www.linkedin.com/company/33262154/" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-            <img src="{% static 'images/linkedin.png' %}" alt="LinkedIn" class="h-6 w-6">
-          </a>
-          <a href="https://www.youtube.com/channel/UCXRp8PgcE7L75jEewIixeXg" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-            <img src="{% static 'images/youtube.png' %}" alt="YouTube" class="h-6 w-6">
-          </a>
-          <a href="https://soundcloud.com/go-to-gym-sportswear-as-a-service" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-            <img src="{% static 'images/soundcloud.png' %}" alt="SoundCloud" class="h-6 w-6">
-          </a>
-          <a href="https://www.tiktok.com/@gotogym.sportwear" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-            <img src="{% static 'images/tiktok.png' %}" alt="TikTok" class="h-6 w-6">
-          </a>
-          <a href="https://github.com/gotogymsaas" target="_blank" rel="noopener noreferrer" class="flex items-center hover:opacity-80 transition">
-            <img src="{% static 'images/github.png' %}" alt="GitHub" class="h-6 w-6">
-          </a>
+      <form class="gtg-footer-newsletter" method="post" action="{% url 'contacto' %}">
+        {% csrf_token %}
+        <label for="footer-newsletter-email">{% trans "Mantenerme informado" %}</label>
+        <div>
+          <input id="footer-newsletter-email" name="email" type="email" placeholder="{% trans 'Ingresa tu email' %}">
+          <button type="submit">{% trans "Suscribirme" %}</button>
         </div>
+      </form>
+      <div class="gtg-footer-links">
+        <div class="gtg-socials">
+          <a href="https://www.facebook.com/Gotogym.Sportwear" target="_blank" rel="noopener noreferrer">f</a>
+          <a href="https://www.instagram.com/gotogym.sportwear" target="_blank" rel="noopener noreferrer">ig</a>
+          <a href="https://www.tiktok.com/@gotogym.sportwear" target="_blank" rel="noopener noreferrer">tk</a>
+        </div>
+        <a href="{% url 'acerca_de' %}">{% trans "Acerca de" %}</a>
+        <a href="{% url 'politica_privacidad' %}">{% trans "Privacidad" %}</a>
+        <a href="{% url 'terminos' %}">{% trans "Terminos" %}</a>
       </div>
-      <p class="text-sm text-white/60">
-        © {% trans "2025 GoToGym. Todos los derechos reservados." %}
-      </p>
     </div>
   </footer>
-  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
   <script>
-    AOS.init({ duration: 1200, once: true });
     function toggleMobileMenu() {
       document.getElementById('mobile-menu').classList.toggle('hidden');
     }
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-      updateDarkSlider();
-    }
-    function updateDarkSlider() {
-      const isDark = document.body.classList.contains('dark-mode');
-      const slider = document.getElementById('darkSlider');
-      const btn = document.getElementById('darkModeToggle');
-      const btnMobile = document.getElementById('darkModeToggleMobile');
-      if (btn) btn.title = isDark ? 'Modo oscuro' : 'Modo claro';
-      if (btnMobile) btnMobile.title = isDark ? 'Modo oscuro' : 'Modo claro';
-      if (slider) slider.style.left = isDark ? '32px' : '4px';
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-      if (localStorage.getItem('darkMode') === 'true') {
-        document.body.classList.add('dark-mode');
-      }
-      updateDarkSlider();
-    });
-    function toggleLangDropdown() {
-      const dropdown = document.getElementById('langDropdown');
-      const btn = document.getElementById('langAbbrBtn');
-      if (dropdown.classList.contains('hidden')) {
-        dropdown.classList.remove('hidden');
-        // Solo añadir el listener una vez
-        function handler(e) {
-          if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
-            dropdown.classList.add('hidden');
-            document.removeEventListener('click', handler);
-          }
-        }
-        setTimeout(() => {
-          document.addEventListener('click', handler);
-        }, 0);
-      } else {
-        dropdown.classList.add('hidden');
-      }
-    }
+
     function toggleUserMenu() {
       const dropdown = document.getElementById('userDropdown');
       const btn = document.getElementById('userMenuBtn');
+      if (!dropdown || !btn) return;
       if (dropdown.classList.contains('hidden')) {
         dropdown.classList.remove('hidden');
         function handler(e) {
@@ -407,16 +138,17 @@
             document.removeEventListener('click', handler);
           }
         }
-        setTimeout(() => {
-          document.addEventListener('click', handler);
-        }, 0);
+        setTimeout(() => document.addEventListener('click', handler), 0);
       } else {
         dropdown.classList.add('hidden');
       }
     }
+
     function closeUserMenu() {
-      document.getElementById('userDropdown').classList.add('hidden');
+      const dropdown = document.getElementById('userDropdown');
+      if (dropdown) dropdown.classList.add('hidden');
     }
   </script>
+  {% block extra_scripts %}{% endblock %}
 </body>
 </html>
