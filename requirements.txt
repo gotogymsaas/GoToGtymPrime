@@ -10,6 +10,7 @@ mysql-connector-python
 djangorestframework
 djangorestframework-simplejwt
 django-cors-headers
+whitenoise
 psycopg2-binary
 requests
 cryptography>=42.0.0
