@@ -157,7 +157,7 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--space-4);
+  gap: 4px;
 }
 
 .gtg-icon-button,
@@ -173,12 +173,83 @@ textarea:focus-visible {
   background: transparent;
   color: var(--color-text-primary);
   cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
 
 .gtg-icon-button:hover,
-.gtg-menu-toggle:hover,
-.gtg-icon-button.is-accent {
+.gtg-menu-toggle:hover {
   color: var(--color-accent);
+  background: rgba(0, 212, 199, 0.08);
+}
+
+.gtg-user-button {
+  width: 96px;
+  height: 54px;
+  min-width: 96px;
+  min-height: 54px;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 6px;
+  overflow: visible;
+  align-items: center;
+  color: var(--color-text-primary);
+  border-radius: var(--radius-sm);
+}
+
+.gtg-user-button:hover,
+.gtg-user-button.is-accent:hover {
+  color: var(--color-accent);
+  background: rgba(0, 212, 199, 0.08);
+}
+
+.gtg-account-icon {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+  line-height: 1;
+}
+
+.gtg-account-icon svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.gtg-user-email-label {
+  display: block;
+  width: 100%;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.2s ease, font-weight 0.2s ease;
+}
+
+.gtg-admin-user-button {
+  position: relative;
+}
+
+.gtg-admin-user-identity {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  max-width: 132px;
+}
+
+.gtg-user-button:hover .gtg-user-email-label,
+.gtg-admin-user-button:hover .gtg-user-email-label {
+  color: var(--color-accent);
+  font-weight: 700;
 }
 
 .gtg-cart-link #cart-count {
