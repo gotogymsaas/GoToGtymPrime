@@ -43,8 +43,13 @@
         </a>
         {% if user.is_authenticated %}
         <div class="gtg-user-menu" id="userMenuWrapper">
-          <button id="userMenuBtn" type="button" class="gtg-icon-button is-accent" aria-label="Menu de usuario" onclick="toggleUserMenu()">
-            <span class="material-icons-outlined">account_circle</span>
+          <button id="userMenuBtn" type="button" class="gtg-icon-button gtg-user-button is-accent" aria-label="Menu de usuario" onclick="toggleUserMenu()">
+            <span class="gtg-account-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 3.1a3.2 3.2 0 1 1 0 6.4 3.2 3.2 0 0 1 0-6.4Zm0 14.1a7.1 7.1 0 0 1-5.7-2.9c1.2-2 3.3-3.2 5.7-3.2s4.5 1.2 5.7 3.2a7.1 7.1 0 0 1-5.7 2.9Z"/>
+              </svg>
+            </span>
+            <span class="gtg-user-email-label">{{ user.email }}</span>
           </button>
           <div id="userDropdown" class="gtg-dropdown hidden">
             <a href="{% url 'edit_profile' %}" onclick="closeUserMenu()">{% trans "Editar perfil" %}</a>
@@ -61,8 +66,13 @@
           </div>
         </div>
         {% else %}
-        <a href="{% url 'login' %}" class="gtg-icon-button is-accent" aria-label="Iniciar sesion">
-          <span class="material-icons-outlined">account_circle</span>
+        <a href="{% url 'login' %}" class="gtg-icon-button gtg-user-button is-accent" aria-label="Iniciar sesion">
+          <span class="gtg-account-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 3.1a3.2 3.2 0 1 1 0 6.4 3.2 3.2 0 0 1 0-6.4Zm0 14.1a7.1 7.1 0 0 1-5.7-2.9c1.2-2 3.3-3.2 5.7-3.2s4.5 1.2 5.7 3.2a7.1 7.1 0 0 1-5.7 2.9Z"/>
+            </svg>
+          </span>
+          <span class="gtg-user-email-label">iniciar sesi&oacute;n</span>
         </a>
         {% endif %}
         <a href="{% url 'carrito:cart_detail' %}" class="gtg-icon-button gtg-cart-link" aria-label="Carrito">
