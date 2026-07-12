@@ -25,16 +25,22 @@
 {% endif %}
 
 <main class="figma-home">
-  <section class="figma-hero">
+  <section class="figma-hero" data-hero-carousel>
+    <div class="figma-hero__slides" aria-hidden="true">
+      <div class="figma-hero__slide is-active" style="background-image: url('{% static 'images/img/hero.webp' %}');"></div>
+      <div class="figma-hero__slide" style="background-image: url('{% static 'images/img/Imagen Home 1.jpg' %}');"></div>
+      <div class="figma-hero__slide" style="background-image: url('{% static 'images/img/Imagen home 2.jpg' %}');"></div>
+      <div class="figma-hero__slide" style="background-image: url('{% static 'images/img/Imagen Home 3.jpg' %}');"></div>
+    </div>
     <div class="figma-hero__overlay"></div>
     <div class="figma-hero__content container mx-auto">
       <h1>{% trans "Entrena con lo último en" %} <strong>{% trans "tecnología deportiva" %}</strong></h1>
       <a href="{% url 'tienda:producto_list' %}" class="gtg-btn-primary">{% trans "Conoce más" %}</a>
       <div class="figma-hero__dots" aria-label="Indicadores del slider">
-        <span class="is-active"></span>
-        <span></span>
-        <span></span>
-        <span></span>
+        <button type="button" class="is-active" aria-label="Ver imagen 1" aria-current="true"></button>
+        <button type="button" aria-label="Ver imagen 2"></button>
+        <button type="button" aria-label="Ver imagen 3"></button>
+        <button type="button" aria-label="Ver imagen 4"></button>
       </div>
     </div>
   </section>
@@ -54,8 +60,12 @@
       </form>
     </div>
 
-    <div class="figma-influencer__media">
-      <img src="{% static 'images/img/Imagen Home 3.jpg' %}" alt="Influencer GoToGym">
+    <div class="figma-influencer__media" data-decision-carousel aria-label="Carrusel Make the Decision">
+      <img class="figma-decision-slide is-active" src="{% static 'images/img/Imagen Home 3.jpg' %}" alt="Make the Decision GoToGym">
+      <img class="figma-decision-slide" src="{% static 'images/img/Carrusel/Carrusel 1.jpg.webp' %}" alt="GoToGym coleccion grafeno en glaciar">
+      <img class="figma-decision-slide" src="{% static 'images/img/Carrusel/Carrusel 2.jpg.webp' %}" alt="GoToGym entrenamiento en desierto">
+      <img class="figma-decision-slide" src="{% static 'images/img/Carrusel/Carrusel 3.jpg.webp' %}" alt="GoToGym innovacion deportiva sostenible">
+      <img class="figma-decision-slide" src="{% static 'images/img/Carrusel/Carrusel 4.jpg.webp' %}" alt="GoToGym moda deportiva en ciudad">
     </div>
   </section>
 
@@ -101,4 +111,90 @@
     </div>
   </section>
 </main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const carousel = document.querySelector('[data-hero-carousel]');
+    if (!carousel) return;
+
+    const slides = Array.from(carousel.querySelectorAll('.figma-hero__slide'));
+    const dots = Array.from(carousel.querySelectorAll('.figma-hero__dots button'));
+    if (slides.length < 2 || dots.length !== slides.length) return;
+
+    let currentIndex = 0;
+    let timerId = null;
+    const stillMs = 5000;
+    const transitionMs = 1000;
+
+    function goToSlide(index) {
+      currentIndex = (index + slides.length) % slides.length;
+
+      slides.forEach(function (slide, slideIndex) {
+        slide.classList.toggle('is-active', slideIndex === currentIndex);
+      });
+
+      dots.forEach(function (dot, dotIndex) {
+        const isActive = dotIndex === currentIndex;
+        dot.classList.toggle('is-active', isActive);
+        dot.setAttribute('aria-current', isActive ? 'true' : 'false');
+      });
+    }
+
+    function stopCarousel() {
+      if (!timerId) return;
+      window.clearTimeout(timerId);
+      timerId = null;
+    }
+
+    function startCarousel() {
+      stopCarousel();
+      timerId = window.setTimeout(function () {
+        goToSlide(currentIndex + 1);
+        startCarousel();
+      }, stillMs + transitionMs);
+    }
+
+    function startCarouselAfterStillFrame() {
+      stopCarousel();
+      timerId = window.setTimeout(function () {
+        goToSlide(currentIndex + 1);
+        startCarousel();
+      }, stillMs);
+    }
+
+    dots.forEach(function (dot, index) {
+      dot.addEventListener('click', function () {
+        goToSlide(index);
+        startCarousel();
+      });
+    });
+
+    carousel.addEventListener('mouseenter', stopCarousel);
+    carousel.addEventListener('mouseleave', startCarouselAfterStillFrame);
+    carousel.addEventListener('focusin', stopCarousel);
+    carousel.addEventListener('focusout', startCarouselAfterStillFrame);
+
+    startCarouselAfterStillFrame();
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const carousel = document.querySelector('[data-decision-carousel]');
+    if (!carousel) return;
+
+    const slides = Array.from(carousel.querySelectorAll('.figma-decision-slide'));
+    if (slides.length < 2) return;
+
+    let currentIndex = 0;
+    const stillMs = 5000;
+
+    window.setInterval(function () {
+      currentIndex = (currentIndex + 1) % slides.length;
+      slides.forEach(function (slide, slideIndex) {
+        slide.classList.toggle('is-active', slideIndex === currentIndex);
+      });
+    }, stillMs);
+  });
+</script>
 {% endblock %}

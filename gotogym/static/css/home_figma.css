@@ -59,9 +59,24 @@
   overflow: hidden;
   margin-top: -112px;
   padding-top: 112px;
-  background-image: url("../images/img/hero.webp");
+  background: #0d0d0f;
+}
+
+.figma-hero__slides,
+.figma-hero__slide {
+  position: absolute;
+  inset: 0;
+}
+
+.figma-hero__slide {
   background-size: cover;
   background-position: center 36%;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.figma-hero__slide.is-active {
+  opacity: 1;
 }
 
 .figma-hero__overlay {
@@ -108,15 +123,29 @@
   gap: var(--space-3);
 }
 
-.figma-hero__dots span {
+.figma-hero__dots button {
   width: 12px;
   height: 12px;
+  padding: 0;
   border: 1px solid #ffffff;
   border-radius: var(--radius-pill);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-.figma-hero__dots span.is-active {
+.figma-hero__dots button.is-active {
   background: #ffffff;
+}
+
+.figma-hero__dots button:hover,
+.figma-hero__dots button:focus-visible {
+  transform: scale(1.18);
+}
+
+.figma-hero__dots button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 4px;
 }
 
 .figma-influencer {
@@ -191,12 +220,28 @@
   font-weight: 800;
 }
 
-.figma-influencer__media img {
+.figma-influencer__media {
+  position: relative;
   width: 100%;
   aspect-ratio: 0.72;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: #111113;
+}
+
+.figma-influencer__media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   display: block;
   object-fit: cover;
-  border-radius: var(--radius-sm);
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.figma-influencer__media img.is-active {
+  opacity: 1;
 }
 
 .figma-products {

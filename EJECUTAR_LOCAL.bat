@@ -6,6 +6,12 @@ cd /d "%~dp0"
 set "PORT=8000"
 set "PYTHONUTF8=1"
 
+netstat -ano | findstr /R /C:":%PORT% .*LISTENING" >nul 2>nul
+if %errorlevel%==0 (
+    echo El puerto %PORT% esta ocupado. Se usara el puerto 8001.
+    set "PORT=8001"
+)
+
 where py >nul 2>nul
 if %errorlevel%==0 (
     set "PY_CMD=py -3"
