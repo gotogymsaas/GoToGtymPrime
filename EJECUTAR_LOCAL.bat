@@ -60,6 +60,27 @@ if errorlevel 1 (
     exit /b 1
 )
 
+if not exist "static\images\img\Nuestros productos\Camiseta.png" (
+    echo No se encontro la imagen de Camisetas en static\images\img\Nuestros productos.
+    pause
+    exit /b 1
+)
+if not exist "static\images\img\Nuestros productos\Conjunto 31.png" (
+    echo No se encontro la imagen de Sets en static\images\img\Nuestros productos.
+    pause
+    exit /b 1
+)
+if not exist "static\images\img\Nuestros productos\Topito.png" (
+    echo No se encontro la imagen de Tops en static\images\img\Nuestros productos.
+    pause
+    exit /b 1
+)
+if not exist "static\images\img\Nuestros productos\Leggins blanco.png" (
+    echo No se encontro la imagen de Leggings en static\images\img\Nuestros productos.
+    pause
+    exit /b 1
+)
+
 echo.
 echo Proyecto listo.
 echo Abre http://127.0.0.1:%PORT%/ en el navegador.
