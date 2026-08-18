@@ -1,0 +1,54 @@
+{% extends "administracion/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Clasificacion del catalogo</p>
+    <h1>Catalogos</h1>
+  </div>
+</section>
+<section class="grid-two">
+  <form class="panel form-grid catalog-form" method="post">
+    {% csrf_token %}<input type="hidden" name="kind" value="category">
+    <h2>Nueva categoria</h2>
+    {{ category_form.as_p }}
+    <button class="button catalog-save-button" type="submit">Guardar categoria</button>
+  </form>
+  <form class="panel form-grid catalog-form" method="post">
+    {% csrf_token %}<input type="hidden" name="kind" value="brand">
+    <h2>Nueva marca</h2>
+    {{ brand_form.as_p }}
+    <div class="brand-form-spacer" aria-hidden="true"></div>
+    <button class="button catalog-save-button" type="submit">Guardar marca</button>
+  </form>
+</section>
+<section class="grid-two">
+  <div class="panel">
+    <h2>Categorias</h2>
+    {% for item in categories %}
+      <div class="list-row catalog-row">
+        <span>{{ item.name }}</span>
+        <form method="post" action="{% url 'admin_category_delete' item.pk %}">
+          {% csrf_token %}
+          <button class="button catalog-delete-button" type="submit">Eliminar</button>
+        </form>
+      </div>
+    {% empty %}
+      <p class="list-row">No hay categorias registradas.</p>
+    {% endfor %}
+  </div>
+  <div class="panel">
+    <h2>Marcas</h2>
+    {% for item in brands %}
+      <div class="list-row catalog-row">
+        <span>{{ item.name }}</span>
+        <form method="post" action="{% url 'admin_brand_delete' item.pk %}">
+          {% csrf_token %}
+          <button class="button catalog-delete-button" type="submit">Eliminar</button>
+        </form>
+      </div>
+    {% empty %}
+      <p class="list-row">No hay marcas registradas.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

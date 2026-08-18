@@ -1,0 +1,23 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ingreso GoToGym Admin</title>
+  <link rel="stylesheet" href="{% static 'administracion/style.css' %}">
+</head>
+<body class="login-page">
+  <form class="login-card" method="post">
+    {% csrf_token %}
+    <h1>GoToGym</h1>
+    <p>Administracion privada</p>
+    {{ form.non_field_errors }}
+    <label>Usuario o email</label>
+    {{ form.username }}
+    <label>Contrasena</label>
+    {{ form.password }}
+    <button type="submit">Entrar</button>
+  </form>
+</body>
+</html>

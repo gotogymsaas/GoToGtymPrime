@@ -1,0 +1,37 @@
+{% extends "administracion/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Catalogo comercial</p>
+    <h1>Productos</h1>
+  </div>
+  <a class="button" href="{% url 'admin_product_new' %}">Crear producto</a>
+</section>
+<form class="search" method="get">
+  <input name="q" value="{{ query }}" placeholder="Buscar por nombre">
+  <button type="submit">Buscar</button>
+</form>
+<div class="panel">
+  <table>
+    <thead><tr><th>Imagen</th><th>Producto</th><th>Categoria</th><th>Precio</th><th>Stock</th><th></th></tr></thead>
+    <tbody>
+      {% for product in page_obj %}
+      <tr>
+        <td>{% if product.image %}<img class="thumb" src="{{ product.image.url }}" alt="{{ product.name }}">{% else %}<span class="empty-img">Sin imagen</span>{% endif %}</td>
+        <td><strong>{{ product.name }}</strong><small>{{ product.brand.name|default:"Sin marca" }}</small></td>
+        <td>{{ product.category.name }}</td>
+        <td>${{ product.price|floatformat:2 }}</td>
+        <td>{{ product.stock }}</td>
+        <td class="actions">
+          <a class="ghost" href="{% url 'admin_product_edit' product.pk %}">Editar</a>
+          <form method="post" action="{% url 'admin_product_delete' product.pk %}">
+            {% csrf_token %}<button class="button product-delete-button" type="submit">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="6">No hay productos registrados.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "administracion/pagination.html" %}
+{% endblock %}

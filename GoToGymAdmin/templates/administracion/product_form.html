@@ -1,0 +1,29 @@
+{% extends "administracion/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Productos a comercializar</p>
+    <h1>{% if product %}Editar producto{% else %}Nuevo producto{% endif %}</h1>
+  </div>
+</section>
+<form class="panel form-grid" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% for field in form %}
+    <label>
+      <span>{{ field.label }}</span>
+      {{ field }}
+      {{ field.errors }}
+    </label>
+  {% endfor %}
+  {% if product.image %}
+    <div class="image-editor">
+      <img src="{{ product.image.url }}" alt="{{ product.name }}">
+      <label class="check"><input type="checkbox" name="clear_image" value="1"> Eliminar imagen actual</label>
+    </div>
+  {% endif %}
+  <div class="form-actions">
+    <a class="ghost" href="{% url 'admin_products' %}">Cancelar</a>
+    <button class="button" type="submit">Guardar</button>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "administracion/base.html" %}
+{% block title %}Panel GoToGym Admin{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <p class="eyebrow">Base conectada con tienda comercial</p>
+    <h1>Centro administrador GoToGym</h1>
+  </div>
+  <a class="button" href="{% url 'admin_product_new' %}">Nuevo producto</a>
+</section>
+<section class="stats">
+  <article><span>{{ product_count }}</span><p>Productos</p></article>
+  <article><span>{{ user_count }}</span><p>Usuarios inscritos</p></article>
+  <article><span>{{ category_count }}</span><p>Categorias</p></article>
+  <article><span>{{ stock_total }}</span><p>Unidades en stock</p></article>
+</section>
+<section class="grid-two">
+  <div class="panel">
+    <h2>Productos recientes</h2>
+    <table>
+      {% for product in latest_products %}
+      <tr><td>{{ product.name }}</td><td>${{ product.price|floatformat:2 }}</td><td>{{ product.stock }}</td></tr>
+      {% empty %}<tr><td>No hay productos.</td></tr>{% endfor %}
+    </table>
+  </div>
+  <div class="panel">
+    <h2>Usuarios recientes</h2>
+    <table>
+      {% for user in latest_users %}
+      <tr><td>{{ user.email }}</td><td>{{ user.first_name }} {{ user.last_name }}</td></tr>
+      {% empty %}<tr><td>No hay usuarios.</td></tr>{% endfor %}
+    </table>
+  </div>
+</section>
+{% endblock %}
