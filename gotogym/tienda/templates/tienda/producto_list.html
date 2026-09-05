@@ -2,109 +2,169 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}{% trans "Tienda" %}{% endblock %}
+{% block title %}{% trans "Store" %}{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/shop_figma.css' %}">
+<link rel="stylesheet" href="{% static 'css/shop_figma.css' %}?v=20260905-store-controls-inner-margin-12">
 {% endblock %}
 
 {% block content %}
-<main class="shop-collection">
-  <header class="shop-collection__header">
-    <h1>{% trans "Sets" %}</h1>
-    <form method="get" class="shop-collection__filters">
-      <label class="shop-search">
-        <span class="material-icons-outlined">search</span>
-        <input type="text" name="filtro" value="{{ filtro }}" placeholder="{% trans 'Buscar producto' %}" autocomplete="off">
-      </label>
-      <select name="categoria" aria-label="{% trans 'Categoria' %}">
-        <option value="">{% trans "Todas" %}</option>
-        {% for cat in categorias %}
-        <option value="{{ cat.id }}" {% if request.GET.categoria == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
-        {% endfor %}
-      </select>
-      <select name="orden" aria-label="{% trans 'Orden' %}">
-        <option value="">{% trans "Ordenar" %}</option>
-        <option value="precio_asc" {% if request.GET.orden == "precio_asc" %}selected{% endif %}>{% trans "Precio menor" %}</option>
-        <option value="precio_desc" {% if request.GET.orden == "precio_desc" %}selected{% endif %}>{% trans "Precio mayor" %}</option>
-        <option value="nombre_asc" {% if request.GET.orden == "nombre_asc" %}selected{% endif %}>{% trans "Nombre A-Z" %}</option>
-        <option value="nombre_desc" {% if request.GET.orden == "nombre_desc" %}selected{% endif %}>{% trans "Nombre Z-A" %}</option>
-      </select>
-      <button type="submit">{% trans "Filtrar" %}</button>
-    </form>
-  </header>
-
-  <section class="shop-grid" aria-label="{% trans 'Productos' %}">
-    {% for producto in productos %}
-    <article class="shop-card">
-      <a href="{% url 'tienda:producto_detail' producto.id %}" class="shop-card__image">
-        {% if producto.image %}
-        <img src="{{ producto.image.url }}" alt="{{ producto.name }}">
-        {% else %}
-        <img src="{% static 'images/img/placeholder.webp' %}" alt="{{ producto.name }}">
-        {% endif %}
-      </a>
-      <div class="shop-card__body">
-        <a href="{% url 'tienda:producto_detail' producto.id %}" class="shop-card__title">{{ producto.name }}</a>
-        <strong class="shop-card__price">${{ producto.price|floatformat:0 }}</strong>
-        <button type="button" class="shop-card__cart add-to-cart-btn" data-add-url="{% url 'carrito:add_to_cart' producto.id %}">
-          <span class="material-icons-outlined">shopping_cart</span>
-          {% trans "Agregar" %}
-        </button>
-      </div>
-    </article>
-    {% empty %}
-    <div class="shop-empty">
-      <p>{% trans "No hay productos para mostrar." %}</p>
+<main class="figma-home store-page">
+  <section class="quantum-hero store-hero" aria-label="{% trans 'Store GoToGym' %}">
+    <div class="quantum-field store-quantum-field" aria-hidden="true">
+      <span class="quantum-watermark"></span>
+      <span class="quantum-orbit quantum-orbit--outer"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--one"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--two"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--three"><i></i></span>
+      <span class="quantum-core"></span>
     </div>
-    {% endfor %}
-  </section>
 
-  {% if page_obj.has_other_pages %}
-  <nav class="shop-pagination" aria-label="{% trans 'Paginacion' %}">
-    {% if page_obj.has_previous %}
-    <a href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
-    {% endif %}
-    {% for num in page_obj.paginator.page_range %}
-    {% if page_obj.number == num %}
-    <span>{{ num }}</span>
-    {% else %}
-    <a href="?page={{ num }}">{{ num }}</a>
-    {% endif %}
-    {% endfor %}
-    {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}">&raquo;</a>
-    {% endif %}
-  </nav>
-  {% endif %}
+    <div class="quantum-hero__content store-hero__content">
+      <a href="{% url 'logged_home' %}" class="quantum-hero__logo store-hero__logo" aria-label="GoToGym inicio">
+        <img src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" aria-hidden="true">
+      </a>
+
+      <div class="store-orbit-user">
+        <span>{% trans "welcome" %}</span>
+        <strong>{{ user.email|default:user.username }}</strong>
+      </div>
+
+      <form method="get" id="storeCategoryForm" class="store-select-group">
+        <label for="storeCategorySelect">{% trans "Categoría" %}</label>
+        <select id="storeCategorySelect" name="categoria">
+          {% for cat in categorias %}
+          <option value="{{ cat.id }}" {% if selected_category_id == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+
+      <div class="store-select-group">
+        <label for="storeProductSelect">{% trans "Productos" %}</label>
+        <select id="storeProductSelect">
+          <option value="">{% trans "Selecciona un producto" %}</option>
+          {% for producto in productos %}
+          <option value="{{ producto.id }}">{{ producto.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="store-product-list" id="storeProductList" hidden>
+        {% for producto in productos %}
+        <article
+          class="store-product-row"
+          data-product-id="{{ producto.id }}"
+          data-name="{{ producto.name|escapejs }}"
+          data-price="${{ producto.price|floatformat:0 }}"
+          data-description="{{ producto.description|default:'Producto GoToGym seleccionado.'|escapejs }}"
+          data-detail-url="{% url 'tienda:producto_detail' producto.id %}"
+          data-add-url="{% url 'carrito:add_to_cart' producto.id %}"
+          data-image="{% if producto.image %}{{ producto.image.url }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
+        >
+          <span>{{ producto.name }}</span>
+          <button type="button" class="store-more-button">{% trans "Conocer más" %}</button>
+        </article>
+        {% empty %}
+        <p class="store-empty">{% trans "No hay productos para esta categoria." %}</p>
+        {% endfor %}
+      </div>
+
+      <a class="store-back-link" href="{% url 'logged_home' %}">{% trans "Regresar" %}</a>
+    </div>
+
+    <aside class="store-product-frame" id="storeProductFrame" aria-live="polite" hidden>
+      <img id="storeFrameImage" src="" alt="">
+      <div class="store-product-frame__body">
+        <h1 id="storeFrameName"></h1>
+        <strong id="storeFramePrice"></strong>
+        <p id="storeFrameDescription"></p>
+        <div class="store-product-frame__actions">
+          <button type="button" id="storeReturnButton">{% trans "Regresar al listado" %}</button>
+          <button type="button" id="storeBuyButton">{% trans "Comprar" %}</button>
+        </div>
+      </div>
+    </aside>
+  </section>
 </main>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.add-to-cart-btn').forEach((button) => {
-      button.addEventListener('click', async () => {
-        const addUrl = button.dataset.addUrl;
-        const original = button.innerHTML;
-        button.disabled = true;
-        button.innerHTML = '<span class="material-icons-outlined">check</span> {% trans "Agregado" %}';
-        try {
-          const response = await fetch(addUrl, {
-            headers: { 'x-requested-with': 'XMLHttpRequest' }
-          });
-          const data = await response.json();
-          const count = document.getElementById('cart-count');
-          if (count && data.cart_count !== undefined) count.textContent = data.cart_count;
-        } catch (error) {
-          button.innerHTML = original;
-        } finally {
-          setTimeout(() => {
-            button.disabled = false;
-            button.innerHTML = original;
-          }, 1200);
-        }
-      });
+    const categoryForm = document.getElementById('storeCategoryForm');
+    const categorySelect = document.getElementById('storeCategorySelect');
+    const productSelect = document.getElementById('storeProductSelect');
+    const productList = document.getElementById('storeProductList');
+    const frame = document.getElementById('storeProductFrame');
+    const frameImage = document.getElementById('storeFrameImage');
+    const frameName = document.getElementById('storeFrameName');
+    const framePrice = document.getElementById('storeFramePrice');
+    const frameDescription = document.getElementById('storeFrameDescription');
+    const returnButton = document.getElementById('storeReturnButton');
+    const buyButton = document.getElementById('storeBuyButton');
+
+    let activeAddUrl = '';
+
+    if (categorySelect && categoryForm) {
+      categorySelect.addEventListener('change', () => categoryForm.submit());
+    }
+
+    function openProduct(row) {
+      if (!row || !frame) return;
+      productList.querySelectorAll('.store-product-row').forEach((item) => item.classList.toggle('is-active', item === row));
+      if (productSelect) productSelect.value = row.dataset.productId;
+      frameImage.src = row.dataset.image;
+      frameImage.alt = row.dataset.name;
+      frameName.textContent = row.dataset.name;
+      framePrice.textContent = row.dataset.price;
+      frameDescription.textContent = row.dataset.description;
+      activeAddUrl = row.dataset.addUrl;
+      frame.hidden = false;
+    }
+
+    productList?.addEventListener('click', (event) => {
+      const button = event.target.closest('.store-more-button');
+      if (!button) return;
+      openProduct(button.closest('.store-product-row'));
+    });
+
+    productSelect?.addEventListener('change', () => {
+      if (!productSelect.value) {
+        returnButton?.click();
+        return;
+      }
+      const row = productList.querySelector(`[data-product-id="${productSelect.value}"]`);
+      openProduct(row);
+    });
+
+    returnButton?.addEventListener('click', () => {
+      frame.hidden = true;
+      activeAddUrl = '';
+      productSelect.value = '';
+      productList.querySelectorAll('.store-product-row').forEach((item) => item.classList.remove('is-active'));
+    });
+
+    buyButton?.addEventListener('click', async () => {
+      if (!activeAddUrl) return;
+      const originalText = buyButton.textContent;
+      buyButton.disabled = true;
+      buyButton.textContent = '{% trans "Agregado" %}';
+      try {
+        const response = await fetch(activeAddUrl, {
+          headers: { 'x-requested-with': 'XMLHttpRequest' }
+        });
+        const data = await response.json();
+        const count = document.getElementById('cart-count');
+        if (count && data.cart_count !== undefined) count.textContent = data.cart_count;
+      } finally {
+        setTimeout(() => {
+          buyButton.disabled = false;
+          buyButton.textContent = originalText;
+        }, 1200);
+      }
     });
   });
 </script>

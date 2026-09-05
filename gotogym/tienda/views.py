@@ -1,14 +1,15 @@
 from django.shortcuts import render, get_object_or_404
 from products.models import Product, ProductCategory, Brand
-from django.core.paginator import Paginator
-from django.db.models import F
 
 def producto_list(request):
+    categorias = ProductCategory.objects.all().order_by('name')
+    categoria_id = request.GET.get('categoria')
+    if not categoria_id and categorias.exists():
+        categoria_id = str(categorias.first().id)
+
     productos = Product.objects.all().order_by('id')
-    categorias = ProductCategory.objects.all()
     marcas = Brand.objects.all()
     filtro = request.GET.get('filtro', '')
-    categoria_id = request.GET.get('categoria')
     precio_min = request.GET.get('precio_min')
     precio_max = request.GET.get('precio_max')
     rating = request.GET.get('rating')
@@ -37,18 +38,14 @@ def producto_list(request):
     elif orden == 'nombre_desc':
         productos = productos.order_by('-name')
 
-    paginator = Paginator(productos, 12)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
     featured_products = Product.objects.filter(featured=True)
 
     context = {
-        'productos': page_obj,
+        'productos': productos,
         'categorias': categorias,
         'marcas': marcas,
         'filtro': filtro,
-        'page_obj': page_obj,
+        'selected_category_id': categoria_id,
         'featured_products': featured_products,
     }
     return render(request, 'tienda/producto_list.html', context)

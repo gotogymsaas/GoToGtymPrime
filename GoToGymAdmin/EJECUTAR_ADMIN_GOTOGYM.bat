@@ -63,13 +63,6 @@ if errorlevel 1 (
     exit /b 1
 )
 
-python manage.py seed_initial_data
-if errorlevel 1 (
-    echo No se pudieron crear las categorias y marca iniciales.
-    pause
-    exit /b 1
-)
-
 python manage.py shell -c "from django.contrib.auth import get_user_model; User=get_user_model(); email='%ADMIN_EMAIL%'; u,created=User.objects.get_or_create(email=email, defaults={'username':'%ADMIN_USERNAME%','first_name':'Eric','last_name':'Viana','is_staff':True,'is_superuser':True,'is_active':True}); u.username='%ADMIN_USERNAME%'; u.first_name='Eric'; u.last_name='Viana'; u.is_staff=True; u.is_superuser=True; u.is_active=True; u.set_password('%ADMIN_PASSWORD%'); u.save(); print('Administrador Eric Viana listo:', email)"
 if errorlevel 1 (
     echo No se pudo crear o actualizar el administrador Eric Viana.
@@ -83,7 +76,7 @@ echo URL: http://127.0.0.1:%PORT%/
 echo Usuario: %ADMIN_EMAIL%
 echo Contrasena: %ADMIN_PASSWORD%
 echo Marca inicial: GoToGym
-echo Categorias iniciales cargadas para crear productos.
+echo Las categorias se conservan tal como esten en la base de datos.
 echo Para detener el servidor presiona Ctrl+C.
 echo.
 python manage.py runserver 127.0.0.1:%PORT%
