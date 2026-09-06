@@ -12,6 +12,7 @@
 {% endblock %}
 
 {% block content %}
+{% get_static_prefix as STATIC_PREFIX %}
 <main class="figma-home store-page">
   <section class="quantum-hero store-hero" aria-label="{% trans 'Store GoToGym' %}">
     <div class="quantum-field store-quantum-field" aria-hidden="true">
@@ -62,7 +63,7 @@
           data-description="{{ producto.description|default:'Producto GoToGym seleccionado.'|escapejs }}"
           data-detail-url="{% url 'tienda:producto_detail' producto.id %}"
           data-add-url="{% url 'carrito:add_to_cart' producto.id %}"
-          data-image="{% if producto.image %}{{ producto.image.url }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
+          data-image="{% if producto.image %}{{ STATIC_PREFIX }}product_media/{{ producto.image.name }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
         >
           <span>{{ producto.name }}</span>
           <button type="button" class="store-more-button">{% trans "Conocer más" %}</button>
