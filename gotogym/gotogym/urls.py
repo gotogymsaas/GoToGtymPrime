@@ -51,6 +51,7 @@ urlpatterns += i18n_patterns(
     path('accounts/reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='accounts/password_reset_complete.html'), name='password_reset_complete'),
     path('blog/', include('blog.urls', namespace='blog')),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('admin-panel/', include('administracion.urls')),
     path('products/', include('products.urls', namespace='products')),
     path('configuracion-marca/', include('configuracion_marca.urls', namespace='configuracion_marca')),
     path('contabilidad/', include('contabilidad.urls', namespace='contabilidad')),

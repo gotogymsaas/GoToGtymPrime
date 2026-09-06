@@ -1,4 +1,5 @@
 import os
+import sys
 import urllib.parse
 from pathlib import Path
 from datetime import timedelta
@@ -14,6 +15,11 @@ def _as_bool(value: str, default: bool = False) -> bool:
     return value.lower() in ('1', 'true', 'yes', 'on')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = BASE_DIR.parent
+ADMIN_PROJECT_DIR = PROJECT_ROOT / 'GoToGymAdmin'
+
+if ADMIN_PROJECT_DIR.exists() and str(ADMIN_PROJECT_DIR) not in sys.path:
+    sys.path.insert(0, str(ADMIN_PROJECT_DIR))
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me')
 DEBUG = _as_bool(os.environ.get('DEBUG'), False)
@@ -39,6 +45,7 @@ INSTALLED_APPS = [
     'carrito',
     'crm',
     'metricas',
+    'administracion',
 ]
 
 MIDDLEWARE = [
@@ -59,7 +66,10 @@ ROOT_URLCONF = 'gotogym.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'gotogym' / 'templates'],
+        'DIRS': [
+            BASE_DIR / 'gotogym' / 'templates',
+            ADMIN_PROJECT_DIR / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -139,6 +149,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
+    ADMIN_PROJECT_DIR / 'static',
 ]
 STORAGES = {
     'default': {
@@ -183,6 +194,8 @@ SIMPLE_JWT = {
 }
 
 AUTH_USER_MODEL = 'accounts.User'
+LOGIN_URL = 'commercial_login'
+LOGIN_REDIRECT_URL = 'logged_home'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
