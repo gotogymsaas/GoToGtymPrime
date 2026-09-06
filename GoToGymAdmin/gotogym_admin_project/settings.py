@@ -1,6 +1,17 @@
 import os
 import sys
+import urllib.parse
 from pathlib import Path
+
+
+def _split_csv(value: str) -> list[str]:
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def _as_bool(value, default: bool = False) -> bool:
+    if value is None:
+        return default
+    return value.lower() in ("1", "true", "yes", "on")
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -10,8 +21,8 @@ if str(COMMERCIAL_PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(COMMERCIAL_PROJECT_DIR))
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "gotogym-admin-local-key")
-DEBUG = True
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "*"]
+DEBUG = _as_bool(os.environ.get("DEBUG"), True)
+ALLOWED_HOSTS = _split_csv(os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost"))
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -55,12 +66,38 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "gotogym_admin_project.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": COMMERCIAL_PROJECT_DIR / "db_local.sqlite3",
+_db_url = os.environ.get("DATABASE_URL", "")
+if _db_url:
+    _p = urllib.parse.urlparse(_db_url)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": _p.path.lstrip("/"),
+            "USER": urllib.parse.unquote(_p.username or ""),
+            "PASSWORD": urllib.parse.unquote(_p.password or ""),
+            "HOST": _p.hostname,
+            "PORT": str(_p.port or 5432),
+            "OPTIONS": {"sslmode": "require"},
+        }
     }
-}
+elif os.environ.get("MYSQL_PASSWORD") or os.environ.get("MYSQL_HOST"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.environ.get("MYSQL_DATABASE", "gotogym_bd"),
+            "USER": os.environ.get("MYSQL_USER", "gotogym_user"),
+            "PASSWORD": os.environ.get("MYSQL_PASSWORD", ""),
+            "HOST": os.environ.get("MYSQL_HOST", "servergotogym.mysql.database.azure.com"),
+            "PORT": os.environ.get("MYSQL_PORT", "3306"),
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": COMMERCIAL_PROJECT_DIR / "db_local.sqlite3",
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = []
 LANGUAGE_CODE = "es"
