@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils import timezone
 from django.urls import reverse
+from django.db.models import Q
 from pathlib import Path
 import hashlib
 from .models import User
@@ -74,16 +75,16 @@ def _login_response(request, template_name):
     error_message = None
     redirect_to = request.POST.get('next') or request.GET.get('next') or reverse('logged_home')
     if request.method == 'POST':
-        username_or_email = request.POST.get('username')
+        username_or_email = request.POST.get('username', '').strip()
         password = request.POST.get('password')
         user = authenticate(request, username=username_or_email, password=password)
         if user is None:
             # Intentar autenticación por email
-            try:
-                user_obj = User.objects.get(email=username_or_email)
-                user = authenticate(request, username=user_obj.email, password=password)
-            except User.DoesNotExist:
-                user = None
+            user_obj = User.objects.filter(
+                Q(email__iexact=username_or_email) | Q(username__iexact=username_or_email)
+            ).first()
+            if user_obj is not None:
+                user = authenticate(request, username=user_obj.get_username(), password=password)
         if user is not None:
             login(request, user)
             if not url_has_allowed_host_and_scheme(redirect_to, allowed_hosts={request.get_host()}):
