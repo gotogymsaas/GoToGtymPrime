@@ -112,9 +112,12 @@ jobs:
             --data '{"command":"python gotogym/manage.py migrate --noinput","dir":"/home/site/wwwroot"}')
           echo "Respuesta HTTP migraciones: $MIGRATE_STATUS"
           cat /tmp/migrate_response.txt || true
-          if [[ "$MIGRATE_STATUS" -ge 200 && "$MIGRATE_STATUS" -lt 300 ]]; then
-            echo "Migraciones aplicadas."
-          else
+          if [[ "$MIGRATE_STATUS" -lt 200 || "$MIGRATE_STATUS" -ge 300 ]]; then
             echo "ERROR: Migraciones fallaron con HTTP $MIGRATE_STATUS"
             exit 1
           fi
+          if ! grep -Eq '"ExitCode"[[:space:]]*:[[:space:]]*0' /tmp/migrate_response.txt; then
+            echo "ERROR: El comando de migraciones no termino correctamente."
+            exit 1
+          fi
+          echo "Migraciones aplicadas."
