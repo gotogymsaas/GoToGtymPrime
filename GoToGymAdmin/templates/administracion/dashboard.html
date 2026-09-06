@@ -27,7 +27,7 @@
     <h2>Usuarios recientes</h2>
     <table>
       {% for user in latest_users %}
-      <tr><td>{{ user.email }}</td><td>{{ user.first_name }} {{ user.last_name }}</td></tr>
+      <tr><td>{{ user.email }}</td><td>{{ user.first_name }} {{ user.last_name }}</td><td>{{ user.age|default:"-" }} años</td></tr>
       {% empty %}<tr><td>No hay usuarios.</td></tr>{% endfor %}
     </table>
   </div>

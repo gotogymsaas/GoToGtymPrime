@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import get_user_model
+from django.views.decorators.cache import never_cache
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
@@ -12,7 +13,7 @@ from .forms import BrandForm, CategoryForm, ProductAdminForm
 
 
 def staff_required(view_func):
-    decorated = login_required(user_passes_test(lambda user: user.is_staff)(view_func))
+    decorated = never_cache(login_required(user_passes_test(lambda user: user.is_staff)(view_func)))
     return decorated
 
 
