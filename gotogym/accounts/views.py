@@ -77,16 +77,16 @@ def _login_response(request, template_name):
     if request.method == 'POST':
         username_or_email = request.POST.get('username', '').strip()
         password = request.POST.get('password')
-        user = authenticate(request, username=username_or_email, password=password)
+        user = None
         if user is None:
             # Intentar autenticación por email
             user_obj = User.objects.filter(
                 Q(email__iexact=username_or_email) | Q(username__iexact=username_or_email)
             ).first()
-            if user_obj is not None:
-                user = authenticate(request, username=user_obj.get_username(), password=password)
+            if user_obj is not None and user_obj.is_active and user_obj.check_password(password):
+                user = user_obj
         if user is not None:
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             if not url_has_allowed_host_and_scheme(redirect_to, allowed_hosts={request.get_host()}):
                 redirect_to = '/'
             return redirect(redirect_to)
