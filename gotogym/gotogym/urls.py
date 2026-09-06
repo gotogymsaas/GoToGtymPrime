@@ -23,10 +23,12 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+from django.views.static import serve
 
 urlpatterns = [
     path('accounts', lambda request: redirect('commercial_login', permanent=False)),
     path('setlang/', set_language, name='set_language'),
+    path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
 
 urlpatterns += i18n_patterns(
