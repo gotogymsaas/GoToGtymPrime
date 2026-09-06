@@ -103,3 +103,18 @@ jobs:
             echo "ERROR: Deploy falló con HTTP $HTTP_STATUS"
             exit 1
           fi
+          echo "Aplicando migraciones de produccion..."
+          MIGRATE_STATUS=$(curl -s -o /tmp/migrate_response.txt -w "%{http_code}" \
+            -X POST \
+            "https://${APP_NAME}.scm.azurewebsites.net/api/command" \
+            -u "${SCM_USER}:${SCM_PASS}" \
+            -H "Content-Type: application/json" \
+            --data '{"command":"python gotogym/manage.py migrate --noinput","dir":"site/wwwroot"}')
+          echo "Respuesta HTTP migraciones: $MIGRATE_STATUS"
+          cat /tmp/migrate_response.txt || true
+          if [[ "$MIGRATE_STATUS" -ge 200 && "$MIGRATE_STATUS" -lt 300 ]]; then
+            echo "Migraciones aplicadas."
+          else
+            echo "ERROR: Migraciones fallaron con HTTP $MIGRATE_STATUS"
+            exit 1
+          fi
