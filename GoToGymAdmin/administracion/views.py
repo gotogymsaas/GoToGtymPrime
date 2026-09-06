@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -25,7 +25,7 @@ def dashboard(request):
         "category_count": ProductCategory.objects.count(),
         "stock_total": Product.objects.aggregate(total=Sum("stock")).get("total") or 0,
         "latest_products": Product.objects.select_related("category", "brand").order_by("-id")[:10],
-        "latest_users": User.objects.order_by("-date_joined")[:10],
+        "latest_users": User.objects.order_by("-id")[:10],
     }
     return render(request, "administracion/dashboard.html", context)
 
@@ -83,10 +83,15 @@ def product_image_delete(request, pk):
 def users_list(request):
     User = get_user_model()
     query = request.GET.get("q", "").strip()
-    users = User.objects.order_by("-date_joined")
+    users = User.objects.order_by("-id")
     if query:
-        users = users.filter(email__icontains=query)
-    paginator = Paginator(users, 12)
+        users = users.filter(
+            Q(email__icontains=query)
+            | Q(username__icontains=query)
+            | Q(first_name__icontains=query)
+            | Q(last_name__icontains=query)
+        )
+    paginator = Paginator(users, 50)
     page_obj = paginator.get_page(request.GET.get("page"))
     return render(request, "administracion/users.html", {"page_obj": page_obj, "query": query})
 
