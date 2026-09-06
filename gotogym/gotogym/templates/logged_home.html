@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/home_figma.css' %}?v=20260902-profile-layout">
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="figma-home">
+  <section class="quantum-hero quantum-hero--session" aria-labelledby="quantum-hero-title">
+    <div class="quantum-field" aria-hidden="true">
+      <span class="quantum-watermark"></span>
+      <span class="quantum-orbit quantum-orbit--outer"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--one"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--two"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--three"><i></i></span>
+      <span class="quantum-core"></span>
+    </div>
+
+    <div class="quantum-hero__content">
+      <a href="{% url 'logged_home' %}" class="quantum-hero__logo" aria-label="GoToGym inicio">
+        <img src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" aria-hidden="true">
+      </a>
+
+      <div class="quantum-hero__intro">
+        <h1 id="quantum-hero-title" class="quantum-hero__welcome">
+          welcome <span class="quantum-hero__username">{{ user.get_username }}</span>
+        </h1>
+        <button type="button" class="quantum-hero__profile-edit" data-profile-open>
+          Editar perfil
+        </button>
+        <p class="quantum-hero__lead">
+          {% trans "Entrenamiento, bienestar y tecnología deportiva conectados en una experiencia clara, rápida y personal" %}
+        </p>
+      </div>
+
+      <div class="quantum-hero__links quantum-hero__links--inside" aria-label="{% trans 'Funciones principales' %}">
+        <a href="{% url 'tienda:producto_list' %}">Store</a>
+        <a href="{% url 'blog:post_list' %}">{% trans "Blog" %}</a>
+        <a href="{% url 'contacto' %}?next=logged_home">{% trans "Contacto" %}</a>
+        <a href="{% url 'politicas_privacidad_usuario' %}" class="quantum-hero__privacy-link">{% trans "Políticas de privacidad" %}</a>
+      </div>
+
+      <div class="quantum-hero__links quantum-hero__links--influencer" aria-label="{% trans 'Funciones de influencers' %}">
+        <a href="{% url 'influencer_suscribete' %}">Vincularse como<br>influencer</a>
+        {% if user.es_influencer %}
+        <a href="{% url 'influencer_dashboard' %}">Ir a sección de<br>Influencers</a>
+        {% else %}
+        <button type="button" data-influencer-required>Ir a sección de<br>Influencers</button>
+        {% endif %}
+      </div>
+
+      <div class="quantum-hero__influencer-warning" data-influencer-warning role="status" aria-live="polite" hidden>
+        <p>Usted no es influencer aún. Lo invitamos a que se vincule en el botón respectivo. Gracias!</p>
+        <button type="button" data-close-influencer-warning>Salir</button>
+      </div>
+
+      <form action="{% url 'logout' %}" method="post" class="quantum-hero__logout-form">
+        {% csrf_token %}
+        <button type="submit" class="quantum-hero__logout">{% trans "Cerrar sesión" %}</button>
+      </form>
+
+      <div class="quantum-profile-dialog" data-profile-dialog hidden>
+        <form method="post" action="{% url 'edit_profile' %}" class="quantum-profile-form" data-profile-form>
+          {% csrf_token %}
+          <div class="quantum-profile-form__grid">
+            <div class="quantum-profile-form__field">
+              <label for="profile_first_name">Nombre</label>
+              <input type="text" name="first_name" id="profile_first_name" value="{{ user.first_name|default:'' }}" required>
+            </div>
+            <div class="quantum-profile-form__field">
+              <label for="profile_last_name">Apellido</label>
+              <input type="text" name="last_name" id="profile_last_name" value="{{ user.last_name|default:'' }}" required>
+            </div>
+            <div class="quantum-profile-form__field">
+              <label for="profile_age">Edad</label>
+              <input type="number" name="age" id="profile_age" value="{{ user.age|default:'' }}" min="10" max="120">
+            </div>
+            <div class="quantum-profile-form__field">
+              <label for="profile_email">Correo electrónico</label>
+              <input type="email" name="email" id="profile_email" value="{{ user.email }}" required>
+            </div>
+            <div class="quantum-profile-form__field quantum-profile-form__field--current-password">
+              <label for="profile_current_password">Contraseña actual</label>
+              <input type="password" name="current_password" id="profile_current_password" autocomplete="current-password">
+            </div>
+            <div class="quantum-profile-form__field quantum-profile-form__field--new-password">
+              <label for="profile_password">Nueva contraseña</label>
+              <input type="password" name="password" id="profile_password" autocomplete="new-password">
+            </div>
+            <div class="quantum-profile-form__field quantum-profile-form__field--confirm-password">
+              <label for="profile_password2">Confirmar contraseña</label>
+              <input type="password" name="password2" id="profile_password2" autocomplete="new-password">
+            </div>
+          </div>
+          <p class="quantum-profile-form__message" data-profile-message aria-live="polite"></p>
+          <div class="quantum-profile-form__actions">
+            <button type="button" data-profile-close>Salir</button>
+            <button type="submit">Guardar Cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const openWarning = document.querySelector('[data-influencer-required]');
+    const warning = document.querySelector('[data-influencer-warning]');
+    const closeWarning = document.querySelector('[data-close-influencer-warning]');
+    const profileOpen = document.querySelector('[data-profile-open]');
+    const profileDialog = document.querySelector('[data-profile-dialog]');
+    const profileClose = document.querySelector('[data-profile-close]');
+    const profileForm = document.querySelector('[data-profile-form]');
+    const profileMessage = document.querySelector('[data-profile-message]');
+
+    if (openWarning && warning) {
+      openWarning.addEventListener('click', function () {
+        warning.hidden = false;
+      });
+    }
+
+    if (closeWarning && warning) {
+      closeWarning.addEventListener('click', function () {
+        warning.hidden = true;
+      });
+    }
+
+    if (profileOpen && profileDialog) {
+      profileOpen.addEventListener('click', function () {
+        profileDialog.hidden = false;
+        if (profileMessage) profileMessage.textContent = '';
+      });
+    }
+
+    if (profileClose && profileDialog) {
+      profileClose.addEventListener('click', function () {
+        profileDialog.hidden = true;
+      });
+    }
+
+    if (profileForm && profileDialog) {
+      profileForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (profileMessage) profileMessage.textContent = '';
+
+        fetch(profileForm.action, {
+          method: 'POST',
+          body: new FormData(profileForm),
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          credentials: 'same-origin'
+        })
+          .then(function (response) {
+            return response.json().then(function (data) {
+              return { ok: response.ok, data: data };
+            });
+          })
+          .then(function (result) {
+            if (result.ok && result.data.ok) {
+              profileDialog.hidden = true;
+              window.location.reload();
+              return;
+            }
+            if (profileMessage) profileMessage.textContent = result.data.message || 'No fue posible guardar los cambios.';
+          })
+          .catch(function () {
+            if (profileMessage) profileMessage.textContent = 'No fue posible guardar los cambios.';
+          });
+      });
+    }
+  });
+</script>
+{% endblock %}

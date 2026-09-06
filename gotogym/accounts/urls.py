@@ -8,9 +8,10 @@ from . import views
 # Vista personalizada para logout por GET
 def logout_view(request):
     logout(request)
-    return redirect('/')
+    return redirect('home')
 
 urlpatterns = [
+    path('acceso/', views.commercial_login_view, name='commercial_login'),
     path('login/', views.login_view, name='login'),
     path('logout/', logout_view, name='logout'),
     path('register/', views.register_view, name='register'),

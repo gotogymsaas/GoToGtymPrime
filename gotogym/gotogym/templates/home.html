@@ -3,11 +3,11 @@
 {% load i18n %}
 
 {% block extra_head %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'css/home_figma.css' %}">
+<link rel="stylesheet" href="{% static 'css/home_figma.css' %}?v=20260902-home-links-inside">
 {% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
 
 {% block content %}
 {% if show_influencer_modal %}
@@ -24,177 +24,39 @@
 </div>
 {% endif %}
 
-<main class="figma-home">
-  <section class="figma-hero" data-hero-carousel>
-    <div class="figma-hero__slides" aria-hidden="true">
-      <div class="figma-hero__slide is-active" style="background-image: url('{% static 'images/img/hero.webp' %}');"></div>
-      <div class="figma-hero__slide" style="background-image: url('{% static 'images/img/Imagen Home 1.jpg' %}');"></div>
-      <div class="figma-hero__slide" style="background-image: url('{% static 'images/img/Imagen home 2.jpg' %}');"></div>
-      <div class="figma-hero__slide" style="background-image: url('{% static 'images/img/Imagen Home 3.jpg' %}');"></div>
+<div class="figma-home">
+  <section class="quantum-hero" aria-labelledby="quantum-hero-title">
+    <div class="quantum-field" aria-hidden="true">
+      <span class="quantum-watermark"></span>
+      <span class="quantum-orbit quantum-orbit--outer"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--one"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--two"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--three"><i></i></span>
+      <span class="quantum-core"></span>
     </div>
-    <div class="figma-hero__overlay"></div>
-    <div class="figma-hero__content container mx-auto">
-      <h1>{% trans "Entrena con lo último en" %} <strong>{% trans "tecnología deportiva" %}</strong></h1>
-      <a href="{% url 'tienda:producto_list' %}" class="gtg-btn-primary">{% trans "Conoce más" %}</a>
-      <div class="figma-hero__dots" aria-label="Indicadores del slider">
-        <button type="button" class="is-active" aria-label="Ver imagen 1" aria-current="true"></button>
-        <button type="button" aria-label="Ver imagen 2"></button>
-        <button type="button" aria-label="Ver imagen 3"></button>
-        <button type="button" aria-label="Ver imagen 4"></button>
-      </div>
-    </div>
-  </section>
 
-  <section class="figma-influencer container mx-auto">
-    <div class="figma-influencer__copy">
-      <h2>{% trans "Accede a tus beneficios como" %} <span>{% trans "influencer" %}</span></h2>
-      <form method="post" action="{% url 'login' %}" class="figma-login-card">
-        {% csrf_token %}
-        <h3>{% trans "Inicia sesión" %}</h3>
-        <input type="text" name="username" placeholder="{% trans 'Tu usuario o email' %}" autocomplete="username">
-        <input type="password" name="password" placeholder="{% trans 'Tu contraseña' %}" autocomplete="current-password">
-        <button type="submit" class="gtg-btn-primary">{% trans "Iniciar sesión" %}</button>
-        <p>
-          <a href="{% url 'register' %}">{% trans "¿No tienes cuenta? Crear cuenta" %}</a>
+    <div class="quantum-hero__content">
+      <a href="{% url 'home' %}" class="quantum-hero__logo" aria-label="GoToGym inicio">
+        <img src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" aria-hidden="true">
+      </a>
+
+      <div class="quantum-hero__intro">
+        <h1 id="quantum-hero-title">{% trans "Bienvenido a GoToGym" %}</h1>
+        <p class="quantum-hero__lead">
+          {% trans "Entrenamiento, bienestar y tecnología deportiva conectados en una experiencia clara, rápida y personal" %}
         </p>
-      </form>
-    </div>
-
-    <div class="figma-influencer__media" data-decision-carousel aria-label="Carrusel Make the Decision">
-      <img class="figma-decision-slide is-active" src="{% static 'images/img/Imagen Home 3.jpg' %}" alt="Make the Decision GoToGym">
-      <img class="figma-decision-slide" src="{% static 'images/img/Carrusel/Carrusel 1.jpg.webp' %}" alt="GoToGym coleccion grafeno en glaciar">
-      <img class="figma-decision-slide" src="{% static 'images/img/Carrusel/Carrusel 2.jpg.webp' %}" alt="GoToGym entrenamiento en desierto">
-      <img class="figma-decision-slide" src="{% static 'images/img/Carrusel/Carrusel 3.jpg.webp' %}" alt="GoToGym innovacion deportiva sostenible">
-      <img class="figma-decision-slide" src="{% static 'images/img/Carrusel/Carrusel 4.jpg.webp' %}" alt="GoToGym moda deportiva en ciudad">
-    </div>
-  </section>
-
-  <section class="figma-products container mx-auto">
-    <h2>{% trans "Nuestros productos" %}</h2>
-    <div class="figma-products__grid">
-      <a href="{% url 'tienda:producto_list' %}" class="figma-product-card">
-        <img src="{% static 'images/img/Imagen Home 1.jpg' %}" alt="Camisetas">
-        <span>{% trans "Camisetas" %}</span>
-      </a>
-      <a href="{% url 'tienda:producto_list' %}" class="figma-product-card">
-        <img src="{% static 'images/img/Imagen Slider 1.jpg' %}" alt="Sets deportivos">
-        <span>{% trans "Sets" %}</span>
-      </a>
-      <a href="{% url 'tienda:producto_list' %}" class="figma-product-card">
-        <img src="{% static 'images/img/Imagenes_sueltas/Blusita.png' %}" alt="Tops">
-        <span>{% trans "Tops" %}</span>
-      </a>
-      <a href="{% url 'tienda:producto_list' %}" class="figma-product-card">
-        <img src="{% static 'images/img/Imagenes_sueltas/Malladelujo.jpg' %}" alt="Leggings">
-        <span>{% trans "Leggings" %}</span>
-      </a>
-    </div>
-  </section>
-
-  <section class="figma-newsletter container mx-auto">
-    <div class="figma-newsletter__brand">
-      <img src="{% static 'images/Logo_GoToGym_Blanco.png' %}" alt="GoToGym">
-      <span>GoToGym</span>
-    </div>
-    <form class="figma-newsletter__form" method="post" action="{% url 'contacto' %}">
-      {% csrf_token %}
-      <label for="newsletter-email">{% trans "Mantenerme informado" %}</label>
-      <div>
-        <input id="newsletter-email" name="email" type="email" placeholder="{% trans 'Tu correo electrónico' %}">
-        <button type="submit">{% trans "Suscribirme" %}</button>
       </div>
-    </form>
-    <div class="figma-newsletter__links">
-      <a href="{% url 'acerca_de' %}">{% trans "Acerca de" %}</a>
-      <a href="{% url 'terminos' %}">{% trans "Términos" %}</a>
-      <a href="{% url 'politica_privacidad' %}">{% trans "Privacidad" %}</a>
+
+      <div class="quantum-hero__actions" aria-label="{% trans 'Acciones principales' %}">
+        <a href="{% url 'commercial_login' %}" class="quantum-hero__button quantum-hero__button--gold">{% trans "Iniciar Sesión" %}</a>
+        <a href="{% url 'register' %}" class="quantum-hero__button quantum-hero__button--mint">{% trans "Crear cuenta" %}</a>
+      </div>
+
+      <div class="quantum-hero__links" aria-label="{% trans 'Funciones principales' %}">
+        <a href="{% url 'blog:post_list' %}">{% trans "Blog" %}</a>
+        <a href="{% url 'contacto' %}">{% trans "Contacto" %}</a>
+      </div>
     </div>
   </section>
-</main>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const carousel = document.querySelector('[data-hero-carousel]');
-    if (!carousel) return;
-
-    const slides = Array.from(carousel.querySelectorAll('.figma-hero__slide'));
-    const dots = Array.from(carousel.querySelectorAll('.figma-hero__dots button'));
-    if (slides.length < 2 || dots.length !== slides.length) return;
-
-    let currentIndex = 0;
-    let timerId = null;
-    const stillMs = 5000;
-    const transitionMs = 1000;
-
-    function goToSlide(index) {
-      currentIndex = (index + slides.length) % slides.length;
-
-      slides.forEach(function (slide, slideIndex) {
-        slide.classList.toggle('is-active', slideIndex === currentIndex);
-      });
-
-      dots.forEach(function (dot, dotIndex) {
-        const isActive = dotIndex === currentIndex;
-        dot.classList.toggle('is-active', isActive);
-        dot.setAttribute('aria-current', isActive ? 'true' : 'false');
-      });
-    }
-
-    function stopCarousel() {
-      if (!timerId) return;
-      window.clearTimeout(timerId);
-      timerId = null;
-    }
-
-    function startCarousel() {
-      stopCarousel();
-      timerId = window.setTimeout(function () {
-        goToSlide(currentIndex + 1);
-        startCarousel();
-      }, stillMs + transitionMs);
-    }
-
-    function startCarouselAfterStillFrame() {
-      stopCarousel();
-      timerId = window.setTimeout(function () {
-        goToSlide(currentIndex + 1);
-        startCarousel();
-      }, stillMs);
-    }
-
-    dots.forEach(function (dot, index) {
-      dot.addEventListener('click', function () {
-        goToSlide(index);
-        startCarousel();
-      });
-    });
-
-    carousel.addEventListener('mouseenter', stopCarousel);
-    carousel.addEventListener('mouseleave', startCarouselAfterStillFrame);
-    carousel.addEventListener('focusin', stopCarousel);
-    carousel.addEventListener('focusout', startCarouselAfterStillFrame);
-
-    startCarouselAfterStillFrame();
-  });
-
-  document.addEventListener('DOMContentLoaded', function () {
-    const carousel = document.querySelector('[data-decision-carousel]');
-    if (!carousel) return;
-
-    const slides = Array.from(carousel.querySelectorAll('.figma-decision-slide'));
-    if (slides.length < 2) return;
-
-    let currentIndex = 0;
-    const stillMs = 5000;
-
-    window.setInterval(function () {
-      currentIndex = (currentIndex + 1) % slides.length;
-      slides.forEach(function (slide, slideIndex) {
-        slide.classList.toggle('is-active', slideIndex === currentIndex);
-      });
-    }, stillMs);
-  });
-</script>
+</div>
 {% endblock %}

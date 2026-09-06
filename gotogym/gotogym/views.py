@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from blog.models import Post
 from django.contrib.auth import get_user_model
@@ -13,6 +14,10 @@ def home(request):
         request.user.show_influencer_modal = False
         request.user.save(update_fields=["show_influencer_modal"])
     return render(request, 'home.html', {"show_influencer_modal": show_influencer_modal})
+
+@login_required
+def logged_home(request):
+    return render(request, 'logged_home.html')
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser or u.is_staff)
@@ -66,10 +71,15 @@ def acerca_de(request):
 
 
 def contacto(request):
-    return render(request, 'static_pages/simple_page.html', {
-        'title': 'Contacto',
-        'subtitle': 'Escribenos por nuestros canales oficiales y te responderemos pronto.',
-    })
+    back_url = reverse('home')
+    if request.GET.get('next') == 'logged_home' and request.user.is_authenticated:
+        back_url = reverse('logged_home')
+    return render(request, 'static_pages/contacto.html', {'back_url': back_url})
+
+
+@login_required
+def politicas_privacidad_usuario(request):
+    return render(request, 'static_pages/politicas_privacidad_usuario.html')
 
 
 def politica_privacidad(request):

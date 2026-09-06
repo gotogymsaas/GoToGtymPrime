@@ -25,18 +25,20 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('accounts', lambda request: redirect('login', permanent=False)),
+    path('accounts', lambda request: redirect('commercial_login', permanent=False)),
     path('setlang/', set_language, name='set_language'),
 ]
 
 urlpatterns += i18n_patterns(
     path('', views.home, name='home'),
+    path('welcome/', views.logged_home, name='logged_home'),
     path('tecnologia/', views.tecnologia, name='tecnologia'),
     path('pedidos/', views.pedidos, name='pedidos'),
     path('bienestar/', views.bienestar, name='bienestar'),
     path('gestion/', views.gestion, name='gestion'),
     path('acerca-de/', views.acerca_de, name='acerca_de'),
     path('contacto/', views.contacto, name='contacto'),
+    path('politicas-privacidad-usuario/', views.politicas_privacidad_usuario, name='politicas_privacidad_usuario'),
     path('politica-privacidad/', views.politica_privacidad, name='politica_privacidad'),
     path('terminos/', views.terminos, name='terminos'),
     path('admin/', admin.site.urls),

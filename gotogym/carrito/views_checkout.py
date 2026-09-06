@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect
 from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 
-@login_required(login_url='/accounts/login/')
+@login_required(login_url='/accounts/acceso/')
 def checkout(request):
     cart = request.session.get('cart', {})
     productos = Product.objects.filter(id__in=cart.keys())

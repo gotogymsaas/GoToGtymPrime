@@ -24,8 +24,8 @@ def dashboard(request):
         "user_count": User.objects.count(),
         "category_count": ProductCategory.objects.count(),
         "stock_total": Product.objects.aggregate(total=Sum("stock")).get("total") or 0,
-        "latest_products": Product.objects.select_related("category", "brand").order_by("-id")[:5],
-        "latest_users": User.objects.order_by("-date_joined")[:5],
+        "latest_products": Product.objects.select_related("category", "brand").order_by("-id")[:10],
+        "latest_users": User.objects.order_by("-date_joined")[:10],
     }
     return render(request, "administracion/dashboard.html", context)
 

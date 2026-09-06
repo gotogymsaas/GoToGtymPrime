@@ -1,6 +1,33 @@
 .figma-home {
-  background: var(--color-bg-base);
-  color: var(--color-text-primary);
+  --home-gold: #d5b667;
+  --home-mint: #0fc8bd;
+  --home-muted: rgba(255, 255, 255, 0.64);
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(47, 62, 67, 0.95) 0%, rgba(22, 28, 31, 0.88) 25%, rgba(8, 9, 11, 1) 68%, #030405 100%);
+  color: #ffffff;
+  font-family: var(--font-body);
+  isolation: isolate;
+}
+
+.figma-home::before,
+.figma-home::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.figma-home::before {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(0, 212, 199, 0.2), transparent 18%),
+    linear-gradient(180deg, rgba(3, 4, 5, 0.28), rgba(3, 4, 5, 0.92));
+}
+
+.figma-home::after {
+  display: none;
 }
 
 .gtg-modal {
@@ -24,11 +51,11 @@
   display: grid;
   gap: var(--space-4);
   padding: var(--space-6);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: #171719;
-  color: var(--color-text-primary);
-  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  background: rgba(13, 16, 18, 0.94);
+  color: #ffffff;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
 }
 
 .gtg-modal__close {
@@ -37,9 +64,13 @@
   right: 14px;
   border: 0;
   background: transparent;
-  color: var(--color-text-primary);
+  color: #ffffff;
   font-size: 30px;
   cursor: pointer;
+}
+
+.gtg-modal__close:hover {
+  color: var(--color-accent);
 }
 
 .gtg-modal__card h3,
@@ -53,291 +84,909 @@
   gap: var(--space-3);
 }
 
-.figma-hero {
-  min-height: clamp(520px, 72vh, 720px);
-  position: relative;
-  overflow: hidden;
-  margin-top: -112px;
-  padding-top: 112px;
-  background: #0d0d0f;
-}
-
-.figma-hero__slides,
-.figma-hero__slide {
-  position: absolute;
-  inset: 0;
-}
-
-.figma-hero__slide {
-  background-size: cover;
-  background-position: center 36%;
-  opacity: 0;
-  transition: opacity 1s ease;
-}
-
-.figma-hero__slide.is-active {
-  opacity: 1;
-}
-
-.figma-hero__overlay {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, rgba(13, 13, 15, 0.1) 0%, rgba(13, 13, 15, 0.5) 62%, rgba(13, 13, 15, 1) 100%),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.12) 45%, rgba(0, 0, 0, 0.5) 100%);
-}
-
-.figma-hero__content {
+.quantum-hero {
   position: relative;
   z-index: 1;
-  min-height: calc(clamp(520px, 72vh, 720px) - 112px);
-  width: min(100% - 32px, 1120px);
+  width: min(100% - 36px, 1120px);
+  min-height: 100vh;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: flex-start;
-  padding-bottom: 96px;
+  padding: 18px 0 24px;
+  display: grid;
+  place-items: center;
 }
 
-.figma-hero h1 {
-  max-width: 700px;
-  margin: 0 0 var(--space-5);
-  font-size: clamp(38px, 5vw, 64px);
-  font-weight: 400;
-  line-height: 1.05;
-  color: var(--color-text-primary);
-}
-
-.figma-hero h1 strong {
-  display: inline;
-  font-weight: 800;
-}
-
-.figma-hero__dots {
+.quantum-field {
   position: absolute;
   left: 50%;
-  bottom: 42px;
-  transform: translateX(-50%);
-  display: flex;
-  gap: var(--space-3);
+  top: 47%;
+  width: min(87vw, 930px);
+  aspect-ratio: 1;
+  height: auto;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0.9;
 }
 
-.figma-hero__dots button {
-  width: 12px;
-  height: 12px;
-  padding: 0;
-  border: 1px solid #ffffff;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.figma-hero__dots button.is-active {
-  background: #ffffff;
-}
-
-.figma-hero__dots button:hover,
-.figma-hero__dots button:focus-visible {
-  transform: scale(1.18);
-}
-
-.figma-hero__dots button:focus-visible {
-  outline: 2px solid #ffffff;
-  outline-offset: 4px;
-}
-
-.figma-influencer {
-  width: min(100% - 32px, 960px);
-  margin: 96px auto 0;
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  align-items: center;
-  gap: 72px;
-}
-
-.figma-influencer__copy h2 {
-  width: min(100%, 520px);
-  margin: 0 0 var(--space-6);
-  font-size: clamp(28px, 3.2vw, 40px);
-  font-weight: 800;
-  line-height: 1.08;
-}
-
-.figma-influencer__copy h2 span {
-  color: var(--color-accent);
-}
-
-.figma-login-card {
-  width: min(100%, 420px);
-  min-height: 360px;
-  display: grid;
-  align-content: center;
-  gap: var(--space-4);
-  padding: 42px 54px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: var(--radius-sm);
-  background: rgba(18, 18, 20, 0.78);
-  box-shadow: inset 0 0 54px rgba(255, 255, 255, 0.05), 0 22px 60px rgba(0, 0, 0, 0.5);
-}
-
-.figma-login-card h3 {
-  margin: 0 0 var(--space-5);
-  text-align: center;
-  font-size: 30px;
-  font-weight: 800;
-}
-
-.figma-login-card input {
-  width: 100%;
-  height: 38px;
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: #111113;
-  color: var(--color-text-primary);
-  padding: 0 var(--space-3);
-  font-size: 12px;
-}
-
-.figma-login-card input::placeholder {
-  color: #5f5f65;
-}
-
-.figma-login-card .gtg-btn-primary {
-  width: 100%;
-  margin-top: var(--space-5);
-}
-
-.figma-login-card p {
-  margin: var(--space-4) 0 0;
-  text-align: center;
-  font-size: 12px;
-}
-
-.figma-login-card a {
-  color: var(--color-text-primary);
-  font-weight: 800;
-}
-
-.figma-influencer__media {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 0.72;
-  overflow: hidden;
-  border-radius: var(--radius-sm);
-  background: #111113;
-}
-
-.figma-influencer__media img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 1s ease;
-}
-
-.figma-influencer__media img.is-active {
-  opacity: 1;
-}
-
-.figma-products {
-  width: min(100% - 32px, 1120px);
-  margin: 112px auto 0;
-}
-
-.figma-products h2 {
-  margin: 0 0 42px;
-  text-align: center;
-  font-size: clamp(30px, 3.2vw, 42px);
-  font-weight: 800;
-}
-
-.figma-products__grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-4);
-}
-
-.figma-product-card {
-  position: relative;
-  min-height: 220px;
-  overflow: hidden;
-  border-radius: var(--radius-sm);
-  background: #1b1b1d;
-}
-
-.figma-product-card::after {
+.quantum-field::before,
+.quantum-field::after,
+.quantum-core,
+.quantum-watermark {
   content: "";
   position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.06) 35%, rgba(0, 0, 0, 0.75) 100%);
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
 }
 
-.figma-product-card img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  transition: transform 0.35s ease;
+.quantum-field::before {
+  width: 66%;
+  height: 66%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 90px rgba(0, 212, 199, 0.2);
 }
 
-.figma-product-card:hover img {
-  transform: scale(1.05);
+.quantum-field::after {
+  width: 34%;
+  height: 34%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2), rgba(0, 212, 199, 0.1) 42%, transparent 70%);
+  filter: blur(2px);
 }
 
-.figma-product-card span {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: var(--space-4);
+.quantum-core {
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  box-shadow: 0 0 22px #ffffff, 0 0 64px rgba(0, 212, 199, 0.7);
+}
+
+.quantum-watermark {
   z-index: 1;
+  width: 188px;
+  height: 188px;
+  background: url("../images/logo-gotogym-symbol-transparent.png") center / contain no-repeat;
+  opacity: 0.2;
+  filter: drop-shadow(0 0 22px rgba(0, 212, 199, 0.28));
+}
+
+.quantum-orbit {
+  --orbit-tilt: 0deg;
+  --electron-speed: 9s;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 62%;
+  height: 20%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(var(--orbit-tilt));
+}
+
+.quantum-orbit i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  display: block;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 18px #ffffff, 0 0 34px rgba(0, 212, 199, 0.9);
+  offset-path: ellipse(50% 50% at 50% 50%);
+  offset-distance: 0%;
+  offset-rotate: 0deg;
+  animation: quantum-electron var(--electron-speed) linear infinite;
+}
+
+.quantum-orbit--outer {
+  --orbit-tilt: 0deg;
+  --electron-speed: 13s;
+  width: 66%;
+  height: 66%;
+  border-color: transparent;
+}
+
+.quantum-orbit--outer i {
+  width: 13px;
+  height: 13px;
+  margin: -6.5px 0 0 -6.5px;
+  background: var(--home-mint);
+  box-shadow: 0 0 18px var(--home-mint), 0 0 38px rgba(0, 212, 199, 0.9);
+}
+
+.quantum-orbit--one {
+  --orbit-tilt: 12deg;
+  --electron-speed: 8s;
+}
+
+.quantum-orbit--two {
+  --orbit-tilt: 72deg;
+  --electron-speed: 10s;
+  width: 60%;
+  height: 23%;
+}
+
+.quantum-orbit--three {
+  --orbit-tilt: 132deg;
+  --electron-speed: 12s;
+  width: 54%;
+  height: 19%;
+}
+
+.quantum-orbit--two i {
+  background: var(--home-mint);
+  animation-direction: reverse;
+}
+
+.quantum-orbit--three i {
+  width: 11px;
+  height: 11px;
+}
+
+.quantum-hero__content {
+  position: relative;
+  z-index: 2;
+}
+
+.quantum-hero__content {
+  width: min(100%, 520px);
+  min-height: 812px;
+  display: grid;
+  justify-items: center;
+  align-content: start;
   text-align: center;
+}
+
+.quantum-hero__logo {
+  width: 225px;
+  height: 225px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 3px solid var(--home-mint);
+  border-radius: 50%;
+  background: rgba(8, 8, 6, 0.22);
+  box-shadow: 0 0 34px rgba(15, 200, 189, 0.45), 0 0 90px rgba(15, 200, 189, 0.2);
+}
+
+.quantum-hero__logo img {
+  display: block;
+  width: 174px;
+  height: auto;
+  transform: translateY(2px);
+}
+
+.quantum-hero__intro {
+  margin-top: 72px;
+}
+
+.quantum-hero h1 {
+  margin: 0 0 14px;
+  padding: 13px 28px 15px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(10, 9, 5, 0.38);
+  color: #ffffff;
+  font-size: 23px;
+  font-weight: 800;
+  line-height: 1.1;
+  box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.04), 0 0 14px rgba(255, 255, 255, 0.06);
+}
+
+.quantum-hero__lead,
+.quantum-hero__sublead {
+  margin: 0;
+}
+
+.quantum-hero__lead {
+  width: min(100%, 640px);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.quantum-hero__actions {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 38px;
+  display: grid;
+  gap: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.quantum-hero__button {
+  width: 100%;
+  min-height: 65px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  background: rgba(10, 9, 5, 0.4);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.quantum-hero__button:hover {
+  transform: translateY(-1px);
+  color: #ffffff;
+}
+
+.quantum-hero__button--gold {
+  border: 2px solid var(--home-gold);
+  color: var(--home-gold);
+  box-shadow: inset 0 0 18px rgba(213, 182, 103, 0.05), 0 0 18px rgba(213, 182, 103, 0.14);
+}
+
+.quantum-hero__button--gold:hover {
+  box-shadow: inset 0 0 22px rgba(213, 182, 103, 0.08), 0 0 26px rgba(213, 182, 103, 0.3);
+}
+
+.quantum-hero__button--mint {
+  border: 2px solid var(--home-mint);
+  color: var(--home-mint);
+  box-shadow: inset 0 0 18px rgba(15, 200, 189, 0.04), 0 0 18px rgba(15, 200, 189, 0.18);
+}
+
+.quantum-hero__button--mint:hover {
+  box-shadow: inset 0 0 22px rgba(15, 200, 189, 0.08), 0 0 30px rgba(15, 200, 189, 0.34);
+}
+
+.quantum-hero__links {
+  margin-top: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  color: var(--home-muted);
+}
+
+.quantum-hero__links a {
+  color: var(--home-mint);
   font-size: 22px;
   font-weight: 800;
+  transition: color 0.2s ease;
 }
 
-.figma-newsletter {
+.quantum-hero__links a:hover {
+  color: #ffffff;
+}
+
+.quantum-hero__links .quantum-hero__privacy-link {
+  font-size: 18px;
+}
+
+.quantum-hero .quantum-hero__welcome .quantum-hero__username {
+  color: var(--home-mint) !important;
+}
+
+.quantum-hero__profile-edit {
+  margin: 0 0 18px;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 800 !important;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.quantum-hero__profile-edit:hover,
+.quantum-hero__profile-edit:focus-visible {
+  color: var(--home-mint);
+}
+
+.quantum-profile-dialog {
+  position: absolute;
+  z-index: 4;
+  top: 260px;
+  left: calc(50% + 330px);
+  width: min(430px, calc(50vw - 34px));
+  padding: 18px;
+  background: rgba(13, 16, 18, 0.96);
+  color: #ffffff;
+  text-align: left;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+}
+
+.quantum-profile-dialog[hidden] {
   display: none;
 }
 
+.quantum-profile-form {
+  display: grid;
+  gap: 14px;
+}
+
+.quantum-profile-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 14px;
+}
+
+.quantum-profile-form__field {
+  display: grid;
+  gap: 6px;
+}
+
+.quantum-profile-form__field label {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.quantum-profile-form__field input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: 0;
+  background: rgba(31, 31, 36, 0.9);
+  color: #ffffff;
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.quantum-profile-form__field input:focus {
+  border-color: var(--home-mint);
+  box-shadow: 0 0 0 2px rgba(15, 200, 189, 0.16);
+}
+
+.quantum-profile-form__field--current-password {
+  grid-column: 1;
+}
+
+.quantum-profile-form__field--new-password {
+  grid-column: 1;
+}
+
+.quantum-profile-form__field--confirm-password {
+  grid-column: 2;
+}
+
+.quantum-profile-form__message {
+  min-height: 18px;
+  margin: 0;
+  color: #ff8f8f;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.quantum-profile-form__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.quantum-profile-form__actions button {
+  min-height: 46px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--home-mint);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.quantum-profile-form__actions button:hover,
+.quantum-profile-form__actions button:focus-visible {
+  color: var(--home-mint);
+  background: #07090a;
+  box-shadow: 0 0 18px rgba(15, 200, 189, 0.24);
+}
+
+.quantum-hero--contact .quantum-hero__intro {
+  margin-top: 72px;
+}
+
+.quantum-hero--contact h1 {
+  font-size: 46px;
+}
+
+.quantum-contact__socials {
+  margin-top: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.quantum-contact__socials a {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.quantum-contact__socials a:hover,
+.quantum-contact__socials a:focus-visible {
+  color: var(--home-mint);
+  transform: translateY(-1px);
+}
+
+.quantum-contact__socials svg {
+  width: 28px;
+  height: 28px;
+  display: block;
+  fill: currentColor;
+}
+
+.quantum-contact__back {
+  margin-top: 34px;
+  color: #ffffff !important;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.quantum-contact__back:hover,
+.quantum-contact__back:focus-visible {
+  color: var(--home-mint) !important;
+}
+
+.quantum-hero--session .quantum-hero__links--inside {
+  margin-top: 48px;
+}
+
+.quantum-hero--session .quantum-hero__links--influencer {
+  width: min(100%, 800px);
+  margin-top: 14px;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.quantum-hero--session .quantum-hero__links--influencer a,
+.quantum-hero--session .quantum-hero__links--influencer button {
+  width: min(100%, 220px);
+  min-height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--home-mint);
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.18;
+  text-align: center;
+  cursor: pointer;
+  white-space: normal;
+  transition: color 0.2s ease;
+}
+
+.quantum-hero--session .quantum-hero__links--influencer a:hover,
+.quantum-hero--session .quantum-hero__links--influencer a:focus-visible,
+.quantum-hero--session .quantum-hero__links--influencer button:hover,
+.quantum-hero--session .quantum-hero__links--influencer button:focus-visible {
+  color: #ffffff;
+}
+
+.quantum-hero__influencer-warning {
+  width: min(100%, 390px);
+  margin-top: 18px;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+
+.quantum-hero__influencer-warning[hidden] {
+  display: none;
+}
+
+.quantum-hero__influencer-warning p {
+  margin: 0;
+  color: #ff8f8f;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.quantum-hero__influencer-warning button {
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.quantum-hero__influencer-warning button:hover,
+.quantum-hero__influencer-warning button:focus-visible {
+  color: var(--home-mint);
+}
+
+.quantum-hero__logout-form {
+  margin: 16px 0 0;
+}
+
+.quantum-hero__logout {
+  border: 0;
+  background: transparent;
+  color: #ffffff !important;
+  font-size: 27px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.quantum-hero__logout:hover,
+.quantum-hero__logout:focus-visible {
+  color: var(--home-mint) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quantum-orbit i {
+    animation: none;
+  }
+}
+
+@keyframes quantum-electron {
+  from {
+    offset-distance: 0%;
+  }
+
+  to {
+    offset-distance: 100%;
+  }
+}
+
 @media (max-width: 900px) {
-  .figma-hero {
-    margin-top: -84px;
-    padding-top: 84px;
+  .quantum-hero {
+    width: min(100% - 24px, 1120px);
   }
 
-  .figma-hero__content {
-    min-height: calc(clamp(520px, 72vh, 720px) - 84px);
-  }
-
-  .figma-influencer {
-    grid-template-columns: 1fr;
-    gap: var(--space-7);
-  }
-
-  .figma-login-card {
-    width: 100%;
-  }
-
-  .figma-products__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .quantum-field {
+    width: min(124vw, 780px);
   }
 }
 
 @media (max-width: 560px) {
-  .figma-hero h1 {
-    font-size: 34px;
+  .quantum-hero__content {
+    width: min(100%, 405px);
+    min-height: 720px;
   }
 
-  .figma-login-card {
-    padding: var(--space-6);
+  .quantum-field {
+    top: 46%;
+    width: min(142vw, 640px);
   }
 
-  .figma-products__grid {
+  .quantum-hero__logo {
+    width: 172px;
+    height: 172px;
+  }
+
+  .quantum-hero__logo img {
+    width: 132px;
+    transform: translateY(2px);
+  }
+
+  .quantum-hero__intro {
+    margin-top: 56px;
+  }
+
+  .quantum-hero h1 {
+    font-size: 20px;
+  }
+
+  .quantum-hero--contact h1 {
+    font-size: 40px;
+  }
+
+  .quantum-hero__lead {
+    font-size: 16px;
+  }
+
+  .quantum-profile-dialog {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: min(100%, 330px);
+    margin-top: 18px;
+    padding: 14px;
+  }
+
+  .quantum-profile-form__grid,
+  .quantum-profile-form__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .quantum-profile-form__field--current-password,
+  .quantum-profile-form__field--new-password,
+  .quantum-profile-form__field--confirm-password {
+    grid-column: 1;
+  }
+
+  .quantum-profile-form__field label {
+    font-size: 15px;
+  }
+
+  .quantum-hero__actions {
+    max-width: 330px;
+    margin-top: 34px;
+  }
+
+  .quantum-hero__button {
+    min-height: 58px;
+    border-radius: 14px;
+  }
+
+  .quantum-hero__links {
+    margin-top: 30px;
+    gap: 18px;
+  }
+
+  .quantum-hero__links a {
+    font-size: 16px;
+  }
+
+  .quantum-contact__socials {
+    margin-top: 28px;
+    gap: 12px;
+  }
+
+  .quantum-contact__socials a {
+    width: 34px;
+    height: 34px;
+  }
+
+  .quantum-contact__socials svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .quantum-hero--session .quantum-hero__links--inside {
+    margin-top: 42px;
+  }
+
+  .quantum-hero--session .quantum-hero__links--influencer {
+    width: min(100%, 330px);
+    margin-top: 12px;
+    gap: 14px;
+  }
+
+  .quantum-hero--session .quantum-hero__links--influencer a,
+  .quantum-hero--session .quantum-hero__links--influencer button {
+    width: 150px;
+    min-height: 52px;
+    font-size: 15px;
+  }
+
+  .quantum-hero__logout {
+    font-size: 27px;
+  }
+}
+
+.quantum-hero--session .quantum-hero__links--influencer a:hover,
+.quantum-hero--session .quantum-hero__links--influencer a:focus-visible,
+.quantum-hero--session .quantum-hero__links--influencer button:hover,
+.quantum-hero--session .quantum-hero__links--influencer button:focus-visible {
+  color: #ffffff !important;
+  transform: none !important;
+}
+
+.quantum-hero--session .quantum-hero__logout {
+  font-size: 27px !important;
+  font-weight: 800 !important;
+}
+
+.quantum-hero--session .quantum-hero__links--influencer > a,
+.quantum-hero--session .quantum-hero__links--influencer > button,
+.quantum-hero--session .quantum-hero__links--influencer > a *,
+.quantum-hero--session .quantum-hero__links--influencer > button * {
+  color: #ffffff !important;
+}
+
+.quantum-hero--session .quantum-hero__links--influencer > a:hover,
+.quantum-hero--session .quantum-hero__links--influencer > a:focus-visible,
+.quantum-hero--session .quantum-hero__links--influencer > button:hover,
+.quantum-hero--session .quantum-hero__links--influencer > button:focus-visible,
+.quantum-hero--session .quantum-hero__links--influencer > a:hover *,
+.quantum-hero--session .quantum-hero__links--influencer > a:focus-visible *,
+.quantum-hero--session .quantum-hero__links--influencer > button:hover *,
+.quantum-hero--session .quantum-hero__links--influencer > button:focus-visible * {
+  color: var(--home-mint) !important;
+}
+
+.quantum-privacy {
+  --home-gold: #d5b667;
+  --home-mint: #0fc8bd;
+  --home-muted: rgba(255, 255, 255, 0.68);
+  position: relative;
+  min-height: 100vh;
+  padding: 24px 16px 54px;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(47, 62, 67, 0.95) 0%, rgba(22, 28, 31, 0.88) 25%, rgba(8, 9, 11, 1) 68%, #030405 100%);
+  color: #ffffff;
+  font-family: var(--font-body);
+}
+
+.quantum-privacy::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(0, 212, 199, 0.2), transparent 18%),
+    linear-gradient(180deg, rgba(3, 4, 5, 0.28), rgba(3, 4, 5, 0.92));
+}
+
+.quantum-privacy__background {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.quantum-privacy__background .quantum-field {
+  top: 48%;
+}
+
+.quantum-privacy__container {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 720px);
+  margin: 0 auto;
+}
+
+.quantum-privacy__header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.quantum-privacy__back {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff !important;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.quantum-privacy__back:hover,
+.quantum-privacy__back:focus-visible {
+  color: var(--home-mint) !important;
+  transform: translateX(-2px);
+}
+
+.quantum-privacy__header h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.quantum-privacy__section,
+.quantum-privacy__highlight,
+.quantum-privacy__toc {
+  margin-bottom: 18px;
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(13, 16, 18, 0.84);
+  box-shadow: 0 18px 52px rgba(0, 0, 0, 0.22);
+  scroll-margin-top: 24px;
+}
+
+.quantum-privacy__highlight {
+  border-color: rgba(15, 200, 189, 0.28);
+  background: rgba(15, 200, 189, 0.08);
+}
+
+.quantum-privacy h2 {
+  margin: 0 0 12px;
+  color: var(--home-mint);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.quantum-privacy h3 {
+  margin: 16px 0 8px;
+  color: var(--home-gold);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.quantum-privacy p,
+.quantum-privacy li {
+  color: var(--home-muted);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.quantum-privacy p {
+  margin: 0 0 10px;
+}
+
+.quantum-privacy ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.quantum-privacy__note {
+  font-size: 12px !important;
+}
+
+.quantum-privacy__toc div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+}
+
+.quantum-privacy__toc a,
+.quantum-privacy__top {
+  color: rgba(255, 255, 255, 0.72) !important;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.quantum-privacy__toc a:hover,
+.quantum-privacy__toc a:focus-visible,
+.quantum-privacy__top:hover,
+.quantum-privacy__top:focus-visible {
+  color: var(--home-mint) !important;
+}
+
+.quantum-privacy__top {
+  display: inline-flex;
+  margin-top: 8px;
+}
+
+@media (max-width: 560px) {
+  .quantum-hero__links .quantum-hero__privacy-link {
+    font-size: 14px;
+  }
+
+  .quantum-privacy {
+    padding: 18px 12px 42px;
+  }
+
+  .quantum-privacy__header h1 {
+    font-size: 23px;
+  }
+
+  .quantum-privacy__section,
+  .quantum-privacy__highlight,
+  .quantum-privacy__toc {
+    padding: 18px;
+  }
+
+  .quantum-privacy__toc div {
     grid-template-columns: 1fr;
   }
 }

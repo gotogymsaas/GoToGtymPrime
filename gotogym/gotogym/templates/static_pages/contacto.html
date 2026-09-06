@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Contacto{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/home_figma.css' %}">
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="figma-home">
+  <section class="quantum-hero quantum-hero--contact" aria-labelledby="quantum-contact-title">
+    <div class="quantum-field" aria-hidden="true">
+      <span class="quantum-watermark"></span>
+      <span class="quantum-orbit quantum-orbit--outer"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--one"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--two"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--three"><i></i></span>
+      <span class="quantum-core"></span>
+    </div>
+
+    <div class="quantum-hero__content">
+      <a href="{% url 'home' %}" class="quantum-hero__logo" aria-label="GoToGym inicio">
+        <img src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" aria-hidden="true">
+      </a>
+
+      <div class="quantum-hero__intro">
+        <h1 id="quantum-contact-title">Contacto</h1>
+        <p class="quantum-hero__lead">
+          Escribenos por nuestros canales oficiales y te responderemos pronto
+        </p>
+      </div>
+
+      <div class="quantum-contact__socials" aria-label="{% trans 'Redes sociales' %}">
+        <a href="https://www.facebook.com/Gotogym.Sportwear" target="_blank" rel="noopener noreferrer" aria-label="Facebook GoToGym">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M14 8.2V6.7c0-.7.3-1.1 1.1-1.1h1.4V2.2c-.7-.1-1.5-.2-2.3-.2-2.8 0-4.7 1.7-4.7 4.8v1.4H6.7V12h2.8v10H14V12h2.9l.5-3.8H14Z"/>
+          </svg>
+        </a>
+        <a href="https://www.instagram.com/gotogym.sportwear" target="_blank" rel="noopener noreferrer" aria-label="Instagram GoToGym">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M7.7 2h8.6A5.7 5.7 0 0 1 22 7.7v8.6a5.7 5.7 0 0 1-5.7 5.7H7.7A5.7 5.7 0 0 1 2 16.3V7.7A5.7 5.7 0 0 1 7.7 2Zm0 2A3.7 3.7 0 0 0 4 7.7v8.6A3.7 3.7 0 0 0 7.7 20h8.6a3.7 3.7 0 0 0 3.7-3.7V7.7A3.7 3.7 0 0 0 16.3 4H7.7Zm4.3 3.1a4.9 4.9 0 1 1 0 9.8 4.9 4.9 0 0 1 0-9.8Zm0 2a2.9 2.9 0 1 0 0 5.8 2.9 2.9 0 0 0 0-5.8Zm5.2-2.4a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2Z"/>
+          </svg>
+        </a>
+        <a href="https://www.tiktok.com/@gotogym.sportwear" target="_blank" rel="noopener noreferrer" aria-label="TikTok GoToGym">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M16.1 2c.4 3 2 4.8 5 5v3.4a8.6 8.6 0 0 1-5-1.5v6.8c0 3.5-2.4 6.3-6.2 6.3A6 6 0 0 1 4 15.9c0-3.5 2.7-6.1 6.3-6.1.4 0 .7 0 1 .1v3.6a3.4 3.4 0 0 0-1.1-.2 2.5 2.5 0 1 0 2.4 2.5V2h3.5Z"/>
+          </svg>
+        </a>
+        <a href="https://youtube.com/gotogym.sportwear" target="_blank" rel="noopener noreferrer" aria-label="YouTube GoToGym">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M21.6 7.2a3 3 0 0 0-2.1-2.1C17.7 4.6 12 4.6 12 4.6s-5.7 0-7.5.5a3 3 0 0 0-2.1 2.1C2 9 2 12 2 12s0 3 .4 4.8a3 3 0 0 0 2.1 2.1c1.8.5 7.5.5 7.5.5s5.7 0 7.5-.5a3 3 0 0 0 2.1-2.1C22 15 22 12 22 12s0-3-.4-4.8ZM10 15.4V8.6l5.8 3.4L10 15.4Z"/>
+          </svg>
+        </a>
+        <a href="https://x.com/gotogym.sportwear" target="_blank" rel="noopener noreferrer" aria-label="X GoToGym">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M14.25 10.16 22.16 1h-1.88l-6.86 7.95L7.94 1H1.62l8.3 12.05L1.62 22.67H3.5l7.26-8.42 5.8 8.42h6.32l-8.63-12.51Zm-2.57 2.98-.84-1.2-6.69-9.52h2.89l5.39 7.67.84 1.2 7.01 9.98h-2.89l-5.71-8.13Z"/>
+          </svg>
+        </a>
+        <a href="https://www.whatsapp.com/" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 2a9.9 9.9 0 0 0-8.5 15L2 22l5.1-1.4A10 10 0 1 0 12 2Zm0 18.1c-1.6 0-3.1-.5-4.4-1.3l-.3-.2-3 .8.8-2.9-.2-.3a8.1 8.1 0 1 1 7.1 3.9Zm4.5-6.1c-.2-.1-1.5-.8-1.8-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1-.3-.1-1.1-.4-2-1.2-.8-.7-1.3-1.5-1.4-1.8-.2-.2 0-.4.1-.5l.4-.5c.1-.2.2-.3.3-.5.1-.2.1-.3 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2 0-.1-.2-.2-.4-.3Z"/>
+          </svg>
+        </a>
+      </div>
+
+      <a href="{{ back_url }}" class="quantum-contact__back">Regresar al inicio</a>
+    </div>
+  </section>
+</div>
+{% endblock %}

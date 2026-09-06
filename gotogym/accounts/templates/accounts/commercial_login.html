@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}GoToGym - Iniciar Sesión{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/commercial_auth.css' %}">
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<section class="commercial-auth" aria-labelledby="commercial-auth-title">
+  <h1 id="commercial-auth-title" class="commercial-auth__sr-only">{% trans "Iniciar Sesión" %}</h1>
+
+  <div class="commercial-auth__scene" aria-hidden="true">
+    <span class="commercial-auth__watermark"></span>
+    <span class="commercial-auth__ring commercial-auth__ring--outer"><i></i></span>
+    <span class="commercial-auth__ring commercial-auth__ring--one"><i></i></span>
+    <span class="commercial-auth__ring commercial-auth__ring--two"><i></i></span>
+    <span class="commercial-auth__ring commercial-auth__ring--three"><i></i></span>
+    <span class="commercial-auth__nucleus"></span>
+  </div>
+
+  <div class="commercial-auth__panel">
+    <a href="{% url 'home' %}" class="commercial-auth__logo" aria-label="GoToGym inicio">
+      <img src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" aria-hidden="true">
+    </a>
+
+    {% if error_message %}
+    <div class="commercial-auth__error" role="alert">{{ error_message }}</div>
+    {% endif %}
+
+    <form method="post" class="commercial-auth__form" id="commercial-auth-form">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+
+      <div class="commercial-auth__field">
+        <input type="text" name="username" id="id_username" placeholder="{% trans 'Usuario o Email' %}" autocomplete="username" required>
+        <label for="id_username">{% trans "Usuario o Email" %}</label>
+      </div>
+
+      <div class="commercial-auth__field commercial-auth__password">
+        <input type="password" name="password" id="id_password" placeholder="{% trans 'Contraseña' %}" autocomplete="current-password" required>
+        <label for="id_password">{% trans "Contraseña" %}</label>
+        <button type="button" aria-label="{% trans 'Mostrar contraseña' %}" data-password-toggle>
+          <span class="material-icons-outlined">visibility</span>
+        </button>
+      </div>
+
+      <button type="submit" class="commercial-auth__button commercial-auth__button--gold">
+        {% trans "Iniciar Sesión" %}
+      </button>
+    </form>
+
+    <button type="button" class="commercial-auth__forgot" data-forgot-password>
+      {% trans "¿Olvidaste tu contraseña?" %}
+    </button>
+
+    <div class="commercial-auth__recovery-message" data-recovery-message role="status" aria-live="polite" hidden>
+      <p>revise su correo al cual le acaba de llegar un enlace para recuperar su contraseña. Una vez la recupere, con gusto lo volvemos a atender. Muchas gracias.</p>
+      <a href="{% url 'home' %}" class="commercial-auth__exit">salir</a>
+    </div>
+
+    <div class="commercial-auth__register">
+      <span>{% trans "¿No tienes cuenta?" %}</span>
+      <a href="{% url 'register' %}">{% trans "Regístrate" %}</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toggle = document.querySelector('[data-password-toggle]');
+    const password = document.getElementById('id_password');
+    if (toggle && password) {
+      toggle.addEventListener('click', function () {
+        const isHidden = password.type === 'password';
+        password.type = isHidden ? 'text' : 'password';
+        toggle.setAttribute('aria-label', isHidden ? "{% trans 'Ocultar contraseña' %}" : "{% trans 'Mostrar contraseña' %}");
+        const icon = toggle.querySelector('.material-icons-outlined');
+        if (icon) icon.textContent = isHidden ? 'visibility_off' : 'visibility';
+      });
+    }
+
+    const forgot = document.querySelector('[data-forgot-password]');
+    const recoveryMessage = document.querySelector('[data-recovery-message]');
+    if (forgot && recoveryMessage) {
+      forgot.addEventListener('click', function () {
+        recoveryMessage.hidden = false;
+        recoveryMessage.classList.add('commercial-auth__recovery-message--visible');
+      });
+    }
+  });
+</script>
+{% endblock %}

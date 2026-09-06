@@ -33,6 +33,7 @@ class User(AbstractUser):
     terms_accepted_at = models.DateTimeField(null=True, blank=True)
     terms_hash = models.CharField(max_length=128, blank=True)
     show_influencer_modal = models.BooleanField(default=True)  # Nuevo campo
+    es_influencer = models.BooleanField(default=False, verbose_name="Es influencer")
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

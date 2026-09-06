@@ -16,10 +16,15 @@ def get_compras_referidas(profile):
 def suscribete(request):
     user = request.user
     if hasattr(user, 'influencer_profile'):
+        if not user.es_influencer:
+            user.es_influencer = True
+            user.save(update_fields=['es_influencer'])
         messages.info(request, 'Ya eres influencer.')
         return redirect('influencer_dashboard')
     try:
         InfluencerProfile.objects.create(user=user)
+        user.es_influencer = True
+        user.save(update_fields=['es_influencer'])
         messages.success(request, '¡Ahora eres influencer!')
     except IntegrityError:
         messages.error(request, 'Hubo un problema al suscribirte. Intenta de nuevo.')
@@ -55,5 +60,7 @@ def quitar_suscripcion(request):
     profile = getattr(request.user, 'influencer_profile', None)
     if profile:
         profile.delete()
+        request.user.es_influencer = False
+        request.user.save(update_fields=['es_influencer'])
         messages.success(request, 'Has cancelado tu suscripción de influencer.')
     return redirect('/')

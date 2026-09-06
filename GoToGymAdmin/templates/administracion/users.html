@@ -12,7 +12,7 @@
 </form>
 <div class="panel">
   <table>
-    <thead><tr><th>Email</th><th>Nombre</th><th>Usuario</th><th>Edad</th><th>Fecha registro</th><th>Activo</th></tr></thead>
+    <thead><tr><th>Email</th><th>Nombre</th><th>Usuario</th><th>Edad</th><th>Fecha registro</th><th>Activo</th><th>Es influencer</th></tr></thead>
     <tbody>
       {% for user in page_obj %}
       <tr>
@@ -22,8 +22,9 @@
         <td>{{ user.age|default:"-" }}</td>
         <td>{{ user.date_joined|date:"d/m/Y H:i" }}</td>
         <td>{{ user.is_active|yesno:"Si,No" }}</td>
+        <td>{{ user.es_influencer|yesno:"Si,No" }}</td>
       </tr>
-      {% empty %}<tr><td colspan="6">No hay usuarios registrados.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="7">No hay usuarios registrados.</td></tr>{% endfor %}
     </tbody>
   </table>
 </div>

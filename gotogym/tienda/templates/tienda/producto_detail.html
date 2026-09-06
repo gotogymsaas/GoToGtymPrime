@@ -70,7 +70,7 @@
     {% elif user.is_authenticated and user.influencer_profile %}
       <span class="inline-block bg-green-200 text-green-800 font-bold py-2 px-6 rounded-lg">¡Ya eres influencer!</span>
     {% else %}
-      <a href="{% url 'login' %}?next={% url 'influencer_suscribete' %}" class="inline-block bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold py-2 px-6 rounded-lg shadow hover:from-[#e7c98a] hover:to-[#C5A46B] transition-all">Inicia sesión para ser influencer</a>
+      <a href="{% url 'commercial_login' %}?next={% url 'influencer_suscribete' %}" class="inline-block bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold py-2 px-6 rounded-lg shadow hover:from-[#e7c98a] hover:to-[#C5A46B] transition-all">Inicia sesión para ser influencer</a>
     {% endif %}
   </div>
 </div>

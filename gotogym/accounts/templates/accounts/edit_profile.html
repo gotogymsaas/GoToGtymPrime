@@ -22,8 +22,20 @@
       <input type="email" name="email" id="id_email" value="{{ user.email }}" class="gtg-input" required>
     </div>
     <div>
+      <label for="id_age" class="gtg-label">{% trans "Edad" %}</label>
+      <input type="number" name="age" id="id_age" value="{{ user.age|default:'' }}" min="10" max="120" class="gtg-input">
+    </div>
+    <div>
+      <label for="id_current_password" class="gtg-label">{% trans "Contraseña actual" %} <span class="text-xs text-gray-400">({% trans "si cambias tu contraseña" %})</span></label>
+      <input type="password" name="current_password" id="id_current_password" class="gtg-input" autocomplete="current-password">
+    </div>
+    <div>
       <label for="id_password" class="gtg-label">{% trans "Nueva contraseña" %} <span class="text-xs text-gray-400">({% trans "opcional" %})</span></label>
-      <input type="password" name="password" id="id_password" class="gtg-input">
+      <input type="password" name="password" id="id_password" class="gtg-input" autocomplete="new-password">
+    </div>
+    <div>
+      <label for="id_password2" class="gtg-label">{% trans "Confirmar contraseña" %}</label>
+      <input type="password" name="password2" id="id_password2" class="gtg-input" autocomplete="new-password">
     </div>
     <div class="flex justify-between mt-8">
       <a href="/" class="gtg-btn gtg-btn-outline px-4 py-2 rounded-full font-semibold shadow-sm transition-all">{% trans "Volver" %}</a>

@@ -125,8 +125,11 @@
       <header class="gtg-admin-header flex justify-end items-center p-4 shadow-sm">
         {% if user.is_authenticated %}
         <div class="relative" x-data="{ open: false }">
-          <button @click="open = !open" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0fbfb0]/20 text-white font-bold hover:bg-[#0fbfb0]/30 focus:outline-none">
-            <span class="material-icons-outlined">account_circle</span>
+          <button @click="open = !open" class="gtg-admin-user-button flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0fbfb0]/20 text-white font-bold hover:bg-[#0fbfb0]/30 focus:outline-none">
+            <span class="gtg-admin-user-identity">
+              <span class="material-icons-outlined">account_circle</span>
+              <span class="gtg-user-email-label">{% if user.email %}{{ user.email }}{% else %}favor ingresar{% endif %}</span>
+            </span>
             <span>{{ user.get_full_name|default:user.username }}</span>
             <span class="material-icons-outlined">expand_more</span>
           </button>
