@@ -7,6 +7,7 @@ from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from influencer.models import InfluencerProfile
 from products.models import Brand, Product, ProductCategory
 
 from .forms import BrandForm, CategoryForm, ProductAdminForm
@@ -23,6 +24,7 @@ def dashboard(request):
     context = {
         "product_count": Product.objects.count(),
         "user_count": User.objects.count(),
+        "influencer_count": InfluencerProfile.objects.filter(is_active=True).count(),
         "category_count": ProductCategory.objects.count(),
         "stock_total": Product.objects.aggregate(total=Sum("stock")).get("total") or 0,
         "latest_products": Product.objects.select_related("category", "brand").order_by("-id")[:10],
