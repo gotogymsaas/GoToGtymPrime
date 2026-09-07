@@ -57,13 +57,13 @@
 .influencer-referral {
   width: 100%;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: 230px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 18px;
-  padding: 18px 26px;
-  border-radius: 8px;
-  background: var(--influencer-panel-strong);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+  gap: 28px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .influencer-referral__label {
@@ -149,6 +149,22 @@
 .influencer-action--danger {
   color: #ff9b9b;
   font-weight: 400;
+}
+
+.influencer-home-link {
+  margin-top: 18px;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.15;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.influencer-home-link:hover,
+.influencer-home-link:focus-visible {
+  color: var(--influencer-mint);
+  outline: none;
 }
 
 .influencer-main {
@@ -268,6 +284,10 @@
   }
 
   .influencer-action {
+    text-align: center;
+  }
+
+  .influencer-home-link {
     text-align: center;
   }
 }
