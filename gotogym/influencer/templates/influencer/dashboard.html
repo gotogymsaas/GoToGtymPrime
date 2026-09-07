@@ -1,48 +1,94 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel de influencers{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/home_figma.css' %}?v=20260907-influencer-orbit">
+<link rel="stylesheet" href="{% static 'css/influencer_figma.css' %}?v=20260907-panel">
+{% endblock %}
+
 {% block content %}
-<div class="max-w-7xl mx-auto mt-10 bg-gradient-to-br from-[#fffbe6] via-[#f3e9d2] to-[#f8f6f0] p-12 rounded-3xl shadow-2xl border-2 border-[#e7c98a]">
-  <h2 class="text-4xl font-extrabold mb-6 text-[#093f62] text-center">Panel de Influencer</h2>
-  <div class="flex flex-col items-center justify-center mb-10">
-    <div class="flex flex-row items-center gap-4 bg-gradient-to-r from-[#C5A46B]/90 to-[#e7c98a]/90 rounded-2xl px-8 py-5 shadow-lg border border-[#C5A46B]">
-      <span class="text-xs text-[#093f62] uppercase tracking-widest font-bold mr-4">Tu código de referido</span>
-      <span class="text-2xl md:text-3xl font-mono font-extrabold text-[#093f62] bg-[#fffbe6] px-6 py-3 rounded-xl border-2 border-[#C5A46B] shadow-inner tracking-widest select-all break-all text-center" style="letter-spacing:2px;">{{ profile.referral_code }}</span>
-      <button onclick="navigator.clipboard.writeText('{{ profile.referral_code }}');this.innerText='¡Copiado!';setTimeout(()=>this.innerText='Copiar',1500);" class="ml-4 bg-[#C5A46B] text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-[#e7c98a] hover:text-[#093f62] transition-all">Copiar</button>
+<main class="figma-home influencer-page">
+  <section class="quantum-hero" aria-labelledby="influencer-title">
+    <div class="quantum-field" aria-hidden="true">
+      <span class="quantum-watermark"></span>
+      <span class="quantum-orbit quantum-orbit--outer"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--one"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--two"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--three"><i></i></span>
+      <span class="quantum-core"></span>
     </div>
-    <div class="text-xs text-gray-600 mt-2">Comparte este código para ganar comisiones</div>
-  </div>
-  <div class="flex flex-col md:flex-row gap-12">
-    <aside class="md:w-1/4 mb-6 md:mb-0">
-      <nav class="flex flex-col gap-2">
-        <a href="{% url 'influencer_dashboard' %}" class="block py-2 px-4 rounded-lg hover:bg-[#C5A46B]/20 font-semibold text-[#093f62]">Resumen</a>
-        <a href="{% url 'influencer_compras_referidas' %}" class="block py-2 px-4 rounded-lg hover:bg-[#C5A46B]/20 font-semibold text-[#093f62]">Compras referidas</a>
-        <form method="post" action="{% url 'influencer_solicitar_retiro' %}">{% csrf_token %}
-          <button type="submit" class="w-full py-2 px-4 rounded-lg bg-gradient-to-r from-[#C5A46B] to-[#e7c98a] text-black font-bold shadow hover:from-[#e7c98a] hover:to-[#C5A46B] transition-all mt-2">Solicitar retiro</button>
-        </form>
-        <form method="post" action="{% url 'influencer_quitar_suscripcion' %}">{% csrf_token %}
-          <button type="submit" class="w-full py-2 px-4 rounded-lg bg-red-100 text-red-700 font-bold shadow hover:bg-red-200 transition-all mt-2">Quitar suscripción</button>
-        </form>
-      </nav>
-    </aside>
-    <main class="md:w-3/4">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
-        <div class="bg-white rounded-2xl p-8 text-center shadow border border-[#e7c98a]">
-          <div class="text-lg font-semibold text-[#093f62] mb-2">Personas referidas</div>
-          <div class="text-4xl font-bold text-[#C5A46B]">{{ profile.total_referred }}</div>
-        </div>
-        <div class="bg-white rounded-2xl p-8 text-center shadow border border-[#e7c98a]">
-          <div class="text-lg font-semibold text-[#093f62] mb-2">Ventas generadas</div>
-          <div class="text-4xl font-bold text-[#C5A46B]">${{ profile.total_sales }}</div>
-        </div>
-        <div class="bg-white rounded-2xl p-8 text-center shadow border border-[#e7c98a]">
-          <div class="text-lg font-semibold text-[#093f62] mb-2">Comisión disponible</div>
-          <div class="text-4xl font-bold text-[#C5A46B]">${{ profile.commission_balance }}</div>
+
+    <div class="influencer-shell">
+      <a href="{% url 'logged_home' %}" class="influencer-logo" aria-label="GoToGym inicio">
+        <img src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" aria-hidden="true">
+      </a>
+
+      <h1 id="influencer-title" class="influencer-title">Panel de influencers</h1>
+
+      <section class="influencer-referral" aria-label="Codigo de referido">
+        <span class="influencer-referral__label">Tu c&oacute;digo de referido</span>
+        <strong class="influencer-referral__code">{{ profile.referral_code }}</strong>
+        <button type="button" class="influencer-action influencer-referral__copy" data-copy-code="{{ profile.referral_code }}">Copiar</button>
+      </section>
+
+      <div class="influencer-layout">
+        <aside class="influencer-sidebar" aria-label="Menu de influencers">
+          <nav class="influencer-nav">
+            <a href="{% url 'influencer_dashboard' %}" class="influencer-link">Resumen</a>
+            <a href="{% url 'influencer_compras_referidas' %}" class="influencer-link">Compras referidas</a>
+          </nav>
+          <form class="influencer-form" method="post" action="{% url 'influencer_solicitar_retiro' %}">
+            {% csrf_token %}
+            <button type="submit" class="influencer-action">Solicitar retiro</button>
+          </form>
+          <form class="influencer-form" method="post" action="{% url 'influencer_quitar_suscripcion' %}">
+            {% csrf_token %}
+            <button type="submit" class="influencer-action influencer-action--danger">Quitar suscripci&oacute;n</button>
+          </form>
+        </aside>
+
+        <div class="influencer-main">
+          <section class="influencer-stats" aria-label="Resumen de resultados">
+            <article class="influencer-stat">
+              <span class="influencer-stat__label">Personas referidas</span>
+              <strong class="influencer-stat__value">{{ profile.total_referred }}</strong>
+            </article>
+            <article class="influencer-stat">
+              <span class="influencer-stat__label">Ventas generadas</span>
+              <strong class="influencer-stat__value">${{ profile.total_sales }}</strong>
+            </article>
+            <article class="influencer-stat">
+              <span class="influencer-stat__label">Comisi&oacute;n disponible</span>
+              <strong class="influencer-stat__value">${{ profile.commission_balance }}</strong>
+            </article>
+          </section>
+
+          <section class="influencer-callout">
+            <h3>&iexcl;Comparte tu c&oacute;digo y gana comisiones!</h3>
+            <p>Comparte tu c&oacute;digo de referido con tus amigos y seguidores. Cada compra que realicen usando tu c&oacute;digo te sumar&aacute; comisiones y beneficios exclusivos.</p>
+          </section>
         </div>
       </div>
-      <div class="bg-white border rounded-2xl p-10 shadow text-center">
-        <h3 class="text-2xl font-bold mb-2 text-[#093f62]">¡Comparte tu código y gana comisiones!</h3>
-        <p class="text-gray-700 text-lg">Comparte tu código de referido con tus amigos y seguidores. Cada compra que realicen usando tu código te sumará comisiones y beneficios exclusivos.</p>
-      </div>
-    </main>
-  </div>
-</div>
+    </div>
+  </section>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('click', function (event) {
+    const button = event.target.closest('[data-copy-code]');
+    if (!button) return;
+    navigator.clipboard.writeText(button.dataset.copyCode || '');
+    const originalText = button.textContent;
+    button.textContent = 'Copiado';
+    setTimeout(function () {
+      button.textContent = originalText;
+    }, 1500);
+  });
+</script>
 {% endblock %}

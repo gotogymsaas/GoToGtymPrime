@@ -1,0 +1,301 @@
+.influencer-page {
+  --influencer-mint: #0fc8bd;
+  --influencer-panel: rgba(20, 22, 25, 0.9);
+  --influencer-panel-strong: rgba(13, 16, 18, 0.96);
+  --influencer-muted: rgba(255, 255, 255, 0.66);
+  --influencer-soft: rgba(255, 255, 255, 0.08);
+}
+
+.influencer-page .quantum-hero {
+  width: min(100% - 36px, 1180px);
+  min-height: 100vh;
+  padding: 16px 0 32px;
+  align-items: start;
+}
+
+.influencer-page .quantum-field {
+  top: 50%;
+  width: min(92vw, 980px);
+}
+
+.influencer-shell {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  padding-top: 8px;
+}
+
+.influencer-logo {
+  width: 172px;
+  height: 172px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 3px solid var(--influencer-mint);
+  border-radius: 50%;
+  background: rgba(8, 8, 6, 0.22);
+  box-shadow: 0 0 34px rgba(15, 200, 189, 0.45), 0 0 90px rgba(15, 200, 189, 0.2);
+}
+
+.influencer-logo img {
+  width: 132px;
+  height: auto;
+}
+
+.influencer-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.influencer-referral {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 26px;
+  border-radius: 8px;
+  background: var(--influencer-panel-strong);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+}
+
+.influencer-referral__label {
+  color: var(--influencer-mint);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.influencer-referral__code {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: clamp(16px, 2vw, 28px);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.influencer-link,
+.influencer-action {
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.74);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.influencer-link:hover,
+.influencer-link:focus-visible,
+.influencer-action:hover,
+.influencer-action:focus-visible {
+  color: var(--influencer-mint);
+  outline: none;
+}
+
+.influencer-referral__copy {
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.influencer-layout {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.influencer-sidebar {
+  display: grid;
+  gap: 18px;
+  padding-top: 26px;
+}
+
+.influencer-nav {
+  display: grid;
+  gap: 18px;
+}
+
+.influencer-form {
+  margin: 0;
+}
+
+.influencer-action {
+  width: 100%;
+  min-height: 34px;
+  padding: 0;
+  text-align: left;
+}
+
+.influencer-action--danger {
+  color: #ff9b9b;
+  font-weight: 400;
+}
+
+.influencer-main {
+  display: grid;
+  gap: 28px;
+}
+
+.influencer-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.influencer-stat,
+.influencer-callout,
+.influencer-table-card {
+  border-radius: 8px;
+  background: var(--influencer-panel-strong);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+}
+
+.influencer-stat {
+  min-height: 142px;
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+}
+
+.influencer-stat__label {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.influencer-stat__value {
+  color: var(--influencer-mint);
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.influencer-callout {
+  padding: 36px 42px;
+  text-align: center;
+}
+
+.influencer-callout h3 {
+  margin: 0 0 12px;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.influencer-callout p,
+.influencer-empty {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.influencer-table-card {
+  width: min(100%, 900px);
+  padding: 24px;
+}
+
+.influencer-table-card h2 {
+  margin: 0 0 18px;
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.influencer-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.influencer-table th,
+.influencer-table td {
+  padding: 13px 12px;
+  border-bottom: 1px solid var(--influencer-soft);
+  color: rgba(255, 255, 255, 0.76);
+  text-align: left;
+}
+
+.influencer-table th {
+  color: var(--influencer-mint);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+@media (max-width: 920px) {
+  .influencer-referral,
+  .influencer-layout,
+  .influencer-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .influencer-referral {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .influencer-sidebar {
+    width: 100%;
+    padding-top: 0;
+  }
+
+  .influencer-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .influencer-action {
+    text-align: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .influencer-page .quantum-hero {
+    width: min(100% - 24px, 1180px);
+  }
+
+  .influencer-logo {
+    width: 142px;
+    height: 142px;
+  }
+
+  .influencer-logo img {
+    width: 108px;
+  }
+
+  .influencer-title {
+    font-size: 27px;
+  }
+
+  .influencer-referral {
+    padding: 16px;
+  }
+
+  .influencer-callout,
+  .influencer-table-card {
+    padding: 22px;
+  }
+}

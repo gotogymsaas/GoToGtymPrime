@@ -1,30 +1,63 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Compras referidas{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/home_figma.css' %}?v=20260907-influencer-orbit">
+<link rel="stylesheet" href="{% static 'css/influencer_figma.css' %}?v=20260907-panel">
+{% endblock %}
+
 {% block content %}
-<div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-2xl shadow-xl border border-[#e7c98a]">
-  <h2 class="text-2xl font-extrabold mb-4 text-center text-[#093f62]">Personas que compraron gracias a ti</h2>
-  {% if compras %}
-    <table class="w-full text-left border-collapse">
-      <thead>
-        <tr class="bg-[#f3e9d2]">
-          <th class="py-2 px-4">Nombre</th>
-          <th class="py-2 px-4">Email</th>
-          <th class="py-2 px-4">Fecha</th>
-          <th class="py-2 px-4">Monto</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for compra in compras %}
-        <tr class="border-b">
-          <td class="py-2 px-4">{{ compra.nombre }}</td>
-          <td class="py-2 px-4">{{ compra.email }}</td>
-          <td class="py-2 px-4">{{ compra.fecha|date:'d/m/Y' }}</td>
-          <td class="py-2 px-4">${{ compra.monto }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p class="text-center text-gray-500">Aún no tienes compras referidas.</p>
-  {% endif %}
-</div>
+<main class="figma-home influencer-page">
+  <section class="quantum-hero" aria-labelledby="influencer-purchases-title">
+    <div class="quantum-field" aria-hidden="true">
+      <span class="quantum-watermark"></span>
+      <span class="quantum-orbit quantum-orbit--outer"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--one"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--two"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--three"><i></i></span>
+      <span class="quantum-core"></span>
+    </div>
+
+    <div class="influencer-shell">
+      <a href="{% url 'logged_home' %}" class="influencer-logo" aria-label="GoToGym inicio">
+        <img src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" aria-hidden="true">
+      </a>
+
+      <h1 id="influencer-purchases-title" class="influencer-title">Compras referidas</h1>
+
+      <section class="influencer-table-card">
+        {% if compras %}
+          <table class="influencer-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Fecha</th>
+                <th>Monto</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for compra in compras %}
+              <tr>
+                <td>{{ compra.nombre }}</td>
+                <td>{{ compra.email }}</td>
+                <td>{{ compra.fecha|date:'d/m/Y' }}</td>
+                <td>${{ compra.monto }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="influencer-empty">A&uacute;n no tienes compras referidas.</p>
+        {% endif %}
+      </section>
+
+      <a href="{% url 'influencer_dashboard' %}" class="influencer-link">Resumen</a>
+    </div>
+  </section>
+</main>
 {% endblock %}

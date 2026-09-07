@@ -83,8 +83,8 @@ h2 { font-size: 20px; }
 .danger { background: #402024; color: #ffb4b4; border-color: #6e2d35; }
 .stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
   margin-bottom: 24px;
 }
 .stats article, .panel {
@@ -93,9 +93,9 @@ h2 { font-size: 20px; }
   border-radius: 8px;
   box-shadow: 0 24px 70px rgba(0,0,0,.35);
 }
-.stats article { padding: 20px; }
-.stats span { display: block; font-size: 34px; font-weight: 800; color: var(--accent); }
-.stats p { margin-bottom: 0; color: var(--muted); }
+.stats article { padding: 16px 14px; }
+.stats span { display: block; font-size: 30px; font-weight: 800; color: var(--accent); }
+.stats p { margin-bottom: 0; color: var(--muted); font-size: 13px; line-height: 1.25; }
 .grid-two {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
