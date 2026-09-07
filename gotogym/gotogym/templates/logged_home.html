@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/home_figma.css' %}?v=20260902-profile-layout">
+<link rel="stylesheet" href="{% static 'css/home_figma.css' %}?v=20260907-influencer-enrolled">
 {% endblock %}
 
 {% block navbar %}{% endblock %}
@@ -46,7 +46,11 @@
       </div>
 
       <div class="quantum-hero__links quantum-hero__links--influencer" aria-label="{% trans 'Funciones de influencers' %}">
+        {% if user.es_influencer %}
+        <button type="button" data-influencer-enrolled>Vincularse como<br>influencer</button>
+        {% else %}
         <a href="{% url 'influencer_suscribete' %}">Vincularse como<br>influencer</a>
+        {% endif %}
         {% if user.es_influencer %}
         <a href="{% url 'influencer_dashboard' %}">Ir a sección de<br>Influencers</a>
         {% else %}
@@ -57,6 +61,11 @@
       <div class="quantum-hero__influencer-warning" data-influencer-warning role="status" aria-live="polite" hidden>
         <p>Usted no es influencer aún. Lo invitamos a que se vincule en el botón respectivo. Gracias!</p>
         <button type="button" data-close-influencer-warning>Salir</button>
+      </div>
+
+      <div class="quantum-hero__influencer-warning quantum-hero__influencer-warning--enrolled" data-influencer-enrolled-warning role="status" aria-live="polite" hidden>
+        <p>usted ya es influencer! Puede acceder a la secci&oacute;n de influencers ahora mismo.</p>
+        <button type="button" data-close-influencer-enrolled-warning>salir</button>
       </div>
 
       <form action="{% url 'logout' %}" method="post" class="quantum-hero__logout-form">
@@ -115,6 +124,9 @@
     const openWarning = document.querySelector('[data-influencer-required]');
     const warning = document.querySelector('[data-influencer-warning]');
     const closeWarning = document.querySelector('[data-close-influencer-warning]');
+    const openEnrolledWarning = document.querySelector('[data-influencer-enrolled]');
+    const enrolledWarning = document.querySelector('[data-influencer-enrolled-warning]');
+    const closeEnrolledWarning = document.querySelector('[data-close-influencer-enrolled-warning]');
     const profileOpen = document.querySelector('[data-profile-open]');
     const profileDialog = document.querySelector('[data-profile-dialog]');
     const profileClose = document.querySelector('[data-profile-close]');
@@ -130,6 +142,18 @@
     if (closeWarning && warning) {
       closeWarning.addEventListener('click', function () {
         warning.hidden = true;
+      });
+    }
+
+    if (openEnrolledWarning && enrolledWarning) {
+      openEnrolledWarning.addEventListener('click', function () {
+        enrolledWarning.hidden = false;
+      });
+    }
+
+    if (closeEnrolledWarning && enrolledWarning) {
+      closeEnrolledWarning.addEventListener('click', function () {
+        enrolledWarning.hidden = true;
       });
     }
 

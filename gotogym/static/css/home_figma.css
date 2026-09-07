@@ -599,6 +599,10 @@
   line-height: 1.35;
 }
 
+.quantum-hero__influencer-warning--enrolled p {
+  color: #ff9b9b;
+}
+
 .quantum-hero__influencer-warning button {
   border: 0;
   background: transparent;
