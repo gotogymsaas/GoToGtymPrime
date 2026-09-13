@@ -5,9 +5,6 @@ env:
   AZURE_WEBAPP_NAME: app-gotogym-api-green-pnvfv3
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
@@ -58,8 +55,8 @@ jobs:
 
       - name: Deploy to Azure Web App via Kudu Zip Deploy
         env:
-          SCM_USER: ${{ secrets.AZURE_SCM_USER }}
-          SCM_PASS: ${{ secrets.AZURE_SCM_PASS }}
+          SCM_USER: ${{ secrets.AZURE_API_SCM_USER }}
+          SCM_PASS: ${{ secrets.AZURE_API_SCM_PASS }}
           APP_NAME: ${{ env.AZURE_WEBAPP_NAME }}
         run: |
           set -euo pipefail
