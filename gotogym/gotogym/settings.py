@@ -23,7 +23,13 @@ if ADMIN_PROJECT_DIR.exists() and str(ADMIN_PROJECT_DIR) not in sys.path:
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me')
 DEBUG = _as_bool(os.environ.get('DEBUG'), False)
-ALLOWED_HOSTS = _split_csv(os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1'))
+DEFAULT_ALLOWED_HOSTS = (
+    'localhost,127.0.0.1,'
+    'gotogym.store,www.gotogym.store,developers.gotogym.store,'
+    'api.gotogym.store,gotogym-prime.azurewebsites.net,'
+    'app-gotogym-api-green-pnvfv3.azurewebsites.net'
+)
+ALLOWED_HOSTS = _split_csv(os.environ.get('ALLOWED_HOSTS', DEFAULT_ALLOWED_HOSTS))
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -163,7 +169,13 @@ STORAGES = {
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = _as_bool(os.environ.get('CORS_ALLOW_ALL_ORIGINS'), False)
-CORS_ALLOWED_ORIGINS = _split_csv(os.environ.get('CORS_ALLOWED_ORIGINS', ''))
+DEFAULT_CORS_ALLOWED_ORIGINS = (
+    'https://developers.gotogym.store,'
+    'https://api.gotogym.store,'
+    'https://gotogym.store,'
+    'https://www.gotogym.store'
+)
+CORS_ALLOWED_ORIGINS = _split_csv(os.environ.get('CORS_ALLOWED_ORIGINS', DEFAULT_CORS_ALLOWED_ORIGINS))
 
 CSRF_TRUSTED_ORIGINS = _split_csv(os.environ.get('CSRF_TRUSTED_ORIGINS', ''))
 

@@ -1,0 +1,98 @@
+name: Build and deploy Python app to Azure Web App - api.gotogym.store
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  AZURE_WEBAPP_NAME: app-gotogym-api-green-pnvfv3
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run backend validation suite
+        run: bash environments/backend/run_backend_checks.sh
+
+      - name: Prepare static artifacts
+        run: |
+          set -euo pipefail
+          source .venv-backend-test/bin/activate
+          cd gotogym
+          python manage.py migrate --settings=gotogym.settings_local
+          python manage.py collectstatic --noinput --settings=gotogym.settings_local
+
+      - name: Upload artifact for deployment jobs
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-api-app
+          path: |
+            .
+            !venv/
+            !.venv-backend-test/
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: python-api-app
+
+      - name: Deploy to Azure Web App via Kudu Zip Deploy
+        env:
+          SCM_USER: ${{ secrets.AZURE_SCM_USER }}
+          SCM_PASS: ${{ secrets.AZURE_SCM_PASS }}
+          APP_NAME: ${{ env.AZURE_WEBAPP_NAME }}
+        run: |
+          set -euo pipefail
+          echo "Comprimiendo artefactos..."
+          zip -r deploy.zip . -x "*.pyc" -x ".venv*" -x "venv/*" -x "__pycache__/*" -x ".git/*"
+          echo "Tamano del paquete: $(du -sh deploy.zip | cut -f1)"
+          echo "Enviando a Kudu zipdeploy..."
+          HTTP_STATUS=$(curl -s -o /tmp/deploy_response.txt -w "%{http_code}" \
+            -X POST \
+            "https://${APP_NAME}.scm.azurewebsites.net/api/zipdeploy" \
+            -u "${SCM_USER}:${SCM_PASS}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @deploy.zip)
+          echo "Respuesta HTTP: $HTTP_STATUS"
+          cat /tmp/deploy_response.txt || true
+          if [[ "$HTTP_STATUS" -ge 200 && "$HTTP_STATUS" -lt 300 ]]; then
+            echo "Deploy exitoso."
+          else
+            echo "ERROR: Deploy fallo con HTTP $HTTP_STATUS"
+            exit 1
+          fi
+          echo "Aplicando migraciones de produccion..."
+          MIGRATE_STATUS=$(curl -s -o /tmp/migrate_response.txt -w "%{http_code}" \
+            -X POST \
+            "https://${APP_NAME}.scm.azurewebsites.net/api/command" \
+            -u "${SCM_USER}:${SCM_PASS}" \
+            -H "Content-Type: application/json" \
+            --data '{"command":"python gotogym/manage.py migrate --noinput","dir":"/home/site/wwwroot"}')
+          echo "Respuesta HTTP migraciones: $MIGRATE_STATUS"
+          cat /tmp/migrate_response.txt || true
+          if [[ "$MIGRATE_STATUS" -lt 200 || "$MIGRATE_STATUS" -ge 300 ]]; then
+            echo "ERROR: Migraciones fallaron con HTTP $MIGRATE_STATUS"
+            exit 1
+          fi
+          if ! grep -Eq '"ExitCode"[[:space:]]*:[[:space:]]*0' /tmp/migrate_response.txt; then
+            echo "ERROR: El comando de migraciones no termino correctamente."
+            exit 1
+          fi
+          echo "Migraciones aplicadas."

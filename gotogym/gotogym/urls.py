@@ -24,11 +24,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.views.static import serve
+from accounts import api_views as accounts_api_views
 
 urlpatterns = [
     path('accounts', lambda request: redirect('commercial_login', permanent=False)),
     path('setlang/', set_language, name='set_language'),
     path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
+    path('api/v1/auth/login', accounts_api_views.developer_login, name='developer_auth_login'),
+    path('api/login/', accounts_api_views.developer_login, name='developer_login'),
+    path('api/users/', accounts_api_views.developer_users, name='developer_users'),
 ]
 
 urlpatterns += i18n_patterns(
