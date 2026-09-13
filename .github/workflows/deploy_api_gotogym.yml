@@ -5,6 +5,9 @@ env:
   AZURE_WEBAPP_NAME: app-gotogym-api-green-pnvfv3
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
