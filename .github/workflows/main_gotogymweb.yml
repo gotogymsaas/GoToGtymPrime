@@ -85,13 +85,32 @@ jobs:
           APP_NAME: ${{ env.AZURE_WEBAPP_NAME }}
         run: |
           set -euo pipefail
+
+          kudu_command() {
+            jq -n --arg cmd "$1" --arg dir "/home/site/wwwroot" '{command: $cmd, dir: $dir}' > /tmp/kudu_payload.json
+            curl -s -X POST \
+              "https://${APP_NAME}.scm.azurewebsites.net/api/command" \
+              -u "${SCM_USER}:${SCM_PASS}" \
+              -H "Content-Type: application/json" \
+              --data @/tmp/kudu_payload.json
+          }
+
+          echo "Verificando script de migraciones..."
+          test -f environments/azure/run_production_migrations.sh
+
           echo "Comprimiendo artefactos..."
-          zip -r deploy.zip . -x "*.pyc" -x ".venv*" -x "venv/*" -x "__pycache__/*" -x ".git/*"
+          zip -r deploy.zip . \
+            -x "*.pyc" -x ".venv*" -x "venv/*" -x "__pycache__/*" -x ".git/*" \
+            -x ".github/*" -x "docs/*" -x "*.sqlite3" -x "*.bat" -x "deploy.zip"
           echo "Tamaño del paquete: $(du -sh deploy.zip | cut -f1)"
+
+          echo "Verificando contenido del paquete..."
+          unzip -l deploy.zip | grep -F "environments/azure/run_production_migrations.sh"
+
           echo "Enviando a Kudu zipdeploy..."
           HTTP_STATUS=$(curl -s -o /tmp/deploy_response.txt -w "%{http_code}" \
             -X POST \
-            "https://${APP_NAME}.scm.azurewebsites.net/api/zipdeploy" \
+            "https://${APP_NAME}.scm.azurewebsites.net/api/zipdeploy?isAsync=false" \
             -u "${SCM_USER}:${SCM_PASS}" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @deploy.zip)
@@ -103,9 +122,38 @@ jobs:
             echo "ERROR: Deploy falló con HTTP $HTTP_STATUS"
             exit 1
           fi
+
+          echo "Esperando a que Kudu termine de publicar..."
+          for _ in $(seq 1 30); do
+            LATEST=$(curl -s -u "${SCM_USER}:${SCM_PASS}" \
+              "https://${APP_NAME}.scm.azurewebsites.net/api/deployments/latest" || echo '{}')
+            DEPLOY_COMPLETE=$(echo "$LATEST" | jq -r '.complete // false')
+            DEPLOY_STATE=$(echo "$LATEST" | jq -r '.status // -1')
+            echo "Estado del despliegue: complete=${DEPLOY_COMPLETE} status=${DEPLOY_STATE}"
+            if [[ "$DEPLOY_COMPLETE" == "true" ]]; then
+              if [[ "$DEPLOY_STATE" == "3" ]]; then
+                echo "ERROR: Kudu reporta el despliegue como fallido."
+                exit 1
+              fi
+              break
+            fi
+            sleep 10
+          done
+
+          echo "=== Diagnostico: contenido real visible por Kudu ==="
+          echo "--- ls -la /home/site/wwwroot ---"
+          kudu_command "ls -la /home/site/wwwroot" || true
+          echo "--- find manage.py ---"
+          kudu_command "find /home/site/wwwroot -maxdepth 3 -name manage.py" || true
+          echo "--- find run_production_migrations.sh ---"
+          kudu_command "find /home/site/wwwroot -maxdepth 4 -name run_production_migrations.sh" || true
+          echo "--- which python3 ---"
+          kudu_command "which python3" || true
+          echo "=== Fin del diagnostico ==="
+
           echo "Aplicando migraciones de produccion..."
           MIGRATE_PAYLOAD=$(jq -n \
-            --arg cmd "bash environments/azure/run_production_migrations.sh" \
+            --arg cmd "bash /home/site/wwwroot/environments/azure/run_production_migrations.sh" \
             --arg dir "/home/site/wwwroot" \
             '{command: $cmd, dir: $dir}')
           MIGRATE_STATUS=$(curl -s -o /tmp/migrate_response.txt -w "%{http_code}" \

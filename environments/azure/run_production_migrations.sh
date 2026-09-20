@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Kudu no garantiza el cwd del campo "dir", asi que lo fijamos explicitamente.
+cd "${APP_ROOT:-/home/site/wwwroot}"
+
 if [ -f antenv/bin/activate ]; then
   # shellcheck disable=SC1091
   source antenv/bin/activate
