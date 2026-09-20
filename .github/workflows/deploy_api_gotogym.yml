@@ -79,21 +79,10 @@ jobs:
             exit 1
           fi
           echo "Aplicando migraciones de produccion..."
-          MIGRATE_SHELL_CMD='set -e
-          if [ -f antenv/bin/activate ]; then
-            source antenv/bin/activate
-          fi
-          if [ -f manage.py ]; then
-            python3 manage.py migrate --noinput
-          elif [ -f gotogym/manage.py ]; then
-            cd gotogym && python3 manage.py migrate --noinput
-          else
-            echo "manage.py no encontrado; estructura real de /home/site/wwwroot:"
-            find /home/site/wwwroot -maxdepth 3 -iname manage.py
-            ls -la /home/site/wwwroot
-            exit 2
-          fi'
-          MIGRATE_PAYLOAD=$(jq -n --arg cmd "$MIGRATE_SHELL_CMD" --arg dir "/home/site/wwwroot" '{command: $cmd, dir: $dir}')
+          MIGRATE_PAYLOAD=$(jq -n \
+            --arg cmd "bash environments/azure/run_production_migrations.sh" \
+            --arg dir "/home/site/wwwroot" \
+            '{command: $cmd, dir: $dir}')
           MIGRATE_STATUS=$(curl -s -o /tmp/migrate_response.txt -w "%{http_code}" \
             -X POST \
             "https://${APP_NAME}.scm.azurewebsites.net/api/command" \
@@ -106,7 +95,7 @@ jobs:
             echo "ERROR: Migraciones fallaron con HTTP $MIGRATE_STATUS"
             exit 1
           fi
-          if ! grep -Eq '"ExitCode"[[:space:]]*:[[:space:]]*0' /tmp/migrate_response.txt; then
+          if ! jq -e '.ExitCode == 0' /tmp/migrate_response.txt >/dev/null 2>&1; then
             echo "ERROR: El comando de migraciones no termino correctamente."
             exit 1
           fi
