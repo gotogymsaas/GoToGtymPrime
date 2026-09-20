@@ -60,7 +60,7 @@ if [[ "${slot_count}" == "0" ]]; then
   run_cmd webapp deployment slot create -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" --slot "${STAGING_SLOT}"
 fi
 
-startup_cmd="gunicorn --chdir gotogym gotogym.wsgi --bind=0.0.0.0 --timeout 600 --access-logfile '-' --error-logfile '-'"
+startup_cmd="bash environments/azure/startup.sh"
 run_cmd webapp config set -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" --startup-file "${startup_cmd}"
 
 run_cmd webapp config appsettings set -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" --settings \
