@@ -9,6 +9,6 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     search_fields = ["name", "description"]
-    list_display = ["name", "category", "price", "stock"]
+    list_display = ["name", "category", "base_price", "stock"]
     list_filter = ["category"]
     autocomplete_fields = ["category"]

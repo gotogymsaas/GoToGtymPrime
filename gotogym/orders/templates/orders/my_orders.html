@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Mis pedidos" %}{% endblock %}
+{% block content %}
+<div class="container mx-auto py-8 px-4 max-w-3xl gtg-quantum-ambient">
+  <h1 class="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)] mb-6">{% trans "Mis pedidos" %}</h1>
+
+  {% if orders %}
+  <div class="bg-[var(--color-premium-white)] rounded-xl shadow divide-y divide-gray-200">
+    {% for order in orders %}
+    <a href="{% url 'orders:order_detail' order.order_number %}"
+       class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-4 hover:bg-gray-50 transition">
+      <div>
+        <p class="font-semibold text-[var(--color-zafiro)]">{{ order.order_number }}</p>
+        <p class="text-sm text-gray-500">{{ order.created_at|date:"d/m/Y H:i" }}</p>
+      </div>
+      <div class="flex items-center gap-3 text-sm">
+        <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-900 font-semibold">
+          {{ order.get_order_status_display }}
+        </span>
+        <span class="font-bold text-[var(--color-zafiro)]">${{ order.total|floatformat:0 }}</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="bg-[var(--color-premium-white)] rounded-xl shadow p-10 text-center">
+    <p class="text-gray-600">{% trans "Todavía no tienes pedidos." %}</p>
+    {% url 'tienda:producto_list' as producto_list_url %}
+    {% include "partials/_cta_button.html" with tag="a" href=producto_list_url variant="pill" label="Ir a la tienda" %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% load i18n %}{% comment %}
+Selector de color de la PDP (swatch + nombre). Parametro: colors (lista de
+dicts con name y swatch). Los botones .pdp-color y su atributo data-color
+son el gancho que usa el JS de la PDP; no cambiar sin revisar
+producto_detail.html.
+{% endcomment %}
+{% if colors|length > 1 %}
+<fieldset class="mb-4">
+  <legend class="block text-sm font-semibold text-[var(--color-text-primary)] mb-2">{% trans "Color" %}</legend>
+  <div class="flex flex-wrap gap-2" role="group">
+    {% for color in colors %}
+    <button type="button" data-color="{{ color.name }}"
+            class="pdp-color inline-flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-[var(--color-border)] text-sm text-[var(--color-text-primary)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+      <span class="w-4 h-4 rounded-full border border-[var(--color-border)]" style="background: {{ color.swatch }}"></span>
+      {{ color.name }}
+    </button>
+    {% endfor %}
+  </div>
+</fieldset>
+{% endif %}

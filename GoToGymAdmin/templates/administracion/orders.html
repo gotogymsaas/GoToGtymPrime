@@ -1,0 +1,44 @@
+{% extends "administracion/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Operacion</p>
+    <h1>Pedidos</h1>
+  </div>
+</section>
+<form class="search" method="get">
+  <input name="q" value="{{ query }}" placeholder="Buscar por numero o correo">
+  <select name="order_status">
+    <option value="">Todos los estados</option>
+    {% for value, label in order_status_choices %}
+    <option value="{{ value }}" {% if order_status == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <select name="payment_status">
+    <option value="">Todos los pagos</option>
+    {% for value, label in payment_status_choices %}
+    <option value="{{ value }}" {% if payment_status == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Filtrar</button>
+</form>
+<div class="panel">
+  <table>
+    <thead><tr><th>Pedido</th><th>Fecha</th><th>Cliente</th><th>Estado</th><th>Pago</th><th>Total</th><th></th></tr></thead>
+    <tbody>
+      {% for order in page_obj %}
+      <tr>
+        <td><strong>{{ order.order_number }}</strong></td>
+        <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
+        <td>{{ order.email }}</td>
+        <td>{{ order.get_order_status_display }}</td>
+        <td>{{ order.get_payment_status_display }}</td>
+        <td>${{ order.total|floatformat:0 }}</td>
+        <td class="actions"><a class="ghost" href="{% url 'admin_order_detail' order.order_number %}">Ver</a></td>
+      </tr>
+      {% empty %}<tr><td colspan="7">No hay pedidos registrados.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "administracion/pagination.html" %}
+{% endblock %}

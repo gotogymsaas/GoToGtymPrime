@@ -1,0 +1,92 @@
+{% extends "administracion/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Pedido</p>
+    <h1>{{ order.order_number }}</h1>
+  </div>
+  <a class="button ghost" href="{% url 'admin_orders' %}">Volver</a>
+</section>
+
+<div class="panel">
+  <p><strong>Estado del pedido:</strong> {{ order.get_order_status_display }}</p>
+  <p>
+    <strong>Estado del pago:</strong> {{ order.get_payment_status_display }}
+    <small>(solo lectura: lo controla el proveedor de pago)</small>
+  </p>
+  <p><strong>Cliente:</strong> {{ order.email }} &middot; {{ order.phone }}</p>
+  <p><strong>Creado:</strong> {{ order.created_at|date:"d/m/Y H:i" }}</p>
+</div>
+
+{% if next_statuses %}
+<div class="panel">
+  <h2>Actualizar estado</h2>
+  <form method="post" action="{% url 'admin_order_update_status' order.order_number %}">
+    {% csrf_token %}
+    <select name="order_status">
+      {% for value, label in next_statuses %}
+      <option value="{{ value }}">{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Aplicar</button>
+  </form>
+</div>
+{% endif %}
+
+<div class="panel">
+  <h2>Articulos</h2>
+  <table>
+    <thead><tr><th>SKU</th><th>Producto</th><th>Talla/Color</th><th>Cantidad</th><th>Subtotal</th></tr></thead>
+    <tbody>
+      {% for item in order.items.all %}
+      <tr>
+        <td>{{ item.sku_snapshot }}</td>
+        <td>{{ item.product_name_snapshot }}</td>
+        <td>{{ item.size_snapshot }} / {{ item.color_snapshot }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>${{ item.line_total|floatformat:0 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p>Subtotal: ${{ order.subtotal|floatformat:0 }} &middot; Envio: ${{ order.shipping_cost|floatformat:0 }} &middot; <strong>Total: ${{ order.total|floatformat:0 }}</strong></p>
+</div>
+
+<div class="panel">
+  <h2>Direccion de entrega</h2>
+  {% with address=order.address %}
+  <p>{{ address.full_name }}<br>
+  {{ address.address_line }}{% if address.address_complement %}, {{ address.address_complement }}{% endif %}<br>
+  {{ address.city }}, {{ address.department }}, {{ address.country }}<br>
+  {{ address.phone }}</p>
+  {% endwith %}
+  {% if order.shipping_quote %}
+  <p>{{ order.shipping_quote.carrier_name }} &middot; {{ order.shipping_quote.method_name }} &middot; {{ order.shipping_quote.estimated_days }} dias</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Transacciones de pago</h2>
+  <table>
+    <thead><tr><th>Proveedor</th><th>Referencia</th><th>Estado</th><th>Monto</th><th>Fecha</th></tr></thead>
+    <tbody>
+      {% for transaction in order.payment_transactions.all %}
+      <tr>
+        <td>{{ transaction.provider }}</td>
+        <td>{{ transaction.preference_id }}</td>
+        <td>{{ transaction.get_status_display }}</td>
+        <td>${{ transaction.amount|floatformat:0 }}</td>
+        <td>{{ transaction.created_at|date:"d/m/Y H:i" }}</td>
+      </tr>
+      {% empty %}<tr><td colspan="5">Sin transacciones todavia.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if order.internal_note %}
+<div class="panel">
+  <h2>Nota interna</h2>
+  <p>{{ order.internal_note }}</p>
+</div>
+{% endif %}
+{% endblock %}

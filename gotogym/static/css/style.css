@@ -84,7 +84,18 @@ body.gtg-theme {
   letter-spacing: 0;
 }
 
-body.gtg-theme a {
+/* :where() para que esta regla no tenga peso de especificidad.
+ *
+ * El proposito es que un enlace del tema oscuro herede el color de su
+ * contexto (barra, footer, menus) en vez del azul por defecto del
+ * navegador. Escrita como `body.gtg-theme a` le ganaba tambien a
+ * cualquier clase de color declarada en el propio enlace, asi que un
+ * enlace sobre una tarjeta clara terminaba heredando blanco sobre blanco
+ * (el nombre del producto en el carrito era literalmente invisible).
+ * Con :where() el valor sigue siendo el de herencia por defecto, pero
+ * cualquier color declarado en el enlace tiene prioridad.
+ */
+:where(body.gtg-theme) a {
   color: inherit;
   text-decoration: none;
 }
@@ -110,6 +121,114 @@ textarea:focus-visible {
   background: var(--color-bg-base);
 }
 
+.pdp-gallery__viewport {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--color-premium-white, #f8f9fa);
+  /* Segunda sombra: halo Quantum ambiental, sutil (firma de marca en la
+     pantalla de mayor intencion de compra, sin competir con el producto). */
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24), 0 0 60px var(--color-accent-soft);
+}
+
+.pdp-gallery__track,
+.pdp-gallery__slide {
+  width: 100%;
+  height: 100%;
+}
+
+.pdp-gallery__slide {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 20px;
+}
+
+.pdp-gallery__slide.is-active {
+  display: flex;
+}
+
+.pdp-gallery__slide[hidden] {
+  display: none;
+}
+
+.pdp-gallery__slide img {
+  width: 100%;
+  height: 100%;
+}
+
+.pdp-gallery__control {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 180, 106, 0.72);
+  color: #ffffff;
+  /* rgba precalculado de --color-zafiro (#17375C): box-shadow/background
+     con transparencia no pueden leer un var() de color solido con alpha
+     por separado, asi que se deja fijo aqui en vez de introducir un
+     token nuevo de un solo uso. */
+  background: rgba(23, 55, 92, 0.92);
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(23, 55, 92, 0.28);
+  transform: translateY(-50%);
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.pdp-gallery__control:hover,
+.pdp-gallery__control:focus-visible {
+  color: var(--color-zafiro);
+  background: var(--color-gold, #d4b46a);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.pdp-gallery__control--prev { left: 14px; }
+.pdp-gallery__control--next { right: 14px; }
+
+.pdp-gallery__counter {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: rgba(13, 13, 15, 0.72);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pdp-gallery__thumbs {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  overflow-x: auto;
+  padding: 2px;
+}
+
+.pdp-gallery__thumb {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
+  padding: 4px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  background: var(--color-premium-white, #f8f9fa);
+  cursor: pointer;
+}
+
+.pdp-gallery__thumb.is-active,
+.pdp-gallery__thumb:hover,
+.pdp-gallery__thumb:focus-visible {
+  border-color: var(--color-gold, #d4b46a);
+}
+
 .gtg-navbar {
   position: sticky;
   top: 0;
@@ -129,12 +248,132 @@ textarea:focus-visible {
 }
 
 .gtg-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
   justify-self: center;
   font-family: var(--font-display);
-  font-size: clamp(32px, 4vw, 48px);
+  font-size: clamp(26px, 3.2vw, 38px);
   font-weight: 800;
   line-height: 1;
   color: var(--color-text-primary);
+}
+
+/* Firma Quantum en el header del dominio comercial: el simbolo original
+   de marca (el mismo PNG que usa Home) a tamano de sello (48-72px segun
+   el manuscrito de Direccion de Diseno, no como objeto central), con un
+   halo turquesa que respira suavemente. Es la unica pieza Quantum que
+   viaja a Store/PDP/Cart/Checkout a traves del header compartido. */
+.gtg-brand__mark {
+  width: clamp(38px, 4.2vw, 52px);
+  height: clamp(38px, 4.2vw, 52px);
+  border-radius: 50%;
+  object-fit: contain;
+  padding: 7px;
+  background: rgba(13, 13, 15, 0.35);
+  animation: gtg-brand-breathe 4.5s ease-in-out infinite;
+}
+
+@keyframes gtg-brand-breathe {
+  0%, 100% { box-shadow: 0 0 0 rgba(0, 212, 199, 0); }
+  50% { box-shadow: 0 0 14px rgba(0, 212, 199, 0.5), 0 0 30px rgba(0, 212, 199, 0.2); }
+}
+
+/* --- Firma Quantum del dominio comercial -------------------------------
+ *
+ * El catalogo y el checkout ya viven sobre el lienzo oscuro de la marca
+ * (.gtg-page hereda --color-bg-base): las fichas claras flotan sobre el,
+ * igual que las tarjetas sobre el fondo de Home. Lo que faltaba era el
+ * acento turquesa, que no aparecia en ninguna pantalla de compra. Estas
+ * reglas lo reintroducen en cuatro puntos, siempre como ambiente y nunca
+ * encima de un control: halo detras de los titulos, realce al recorrer el
+ * catalogo, respiracion en el boton que cierra cada pantalla y filete en
+ * los paneles de resumen.
+ */
+
+/* Halo ambiental detras del titulo de cada pantalla. Es background-image
+   sobre el contenedor que ya existe, no un elemento nuevo: el navegador
+   lo recorta al borde de la caja, asi que no puede provocar scroll
+   horizontal ni robar clics. */
+.gtg-quantum-ambient {
+  position: relative;
+  /* Elipse, no circulo: con un circulo el degradado todavia no habia
+     llegado a transparente al borde inferior de su propia caja y se veia
+     el corte como un rectangulo. La elipse cierra el desvanecido dentro
+     de la caja en los dos ejes. */
+  background-image: radial-gradient(ellipse at 0% 0%, rgba(0, 212, 199, 0.20) 0%, transparent 72%);
+  background-repeat: no-repeat;
+  background-size: 520px 360px;
+  background-position: -110px -130px;
+}
+
+/* Tarjeta de producto: al apuntarla (o al enfocarla por teclado) se eleva
+   y toma el halo turquesa en vez de una sombra gris generica. Solo con la
+   interaccion, nunca en reposo: veinte tarjetas brillando a la vez serian
+   ruido, una sola respondiendo al cursor es firma de marca. */
+.gtg-card-quantum {
+  border-radius: 12px;
+  transition: transform var(--motion-ui, 200ms) var(--motion-easing, ease),
+              box-shadow var(--motion-ui, 200ms) var(--motion-easing, ease);
+}
+
+.gtg-card-quantum:hover,
+.gtg-card-quantum:focus-within {
+  transform: translateY(-4px);
+  box-shadow:
+    0 22px 44px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(0, 212, 199, 0.35),
+    0 0 34px rgba(0, 212, 199, 0.28);
+}
+
+/* Boton que cierra cada pantalla de decision (anadir al carrito, continuar,
+   confirmar pedido): respira el mismo halo que el simbolo del header. Son
+   tres botones en todo el flujo, uno por pantalla, no un efecto repetido. */
+.gtg-cta-quantum {
+  animation: gtg-cta-breathe 3.6s ease-in-out infinite;
+}
+
+/* Un boton que todavia no se puede pulsar (falta elegir talla/color, o no
+   hay unidades) no debe pedir atencion: sin halo hasta que sea accionable. */
+.gtg-cta-quantum:disabled {
+  animation: none;
+}
+
+@keyframes gtg-cta-breathe {
+  0%, 100% { box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35); }
+  50% {
+    box-shadow:
+      0 8px 22px rgba(0, 0, 0, 0.35),
+      0 0 18px rgba(0, 212, 199, 0.45),
+      0 0 38px rgba(0, 212, 199, 0.18);
+  }
+}
+
+/* Panel de resumen (carrito y checkout): filete superior turquesa-dorado.
+   Es lo unico que comparten visualmente las dos pantallas donde el usuario
+   confirma dinero, y las marca como la misma familia. */
+.gtg-summary-panel {
+  position: relative;
+}
+
+/* Sin overflow:hidden y con el radio en el propio filete: recortar el
+   panel dejaba el filete prolijo, pero de paso recortaba la sombra del
+   boton que vive dentro, y el halo del CTA desaparecia. */
+.gtg-summary-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-gold));
+}
+
+/* El simbolo del footer respira igual que el del header: es la misma pieza
+   de marca y debe leerse igual en los dos extremos de la pagina. */
+.gtg-footer-brand__mark {
+  border-radius: 50%;
+  padding: 8px;
+  animation: gtg-brand-breathe 4.5s ease-in-out infinite;
 }
 
 .gtg-nav-links {
@@ -253,6 +492,12 @@ textarea:focus-visible {
   font-weight: 700;
 }
 
+/* Con el carrito vacio el contador se oculta, pero el elemento sigue en el
+   DOM para que se pueda actualizar sin recargar. */
+.gtg-cart-link #cart-count[hidden] {
+  display: none;
+}
+
 .gtg-cart-link #cart-count {
   position: absolute;
   top: -7px;
@@ -348,25 +593,6 @@ textarea:focus-visible {
   color: var(--color-accent);
 }
 
-.gtg-mobile-cart-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.gtg-mobile-cart-link #cart-count {
-  min-width: 20px;
-  height: 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-pill);
-  background: var(--color-accent);
-  color: #001a18;
-  font-size: 11px;
-  font-weight: 800;
-}
-
 .gtg-mobile-menu__divider {
   height: 1px;
   margin: var(--space-2) 0;
@@ -431,16 +657,21 @@ textarea:focus-visible {
 .gtg-footer {
   background: var(--color-bg-base);
   color: var(--color-text-primary);
-  padding: 90px 0 76px;
+  padding: var(--space-9) 0 var(--space-7);
+  border-top: 1px solid var(--color-border-subtle);
 }
 
+/* Composicion centrada en una sola columna: marca, suscripcion y redes,
+   cada bloque con su propio aire. Evita el problema de encajar seis
+   botones de red en una columna estrecha de una grilla de tres. */
 .gtg-footer-wrap {
   width: min(100% - 32px, 1120px);
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1.4fr 1fr;
-  align-items: end;
-  gap: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-7);
+  text-align: center;
 }
 
 .gtg-footer-brand {
@@ -448,13 +679,13 @@ textarea:focus-visible {
   align-items: center;
   gap: var(--space-4);
   color: var(--color-gold);
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 800;
 }
 
 .gtg-footer-brand img {
-  width: 58px;
-  height: 58px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
 }
 
@@ -462,6 +693,7 @@ textarea:focus-visible {
   display: grid;
   justify-items: center;
   gap: var(--space-4);
+  width: 100%;
 }
 
 .gtg-footer-newsletter label {
@@ -470,15 +702,15 @@ textarea:focus-visible {
 }
 
 .gtg-footer-newsletter div {
-  width: min(100%, 420px);
+  width: min(100%, 480px);
   display: grid;
-  grid-template-columns: 1fr 130px;
+  grid-template-columns: 1fr 150px;
   gap: var(--space-3);
 }
 
 .gtg-footer-newsletter input,
 .gtg-footer-newsletter button {
-  height: 42px;
+  height: 48px;
   border: 0;
   border-radius: var(--radius-sm);
 }
@@ -504,63 +736,70 @@ textarea:focus-visible {
   background: var(--color-accent);
 }
 
-.gtg-footer-links {
-  display: grid;
-  justify-items: end;
-  gap: 6px;
-  font-size: 14px;
-}
-
 .gtg-socials {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: var(--space-2);
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
 }
 
 .gtg-socials a {
-  width: 18px !important;
-  height: 18px !important;
-  min-width: 18px;
-  min-height: 18px;
+  width: 56px;
+  height: 56px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: var(--radius-pill);
-  color: #ffffff;
-  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text-secondary);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
 .gtg-socials a:hover {
-  background: transparent;
-  color: var(--color-accent);
-  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  transform: translateY(-3px);
 }
 
-.gtg-socials img,
 .gtg-socials svg {
-  width: 14px !important;
-  height: 14px !important;
+  width: 26px;
+  height: 26px;
   display: block;
-  flex: 0 0 14px;
-}
-
-.gtg-socials img {
-  object-fit: contain;
-  filter: brightness(0) invert(1);
-  transition: filter 0.2s ease;
-}
-
-.gtg-socials a:hover img {
-  filter: brightness(0) saturate(100%) invert(64%) sepia(99%) saturate(1391%) hue-rotate(128deg) brightness(95%) contrast(101%);
-}
-
-.gtg-socials svg {
   fill: currentColor;
 }
 
-.gtg-footer-links a:hover {
-  color: var(--color-accent);
+/* Politicas y condiciones: una sola fila horizontal bajo la suscripcion,
+   separada por un filete. Cada enlace es una pildora con area propia para
+   que se pueda apuntar comodamente y no se lean como un parrafo corrido.
+   Envuelve en varias lineas cuando no caben, en vez de crecer en vertical
+   como una lista. */
+.gtg-footer-legal {
+  width: min(100% - 32px, 1120px);
+  margin: var(--space-7) auto 0;
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1) var(--space-2);
+  font-size: 14px;
+}
+
+.gtg-footer-legal a {
+  padding: 10px 16px;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.gtg-footer-legal a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 .gtg-auth-page {
@@ -624,13 +863,7 @@ textarea:focus-visible {
   }
 
   .gtg-footer-wrap {
-    grid-template-columns: 1fr;
-    text-align: center;
-    justify-items: center;
-  }
-
-  .gtg-footer-links {
-    justify-items: center;
+    gap: var(--space-6);
   }
 }
 
@@ -641,5 +874,20 @@ textarea:focus-visible {
 
   .gtg-footer-newsletter div {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Respeta la preferencia de reducir movimiento del sistema operativo: aplica
+   a las transiciones de hover/foco (tarjetas, botones, selectores de talla
+   y color) sin tocar el sistema de animacion Quantum, que es una decision
+   de marca ya establecida y fuera de este alcance. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
   }
 }

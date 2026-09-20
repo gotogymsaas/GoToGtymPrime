@@ -20,7 +20,7 @@
         <td>{% if product.image %}<img class="thumb" src="{{ product.image.url }}" alt="{{ product.name }}">{% else %}<span class="empty-img">Sin imagen</span>{% endif %}</td>
         <td><strong>{{ product.name }}</strong><small>{{ product.brand.name|default:"Sin marca" }}</small></td>
         <td>{{ product.category.name }}</td>
-        <td>${{ product.price|floatformat:2 }}</td>
+        <td>${{ product.base_price|floatformat:2 }}</td>
         <td>{{ product.stock }}</td>
         <td class="actions">
           <a class="ghost" href="{% url 'admin_product_edit' product.pk %}">Editar</a>

@@ -34,6 +34,10 @@ INSTALLED_APPS = [
     "accounts",
     "influencer",
     "products",
+    "inventory",
+    "orders",
+    "payments",
+    "shipping",
     "administracion",
 ]
 

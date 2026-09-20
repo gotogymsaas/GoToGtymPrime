@@ -21,6 +21,12 @@ ADMIN_PROJECT_DIR = PROJECT_ROOT / 'GoToGymAdmin'
 if ADMIN_PROJECT_DIR.exists() and str(ADMIN_PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(ADMIN_PROJECT_DIR))
 
+# `integrations/` (cliente de Mercado Pago, Alegra, HubSpot) vive en la raiz
+# del repositorio, fuera de este proyecto. Sin esto, `import integrations...`
+# falla con ModuleNotFoundError.
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me')
 DEBUG = _as_bool(os.environ.get('DEBUG'), False)
 DEFAULT_ALLOWED_HOSTS = (
@@ -44,6 +50,10 @@ INSTALLED_APPS = [
     'accounts',
     'blog',
     'products',
+    'inventory',
+    'orders',
+    'payments',
+    'shipping',
     'configuracion_marca',
     'contabilidad',
     'influencer',
@@ -83,6 +93,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'carrito.context_processors.cart_count',
             ],
         },
     },
@@ -90,20 +101,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gotogym.wsgi.application'
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.postgresql',
-#        'NAME': os.environ.get('POSTGRES_DB', 'gotogym'),
-#        'USER': os.environ.get('POSTGRES_USER', 'gotogym'),
-#        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'gotogym'),
-#        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
-#        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
-#    }
-#}
-
-
-# SE ADICIONA ESTAS LINEAS PARA SABER QUE SE USA MYSQL ALVARO URREGO VIANA 05/08/2025
-# DATABASE_URL tiene prioridad (PostgreSQL Azure), fallback a MYSQL_* vars
+# Motor de base de datos, en orden de prioridad:
+#
+# 1. DATABASE_URL  -> PostgreSQL. Es el motor objetivo para los entornos
+#    desplegados; el driver (psycopg2-binary) esta en requirements.txt.
+# 2. MYSQL_*       -> MySQL. Solo para entornos heredados que aun declaren
+#    esas variables de forma explicita. El driver requerido por este backend
+#    (mysqlclient) NO esta en requirements.txt, asi que un entorno que caiga
+#    aqui debe instalarlo aparte. No usar en entornos nuevos.
+# 3. Sin variables -> SQLite local, para poder ejecutar manage.py sin
+#    configuracion previa. Nunca apunta a un servidor remoto por defecto.
 _db_url = os.environ.get('DATABASE_URL', '')
 if _db_url:
     _p = urllib.parse.urlparse(_db_url)
@@ -118,15 +125,22 @@ if _db_url:
             'OPTIONS': {'sslmode': 'require'},
         }
     }
-else:
+elif os.environ.get('MYSQL_HOST') or os.environ.get('MYSQL_DATABASE'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': os.environ.get('MYSQL_DATABASE', 'gotogym_bd'),
             'USER': os.environ.get('MYSQL_USER', 'gotogym_user'),
             'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
-            'HOST': os.environ.get('MYSQL_HOST', 'servergotogym.mysql.database.azure.com'),
+            'HOST': os.environ.get('MYSQL_HOST', ''),
             'PORT': os.environ.get('MYSQL_PORT', '3306'),
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
@@ -186,8 +200,18 @@ SECURE_SSL_REDIRECT = _as_bool(os.environ.get('SECURE_SSL_REDIRECT'), False)
 SESSION_COOKIE_SECURE = _as_bool(os.environ.get('SESSION_COOKIE_SECURE'), False)
 CSRF_COOKIE_SECURE = _as_bool(os.environ.get('CSRF_COOKIE_SECURE'), False)
 
+# Panel de simulacion de pagos: visible en desarrollo (DEBUG) o si se activa
+# explicitamente. Nunca debe quedar accesible en produccion real.
+PAYMENTS_MOCK_UI_ENABLED = _as_bool(os.environ.get('PAYMENTS_MOCK_UI_ENABLED'), False)
+
+# Proveedor de pago activo en el checkout. "mock" (default, en todo entorno
+# que no declare esta variable) o "mercadopago". Cambiar esto no requiere
+# tocar el checkout ni las vistas de payments, solo esta variable.
+PAYMENT_PROVIDER = os.environ.get('PAYMENT_PROVIDER', 'mock')
+
 # Variables críticas de integraciones para runtime.
 MERCADOPAGO_ACCESS_TOKEN = os.environ.get('MERCADOPAGO_ACCESS_TOKEN', '')
+MERCADOPAGO_WEBHOOK_SECRET = os.environ.get('MERCADOPAGO_WEBHOOK_SECRET', '')
 HUBSPOT_PRIVATE_TOKEN = os.environ.get('HUBSPOT_PRIVATE_TOKEN', '')
 # Compatibilidad: prioriza ALEGRA_API_TOKEN y usa ALEGRA_TOKEN como fallback.
 ALEGRA_API_TOKEN = os.environ.get('ALEGRA_API_TOKEN') or os.environ.get('ALEGRA_TOKEN', '')

@@ -1,0 +1,15 @@
+{% load i18n %}{% comment %}
+Boton de llamada a la accion del dominio comercial (PLP, PDP, carrito,
+checkout, pedidos). Parametros:
+  tag     - 'a' (por defecto) o 'button'
+  href    - URL de destino, solo si tag='a'
+  type    - atributo type del boton, solo si tag='button' (ej. 'submit')
+  variant - por defecto, pildora de catalogo (fondo zafiro, hover dorado);
+            'primary' (fondo zafiro, hover dorado, ancho completo, con el
+            halo Quantum que respira: es el boton que cierra la pantalla) o
+            'pill' (fondo zafiro solido, pildora pequena, sin hover)
+  size    - 'base' (por defecto) o 'sm'; solo aplica a la pildora de
+            catalogo
+  label   - texto visible, ya en espanol (se traduce con {% trans %})
+{% endcomment %}
+{% if tag == 'button' %}<button type="{{ type|default:'button' }}" class="{% if variant == 'primary' %}gtg-cta-quantum w-full bg-[var(--color-zafiro)] text-white py-3 rounded-full font-bold hover:bg-[var(--color-gold)] transition{% elif variant == 'pill' %}mt-4 inline-block px-5 py-2 rounded-full bg-[var(--color-zafiro)] text-white font-semibold{% elif size == 'sm' %}mt-2 px-4 py-1 rounded-full bg-[var(--color-zafiro)] text-white font-semibold text-xs hover:bg-[var(--color-gold)] hover:text-[var(--color-zafiro)] transition{% else %}mt-3 block text-center px-4 py-2 rounded-full bg-[var(--color-zafiro)] text-white text-sm font-semibold hover:bg-[var(--color-gold)] hover:text-[var(--color-zafiro)] transition{% endif %}">{% trans label %}</button>{% else %}<a href="{{ href }}" class="{% if variant == 'primary' %}gtg-cta-quantum block text-center w-full bg-[var(--color-zafiro)] text-white py-3 rounded-full font-bold hover:bg-[var(--color-gold)] transition{% elif variant == 'pill' %}mt-4 inline-block px-5 py-2 rounded-full bg-[var(--color-zafiro)] text-white font-semibold{% elif size == 'sm' %}mt-2 px-4 py-1 rounded-full bg-[var(--color-zafiro)] text-white font-semibold text-xs hover:bg-[var(--color-gold)] hover:text-[var(--color-zafiro)] transition{% else %}mt-3 block text-center px-4 py-2 rounded-full bg-[var(--color-zafiro)] text-white text-sm font-semibold hover:bg-[var(--color-gold)] hover:text-[var(--color-zafiro)] transition{% endif %}">{% trans label %}</a>{% endif %}

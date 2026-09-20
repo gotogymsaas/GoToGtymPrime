@@ -1,0 +1,14 @@
+{% load i18n %}{% comment %}
+Fila de dos columnas para resumenes de precio (Subtotal/Envio/Total).
+Parametros:
+  label      - texto de la etiqueta, ya en espanol (se traduce)
+  row_class  - clases Tailwind de la fila (tipografia, color, bordes)
+  amount     - monto numerico; se muestra como "$monto" (usar esto o
+               value_text, no ambos)
+  suffix     - texto opcional despues del monto (ej. codigo de moneda)
+  value_text - texto ya traducible para casos no monetarios (ej.
+               "Sin costo por ahora")
+{% endcomment %}<div class="{{ row_class }}">
+  <span>{% trans label %}</span>
+  <span>{% if value_text %}{% trans value_text %}{% else %}${{ amount|floatformat:0 }}{% if suffix %} {{ suffix }}{% endif %}{% endif %}</span>
+</div>

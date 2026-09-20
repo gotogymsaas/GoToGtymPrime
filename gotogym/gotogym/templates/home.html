@@ -10,20 +10,6 @@
 {% block footer %}{% endblock %}
 
 {% block content %}
-{% if show_influencer_modal %}
-<div id="influencer-modal" class="gtg-modal">
-  <div class="gtg-modal__card">
-    <button type="button" onclick="document.getElementById('influencer-modal').classList.add('hidden')" class="gtg-modal__close">&times;</button>
-    <h3>{% trans "¿Quieres ser influencer?" %}</h3>
-    <p>{% trans "Suscríbete y obtén beneficios exclusivos como embajador de GoToGym." %}</p>
-    <div class="gtg-modal__actions">
-      <a href="{% url 'influencer_suscribete' %}" class="gtg-btn-primary">{% trans "Suscribirme" %}</a>
-      <button type="button" onclick="document.getElementById('influencer-modal').classList.add('hidden')" class="gtg-btn-ghost">{% trans "No, gracias" %}</button>
-    </div>
-  </div>
-</div>
-{% endif %}
-
 <div class="figma-home">
   <section class="quantum-hero" aria-labelledby="quantum-hero-title">
     <div class="quantum-field" aria-hidden="true">

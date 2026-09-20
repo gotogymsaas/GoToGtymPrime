@@ -1,0 +1,65 @@
+{% load static i18n %}{% get_static_prefix as STATIC_PREFIX %}{% comment %}
+Tarjeta de producto. Parametros:
+  card       - dict de tienda.catalog.build_product_card: product, image,
+               price_min, price_max, has_price_range, sizes, colors,
+               in_stock
+  detail_url - URL de la ficha del producto (se calcula en la plantilla
+               que incluye este partial, con {% url %})
+  mode       - 'grid' (PLP, tarjeta completa; por defecto) o 'compact'
+               (PDP, productos relacionados)
+{% endcomment %}
+{% if mode == 'compact' %}
+<article class="bg-[var(--color-premium-white)] rounded-xl shadow p-3 flex flex-col items-center gtg-card-quantum">
+  <img src="{% if card.image %}{{ STATIC_PREFIX }}product_media/{{ card.image.name }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
+       alt="{{ card.product.name }}" loading="lazy" class="h-28 object-contain mb-2">
+  <h3 class="font-semibold text-center text-[var(--color-zafiro)] text-sm">{{ card.product.name }}</h3>
+  <p class="text-[var(--color-zafiro)] font-bold">{% include "tienda/partials/_price.html" with price_min=card.price_min has_range=False %}</p>
+  {% if not card.in_stock %}<span class="text-xs text-gray-500">{% trans "Agotado" %}</span>{% endif %}
+  {% include "partials/_cta_button.html" with tag="a" href=detail_url size="sm" label="Ver detalles" %}
+</article>
+{% else %}
+{% comment %}
+El halo va en un contenedor propio, no en el <article>: el article necesita
+overflow-hidden para recortar la imagen a las esquinas redondeadas, y ese
+mismo overflow recortaria la sombra exterior hasta hacerla invisible.
+{% endcomment %}
+<div class="gtg-card-quantum h-full">
+<article class="bg-[var(--color-premium-white)] rounded-xl shadow flex flex-col overflow-hidden h-full">
+  <a href="{{ detail_url }}" class="block relative">
+    <div class="aspect-[4/5] bg-gray-50 flex items-center justify-center overflow-hidden">
+      <img src="{% if card.image %}{{ STATIC_PREFIX }}product_media/{{ card.image.name }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
+           alt="{{ card.product.name }}" loading="lazy"
+           class="object-contain max-h-full max-w-full">
+    </div>
+    {% if not card.in_stock %}
+    {% include "partials/_badge.html" with label="Agotado" %}
+    {% endif %}
+  </a>
+
+  <div class="p-3 sm:p-4 flex flex-col flex-1">
+    <h2 class="font-semibold text-[var(--color-zafiro)] text-sm sm:text-base leading-snug">
+      <a href="{{ detail_url }}" class="hover:underline">{{ card.product.name }}</a>
+    </h2>
+    <p class="text-xs text-gray-500 mt-0.5">{{ card.product.category.name }}</p>
+
+    <p class="mt-2 font-bold text-[var(--color-zafiro)]">
+      {% include "tienda/partials/_price.html" with price_min=card.price_min price_max=card.price_max has_range=card.has_price_range %}
+    </p>
+
+    {% if card.sizes %}
+    <div class="mt-2 flex flex-wrap gap-1">
+      {% for size in card.sizes %}
+      <span class="text-[11px] border border-gray-300 rounded px-1.5 py-0.5 text-gray-600">{{ size }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if card.colors %}
+    <p class="mt-1 text-xs text-gray-500">{{ card.colors|join:", " }}</p>
+    {% endif %}
+
+    {% include "partials/_cta_button.html" with tag="a" href=detail_url size="base" label="Ver producto" %}
+  </div>
+</article>
+</div>
+{% endif %}

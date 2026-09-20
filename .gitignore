@@ -16,6 +16,7 @@ environments/azure/.env.release
 
 # Local test virtualenv
 .venv-backend-test/
+.venv
 
 # Build
 build/

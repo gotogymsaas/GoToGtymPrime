@@ -20,7 +20,7 @@
     <h2>Productos recientes</h2>
     <table>
       {% for product in latest_products %}
-      <tr><td>{{ product.name }}</td><td>${{ product.price|floatformat:2 }}</td><td>{{ product.stock }}</td></tr>
+      <tr><td>{{ product.name }}</td><td>${{ product.base_price|floatformat:2 }}</td><td>{{ product.stock }}</td></tr>
       {% empty %}<tr><td>No hay productos.</td></tr>{% endfor %}
     </table>
   </div>

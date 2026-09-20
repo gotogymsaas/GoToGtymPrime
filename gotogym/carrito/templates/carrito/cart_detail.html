@@ -1,65 +1,103 @@
 {% extends 'base.html' %}
-{% block title %}Shopping Cart{% endblock %}
+{% load static %}
+{% load i18n %}
+{% block title %}{% trans "Carrito" %}{% endblock %}
 {% block content %}
-<div class="container mx-auto py-8 px-2 sm:px-4">
+{% get_static_prefix as STATIC_PREFIX %}
+<div class="container mx-auto py-8 px-4">
+
+  {% if messages %}
+  <div class="mb-4 space-y-2">
+    {% for message in messages %}
+    <p class="px-4 py-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-sm">{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <div class="flex flex-col lg:flex-row gap-8">
-    <div class="w-full lg:w-2/3">
-      <h2 class="text-2xl font-bold mb-4">Shopping Cart <span class="text-base font-normal text-gray-500">{{ num_items }} items</span></h2>
-      <div class="bg-white rounded-xl shadow p-4">
+
+    <div class="w-full lg:w-2/3 gtg-quantum-ambient">
+      <h1 class="text-2xl font-bold mb-4 text-[var(--color-text-primary)]">
+        {% trans "Carrito" %}
+        <span class="text-base font-normal text-[var(--color-text-secondary)]">
+          {% blocktrans count counter=num_items %}{{ counter }} artículo{% plural %}{{ counter }} artículos{% endblocktrans %}
+        </span>
+      </h1>
+
+      <div class="bg-[var(--color-premium-white)] rounded-xl shadow divide-y">
         {% for item in items %}
-        <div class="flex flex-col sm:flex-row items-center justify-between border-b py-4 last:border-b-0 gap-4">
-          <div class="flex items-center gap-4 w-full sm:w-auto">
-            <img src="{{ item.producto.image.url }}" alt="{{ item.producto.name }}" class="w-16 h-16 object-contain rounded"/>
-            <div>
-              <div class="font-semibold">{{ item.producto.name }}</div>
-              <div class="text-gray-500 text-sm">{{ item.producto.description|truncatechars:30 }}</div>
-            </div>
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4">
+
+          <img src="{% if item.image %}{{ STATIC_PREFIX }}product_media/{{ item.image.name }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
+               alt="{{ item.producto.name }}" class="w-20 h-20 object-contain rounded shrink-0">
+
+          <div class="flex-1 min-w-0">
+            <a href="{% url 'tienda:producto_detail' item.producto.id %}" class="font-semibold text-[var(--color-zafiro)] hover:underline">{{ item.producto.name }}</a>
+            <dl class="mt-1 text-sm text-gray-600 flex flex-wrap gap-x-4">
+              <div class="flex gap-1">
+                <dt>{% trans "Talla" %}:</dt><dd class="font-medium">{{ item.variant.size }}</dd>
+              </div>
+              <div class="flex gap-1">
+                <dt>{% trans "Color" %}:</dt><dd class="font-medium">{{ item.variant.color }}</dd>
+              </div>
+              <div class="flex gap-1">
+                <dt>SKU:</dt><dd class="font-mono text-xs">{{ item.variant.sku }}</dd>
+              </div>
+            </dl>
+            <p class="mt-1 text-sm text-gray-500">${{ item.precio|floatformat:0 }} {% trans "c/u" %}</p>
           </div>
-          <form method="post" action="{% url 'carrito:update_cart' item.producto.id %}" class="flex items-center gap-2">
+
+          <form method="post" action="{% url 'carrito:update_cart' item.variant.id %}" class="flex items-center gap-2 shrink-0">
             {% csrf_token %}
-            <button type="submit" name="cantidad" value="{{ item.cantidad|add:'-1' }}" class="px-2 py-1 border rounded">-</button>
-            <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" class="w-12 text-center border rounded"/>
-            <button type="submit" name="cantidad" value="{{ item.cantidad|add:'1' }}" class="px-2 py-1 border rounded">+</button>
+            <label class="sr-only" for="cantidad-{{ item.variant.id }}">{% trans "Cantidad" %}</label>
+            <input id="cantidad-{{ item.variant.id }}" type="number" name="cantidad" value="{{ item.cantidad }}" min="1"
+                   class="w-16 text-center border border-gray-300 rounded px-2 py-1 text-[var(--color-ink)]">
+            <button type="submit" class="px-3 py-1 border border-gray-300 rounded text-sm text-[var(--color-ink)] hover:bg-gray-100">{% trans "Actualizar" %}</button>
           </form>
-          <div class="font-semibold">€ {{ item.subtotal|floatformat:2 }}</div>
-          <a href="{% url 'carrito:remove_from_cart' item.producto.id %}" class="text-gray-400 hover:text-red-500 text-xl">&times;</a>
+
+          <div class="font-semibold text-[var(--color-zafiro)] w-28 text-right shrink-0">${{ item.subtotal|floatformat:0 }}</div>
+
+          <form method="post" action="{% url 'carrito:remove_from_cart' item.variant.id %}" class="shrink-0">
+            {% csrf_token %}
+            <button type="submit" class="text-gray-400 hover:text-red-600 text-2xl leading-none px-2"
+                    aria-label="{% trans 'Eliminar del carrito' %}">&times;</button>
+          </form>
         </div>
         {% empty %}
-        <div class="text-center text-gray-500 py-8">El carrito está vacío.</div>
+        <div class="text-center text-gray-500 py-12">
+          <p>{% trans "Tu carrito está vacío." %}</p>
+          {% url 'tienda:producto_list' as producto_list_url %}
+          {% include "partials/_cta_button.html" with tag="a" href=producto_list_url variant="pill" label="Ir a la tienda" %}
+        </div>
         {% endfor %}
       </div>
-      <a href="/tienda/" class="mt-4 inline-block text-gray-600 hover:underline">&larr; Back to shop</a>
+
+      <a href="{% url 'tienda:producto_list' %}" class="mt-4 inline-block text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition">&larr; {% trans "Seguir comprando" %}</a>
     </div>
+
+    {% if items %}
     <div class="w-full lg:w-1/3">
-      <div class="bg-gray-100 rounded-xl p-6">
-        <h3 class="font-bold text-lg mb-4">Summary</h3>
-        <div class="flex justify-between mb-2">
-          <span>ITEMS {{ num_items }}</span>
-          <span>€ {{ total|floatformat:2 }}</span>
+      <div class="gtg-summary-panel bg-gray-100 rounded-xl p-6">
+        <h2 class="font-bold text-lg mb-4 text-[var(--color-zafiro)]">{% trans "Resumen" %}</h2>
+
+        {% include "partials/_price_row.html" with row_class="flex justify-between mb-2 text-[var(--color-ink)]" label="Subtotal" amount=subtotal %}
+
+        <div class="flex justify-between mb-1 text-sm text-gray-600">
+          <span>{% trans "Envío" %}</span>
+          <span>
+            {% if shipping_estimate > 0 %}{% trans "desde" %} ${{ shipping_estimate|floatformat:0 }}
+            {% else %}{% trans "Gratis" %}{% endif %}
+          </span>
         </div>
-        <div class="mb-2">
-          <span class="block mb-1">SHIPPING</span>
-          <select class="w-full border rounded px-2 py-1">
-            <option>Standard Delivery - € {{ shipping|floatformat:2 }}</option>
-          </select>
-        </div>
-        <div class="mb-2">
-          <span class="block mb-1">GIVE CODE</span>
-          <form class="flex">
-            <input type="text" class="flex-1 border rounded-l px-2 py-1" placeholder="Enter your code"/>
-            <button type="submit" class="bg-white border border-l-0 rounded-r px-3">→</button>
-          </form>
-        </div>
-        <div class="flex justify-between font-bold text-lg mt-4 mb-4">
-          <span>TOTAL PRICE</span>
-          <span>€ {{ total_price|floatformat:2 }}</span>
-        </div>
-        <form method="post" action="{% url 'carrito:checkout' %}">
-          {% csrf_token %}
-          <button type="submit" class="w-full bg-black text-white py-2 rounded font-bold mt-2">CHECKOUT</button>
-        </form>
+        <p class="text-xs text-gray-400 mb-3">{% trans "El costo exacto se confirma con tu dirección en el siguiente paso." %}</p>
+
+        {% include "partials/_price_row.html" with row_class="flex justify-between font-bold text-lg border-t border-gray-300 pt-4 mb-4 text-[var(--color-zafiro)]" label="Total" amount=total %}
+
+        {% url 'orders:checkout' as checkout_url %}
+        {% include "partials/_cta_button.html" with tag="a" href=checkout_url variant="primary" label="Continuar" %}
       </div>
     </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

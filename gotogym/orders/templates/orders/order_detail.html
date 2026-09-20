@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Pedido" %} {{ pedido.order_number }}{% endblock %}
+
+{% block extra_head %}
+<style>
+  @media print {
+    .no-print { display: none !important; }
+    body { background: white; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-8 px-4 max-w-3xl">
+
+  {% if messages %}
+  <div class="mb-4 space-y-2 no-print">
+    {% for message in messages %}
+    <p class="px-4 py-3 rounded-lg text-sm
+      {% if message.tags == 'success' %}bg-green-50 border border-green-200 text-green-800
+      {% elif message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800
+      {% elif message.tags == 'warning' %}bg-amber-50 border border-amber-200 text-amber-900
+      {% else %}bg-blue-50 border border-blue-200 text-blue-900{% endif %}">
+      {{ message }}
+    </p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if pedido.order_status == 'confirmed' %}
+  <div class="mb-4 px-4 py-3 rounded-lg bg-green-50 border border-green-200 text-green-800 text-sm no-print">
+    {% trans "Pago aprobado. Tu pedido quedó confirmado." %}
+  </div>
+  {% elif pedido.order_status == 'cancelled' and pedido.payment_status == 'approved' %}
+  <div class="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm no-print">
+    {% trans "Tu pago fue aprobado, pero hubo un problema para completar el pedido. Nuestro equipo se pondrá en contacto contigo." %}
+  </div>
+  {% endif %}
+
+  <div class="bg-[var(--color-premium-white)] rounded-xl shadow p-6">
+
+    <header class="border-b border-gray-200 pb-4 mb-4">
+      <p class="text-sm text-gray-500">{% trans "Pedido" %} / {% trans "Recibo" %}</p>
+      <h1 class="text-2xl font-bold text-[var(--color-zafiro)]">{{ pedido.order_number }}</h1>
+      <p class="text-sm text-gray-600 mt-1">{{ pedido.created_at|date:"d/m/Y H:i" }}</p>
+
+      <div class="flex flex-wrap gap-2 mt-3">
+        <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-semibold">
+          {% trans "Estado" %}: {{ pedido.get_order_status_display }}
+        </span>
+        <span class="px-3 py-1 rounded-full bg-gray-200 text-gray-800 text-xs font-semibold">
+          {% trans "Pago" %}: {{ pedido.get_payment_status_display }}
+        </span>
+      </div>
+    </header>
+
+    <section class="mb-6">
+      <h2 class="font-semibold text-[var(--color-zafiro)] mb-2">{% trans "Artículos" %}</h2>
+      <ul class="divide-y divide-gray-200">
+        {% for item in pedido.items.all %}
+        <li class="py-3 flex justify-between gap-4 text-sm">
+          <div>
+            <p class="font-semibold text-[var(--color-ink)]">{{ item.product_name_snapshot }}</p>
+            <p class="text-gray-600">{{ item.size_snapshot }} / {{ item.color_snapshot }} &middot; x{{ item.quantity }}</p>
+            <p class="text-xs text-gray-500 font-mono">{{ item.sku_snapshot }}</p>
+          </div>
+          <span class="font-semibold whitespace-nowrap text-[var(--color-ink)]">${{ item.line_total|floatformat:0 }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section class="mb-6 text-sm">
+      {% include "partials/_price_row.html" with row_class="flex justify-between mb-1 text-[var(--color-ink)]" label="Subtotal" amount=pedido.subtotal %}
+      {% include "partials/_price_row.html" with row_class="flex justify-between mb-1 text-[var(--color-ink)]" label="Envío" amount=pedido.shipping_cost %}
+      {% include "partials/_price_row.html" with row_class="flex justify-between font-bold text-lg border-t border-gray-200 pt-2 mt-2 text-[var(--color-zafiro)]" label="Total" amount=pedido.total suffix=pedido.currency %}
+    </section>
+
+    <section class="mb-6 text-sm">
+      <h2 class="font-semibold text-[var(--color-zafiro)] mb-2">{% trans "Entrega" %}</h2>
+      <address class="not-italic text-gray-700 leading-relaxed">
+        {{ pedido.address.full_name }}<br>
+        {{ pedido.address.address_line }}{% if pedido.address.address_complement %}, {{ pedido.address.address_complement }}{% endif %}<br>
+        {{ pedido.address.city }}, {{ pedido.address.department }}, {{ pedido.address.country }}
+        {% if pedido.address.postal_code %}<br>{{ pedido.address.postal_code }}{% endif %}<br>
+        {{ pedido.address.phone }} &middot; {{ pedido.email }}
+        {% if pedido.address.notes %}<br><span class="text-gray-500">{{ pedido.address.notes }}</span>{% endif %}
+      </address>
+      {% if pedido.shipping_quote %}
+      <p class="text-gray-500 mt-2">
+        {{ pedido.shipping_quote.carrier_name }} &middot; {{ pedido.shipping_quote.method_name }}
+        &middot; {% blocktrans count dias=pedido.shipping_quote.estimated_days %}{{ dias }} día hábil{% plural %}{{ dias }} días hábiles{% endblocktrans %}
+      </p>
+      {% endif %}
+    </section>
+
+    {% if pedido.payment_status == 'pending' %}
+    <p class="px-4 py-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-sm no-print">
+      {% trans "Tu pedido quedó registrado y está pendiente de pago." %}
+      <a href="{% url 'payments:pending' pedido.order_number %}" class="underline font-semibold">{% trans "Ir a pagar" %}</a>
+    </p>
+    {% endif %}
+
+    <div class="flex flex-wrap gap-4 mt-4 no-print">
+      <a href="{% url 'tienda:producto_list' %}" class="text-gray-600 hover:underline">&larr; {% trans "Volver a la tienda" %}</a>
+      {% if pedido.order_status == 'confirmed' %}
+      <button type="button" onclick="window.print()" class="text-[var(--color-zafiro)] font-semibold hover:underline">
+        {% trans "Imprimir recibo" %}
+      </button>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

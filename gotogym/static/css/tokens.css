@@ -1,0 +1,56 @@
+/* Tokens del dominio comercial (PLP, PDP, carrito, checkout, pedidos, pagos).
+ *
+ * Los tokens de la identidad Quantum (fondo, acento turquesa, dorado,
+ * tipografia, espaciado, radios) ya viven en style.css y no se duplican
+ * aqui. Este archivo agrega solo lo que faltaba para que el dominio
+ * comercial deje de usar hexadecimales sueltos.
+ *
+ * Fuente de la paleta de marca: modelo ColorMarca (configuracion_marca/
+ * models.py), que documenta la paleta sugerida del Brand Book. La tabla
+ * esta vacia y no hay ningun context processor que la use en runtime;
+ * se usa aqui solo como referencia de los hex oficiales.
+ *
+ * Decisiones de reconciliacion:
+ *
+ * - Dorado: el Brand Book define "Dorado Fitness" en #D4B46A, que ya es
+ *   exactamente --color-gold en style.css. Las plantillas de comercio
+ *   usaban #C5A46B (un dorado ligeramente distinto, no definido en ningun
+ *   token). Se migro a --color-gold en el sprint de tokens.
+ *
+ * - Azul: el Brand Book define "Azul Zafiro" en #17375C. Las plantillas
+ *   de comercio usaban #093f62 (un azul cercano pero no oficial). Se
+ *   corrigio al hex oficial: la diferencia es sutil (misma familia de
+ *   azul oscuro) y cierra la ultima divergencia de color pendiente del
+ *   dominio comercial contra el Brand Book real (ColorMarca).
+ *
+ * - Blanco: el Brand Book define "Blanco Premium" en #F8F9FA para
+ *   contenido largo y catalogo. El dominio comercial usaba el blanco
+ *   generico de Tailwind (#FFFFFF) en todas las superficies de tarjeta.
+ *   Se agrega --color-premium-white y se migra el catalogo a usarlo.
+ */
+
+:root {
+  --color-zafiro: #17375C;
+  --color-premium-white: #F8F9FA;
+
+  /* Negro Grafito (Brand Book, ver ColorMarca). El body global define
+     color: #ffffff (tema Quantum), que se hereda hasta dentro de las
+     superficies claras del dominio comercial (inputs, selects, filas de
+     resumen) cuando esos elementos no fijan su propio color: texto
+     blanco sobre fondo blanco, invisible. --color-ink es el color de
+     texto por defecto para ese contenido, y se aplica explicitamente
+     elemento por elemento (no como reset global de .bg-white, que
+     afectaria paginas fuera del dominio comercial sin poder verificarlo
+     visualmente en este entorno). */
+  --color-ink: #101012;
+
+  /* Ver Anexo A / seccion 11 del manuscrito de Direccion de Diseno:
+     nunca usar --color-gold ni --color-zafiro como texto pequeno sobre
+     fondos claros sin verificar contraste AA primero (ya hubo un caso
+     real corregido en la ficha de producto). */
+
+  --motion-fast: 120ms;
+  --motion-ui: 200ms;
+  --motion-story: 480ms;
+  --motion-easing: cubic-bezier(0.22, 1, 0.36, 1);
+}

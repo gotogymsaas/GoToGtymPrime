@@ -1,172 +1,154 @@
 {% extends "base.html" %}
-{% load static %}
 {% load i18n %}
 
 {% block title %}{% trans "Store" %}{% endblock %}
 
-{% block navbar %}{% endblock %}
-{% block footer %}{% endblock %}
-
-{% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/shop_figma.css' %}?v=20260905-store-controls-inner-margin-12">
-{% endblock %}
-
 {% block content %}
-{% get_static_prefix as STATIC_PREFIX %}
-<main class="figma-home store-page">
-  <section class="quantum-hero store-hero" aria-label="{% trans 'Store GoToGym' %}">
-    <div class="quantum-field store-quantum-field" aria-hidden="true">
-      <span class="quantum-watermark"></span>
-      <span class="quantum-orbit quantum-orbit--outer"><i></i></span>
-      <span class="quantum-orbit quantum-orbit--one"><i></i></span>
-      <span class="quantum-orbit quantum-orbit--two"><i></i></span>
-      <span class="quantum-orbit quantum-orbit--three"><i></i></span>
-      <span class="quantum-core"></span>
-    </div>
+<div class="container mx-auto px-4 py-6 gtg-quantum-ambient">
 
-    <div class="quantum-hero__content store-hero__content">
-      <a href="{% url 'logged_home' %}" class="quantum-hero__logo store-hero__logo" aria-label="GoToGym inicio">
-        <img src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" aria-hidden="true">
-      </a>
+  <header class="mb-6">
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-[var(--color-text-primary)]">{% trans "Tienda" %}</h1>
+    <p class="text-[var(--color-text-secondary)] mt-1">
+      {% blocktrans count counter=total_resultados %}{{ counter }} producto disponible{% plural %}{{ counter }} productos disponibles{% endblocktrans %}
+    </p>
+  </header>
 
-      <div class="store-orbit-user">
-        <span>{% trans "welcome" %}</span>
-        <strong>{{ user.email|default:user.username }}</strong>
-      </div>
+  <button type="button" data-filters-toggle
+          class="lg:hidden w-full mb-4 px-4 py-2 rounded-xl border border-[var(--color-border)] font-semibold text-[var(--color-text-primary)] flex items-center justify-center gap-2">
+    <span class="material-icons-outlined">tune</span>{% trans "Filtros" %}
+  </button>
 
-      <form method="get" id="storeCategoryForm" class="store-select-group">
-        <label for="storeCategorySelect">{% trans "Categoría" %}</label>
-        <select id="storeCategorySelect" name="categoria">
-          {% for cat in categorias %}
-          <option value="{{ cat.id }}" {% if selected_category_id == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
-          {% endfor %}
-        </select>
+  <div class="flex flex-col lg:flex-row gap-6">
+
+    <aside data-filters-panel class="hidden lg:block w-full lg:w-64 shrink-0">
+      <form method="get" class="bg-[var(--color-premium-white)] rounded-xl shadow p-4 space-y-5">
+
+        <div>
+          <label for="f-buscar" class="block text-sm font-semibold text-gray-700 mb-1">{% trans "Buscar" %}</label>
+          <input id="f-buscar" type="search" name="filtro" value="{{ filtro }}"
+                 placeholder="{% trans 'Nombre del producto' %}"
+                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-[var(--color-ink)]">
+        </div>
+
+        <div>
+          <label for="f-categoria" class="block text-sm font-semibold text-gray-700 mb-1">{% trans "Categoría" %}</label>
+          <select id="f-categoria" name="categoria" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-[var(--color-ink)]">
+            <option value="">{% trans "Todas" %}</option>
+            {% for cat in categorias %}
+            <option value="{{ cat.id }}" {% if selected_category_id == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        {% if sizes %}
+        <fieldset>
+          <legend class="block text-sm font-semibold text-gray-700 mb-2">{% trans "Talla" %}</legend>
+          <div class="flex flex-wrap gap-2">
+            <label class="cursor-pointer">
+              <input type="radio" name="talla" value="" class="sr-only peer" {% if not selected_size %}checked{% endif %}>
+              <span class="inline-block px-3 py-1 rounded-full border border-gray-300 text-sm text-[var(--color-ink)] peer-checked:bg-[var(--color-zafiro)] peer-checked:text-white peer-focus:ring-2 peer-focus:ring-[var(--color-gold)]">{% trans "Todas" %}</span>
+            </label>
+            {% for size in sizes %}
+            <label class="cursor-pointer">
+              <input type="radio" name="talla" value="{{ size }}" class="sr-only peer" {% if selected_size == size %}checked{% endif %}>
+              <span class="inline-block px-3 py-1 rounded-full border border-gray-300 text-sm text-[var(--color-ink)] peer-checked:bg-[var(--color-zafiro)] peer-checked:text-white peer-focus:ring-2 peer-focus:ring-[var(--color-gold)]">{{ size }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </fieldset>
+        {% endif %}
+
+        {% if colors %}
+        <div>
+          <label for="f-color" class="block text-sm font-semibold text-gray-700 mb-1">{% trans "Color" %}</label>
+          <select id="f-color" name="color" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-[var(--color-ink)]">
+            <option value="">{% trans "Todos" %}</option>
+            {% for c in colors %}
+            <option value="{{ c }}" {% if selected_color == c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+
+        <div>
+          <span class="block text-sm font-semibold text-gray-700 mb-1">{% trans "Precio (COP)" %}</span>
+          <div class="flex gap-2">
+            <input type="number" name="precio_min" value="{{ precio_min }}" min="0" placeholder="{% trans 'Mín' %}"
+                   aria-label="{% trans 'Precio mínimo' %}"
+                   class="w-1/2 border border-gray-300 rounded-lg px-2 py-2 text-sm text-[var(--color-ink)]">
+            <input type="number" name="precio_max" value="{{ precio_max }}" min="0" placeholder="{% trans 'Máx' %}"
+                   aria-label="{% trans 'Precio máximo' %}"
+                   class="w-1/2 border border-gray-300 rounded-lg px-2 py-2 text-sm text-[var(--color-ink)]">
+          </div>
+        </div>
+
+        <div>
+          <label for="f-orden" class="block text-sm font-semibold text-gray-700 mb-1">{% trans "Ordenar por" %}</label>
+          <select id="f-orden" name="orden" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-[var(--color-ink)]">
+            <option value="">{% trans "Relevancia" %}</option>
+            <option value="precio_asc" {% if orden == 'precio_asc' %}selected{% endif %}>{% trans "Precio: menor a mayor" %}</option>
+            <option value="precio_desc" {% if orden == 'precio_desc' %}selected{% endif %}>{% trans "Precio: mayor a menor" %}</option>
+            <option value="nombre_asc" {% if orden == 'nombre_asc' %}selected{% endif %}>{% trans "Nombre: A-Z" %}</option>
+            <option value="nombre_desc" {% if orden == 'nombre_desc' %}selected{% endif %}>{% trans "Nombre: Z-A" %}</option>
+          </select>
+        </div>
+
+        <div class="flex gap-2 pt-1">
+          <button type="submit" class="flex-1 bg-[var(--color-zafiro)] text-white rounded-full py-2 font-semibold hover:bg-[var(--color-gold)] hover:text-[var(--color-zafiro)] transition">{% trans "Aplicar" %}</button>
+          {% if filtros_activos %}
+          <a href="{% url 'tienda:producto_list' %}" class="px-4 py-2 rounded-full border border-gray-300 text-sm text-gray-700 hover:bg-gray-100">{% trans "Limpiar" %}</a>
+          {% endif %}
+        </div>
       </form>
+    </aside>
 
-      <div class="store-select-group">
-        <label for="storeProductSelect">{% trans "Productos" %}</label>
-        <select id="storeProductSelect">
-          <option value="">{% trans "Selecciona un producto" %}</option>
-          {% for producto in productos %}
-          <option value="{{ producto.id }}">{{ producto.name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div class="store-product-list" id="storeProductList" hidden>
-        {% for producto in productos %}
-        <article
-          class="store-product-row"
-          data-product-id="{{ producto.id }}"
-          data-name="{{ producto.name|escapejs }}"
-          data-price="${{ producto.price|floatformat:0 }}"
-          data-description="{{ producto.description|default:'Producto GoToGym seleccionado.'|escapejs }}"
-          data-detail-url="{% url 'tienda:producto_detail' producto.id %}"
-          data-add-url="{% url 'carrito:add_to_cart' producto.id %}"
-          data-image="{% if producto.image %}{{ STATIC_PREFIX }}product_media/{{ producto.image.name }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
-        >
-          <span>{{ producto.name }}</span>
-          <button type="button" class="store-more-button">{% trans "Conocer más" %}</button>
-        </article>
-        {% empty %}
-        <p class="store-empty">{% trans "No hay productos para esta categoria." %}</p>
+    <section class="flex-1">
+      {% if cards %}
+      <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+        {% for card in cards %}
+        {% url 'tienda:producto_detail' card.product.id as card_detail_url %}
+        {% include "tienda/partials/_product_card.html" with card=card detail_url=card_detail_url mode="grid" %}
         {% endfor %}
       </div>
 
-      <a class="store-back-link" href="{% url 'logged_home' %}">{% trans "Regresar" %}</a>
-    </div>
+      {% if page_obj.has_other_pages %}
+      <nav class="mt-8 flex justify-center items-center gap-3" aria-label="{% trans 'Paginación' %}">
+        {% if page_obj.has_previous %}
+        <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}"
+           class="px-3 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition">{% trans "Anterior" %}</a>
+        {% endif %}
+        <span class="text-sm text-[var(--color-text-secondary)]">{% blocktrans with num=page_obj.number total=page_obj.paginator.num_pages %}Página {{ num }} de {{ total }}{% endblocktrans %}</span>
+        {% if page_obj.has_next %}
+        <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}"
+           class="px-3 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition">{% trans "Siguiente" %}</a>
+        {% endif %}
+      </nav>
+      {% endif %}
 
-    <aside class="store-product-frame" id="storeProductFrame" aria-live="polite" hidden>
-      <img id="storeFrameImage" src="" alt="">
-      <div class="store-product-frame__body">
-        <h1 id="storeFrameName"></h1>
-        <strong id="storeFramePrice"></strong>
-        <p id="storeFrameDescription"></p>
-        <div class="store-product-frame__actions">
-          <button type="button" id="storeReturnButton">{% trans "Regresar al listado" %}</button>
-          <button type="button" id="storeBuyButton">{% trans "Comprar" %}</button>
-        </div>
+      {% else %}
+      <div class="bg-[var(--color-premium-white)] rounded-xl shadow p-10 text-center">
+        <p class="text-gray-600">{% trans "No encontramos productos con esos filtros." %}</p>
+        {% if filtros_activos %}
+        {% url 'tienda:producto_list' as producto_list_url %}
+        {% include "partials/_cta_button.html" with tag="a" href=producto_list_url variant="pill" label="Ver todo el catálogo" %}
+        {% endif %}
       </div>
-    </aside>
-  </section>
-</main>
+      {% endif %}
+    </section>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const categoryForm = document.getElementById('storeCategoryForm');
-    const categorySelect = document.getElementById('storeCategorySelect');
-    const productSelect = document.getElementById('storeProductSelect');
-    const productList = document.getElementById('storeProductList');
-    const frame = document.getElementById('storeProductFrame');
-    const frameImage = document.getElementById('storeFrameImage');
-    const frameName = document.getElementById('storeFrameName');
-    const framePrice = document.getElementById('storeFramePrice');
-    const frameDescription = document.getElementById('storeFrameDescription');
-    const returnButton = document.getElementById('storeReturnButton');
-    const buyButton = document.getElementById('storeBuyButton');
-
-    let activeAddUrl = '';
-
-    if (categorySelect && categoryForm) {
-      categorySelect.addEventListener('change', () => categoryForm.submit());
+  document.addEventListener('DOMContentLoaded', function () {
+    var toggle = document.querySelector('[data-filters-toggle]');
+    var panel = document.querySelector('[data-filters-panel]');
+    if (toggle && panel) {
+      toggle.addEventListener('click', function () {
+        panel.classList.toggle('hidden');
+      });
     }
-
-    function openProduct(row) {
-      if (!row || !frame) return;
-      productList.querySelectorAll('.store-product-row').forEach((item) => item.classList.toggle('is-active', item === row));
-      if (productSelect) productSelect.value = row.dataset.productId;
-      frameImage.src = row.dataset.image;
-      frameImage.alt = row.dataset.name;
-      frameName.textContent = row.dataset.name;
-      framePrice.textContent = row.dataset.price;
-      frameDescription.textContent = row.dataset.description;
-      activeAddUrl = row.dataset.addUrl;
-      frame.hidden = false;
-    }
-
-    productList?.addEventListener('click', (event) => {
-      const button = event.target.closest('.store-more-button');
-      if (!button) return;
-      openProduct(button.closest('.store-product-row'));
-    });
-
-    productSelect?.addEventListener('change', () => {
-      if (!productSelect.value) {
-        returnButton?.click();
-        return;
-      }
-      const row = productList.querySelector(`[data-product-id="${productSelect.value}"]`);
-      openProduct(row);
-    });
-
-    returnButton?.addEventListener('click', () => {
-      frame.hidden = true;
-      activeAddUrl = '';
-      productSelect.value = '';
-      productList.querySelectorAll('.store-product-row').forEach((item) => item.classList.remove('is-active'));
-    });
-
-    buyButton?.addEventListener('click', async () => {
-      if (!activeAddUrl) return;
-      const originalText = buyButton.textContent;
-      buyButton.disabled = true;
-      buyButton.textContent = '{% trans "Agregado" %}';
-      try {
-        const response = await fetch(activeAddUrl, {
-          headers: { 'x-requested-with': 'XMLHttpRequest' }
-        });
-        const data = await response.json();
-        const count = document.getElementById('cart-count');
-        if (count && data.cart_count !== undefined) count.textContent = data.cart_count;
-      } finally {
-        setTimeout(() => {
-          buyButton.disabled = false;
-          buyButton.textContent = originalText;
-        }, 1200);
-      }
-    });
   });
 </script>
 {% endblock %}

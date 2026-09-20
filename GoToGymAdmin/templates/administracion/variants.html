@@ -1,0 +1,32 @@
+{% extends "administracion/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Catalogo comercial</p>
+    <h1>Variantes</h1>
+  </div>
+</section>
+<form class="search" method="get">
+  <input name="q" value="{{ query }}" placeholder="Buscar por SKU o producto">
+  <button type="submit">Buscar</button>
+</form>
+<div class="panel">
+  <table>
+    <thead><tr><th>SKU</th><th>Producto</th><th>Talla</th><th>Color</th><th>Precio</th><th>Stock</th><th>Activa</th></tr></thead>
+    <tbody>
+      {% for variant in page_obj %}
+      <tr>
+        <td><strong>{{ variant.sku }}</strong></td>
+        <td>{{ variant.product.name }}</td>
+        <td>{{ variant.size }}</td>
+        <td>{{ variant.color }}</td>
+        <td>${{ variant.effective_price|floatformat:2 }}{% if variant.price_override %} <small>propio</small>{% endif %}</td>
+        <td>{% if variant.inventory %}{{ variant.inventory.quantity_available }}{% else %}<span class="empty-img">sin inventario</span>{% endif %}</td>
+        <td>{% if variant.is_active %}Si{% else %}No{% endif %}</td>
+      </tr>
+      {% empty %}<tr><td colspan="7">No hay variantes registradas.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "administracion/pagination.html" %}
+{% endblock %}

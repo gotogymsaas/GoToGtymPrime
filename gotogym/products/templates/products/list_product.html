@@ -44,7 +44,7 @@
             <td class="px-6 py-3 font-medium text-gray-800 whitespace-nowrap">{{ product.name }}</td>
             <td class="px-6 py-3">{{ product.category.name }}</td>
             
-            <td class="px-6 py-3">${{ product.price }}</td>
+            <td class="px-6 py-3">${{ product.base_price }}</td>
             <td class="px-6 py-3">{{ product.stock }}</td>
             <td class="px-6 py-3">
               {% if product.image %}
@@ -158,7 +158,7 @@
           name: `{{ product.name|escapejs }}`,
           
           category: `{{ product.category.name|escapejs }}`,
-          price: `{{ product.price }}`,
+          price: `{{ product.base_price }}`,
           stock: `{{ product.stock }}`,
           image: `{% if product.image %}{{ product.image.url }}{% endif %}`
         },

@@ -10,7 +10,8 @@
   <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260919-quantum-store">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260919-quantum-store">
   {% block extra_head %}{% endblock %}
   {% if paleta_marca %}
   <style>
@@ -30,9 +31,18 @@
         <span class="material-icons-outlined">menu</span>
       </button>
 
-      <a href="{% url 'home' %}" class="gtg-brand" aria-label="GoToGym inicio">GoToGym</a>
+      <a href="{% url 'home' %}" class="gtg-brand" aria-label="GoToGym inicio">
+        <img src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" aria-hidden="true" class="gtg-brand__mark">
+        <span class="gtg-brand__word">GoToGym</span>
+      </a>
 
       <div class="gtg-nav-actions">
+        <a href="{% url 'carrito:cart_detail' %}" class="gtg-icon-button gtg-cart-link"
+           aria-label="{% trans 'Carrito' %}">
+          <span class="material-icons-outlined" aria-hidden="true">shopping_cart</span>
+          <span id="cart-count" aria-live="polite"{% if not cart_count %} hidden{% endif %}>{{ cart_count|default:"0" }}</span>
+        </a>
+
         {% if user.is_authenticated %}
         <div class="gtg-user-menu" id="userMenuWrapper">
           <button id="userMenuBtn" type="button" class="gtg-icon-button gtg-user-button is-accent" aria-label="Menu de usuario" onclick="toggleUserMenu()">
@@ -44,6 +54,7 @@
             <span class="gtg-user-email-label">{{ user.email }}</span>
           </button>
           <div id="userDropdown" class="gtg-dropdown hidden">
+            <a href="{% url 'orders:my_orders' %}" onclick="closeUserMenu()">{% trans "Mis pedidos" %}</a>
             <a href="{% url 'edit_profile' %}" onclick="closeUserMenu()">{% trans "Editar perfil" %}</a>
             {% if user.is_authenticated and user.influencer_profile %}
             <a href="{% url 'influencer_dashboard' %}" onclick="closeUserMenu()">{% trans "Panel influencer" %}</a>
@@ -63,15 +74,12 @@
 
     <div id="mobile-menu" class="gtg-mobile-menu hidden">
       <a href="{% url 'home' %}">GoToGym</a>
-      <a href="{% url 'carrito:cart_detail' %}" class="gtg-mobile-cart-link">
-        <span>{% trans "Carrito" %}</span>
-        <span id="cart-count">{{ cart_count|default:"0" }}</span>
-      </a>
       <a href="{% url 'tienda:producto_list' %}">Store</a>
       <a href="{% url 'blog:post_list' %}">{% trans "Blog" %}</a>
       <a href="{% url 'contacto' %}">{% trans "Contacto" %}</a>
       {% if user.is_authenticated %}
       <span class="gtg-mobile-menu__divider"></span>
+      <a href="{% url 'orders:my_orders' %}">{% trans "Mis pedidos" %}</a>
       <a href="{% url 'edit_profile' %}">{% trans "Editar perfil" %}</a>
       <form action="{% url 'logout' %}" method="post">
         {% csrf_token %}
@@ -90,7 +98,7 @@
   <footer class="gtg-footer">
     <div class="gtg-footer-wrap">
       <div class="gtg-footer-brand">
-        <img src="{% static 'images/Logo_GoToGym_Blanco.png' %}" alt="GoToGym">
+        <img src="{% static 'images/Logo_GoToGym_Blanco.png' %}" alt="GoToGym" class="gtg-footer-brand__mark">
         <span>GoToGym</span>
       </div>
       <form class="gtg-footer-newsletter" method="post" action="{% url 'contacto' %}">
@@ -101,8 +109,7 @@
           <button type="submit">{% trans "Suscribirme" %}</button>
         </div>
       </form>
-      <div class="gtg-footer-links">
-        <div class="gtg-socials">
+      <div class="gtg-socials" aria-label="{% trans 'Redes sociales' %}">
           <a href="https://www.facebook.com/Gotogym.Sportwear" target="_blank" rel="noopener noreferrer" aria-label="Facebook GoToGym">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M14 8.2V6.7c0-.7.3-1.1 1.1-1.1h1.4V2.2c-.7-.1-1.5-.2-2.3-.2-2.8 0-4.7 1.7-4.7 4.8v1.4H6.7V12h2.8v10H14V12h2.9l.5-3.8H14Z"/>
@@ -133,12 +140,20 @@
               <path d="M12 2a9.9 9.9 0 0 0-8.5 15L2 22l5.1-1.4A10 10 0 1 0 12 2Zm0 18.1c-1.6 0-3.1-.5-4.4-1.3l-.3-.2-3 .8.8-2.9-.2-.3a8.1 8.1 0 1 1 7.1 3.9Zm4.5-6.1c-.2-.1-1.5-.8-1.8-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1-.3-.1-1.1-.4-2-1.2-.8-.7-1.3-1.5-1.4-1.8-.2-.2 0-.4.1-.5l.4-.5c.1-.2.2-.3.3-.5.1-.2.1-.3 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2 0-.1-.2-.2-.4-.3Z"/>
             </svg>
           </a>
-        </div>
-        <a href="{% url 'acerca_de' %}">{% trans "Acerca de" %}</a>
-        <a href="{% url 'politica_privacidad' %}">{% trans "Privacidad" %}</a>
-        <a href="{% url 'terminos' %}">{% trans "Terminos" %}</a>
       </div>
     </div>
+
+    <nav class="gtg-footer-legal" aria-label="{% trans 'Políticas y condiciones' %}">
+      <a href="{% url 'acerca_de' %}">{% trans "Acerca de" %}</a>
+      <a href="{% url 'politica_privacidad' %}">{% trans "Privacidad" %}</a>
+      <a href="{% url 'terminos' %}">{% trans "Terminos" %}</a>
+      <a href="{% url 'politica_cambios' %}">{% trans "Cambios" %}</a>
+      <a href="{% url 'politica_devoluciones' %}">{% trans "Devoluciones" %}</a>
+      <a href="{% url 'politica_garantia' %}">{% trans "Garantía" %}</a>
+      <a href="{% url 'politica_envios' %}">{% trans "Envíos" %}</a>
+      <a href="{% url 'politica_pagos' %}">{% trans "Pagos" %}</a>
+      <a href="{% url 'politica_tratamiento_datos' %}">{% trans "Tratamiento de datos" %}</a>
+    </nav>
   </footer>
   {% endblock %}
 

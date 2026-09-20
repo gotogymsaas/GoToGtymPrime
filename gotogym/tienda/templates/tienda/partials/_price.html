@@ -1,0 +1,6 @@
+{% comment %}
+Formatea un precio o rango de precios en pesos colombianos. Parametros:
+  price_min - monto minimo (obligatorio)
+  price_max - monto maximo (opcional, junto con has_range)
+  has_range - si es verdadero, muestra "price_min - price_max"
+{% endcomment %}${{ price_min|floatformat:0 }}{% if has_range %} – ${{ price_max|floatformat:0 }}{% endif %}

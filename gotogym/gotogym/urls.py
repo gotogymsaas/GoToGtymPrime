@@ -25,6 +25,7 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.views.static import serve
 from accounts import api_views as accounts_api_views
+from payments import views as payments_views
 
 urlpatterns = [
     path('accounts', lambda request: redirect('commercial_login', permanent=False)),
@@ -33,6 +34,9 @@ urlpatterns = [
     path('api/v1/auth/login', accounts_api_views.developer_login, name='developer_auth_login'),
     path('api/login/', accounts_api_views.developer_login, name='developer_login'),
     path('api/users/', accounts_api_views.developer_users, name='developer_users'),
+    # Fuera de i18n_patterns a proposito: un webhook real no antepone un
+    # prefijo de idioma a la URL.
+    path('pagos/webhook/mercadopago/', payments_views.mercadopago_webhook, name='mercadopago_webhook'),
 ]
 
 urlpatterns += i18n_patterns(
@@ -47,6 +51,12 @@ urlpatterns += i18n_patterns(
     path('politicas-privacidad-usuario/', views.politicas_privacidad_usuario, name='politicas_privacidad_usuario'),
     path('politica-privacidad/', views.politica_privacidad, name='politica_privacidad'),
     path('terminos/', views.terminos, name='terminos'),
+    path('politica-cambios/', views.politica_cambios, name='politica_cambios'),
+    path('politica-devoluciones/', views.politica_devoluciones, name='politica_devoluciones'),
+    path('politica-garantia/', views.politica_garantia, name='politica_garantia'),
+    path('politica-tratamiento-datos/', views.politica_tratamiento_datos, name='politica_tratamiento_datos'),
+    path('politica-envios/', views.politica_envios, name='politica_envios'),
+    path('politica-pagos/', views.politica_pagos, name='politica_pagos'),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('influencer/', include('influencer.urls')),
@@ -64,6 +74,8 @@ urlpatterns += i18n_patterns(
     path('metricas/', include('metricas.urls', namespace='metricas')),
     path('tienda/', include('tienda.urls', namespace='tienda')),
     path('carrito/', include('carrito.urls', namespace='carrito')),
+    path('pedidos-tienda/', include('orders.urls', namespace='orders')),
+    path('pagos/', include('payments.urls', namespace='payments')),
     path('crm/', include('crm.urls')),
 )
 

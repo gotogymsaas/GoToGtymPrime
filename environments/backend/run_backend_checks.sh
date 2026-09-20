@@ -28,6 +28,10 @@ echo "[backend] Ejecutando django check (settings_local)..."
 python manage.py check --settings=gotogym.settings_local
 
 echo "[backend] Ejecutando test suite (settings_test)..."
+# `manage.py test` sin argumentos solo descubre pruebas dentro del arbol de
+# este directorio (gotogym/). `administracion` vive fisicamente en
+# GoToGymAdmin/ y por eso hay que nombrarla aparte, o sus tests nunca corren.
 python manage.py test --settings=gotogym.settings_test
+python manage.py test administracion --settings=gotogym.settings_test
 
 echo "[backend] Validaciones finalizadas."

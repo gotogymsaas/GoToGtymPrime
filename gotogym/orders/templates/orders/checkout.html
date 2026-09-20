@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block title %}{% trans "Checkout" %}{% endblock %}
+{% block content %}
+{% get_static_prefix as STATIC_PREFIX %}
+<div class="container mx-auto py-8 px-4 gtg-quantum-ambient">
+
+  <h1 class="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)] mb-6">{% trans "Finalizar compra" %}</h1>
+
+  {% if messages %}
+  <div class="mb-4 space-y-2">
+    {% for message in messages %}
+    <p class="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm">{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if form.non_field_errors %}
+  <div class="mb-4">
+    {% for error in form.non_field_errors %}
+    <p class="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm">{{ error }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {{ municipios_por_departamento|json_script:"municipios-data" }}
+
+  <form method="post" novalidate class="flex flex-col lg:flex-row gap-8">
+    {% csrf_token %}
+
+    <div class="w-full lg:w-2/3 space-y-6">
+
+      <section class="bg-[var(--color-premium-white)] rounded-xl shadow p-5">
+        <h2 class="font-bold text-lg text-[var(--color-zafiro)] mb-4">{% trans "Contacto" %}</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {% for field in form %}{% if field.name in 'first_name,last_name,email,phone' %}
+          <div{% if field.name == 'email' or field.name == 'phone' %}{% endif %}>
+            <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">
+              {{ field.label }}{% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+            </label>
+            {{ field }}
+            {% for error in field.errors %}
+            <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}{% endfor %}
+        </div>
+      </section>
+
+      <section class="bg-[var(--color-premium-white)] rounded-xl shadow p-5">
+        <h2 class="font-bold text-lg text-[var(--color-zafiro)] mb-4">{% trans "Entrega" %}</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {% for field in form %}{% if field.name not in 'first_name,last_name,email,phone' %}
+          <div class="{% if field.name == 'address_line' or field.name == 'address_complement' or field.name == 'notes' %}sm:col-span-2{% endif %}">
+            <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">
+              {{ field.label }}{% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+            </label>
+            {% if field.name == 'city' %}
+            {% comment %}
+            Select manual (no {{ field }}): las opciones dependen del
+            departamento elegido y las llena el JS de mas abajo. data-selected
+            conserva la ciudad ya elegida si el formulario se vuelve a
+            renderizar por un error en otro campo.
+            {% endcomment %}
+            <select name="{{ field.html_name }}" id="{{ field.id_for_label }}"
+                    data-selected="{{ field.value|default:'' }}"
+                    data-city-select
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-[var(--color-ink)]">
+              <option value="">{% trans "Selecciona primero un departamento" %}</option>
+            </select>
+            {% else %}
+            {{ field }}
+            {% endif %}
+            {% for error in field.errors %}
+            <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}{% endfor %}
+        </div>
+      </section>
+    </div>
+
+    <aside class="w-full lg:w-1/3">
+      <div class="gtg-summary-panel bg-gray-100 rounded-xl p-6 lg:sticky lg:top-4">
+        <h2 class="font-bold text-lg text-[var(--color-zafiro)] mb-4">{% trans "Tu pedido" %}</h2>
+
+        <ul class="divide-y divide-gray-300 mb-4">
+          {% for item in resumen.items %}
+          <li class="py-3 flex gap-3">
+            <img src="{% if item.image %}{{ STATIC_PREFIX }}product_media/{{ item.image.name }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
+                 alt="{{ item.producto.name }}" class="w-12 h-12 object-contain rounded shrink-0">
+            <div class="flex-1 min-w-0 text-sm">
+              <p class="font-semibold text-[var(--color-zafiro)]">{{ item.producto.name }}</p>
+              <p class="text-gray-600">{{ item.variant.size }} / {{ item.variant.color }} &middot; x{{ item.cantidad }}</p>
+              <p class="text-xs text-gray-500 font-mono">{{ item.variant.sku }}</p>
+            </div>
+            <span class="font-semibold text-sm text-[var(--color-ink)]">${{ item.subtotal|floatformat:0 }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+
+        {% include "partials/_price_row.html" with row_class="flex justify-between mb-2 text-sm text-[var(--color-ink)]" label="Subtotal" amount=resumen.subtotal %}
+        {% include "partials/_price_row.html" with row_class="flex justify-between mb-4 text-sm text-gray-600" label="Envío" value_text="Sin costo por ahora" %}
+        {% include "partials/_price_row.html" with row_class="flex justify-between font-bold text-lg border-t border-gray-300 pt-4 mb-5 text-[var(--color-zafiro)]" label="Total" amount=resumen.total %}
+
+        {% include "partials/_cta_button.html" with tag="button" type="submit" variant="primary" label="Confirmar pedido" %}
+        <p class="text-xs text-gray-500 text-center mt-3">
+          {% blocktrans %}Al confirmar aceptas nuestra{% endblocktrans %}
+          <a href="{% url 'politica_cambios' %}" class="underline" target="_blank" rel="noopener">{% trans "política de cambios" %}</a>,
+          <a href="{% url 'politica_devoluciones' %}" class="underline" target="_blank" rel="noopener">{% trans "devoluciones" %}</a>
+          {% trans "y" %}
+          <a href="{% url 'politica_envios' %}" class="underline" target="_blank" rel="noopener">{% trans "envíos" %}</a>.
+        </p>
+        <a href="{% url 'carrito:cart_detail' %}" class="block text-center mt-3 text-sm text-gray-600 hover:underline">
+          {% trans "Volver al carrito" %}
+        </a>
+      </div>
+    </aside>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.querySelectorAll('#content input, form input, form textarea, form select').forEach(function (el) {
+    if (el.type === 'hidden' || el.hasAttribute('data-city-select')) return;
+    el.classList.add('w-full', 'border', 'border-gray-300', 'rounded-lg', 'px-3', 'py-2', 'text-sm', 'text-[var(--color-ink)]');
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var datosEl = document.getElementById('municipios-data');
+    var deptoSelect = document.getElementById('id_department');
+    var ciudadSelect = document.querySelector('[data-city-select]');
+    if (!datosEl || !deptoSelect || !ciudadSelect) return;
+
+    var municipiosPorDepartamento = JSON.parse(datosEl.textContent);
+
+    function llenarCiudades(departamento, ciudadAConservar) {
+      var municipios = municipiosPorDepartamento[departamento] || [];
+      ciudadSelect.innerHTML = '';
+
+      var placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = municipios.length
+        ? '{% trans "Selecciona una ciudad" %}'
+        : '{% trans "Selecciona primero un departamento" %}';
+      ciudadSelect.appendChild(placeholder);
+
+      municipios.forEach(function (municipio) {
+        var opcion = document.createElement('option');
+        opcion.value = municipio;
+        opcion.textContent = municipio;
+        if (municipio === ciudadAConservar) opcion.selected = true;
+        ciudadSelect.appendChild(opcion);
+      });
+    }
+
+    // Al cambiar de departamento, la ciudad anterior deja de ser valida.
+    deptoSelect.addEventListener('change', function () {
+      llenarCiudades(deptoSelect.value, null);
+    });
+
+    // Carga inicial: si el formulario ya trae departamento (reenviado por un
+    // error en otro campo), conserva la ciudad que el usuario ya habia
+    // elegido en vez de dejar el select vacio.
+    if (deptoSelect.value) {
+      llenarCiudades(deptoSelect.value, ciudadSelect.dataset.selected);
+    }
+  });
+</script>
+{% endblock %}

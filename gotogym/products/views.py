@@ -1,151 +1,105 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import ProductCategory, Product, Brand
-from django import forms
-from django.core.paginator import Paginator
+"""CRUD heredado, deprecado en favor del panel `administracion`.
+
+Este modulo duplicaba exactamente lo que ya hace `administracion` (crear,
+editar y eliminar productos/categorias/marcas), y mantener dos formularios
+divergentes del mismo dominio es justo el riesgo que se queria evitar. Las
+vistas de HTML redirigen a su equivalente en el panel; las dos de AJAX
+devuelven 410 (Gone) en vez de ejecutar la mutacion.
+
+Se conservan como redirects, en vez de borrarse, para no romper enlaces o
+marcadores existentes hacia estas URLs.
+"""
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-from .forms import ProductForm
+from django.shortcuts import redirect
+from django.views.decorators.cache import never_cache
 
-class ProductCategoryForm(forms.ModelForm):
-    class Meta:
-        model = ProductCategory
-        fields = ['name', 'description']
+_MENSAJE_AJAX_DEPRECADO = {
+    'success': False,
+    'error': 'Este endpoint fue reemplazado por el panel de administracion.',
+}
 
+
+def staff_required(view_func):
+    decorated = never_cache(login_required(user_passes_test(lambda user: user.is_staff)(view_func)))
+    return decorated
+
+
+@staff_required
 def add_category(request):
-    if request.method == 'POST':
-        form = ProductCategoryForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('products:list_category')
-    else:
-        form = ProductCategoryForm()
-    return render(request, 'products/add_category.html', {'form': form})
+    return redirect('admin_catalogs')
 
+
+@staff_required
 def add_product(request):
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('products:list_product')
-    else:
-        form = ProductForm()
-    return render(request, 'products/add_product.html', {'form': form})
+    return redirect('admin_product_new')
 
+
+@staff_required
 def list_category(request):
-    categories = ProductCategory.objects.all()
-    paginator = Paginator(categories, 4)  # 4 categorías por página
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, 'products/list_category.html', {'categories': page_obj, 'page_obj': page_obj})
+    return redirect('admin_catalogs')
 
+
+@staff_required
 def list_product(request):
-    products = Product.objects.select_related('category').all()
-    paginator = Paginator(products, 4)  # 4 productos por página
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, 'products/list_product.html', {'products': page_obj, 'page_obj': page_obj})
+    return redirect('admin_products')
 
+
+@staff_required
 def view_product(request, pk):
-    product = get_object_or_404(Product, pk=pk)
-    return render(request, 'products/view_product.html', {'product': product})
+    return redirect('admin_product_edit', pk=pk)
 
+
+@staff_required
 def edit_product(request, pk):
-    product = get_object_or_404(Product, pk=pk)
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES, instance=product)
-        if form.is_valid():
-            # Si el usuario eliminó la imagen desde el frontend
-            if request.POST.get('image-clear') == '1':
-                if product.image:
-                    product.image.delete(save=False)
-                product.image = None
-            # Si sube una nueva imagen, se actualiza automáticamente
-            form.save()
-            return redirect('products:list_product')
-    else:
-        form = ProductForm(instance=product)
-    return render(request, 'products/edit_product.html', {'form': form, 'edit': True, 'product': product})
+    return redirect('admin_product_edit', pk=pk)
 
+
+@staff_required
 def delete_product(request, pk):
-    product = get_object_or_404(Product, pk=pk)
-    if request.method == 'POST':
-        product.delete()
-        return redirect('products:list_product')
-    return render(request, 'products/delete_product.html', {'product': product})
+    return redirect('admin_product_edit', pk=pk)
 
-@csrf_exempt
+
+@staff_required
 def delete_product_image(request, pk):
-    if request.method == 'POST':
-        product = get_object_or_404(Product, pk=pk)
-        if product.image:
-            product.image.delete(save=False)
-            product.image = None
-            product.save()
-        return JsonResponse({'success': True})
-    return JsonResponse({'success': False}, status=400)
+    return JsonResponse(_MENSAJE_AJAX_DEPRECADO, status=410)
 
+
+@staff_required
 def edit_category(request, pk):
-    category = get_object_or_404(ProductCategory, pk=pk)
-    if request.method == 'POST':
-        form = ProductCategoryForm(request.POST, instance=category)
-        if form.is_valid():
-            form.save()
-            return redirect('products:list_category')
-    else:
-        form = ProductCategoryForm(instance=category)
-    return render(request, 'products/edit_category.html', {'form': form, 'category': category})
+    return redirect('admin_catalogs')
 
+
+@staff_required
 def delete_category(request, pk):
-    category = get_object_or_404(ProductCategory, pk=pk)
-    if request.method == 'POST':
-        category.delete()
-        return redirect('products:list_category')
-    return render(request, 'products/delete_category.html', {'category': category})
+    return redirect('admin_catalogs')
 
-@csrf_exempt
+
+@staff_required
 def delete_category_ajax(request, pk):
-    if request.method == 'POST':
-        category = get_object_or_404(ProductCategory, pk=pk)
-        category.delete()
-        return JsonResponse({'success': True})
-    return JsonResponse({'success': False}, status=400)
+    return JsonResponse(_MENSAJE_AJAX_DEPRECADO, status=410)
 
+
+@staff_required
 def view_category(request, pk):
-    category = get_object_or_404(ProductCategory, pk=pk)
-    return render(request, 'products/view_category.html', {'category': category})
+    return redirect('admin_catalogs')
 
-# Listar y añadir marca
+
+@staff_required
 def brand_list(request):
-    marcas = Brand.objects.all().order_by('name')
-    marca = None
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        if name:
-            Brand.objects.create(name=name)
-            return redirect('products:brand_list')
-    return render(request, 'products/brand_list.html', {'marcas': marcas, 'marca': marca})
+    return redirect('admin_catalogs')
 
-# Editar marca
+
+@staff_required
 def brand_edit(request, pk):
-    marca = get_object_or_404(Brand, pk=pk)
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        if name:
-            marca.name = name
-            marca.save()
-            return redirect('products:brand_list')
-    marcas = Brand.objects.all().order_by('name')
-    return render(request, 'products/brand_list.html', {'marcas': marcas, 'marca': marca})
+    return redirect('admin_catalogs')
 
-# Previsualizar marca
+
+@staff_required
 def brand_preview(request, pk):
-    marca = get_object_or_404(Brand, pk=pk)
-    return render(request, 'products/brand_preview.html', {'marca': marca})
+    return redirect('admin_catalogs')
 
-# Eliminar marca
-@require_POST
+
+@staff_required
 def brand_delete(request, pk):
-    marca = get_object_or_404(Brand, pk=pk)
-    marca.delete()
-    return redirect('products:brand_list')
+    return redirect('admin_catalogs')

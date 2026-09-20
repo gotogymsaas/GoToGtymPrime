@@ -8,12 +8,14 @@ from django.db.models import Count
 import json
 
 def home(request):
-    show_influencer_modal = False
-    if request.user.is_authenticated and hasattr(request.user, 'show_influencer_modal') and request.user.show_influencer_modal:
-        show_influencer_modal = True
-        request.user.show_influencer_modal = False
-        request.user.save(update_fields=["show_influencer_modal"])
-    return render(request, 'home.html', {"show_influencer_modal": show_influencer_modal})
+    # La home publica es la puerta de entrada para visitantes. Con sesion
+    # activa no aporta nada (sus unicas acciones son iniciar sesion y crear
+    # cuenta), asi que se redirige a la home de sesion. Resolverlo aqui y no
+    # en cada plantilla cubre tambien el logo, el menu movil y una URL
+    # escrita a mano.
+    if request.user.is_authenticated:
+        return redirect('logged_home')
+    return render(request, 'home.html')
 
 @login_required
 def logged_home(request):
@@ -91,3 +93,68 @@ def politica_privacidad(request):
 
 def terminos(request):
     return render(request, 'accounts/terms_and_conditions.html')
+
+
+def _policy_page(request, title, paragraphs):
+    """Pagina de politica con contenido MOCK: mismo aviso y misma
+    plantilla para todas, claramente marcado como provisional."""
+    return render(request, 'static_pages/policy_page.html', {'title': title, 'paragraphs': paragraphs})
+
+
+def politica_cambios(request):
+    return _policy_page(request, 'Cambios', [
+        'Puedes solicitar un cambio de talla o color dentro de los 15 dias calendario '
+        'siguientes a la entrega, siempre que la prenda conserve sus etiquetas originales '
+        'y no haya sido usada.',
+        'Para iniciar un cambio, escribenos desde la seccion de contacto indicando tu numero '
+        'de pedido. Este contenido es un texto de referencia (MOCK) y sera reemplazado por la '
+        'politica definitiva de GoToGym antes de operar con clientes reales.',
+    ])
+
+
+def politica_devoluciones(request):
+    return _policy_page(request, 'Devoluciones', [
+        'Si tu pedido llega con un defecto de fabricacion o no corresponde a lo solicitado, '
+        'puedes solicitar su devolucion dentro de los 5 dias habiles siguientes a la entrega.',
+        'El valor se reintegra por el mismo medio de pago una vez verificado el estado de la '
+        'prenda. Este contenido es un texto de referencia (MOCK) y sera reemplazado por la '
+        'politica definitiva antes de operar con clientes reales.',
+    ])
+
+
+def politica_garantia(request):
+    return _policy_page(request, 'Garantia', [
+        'Las prendas GoToGym cuentan con garantia por defectos de fabricacion durante los 3 '
+        'meses siguientes a la compra, bajo condiciones normales de uso y cuidado.',
+        'Este contenido es un texto de referencia (MOCK) y sera reemplazado por la politica '
+        'definitiva antes de operar con clientes reales.',
+    ])
+
+
+def politica_tratamiento_datos(request):
+    return _policy_page(request, 'Tratamiento de datos personales', [
+        'GoToGym trata los datos personales suministrados durante el registro y la compra '
+        'unicamente para gestionar el pedido, la atencion al cliente y las comunicaciones que '
+        'el usuario autorice.',
+        'Este contenido es un texto de referencia (MOCK) y sera reemplazado por la politica '
+        'definitiva antes de operar con clientes reales.',
+    ])
+
+
+def politica_envios(request):
+    return _policy_page(request, 'Envios', [
+        'Los tiempos y costos de envio se calculan segun la ciudad de entrega y se muestran '
+        'antes de confirmar el pedido.',
+        'Este contenido es un texto de referencia (MOCK); el proveedor de envio real todavia '
+        'no esta integrado.',
+    ])
+
+
+def politica_pagos(request):
+    return _policy_page(request, 'Pagos', [
+        'GoToGym SHOP procesa los pagos a traves de un proveedor simulado mientras se completa '
+        'la integracion con un proveedor de pagos real. Ningun dato de tarjeta se solicita ni '
+        'se almacena.',
+        'Este contenido es un texto de referencia (MOCK) y sera reemplazado antes de procesar '
+        'pagos reales de clientes.',
+    ])

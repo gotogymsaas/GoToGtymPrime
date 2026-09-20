@@ -13,6 +13,10 @@ INSTALLED_APPS = [
     'accounts',
     'blog',
     'products',
+    'inventory',
+    'orders',
+    'payments',
+    'shipping',
     'configuracion_marca',
     'contabilidad',
     'influencer',
@@ -20,6 +24,7 @@ INSTALLED_APPS = [
     'carrito',
     'crm',
     'metricas',
+    'administracion',
 ]
 
 ROOT_URLCONF = 'gotogym.urls'

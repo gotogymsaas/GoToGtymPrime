@@ -21,9 +21,68 @@
       <label class="check"><input type="checkbox" name="clear_image" value="1"> Eliminar imagen actual</label>
     </div>
   {% endif %}
+
+  {% if variant_formset %}
+  <div class="panel">
+    <h2>Variantes</h2>
+    {{ variant_formset.non_form_errors }}
+    {{ variant_formset.management_form }}
+    <table>
+      <thead><tr><th>SKU</th><th>Talla</th><th>Color</th><th>Precio propio</th><th>Stock</th><th>Activa</th><th>Eliminar</th></tr></thead>
+      <tbody>
+        {% for vform in variant_formset.forms %}
+        <tr>
+          <td>{{ vform.id }}{{ vform.sku }}{{ vform.sku.errors }}</td>
+          <td>{{ vform.size }}</td>
+          <td>{{ vform.color }}</td>
+          <td>{{ vform.price_override }}</td>
+          <td>{{ vform.quantity_available }}</td>
+          <td>{{ vform.is_active }}</td>
+          <td>{% if vform.instance.pk %}{{ vform.DELETE }}{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% elif not product %}
+  <p class="hint">Guarda el producto primero para poder agregar sus variantes.</p>
+  {% endif %}
+
   <div class="form-actions">
     <a class="ghost" href="{% url 'admin_products' %}">Cancelar</a>
     <button class="button" type="submit">Guardar</button>
   </div>
 </form>
+
+{% if product %}
+<div class="panel">
+  <h2>Imagenes</h2>
+  <div class="media-gallery">
+    {% for media in media_items %}
+    <div class="media-item">
+      <img src="{{ media.image.url }}" alt="{{ media.alt_text }}">
+      <p>{% if media.is_primary %}<strong>Principal</strong>{% endif %} orden {{ media.sort_order }}</p>
+      <form method="post" action="{% url 'admin_product_media_delete' product.pk media.pk %}">
+        {% csrf_token %}
+        <button class="ghost" type="submit">Eliminar</button>
+      </form>
+    </div>
+    {% empty %}
+    <p>Este producto todavia no tiene imagenes en la galeria.</p>
+    {% endfor %}
+  </div>
+
+  <form method="post" action="{% url 'admin_product_media_add' product.pk %}" enctype="multipart/form-data" class="form-grid">
+    {% csrf_token %}
+    {% for field in media_form %}
+    <label>
+      <span>{{ field.label }}</span>
+      {{ field }}
+      {{ field.errors }}
+    </label>
+    {% endfor %}
+    <button class="button" type="submit">Agregar imagen</button>
+  </form>
+</div>
+{% endif %}
 {% endblock %}
