@@ -5,7 +5,7 @@
  * aqui. Este archivo agrega solo lo que faltaba para que el dominio
  * comercial deje de usar hexadecimales sueltos.
  *
- * Fuente de la paleta de marca: modelo ColorMarca (configuracion_marca/
+ * Fuente de la paleta de marca: design tokens centralizados en este archivo
  * models.py), que documenta la paleta sugerida del Brand Book. La tabla
  * esta vacia y no hay ningun context processor que la use en runtime;
  * se usa aqui solo como referencia de los hex oficiales.

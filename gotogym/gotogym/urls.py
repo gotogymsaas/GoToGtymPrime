@@ -30,6 +30,8 @@ from payments import views as payments_views
 urlpatterns = [
     path('accounts', lambda request: redirect('commercial_login', permanent=False)),
     path('setlang/', set_language, name='set_language'),
+    path('healthz', views.healthz, name='healthz'),
+    path('crm/healthz', views.healthz, name='legacy_crm_healthz'),
     path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
     path('api/v1/auth/login', accounts_api_views.developer_login, name='developer_auth_login'),
     path('api/login/', accounts_api_views.developer_login, name='developer_login'),
@@ -66,17 +68,15 @@ urlpatterns += i18n_patterns(
     path('accounts/reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='accounts/password_reset_confirm.html'), name='password_reset_confirm'),
     path('accounts/reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='accounts/password_reset_complete.html'), name='password_reset_complete'),
     path('blog/', include('blog.urls', namespace='blog')),
-    path('dashboard/', views.dashboard, name='dashboard'),
     path('admin-panel/', include('administracion.urls')),
+    path('configuracion-marca/', lambda request: redirect('admin_catalogs', permanent=False)),
+    path('metricas/', lambda request: redirect('admin_dashboard', permanent=False)),
     path('products/', include('products.urls', namespace='products')),
-    path('configuracion-marca/', include('configuracion_marca.urls', namespace='configuracion_marca')),
     path('contabilidad/', include('contabilidad.urls', namespace='contabilidad')),
-    path('metricas/', include('metricas.urls', namespace='metricas')),
     path('tienda/', include('tienda.urls', namespace='tienda')),
     path('carrito/', include('carrito.urls', namespace='carrito')),
     path('pedidos-tienda/', include('orders.urls', namespace='orders')),
     path('pagos/', include('payments.urls', namespace='payments')),
-    path('crm/', include('crm.urls')),
 )
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

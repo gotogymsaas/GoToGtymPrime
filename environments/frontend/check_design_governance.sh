@@ -17,10 +17,28 @@ if [[ -z "${MAX_HEX_IN_TEMPLATES:-}" ]]; then
   exit 1
 fi
 
+TEMPLATE_DIRS=(
+  "${ROOT_DIR}/gotogym/accounts/templates"
+  "${ROOT_DIR}/gotogym/products/templates"
+  "${ROOT_DIR}/gotogym/gotogym/templates"
+)
+
+EXISTING_TEMPLATE_DIRS=()
+for dir in "${TEMPLATE_DIRS[@]}"; do
+  if [[ -d "${dir}" ]]; then
+    EXISTING_TEMPLATE_DIRS+=("${dir}")
+  fi
+done
+
+if (( ${#EXISTING_TEMPLATE_DIRS[@]} == 0 )); then
+  echo "[design-governance] ERROR: no hay directorios de templates para validar."
+  exit 1
+fi
+
 if command -v rg >/dev/null 2>&1; then
-  CURRENT_COUNT="$(rg -n "#[0-9A-Fa-f]{3,6}" "${ROOT_DIR}/gotogym/accounts/templates" "${ROOT_DIR}/gotogym/products/templates" "${ROOT_DIR}/gotogym/gotogym/templates" -g '*.html' | wc -l | tr -d ' ')"
+  CURRENT_COUNT="$(rg -n "#[0-9A-Fa-f]{3,6}" "${EXISTING_TEMPLATE_DIRS[@]}" -g '*.html' | wc -l | tr -d ' ')"
 else
-  CURRENT_COUNT="$(grep -REn --include='*.html' "#[0-9A-Fa-f]{3,6}" "${ROOT_DIR}/gotogym/accounts/templates" "${ROOT_DIR}/gotogym/products/templates" "${ROOT_DIR}/gotogym/gotogym/templates" | wc -l | tr -d ' ')"
+  CURRENT_COUNT="$(grep -REn --include='*.html' "#[0-9A-Fa-f]{3,6}" "${EXISTING_TEMPLATE_DIRS[@]}" | wc -l | tr -d ' ')"
 fi
 
 echo "[design-governance] Baseline permitido: ${MAX_HEX_IN_TEMPLATES}"
