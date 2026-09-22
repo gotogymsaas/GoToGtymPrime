@@ -1,7 +1,14 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required, user_passes_test
+from blog.models import Post
+from django.contrib.auth import get_user_model
+from django.db.models.functions import TruncMonth
+from django.db.models import Count
+from django.db.models import Prefetch
+from products.models import Product, ProductMedia
+from tienda.catalog import build_product_card, catalog_variants_queryset
+import json
 
 def home(request):
     # La home publica es la puerta de entrada para visitantes. Con sesion
@@ -15,7 +22,35 @@ def home(request):
 
 @login_required
 def logged_home(request):
-    return render(request, 'logged_home.html')
+    # El Home utiliza la misma fuente de verdad del catalogo que la PLP. De
+    # este modo precio, variantes, imagen y disponibilidad no divergen entre
+    # la portada y la tienda, y las relaciones se resuelven sin consultas N+1.
+    products = list(
+        Product.objects
+        .select_related('category', 'brand')
+        .prefetch_related(
+            Prefetch('variants', queryset=catalog_variants_queryset()),
+            Prefetch(
+                'media',
+                queryset=ProductMedia.objects.order_by('-is_primary', 'sort_order', 'id'),
+            ),
+        )
+        .filter(
+            variants__is_active=True,
+            variants__inventory__quantity_available__gt=0,
+        )
+        .distinct()
+        .order_by('-featured', 'id')[:4]
+    )
+    context = {
+        'featured_cards': [build_product_card(product) for product in products],
+        'latest_posts': (
+            Post.objects.filter(is_published=True)
+            .select_related('category', 'author')
+            .order_by('-published')[:3]
+        ),
+    }
+    return render(request, 'logged_home.html', context)
 
 def pedidos(request):
     return redirect('carrito:cart_detail')

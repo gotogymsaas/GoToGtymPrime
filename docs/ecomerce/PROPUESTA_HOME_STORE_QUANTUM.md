@@ -80,6 +80,70 @@ GoToGym une diseño deportivo, personalización y tecnología textil en prendas 
 **Usar:** movimiento, diseño, precisión, rendimiento, bienestar, personalización, materiales, colección, acompaña.  
 **Evitar:** milagroso, cuántico como propiedad médica, cambia tu cuerpo, resultados garantizados, tecnología revolucionaria sin evidencia.
 
+### Sistema editorial operativo
+
+La identidad no se sostiene sólo con un buen lanzamiento. El Home necesita un
+sistema que permita decidir **qué historia publicar, para quién y con qué
+evidencia**. Cada módulo debe cumplir una función diferente dentro del recorrido:
+
+| Momento | Pregunta del usuario | Respuesta editorial | Módulo | KPI |
+|---|---|---|---|---|
+| Descubrimiento | “¿Qué es esto?” | Una promesa breve y una imagen memorable | Hero | CTR a colección |
+| Relevancia | “¿Es para mí?” | Entradas por intención, no por organigrama | Intenciones | CTR por intención |
+| Consideración | “¿Qué puedo comprar?” | Producto disponible, precio y variantes reales | Selección | CTR a PDP |
+| Credibilidad | “¿Por qué es diferente?” | Diseño y tecnología explicados con evidencia | Technology | Profundidad/CTR |
+| Afinidad | “¿Qué representa la marca?” | Personas, cultura y conocimiento útil | Bienestar/Journal | Lectura y leads |
+| Acción | “¿Qué hago ahora?” | Una invitación clara, sin presión artificial | Cierre | CTR a tienda |
+
+#### Jerarquía de mensajes
+
+1. **Promesa de campaña:** una sola frase memorable; cambia como máximo por temporada.
+2. **Prueba de producto:** materiales, construcción, uso y disponibilidad verificables.
+3. **Prueba humana:** contexto real de uso, comunidad y equipo.
+4. **Acción:** verbo específico y destino congruente; nunca “conoce más” sin explicar qué se conocerá.
+
+Cada bloque debe poder resumirse como `idea + evidencia + acción`. Si contiene
+dos campañas, dos audiencias o más de un CTA primario, debe dividirse.
+
+#### Cadencia y gobierno
+
+- **Campaña principal:** revisión cada 6–8 semanas, sin cambiar únicamente por presión de novedad.
+- **Selección de producto:** revisión semanal y automatización diaria de disponibilidad.
+- **Journal:** una historia útil quincenal es preferible a contenido semanal superficial.
+- **Bienestar empresarial:** caso, evento o prueba concreta cada trimestre.
+- **Responsables:** Marca aprueba tono; Producto valida claims; Comercio define prioridad; Legal valida evidencia; Tecnología publica y mide.
+- Toda pieza debe registrar propietario, fecha de publicación, fecha de revisión, CTA, destino, segmento y fuente de la afirmación técnica.
+
+#### Matriz de contenidos
+
+El mix trimestral recomendado es **40 % producto y uso**, **25 % diseño y
+tecnología**, **20 % bienestar aplicable** y **15 % cultura/personas**. Esta
+proporción evita que “Quantum” se convierta en decoración vacía o que el Journal
+sea un catálogo disfrazado.
+
+#### Plantilla de campaña
+
+```text
+Objetivo comercial:
+Audiencia y necesidad:
+Promesa principal (máx. 9 palabras):
+Evidencia disponible:
+Producto(s) y stock:
+Imagen y derechos confirmados:
+CTA y URL final:
+Fecha de inicio / retiro:
+Evento y métrica de éxito:
+Responsable de revisión:
+```
+
+#### Reglas de nomenclatura de producto
+
+- **Nombre:** familia + tipo de prenda; máximo 45 caracteres.
+- **Línea:** Graphene Series, Performance, Daily Motion o Personalizada.
+- **Descriptor:** beneficio o contexto, nunca repetir color/género como si fueran la propuesta de valor.
+- **Variantes:** talla y color permanecen como datos de compra, no dentro del nombre comercial.
+- Conservar el nombre administrativo anterior como alias interno durante la migración para no romper operación ni búsquedas.
+
 ---
 
 ## 4. Redacción propuesta del Home
