@@ -24,6 +24,7 @@
   {% endif %}
 </head>
 <body class="gtg-theme">
+  <a class="gtg-skip-link" href="#main-content">{% trans "Saltar al contenido" %}</a>
   {% block navbar %}
   <nav class="gtg-navbar">
     <div class="gtg-nav-wrap">
@@ -51,7 +52,7 @@
                 <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 3.1a3.2 3.2 0 1 1 0 6.4 3.2 3.2 0 0 1 0-6.4Zm0 14.1a7.1 7.1 0 0 1-5.7-2.9c1.2-2 3.3-3.2 5.7-3.2s4.5 1.2 5.7 3.2a7.1 7.1 0 0 1-5.7 2.9Z"/>
               </svg>
             </span>
-            <span class="gtg-user-email-label">{{ user.email }}</span>
+            <span class="gtg-user-email-label">{{ user.first_name|default:user.email }}</span>
           </button>
           <div id="userDropdown" class="gtg-dropdown hidden">
             <a href="{% url 'orders:my_orders' %}" onclick="closeUserMenu()">{% trans "Mis pedidos" %}</a>
@@ -90,7 +91,7 @@
   </nav>
   {% endblock %}
 
-  <main class="gtg-page">
+  <main class="gtg-page" id="main-content">
     {% block content %}{% endblock %}
   </main>
 

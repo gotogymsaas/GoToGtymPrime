@@ -5,6 +5,7 @@ from blog.models import Post
 from django.contrib.auth import get_user_model
 from django.db.models.functions import TruncMonth
 from django.db.models import Count
+from tienda.catalog import curated_product_cards
 import json
 
 def home(request):
@@ -19,7 +20,18 @@ def home(request):
 
 @login_required
 def logged_home(request):
-    return render(request, 'logged_home.html')
+    # El Home utiliza la misma fuente de verdad del catalogo que la PLP. De
+    # este modo precio, variantes, imagen y disponibilidad no divergen entre
+    # la portada y la tienda, y las relaciones se resuelven sin consultas N+1.
+    context = {
+        'featured_cards': curated_product_cards(limit=4),
+        'latest_posts': (
+            Post.objects.filter(is_published=True)
+            .select_related('category', 'author')
+            .order_by('-published')[:3]
+        ),
+    }
+    return render(request, 'logged_home.html', context)
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser or u.is_staff)
@@ -66,10 +78,7 @@ def tecnologia(request):
 
 
 def acerca_de(request):
-    return render(request, 'static_pages/simple_page.html', {
-        'title': 'Acerca de GoToGym',
-        'subtitle': 'Tecnologia textil, bienestar y alto rendimiento en una sola experiencia.',
-    })
+    return render(request, 'static_pages/about.html')
 
 
 def contacto(request):

@@ -1,34 +1,35 @@
 {% extends 'base.html' %}
-{% load i18n %}
-{% block title %}{% trans "Mis pedidos" %}{% endblock %}
+{% load static i18n %}
+{% block title %}{% trans "Mis pedidos" %} | GoToGym{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260922">{% endblock %}
 {% block content %}
-<div class="container mx-auto py-8 px-4 max-w-3xl gtg-quantum-ambient">
-  <h1 class="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)] mb-6">{% trans "Mis pedidos" %}</h1>
-
-  {% if orders %}
-  <div class="bg-[var(--color-premium-white)] rounded-xl shadow divide-y divide-gray-200">
-    {% for order in orders %}
-    <a href="{% url 'orders:order_detail' order.order_number %}"
-       class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-4 hover:bg-gray-50 transition">
-      <div>
-        <p class="font-semibold text-[var(--color-zafiro)]">{{ order.order_number }}</p>
-        <p class="text-sm text-gray-500">{{ order.created_at|date:"d/m/Y H:i" }}</p>
+{% static 'product_media/' as PRODUCT_MEDIA_PREFIX %}
+<div class="editorial-page">
+  <header class="editorial-hero">
+    <div class="editorial-shell"><p class="editorial-kicker">Tu cuenta</p><h1 class="editorial-title">Tus pedidos,<br><em>bajo control.</em></h1><p class="editorial-lead">Consulta el estado, la entrega y el detalle de cada compra en un solo lugar.</p></div>
+  </header>
+  <section class="editorial-section editorial-section--mist">
+    <div class="editorial-shell">
+      {% if orders %}
+      <div class="order-list">
+        {% for order in orders %}
+        <a class="order-row" href="{% url 'orders:order_detail' order.order_number %}">
+          <div><strong>{{ order.order_number }}</strong><small>{{ order.created_at|date:"d/m/Y · H:i" }}</small></div>
+          <div class="order-row__meta"><span class="order-status">{{ order.get_order_status_display }}</span><strong>${{ order.total|floatformat:0 }}</strong><span aria-hidden="true">→</span></div>
+        </a>
+        {% endfor %}
       </div>
-      <div class="flex items-center gap-3 text-sm">
-        <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-900 font-semibold">
-          {{ order.get_order_status_display }}
-        </span>
-        <span class="font-bold text-[var(--color-zafiro)]">${{ order.total|floatformat:0 }}</span>
-      </div>
-    </a>
-    {% endfor %}
-  </div>
-  {% else %}
-  <div class="bg-[var(--color-premium-white)] rounded-xl shadow p-10 text-center">
-    <p class="text-gray-600">{% trans "Todavía no tienes pedidos." %}</p>
-    {% url 'tienda:producto_list' as producto_list_url %}
-    {% include "partials/_cta_button.html" with tag="a" href=producto_list_url variant="pill" label="Ir a la tienda" %}
-  </div>
+      {% else %}
+      <div class="editorial-empty"><p class="editorial-kicker">Tu primera historia está por comenzar</p><h2>Todavía no tienes pedidos.</h2><p>Cuando hagas tu primera compra podrás seguir aquí su estado, envío y detalles.</p><a class="editorial-action" href="{% url 'tienda:producto_list' %}">Explorar la tienda</a></div>
+      {% endif %}
+    </div>
+  </section>
+  {% if not orders and recommended_cards %}
+  <section class="editorial-section">
+    <div class="editorial-shell"><p class="editorial-kicker">Selección GoToGym</p><h2>Un buen lugar para empezar.</h2><div class="recommendation-grid">
+      {% for card in recommended_cards %}<article class="recommendation-card"><a href="{% url 'tienda:producto_detail' card.product.pk %}"><img src="{% if card.image %}{{ PRODUCT_MEDIA_PREFIX }}{{ card.image.name }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}" alt="{{ card.product.name }}" loading="lazy"></a><div><h3><a href="{% url 'tienda:producto_detail' card.product.pk %}">{{ card.product.name }}</a></h3><strong>{% include 'tienda/partials/_price.html' with price_min=card.price_min price_max=card.price_max has_range=card.has_price_range %}</strong></div></article>{% endfor %}
+    </div></div>
+  </section>
   {% endif %}
 </div>
 {% endblock %}
