@@ -8,6 +8,7 @@ from .colombia_data import MUNICIPIOS_POR_DEPARTAMENTO
 from .forms import CheckoutForm
 from .models import Order
 from .services import CheckoutError, create_order_from_cart
+from tienda.catalog import curated_product_cards
 
 
 @login_required
@@ -54,7 +55,10 @@ def my_orders(request):
         .select_related('address')
         .order_by('-created_at')
     )
-    return render(request, 'orders/my_orders.html', {'orders': orders})
+    return render(request, 'orders/my_orders.html', {
+        'orders': orders,
+        'recommended_cards': [] if orders.exists() else curated_product_cards(limit=3),
+    })
 
 
 @login_required

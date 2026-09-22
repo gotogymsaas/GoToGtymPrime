@@ -1,17 +1,18 @@
 {% extends "base.html" %}
 {% load static i18n %}
-{% get_static_prefix as STATIC_PREFIX %}
-{% get_media_prefix as MEDIA_PREFIX %}
 
 {% block title %}GoToGym — Diseñada para tu forma de avanzar{% endblock %}
 
 {% block extra_head %}
+{% get_media_prefix as MEDIA_PREFIX %}
 <link rel="preload" as="image" media="(max-width: 720px)" href="{{ MEDIA_PREFIX }}products/Imagenes%20Home/bienestar_empresarial_5.jpeg" fetchpriority="high">
 <link rel="preload" as="image" media="(min-width: 721px)" href="{{ MEDIA_PREFIX }}products/Imagenes%20Home/WhatsApp%20Image%202026-07-21%20at%206.53.20%20PM%20(2).jpeg" fetchpriority="high">
 <link rel="stylesheet" href="{% static 'css/store_home.css' %}?v=20260922-editorial">
 {% endblock %}
 
 {% block content %}
+{% static 'product_media/' as PRODUCT_MEDIA_PREFIX %}
+{% get_media_prefix as MEDIA_PREFIX %}
 <div class="store-home">
   <section class="store-hero" aria-labelledby="store-hero-title">
     <div class="store-hero__media" aria-hidden="true">
@@ -103,7 +104,7 @@
         {% for card in featured_cards %}
         <article class="home-product-card">
           <a class="home-product-card__image" data-track="featured_product" data-product-id="{{ card.product.pk }}" href="{% url 'tienda:producto_detail' card.product.pk %}">
-            <img src="{% if card.image %}{{ STATIC_PREFIX }}product_media/{{ card.image.name }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
+            <img src="{% if card.image %}{{ PRODUCT_MEDIA_PREFIX }}{{ card.image.name }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
                  alt="{{ card.product.name }}" width="520" height="650" loading="lazy">
             {% if not card.in_stock %}<span>Agotado</span>{% endif %}
           </a>

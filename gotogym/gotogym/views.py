@@ -6,9 +6,7 @@ from blog.models import Post
 from django.contrib.auth import get_user_model
 from django.db.models.functions import TruncMonth
 from django.db.models import Count
-from django.db.models import Prefetch
-from products.models import Product, ProductMedia
-from tienda.catalog import build_product_card, catalog_variants_queryset
+from tienda.catalog import curated_product_cards
 import json
 
 def home(request):
@@ -26,25 +24,8 @@ def logged_home(request):
     # El Home utiliza la misma fuente de verdad del catalogo que la PLP. De
     # este modo precio, variantes, imagen y disponibilidad no divergen entre
     # la portada y la tienda, y las relaciones se resuelven sin consultas N+1.
-    products = list(
-        Product.objects
-        .select_related('category', 'brand')
-        .prefetch_related(
-            Prefetch('variants', queryset=catalog_variants_queryset()),
-            Prefetch(
-                'media',
-                queryset=ProductMedia.objects.order_by('-is_primary', 'sort_order', 'id'),
-            ),
-        )
-        .filter(
-            variants__is_active=True,
-            variants__inventory__quantity_available__gt=0,
-        )
-        .distinct()
-        .order_by('-featured', 'id')[:4]
-    )
     context = {
-        'featured_cards': [build_product_card(product) for product in products],
+        'featured_cards': curated_product_cards(limit=4),
         'latest_posts': (
             Post.objects.filter(is_published=True)
             .select_related('category', 'author')
@@ -100,10 +81,7 @@ def healthz(request):
 
 
 def acerca_de(request):
-    return render(request, 'static_pages/simple_page.html', {
-        'title': 'Acerca de GoToGym',
-        'subtitle': 'Tecnologia textil, bienestar y alto rendimiento en una sola experiencia.',
-    })
+    return render(request, 'static_pages/about.html')
 
 
 def contacto(request):

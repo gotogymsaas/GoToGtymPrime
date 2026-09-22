@@ -4,7 +4,9 @@ Concentra el calculo de "que se muestra de un producto" (precio, tallas y
 colores con stock, imagen principal) para que las vistas de listado y de
 detalle partan de la misma fuente y no diverjan.
 """
-from products.models import ProductVariant
+from django.db.models import Prefetch
+
+from products.models import Product, ProductMedia, ProductVariant
 
 # Orden de talla para presentacion; cualquier valor desconocido va al final.
 SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'UNICA']
@@ -81,6 +83,33 @@ def build_product_card(product):
         'in_stock': bool(disponibles),
         'total_stock': sum(variant_stock(v) for v in disponibles),
     }
+
+
+def curated_product_cards(limit=4):
+    """Productos comprables para superficies editoriales.
+
+    Mantiene la misma forma de tarjeta que PLP/PDP, prioriza la curaduria
+    manual y completa los espacios con catalogo disponible. Centralizarlo
+    evita repetir consultas y reglas en Home, pedidos y futuras campañas.
+    """
+    products = list(
+        Product.objects
+        .select_related('category', 'brand')
+        .prefetch_related(
+            Prefetch('variants', queryset=catalog_variants_queryset()),
+            Prefetch(
+                'media',
+                queryset=ProductMedia.objects.order_by('-is_primary', 'sort_order', 'id'),
+            ),
+        )
+        .filter(
+            variants__is_active=True,
+            variants__inventory__quantity_available__gt=0,
+        )
+        .distinct()
+        .order_by('-featured', 'id')[:limit]
+    )
+    return [build_product_card(product) for product in products]
 
 
 def available_filter_values():

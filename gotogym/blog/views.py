@@ -6,6 +6,7 @@ from django.db.models import Q
 
 def post_list(request):
     posts = Post.objects.filter(is_published=True).select_related('category', 'author').order_by('-published')
+    has_published_posts = posts.exists()
     categories = Category.objects.all()
     authors = get_user_model().objects.filter(posts__isnull=False).distinct()
 
@@ -35,6 +36,8 @@ def post_list(request):
         'is_paginated': page_obj.has_other_pages(),
         'page_obj': page_obj,
         'params': params,
+        'has_published_posts': has_published_posts,
+        'has_active_filters': any([search, category, author]),
     }
     return render(request, 'blog/post_list.html', context)
 
