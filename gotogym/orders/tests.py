@@ -11,6 +11,7 @@ from products.models import Brand, Product, ProductCategory, ProductVariant
 
 from shipping.models import ShippingQuote
 from shipping.services import FREE_SHIPPING_THRESHOLD
+from tienda.templatetags.tienda_filters import cop
 
 from .forms import CheckoutForm
 from .models import Address, Order, OrderItem, OrderStatus, PaymentStatus
@@ -328,8 +329,8 @@ class EnvioIntegradoAlTotalTests(CheckoutBaseTestCase):
         response = self.client.post(reverse('orders:checkout'), DATOS_VALIDOS, follow=True)
         pedido = Order.objects.get()
 
-        self.assertContains(response, f"${pedido.shipping_cost:.0f}")
-        self.assertContains(response, f"${pedido.total:.0f}")
+        self.assertContains(response, f"${cop(pedido.shipping_cost)}")
+        self.assertContains(response, f"${cop(pedido.total)}")
 
 
 class TotalUnicoDePuntaAPuntaTests(CheckoutBaseTestCase):
@@ -361,4 +362,4 @@ class TotalUnicoDePuntaAPuntaTests(CheckoutBaseTestCase):
         # 4. Lo que efectivamente se muestra en la pantalla de pago es ese
         #    mismo numero, no uno recalculado aparte.
         response = self.client.get(reverse('payments:pending', args=[pedido.order_number]))
-        self.assertContains(response, f"${pedido.total:.0f}")
+        self.assertContains(response, f"${cop(pedido.total)}")

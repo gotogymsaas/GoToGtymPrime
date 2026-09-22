@@ -64,7 +64,7 @@ class ManipulacionDirectaDeCarritoTests(TestCase):
 
         detalle = self.client.get(reverse('carrito:cart_detail'))
         # El precio mostrado es el real de la variante, no "1".
-        self.assertContains(detalle, '50000')
+        self.assertContains(detalle, '50.000')
         self.assertNotContains(detalle, '$1<')
 
     def test_manipular_cantidad_por_encima_del_stock_no_cambia_el_total_cobrado(self):

@@ -176,3 +176,255 @@ msgstr "Discover collection"
 
 msgid "Política de privacidad"
 msgstr "Privacy Policy"
+
+msgid "Store"
+msgstr "Store"
+
+msgid "Selección GoToGym"
+msgstr "GoToGym Selection"
+
+msgid "Encuentra tu próximo movimiento"
+msgstr "Find your next move"
+
+msgid "Filtros"
+msgstr "Filters"
+
+msgid "Buscar"
+msgstr "Search"
+
+msgid "Categoría"
+msgstr "Category"
+
+msgid "Todas"
+msgstr "All"
+
+msgid "Talla"
+msgstr "Size"
+
+msgid "Color"
+msgstr "Color"
+
+msgid "Todos"
+msgstr "All"
+
+msgid "Precio (COP)"
+msgstr "Price (COP)"
+
+msgid "Ordenar por"
+msgstr "Sort by"
+
+msgid "Relevancia"
+msgstr "Relevance"
+
+msgid "Precio: menor a mayor"
+msgstr "Price: low to high"
+
+msgid "Precio: mayor a menor"
+msgstr "Price: high to low"
+
+msgid "Nombre: A-Z"
+msgstr "Name: A-Z"
+
+msgid "Nombre: Z-A"
+msgstr "Name: Z-A"
+
+msgid "Aplicar"
+msgstr "Apply"
+
+msgid "Limpiar"
+msgstr "Clear"
+
+msgid "Anterior"
+msgstr "Previous"
+
+msgid "Siguiente"
+msgstr "Next"
+
+msgid "No encontramos productos con esos filtros."
+msgstr "No products match those filters."
+
+msgid "Nombre del producto"
+msgstr "Product name"
+
+msgid "Mín"
+msgstr "Min"
+
+msgid "Precio mínimo"
+msgstr "Minimum price"
+
+msgid "Máx"
+msgstr "Max"
+
+msgid "Precio máximo"
+msgstr "Maximum price"
+
+msgid "Paginación"
+msgstr "Pagination"
+
+msgid "Sin reseñas todavía"
+msgstr "No reviews yet"
+
+msgid "Marca"
+msgstr "Brand"
+
+msgid "Agotado"
+msgstr "Sold out"
+
+msgid "Añadir al carrito"
+msgstr "Add to cart"
+
+msgid "Productos relacionados"
+msgstr "Related products"
+
+msgid "Selecciona una opción para ver disponibilidad."
+msgstr "Select an option to see availability."
+
+msgid "Combinación sin unidades disponibles."
+msgstr "That combination is out of stock."
+
+msgid "Esa combinación no existe para este producto."
+msgstr "That combination does not exist for this product."
+
+msgid "Carrito"
+msgstr "Cart"
+
+msgid "c/u"
+msgstr "each"
+
+msgid "Cantidad"
+msgstr "Quantity"
+
+msgid "Actualizar"
+msgstr "Update"
+
+msgid "Seguir comprando"
+msgstr "Continue shopping"
+
+msgid "Tu carrito está vacío."
+msgstr "Your cart is empty."
+
+msgid "Resumen"
+msgstr "Summary"
+
+msgid "Total a pagar"
+msgstr "Total to pay"
+
+msgid "Envío"
+msgstr "Shipping"
+
+msgid "desde"
+msgstr "from"
+
+msgid "Gratis"
+msgstr "Free"
+
+msgid "El costo exacto se confirma con tu dirección en el siguiente paso."
+msgstr "The exact cost is confirmed with your address in the next step."
+
+msgid "Eliminar del carrito"
+msgstr "Remove from cart"
+
+msgid "Tu <em>carrito</em>"
+msgstr "Your <em>cart</em>"
+
+msgid "Checkout"
+msgstr "Checkout"
+
+msgid "Datos de contacto"
+msgstr "Contact details"
+
+msgid "Entrega"
+msgstr "Delivery"
+
+msgid "Dirección de entrega"
+msgstr "Delivery address"
+
+msgid "Selecciona primero un departamento"
+msgstr "Select a department first"
+
+msgid "Tu pedido"
+msgstr "Your order"
+
+msgid "Confirmar pedido"
+msgstr "Confirm order"
+
+msgid "política de cambios"
+msgstr "exchange policy"
+
+msgid "devoluciones"
+msgstr "returns"
+
+msgid "y"
+msgstr "and"
+
+msgid "envíos"
+msgstr "shipping"
+
+msgid "Volver al carrito"
+msgstr "Back to cart"
+
+msgid "Selecciona una ciudad"
+msgstr "Select a city"
+
+msgid "Finalizar <em>compra</em>"
+msgstr "Complete <em>checkout</em>"
+
+msgid "Al confirmar aceptas nuestra"
+msgstr "By confirming you accept our"
+
+msgid "Nombre"
+msgstr "First name"
+
+msgid "Apellido"
+msgstr "Last name"
+
+msgid "Correo electrónico"
+msgstr "Email"
+
+msgid "Teléfono"
+msgstr "Phone"
+
+msgid "País"
+msgstr "Country"
+
+msgid "Departamento"
+msgstr "Department"
+
+msgid "Selecciona un departamento"
+msgstr "Select a department"
+
+msgid "Ciudad"
+msgstr "City"
+
+msgid "Código postal"
+msgstr "Postal code"
+
+msgid "Dirección"
+msgstr "Address"
+
+msgid "Complemento (apartamento, torre, referencia)"
+msgstr "Additional info (apartment, tower, landmark)"
+
+msgid "Información adicional para la entrega"
+msgstr "Additional delivery information"
+
+msgid "Ir a la tienda"
+msgstr "Go to the store"
+
+msgid "Ver todo el catálogo"
+msgstr "See the whole catalog"
+
+msgid "Ver producto"
+msgstr "View product"
+
+msgid "Ver detalles"
+msgstr "View details"
+
+msgid "Subtotal"
+msgstr "Subtotal"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Sin costo por ahora"
+msgstr "No cost for now"

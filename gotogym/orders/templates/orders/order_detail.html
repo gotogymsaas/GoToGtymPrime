@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n tienda_filters %}
 {% block title %}{% trans "Pedido" %} {{ pedido.order_number }}{% endblock %}
 
 {% block extra_head %}
@@ -65,7 +65,7 @@
             <p class="text-gray-600">{{ item.size_snapshot }} / {{ item.color_snapshot }} &middot; x{{ item.quantity }}</p>
             <p class="text-xs text-gray-500 font-mono">{{ item.sku_snapshot }}</p>
           </div>
-          <span class="font-semibold whitespace-nowrap text-[var(--color-ink)]">${{ item.line_total|floatformat:0 }}</span>
+          <span class="font-semibold whitespace-nowrap text-[var(--color-ink)]">${{ item.line_total|cop }} COP</span>
         </li>
         {% endfor %}
       </ul>

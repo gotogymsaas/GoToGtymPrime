@@ -1,99 +1,102 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 {% block title %}{{ producto.name }}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260922-editorial">
+{% endblock %}
+
 {% block content %}
-<div class="container mx-auto py-6 px-4">
+<div class="shop-page shop-pdp">
+  {% include "partials/_quantum_field.html" %}
 
   {% if messages %}
-  <div class="mb-4 space-y-2">
+  <div class="shop-shell" style="padding-top: 20px;">
     {% for message in messages %}
     <p class="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm">{{ message }}</p>
     {% endfor %}
   </div>
   {% endif %}
 
-  <nav class="text-sm text-[var(--color-text-secondary)] mb-4">
-    <a href="{% url 'tienda:producto_list' %}" class="hover:text-[var(--color-accent)] transition">{% trans "Tienda" %}</a>
-    <span class="mx-1">/</span>
-    <a href="{% url 'tienda:producto_list' %}?categoria={{ producto.category.id }}" class="hover:text-[var(--color-accent)] transition">{{ producto.category.name }}</a>
-  </nav>
+  <div class="shop-shell">
+    <nav class="shop-pdp__breadcrumb">
+      <a href="{% url 'tienda:producto_list' %}">{% trans "Tienda" %}</a>
+      <span aria-hidden="true">/</span>
+      <a href="{% url 'tienda:producto_list' %}?categoria={{ producto.category.id }}">{{ producto.category.name }}</a>
+    </nav>
 
-  <div class="flex flex-col md:flex-row gap-8">
+    <div class="shop-pdp__layout">
 
-    {% include "tienda/partials/_media_gallery.html" %}
+      {% include "tienda/partials/_media_gallery.html" %}
 
-    <div class="w-full md:w-1/2 gtg-quantum-ambient">
-      <h1 class="text-2xl sm:text-4xl font-extrabold mb-2 text-[var(--color-text-primary)] break-words">{{ producto.name }}</h1>
+      <div class="shop-pdp__info">
+        <p class="shop-pdp__category">{{ producto.category.name }}</p>
+        <h1 class="shop-pdp__title">{{ producto.name }}</h1>
+        <p class="shop-pdp__review-note">{% trans "Sin reseñas todavía" %}</p>
 
-      <p class="text-sm text-[var(--color-text-muted)] mb-3">{% trans "Sin reseñas todavía" %}</p>
-
-      <div class="mb-4">
-        <span id="pdp-price" class="text-3xl font-bold text-[var(--color-gold)]">
+        <span id="pdp-price" class="shop-pdp__price">
           {% include "tienda/partials/_price.html" with price_min=price_min price_max=price_max has_range=has_price_range %}
         </span>
-      </div>
 
-      <p class="mb-5 text-[var(--color-text-secondary)] leading-relaxed">{{ producto.description }}</p>
+        <p class="shop-pdp__description">{{ producto.description }}</p>
 
-      <dl class="mb-5 text-sm">
-        <div class="flex gap-2 mb-1">
-          <dt class="font-semibold text-[var(--color-text-primary)]">{% trans "Categoría" %}:</dt>
-          <dd class="text-[var(--color-text-secondary)]">{{ producto.category.name }}</dd>
-        </div>
         {% if producto.brand %}
-        <div class="flex gap-2">
-          <dt class="font-semibold text-[var(--color-text-primary)]">{% trans "Marca" %}:</dt>
-          <dd class="text-[var(--color-text-secondary)]">{{ producto.brand.name }}</dd>
-        </div>
-        {% endif %}
-      </dl>
-
-      {{ variantes_json|json_script:"pdp-variants" }}
-
-      {% comment %}
-      El action se reescribe desde JS al elegir variante: la URL de agregar al
-      carrito identifica la variante, no el producto.
-      {% endcomment %}
-      <form method="post" id="pdp-form" class="border-t border-[var(--color-border)] pt-5"
-            data-add-url-template="{% url 'carrito:add_to_cart' 0 %}"
-            {% if single_variant %}action="{% url 'carrito:add_to_cart' single_variant.id %}"{% endif %}>
-        {% csrf_token %}
-        <input type="hidden" name="variant_id" id="pdp-variant-id"
-               value="{% if single_variant %}{{ single_variant.id }}{% endif %}">
-
-        {% if not single_variant %}
-          {% include "tienda/partials/_size_selector.html" with sizes=sizes %}
-          {% include "tienda/partials/_color_selector.html" with colors=colors %}
+        <dl class="shop-pdp__specs">
+          <div><dt>{% trans "Marca" %}</dt><dd>{{ producto.brand.name }}</dd></div>
+        </dl>
         {% endif %}
 
-        <p id="pdp-availability" class="text-sm mb-3 min-h-[1.25rem]"
-           data-msg-select="{% trans 'Selecciona una opción para ver disponibilidad.' %}"
-           data-msg-unavailable="{% trans 'Combinación sin unidades disponibles.' %}"
-           data-msg-missing="{% trans 'Esa combinación no existe para este producto.' %}"
-           aria-live="polite">
-          {% if not in_stock %}
-          <span class="text-red-400 font-semibold">{% trans "Agotado" %}</span>
+        {{ variantes_json|json_script:"pdp-variants" }}
+
+        {% comment %}
+        El action se reescribe desde JS al elegir variante: la URL de agregar al
+        carrito identifica la variante, no el producto.
+        {% endcomment %}
+        <form method="post" id="pdp-form" class="shop-pdp__form"
+              data-add-url-template="{% url 'carrito:add_to_cart' 0 %}"
+              {% if single_variant %}action="{% url 'carrito:add_to_cart' single_variant.id %}"{% endif %}>
+          {% csrf_token %}
+          <input type="hidden" name="variant_id" id="pdp-variant-id"
+                 value="{% if single_variant %}{{ single_variant.id }}{% endif %}">
+
+          {% if not single_variant %}
+            {% include "tienda/partials/_size_selector.html" with sizes=sizes %}
+            {% include "tienda/partials/_color_selector.html" with colors=colors %}
           {% endif %}
-        </p>
 
-        <button type="submit" id="pdp-submit"
-                class="gtg-cta-quantum w-full sm:w-auto px-8 py-3 rounded-full text-white font-bold transition text-lg inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-[var(--color-zafiro)] hover:bg-[var(--color-gold)] hover:text-[var(--color-zafiro)] disabled:hover:bg-[var(--color-zafiro)] disabled:hover:text-white"
-                {% if not in_stock or not single_variant %}disabled{% endif %}>
-          <span class="material-icons-outlined">shopping_cart</span>
-          {% trans "Añadir al carrito" %}
-        </button>
-      </form>
+          <p id="pdp-availability" class="text-sm mb-3 min-h-[1.25rem] text-[var(--color-text-secondary)]"
+             data-msg-select="{% trans 'Selecciona una opción para ver disponibilidad.' %}"
+             data-msg-unavailable="{% trans 'Combinación sin unidades disponibles.' %}"
+             data-msg-missing="{% trans 'Esa combinación no existe para este producto.' %}"
+             aria-live="polite">
+            {% if not in_stock %}
+            <span class="text-red-400 font-semibold">{% trans "Agotado" %}</span>
+            {% endif %}
+          </p>
+
+          <button type="submit" id="pdp-submit"
+                  class="gtg-cta-quantum w-full sm:w-auto px-8 py-3 text-white font-bold transition text-lg inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-[var(--color-zafiro)] hover:bg-[var(--color-gold)] hover:text-[var(--color-zafiro)] disabled:hover:bg-[var(--color-zafiro)] disabled:hover:text-white"
+                  {% if not in_stock or not single_variant %}disabled{% endif %}>
+            <span class="material-icons-outlined">shopping_cart</span>
+            {% trans "Añadir al carrito" %}
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 
   {% if related_cards %}
-  <section class="mt-12">
-    <h2 class="text-xl sm:text-2xl font-bold mb-4 text-[var(--color-text-primary)]">{% trans "Productos relacionados" %}</h2>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {% for card in related_cards %}
-      {% url 'tienda:producto_detail' card.product.id as related_detail_url %}
-      {% include "tienda/partials/_product_card.html" with card=card detail_url=related_detail_url mode="compact" %}
-      {% endfor %}
+  <section class="shop-related" aria-labelledby="related-title">
+    <div class="shop-shell">
+      <div class="shop-related__heading">
+        <h2 id="related-title">{% trans "Productos relacionados" %}</h2>
+      </div>
+      <div class="gtg-product-grid gtg-product-grid--wide">
+        {% for card in related_cards %}
+        {% url 'tienda:producto_detail' card.product.id as related_detail_url %}
+        {% include "tienda/partials/_product_card.html" with card=card detail_url=related_detail_url mode="compact" %}
+        {% endfor %}
+      </div>
     </div>
   </section>
   {% endif %}
@@ -101,6 +104,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="{% static 'js/quantum_field.js' %}" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   var datos = document.getElementById('pdp-variants');
@@ -128,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (!botonesColor.length && coloresUnicos.length === 1) colorElegido = coloresUnicos[0];
 
   function formatearPrecio(valor) {
-    return '$' + Math.round(valor).toLocaleString('es-CO');
+    return '$' + Math.round(valor).toLocaleString('es-CO') + ' COP';
   }
 
   function marcarSeleccion(botones, activo, atributo) {

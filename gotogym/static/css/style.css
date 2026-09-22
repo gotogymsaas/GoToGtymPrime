@@ -296,6 +296,99 @@ textarea:focus-visible {
   50% { box-shadow: 0 0 14px rgba(0, 212, 199, 0.5), 0 0 30px rgba(0, 212, 199, 0.2); }
 }
 
+/* --- Reaccion de la marca al puntero ----------------------------------
+ *
+ * En reposo el simbolo ya respira (gtg-brand-breathe). Al apuntarlo, ese
+ * mismo latido se acelera y se intensifica, y un destello turquesa-dorado
+ * recorre el logotipo una vez. Se anima solo transform, box-shadow y la
+ * posicion del degradado: nada que reflow-e el header.
+ *
+ * El halo no puede declararse en la regla :hover porque una animacion en
+ * curso le gana a una declaracion normal en la cascada; por eso el hover
+ * cambia de keyframes en vez de cambiar box-shadow.
+ */
+.gtg-brand__mark,
+.gtg-footer-brand__mark {
+  transition: transform 340ms var(--motion-easing, cubic-bezier(0.22, 1, 0.36, 1)),
+              background 340ms ease;
+}
+
+.gtg-brand:hover .gtg-brand__mark,
+.gtg-brand:focus-visible .gtg-brand__mark,
+.gtg-footer-brand:hover .gtg-footer-brand__mark {
+  transform: scale(1.09);
+  background: rgba(0, 212, 199, 0.12);
+  animation: gtg-brand-flare 1.7s ease-in-out infinite;
+}
+
+@keyframes gtg-brand-flare {
+  0%, 100% {
+    box-shadow: 0 0 14px rgba(0, 212, 199, 0.55), 0 0 32px rgba(0, 212, 199, 0.22);
+  }
+  50% {
+    box-shadow:
+      0 0 24px rgba(0, 212, 199, 0.9),
+      0 0 54px rgba(0, 212, 199, 0.45),
+      0 0 80px rgba(212, 180, 106, 0.22);
+  }
+}
+
+/* Destello sobre el logotipo. El degradado arranca y termina en el blanco
+   normal del texto, asi que en reposo se ve igual que siempre; al apuntar
+   solo se desplaza la banda turquesa/dorada. Va dentro de @supports para
+   que, donde background-clip:text no exista, el texto conserve su color en
+   vez de volverse invisible. */
+.gtg-brand__word {
+  transition: text-shadow 340ms ease;
+}
+
+.gtg-brand:hover .gtg-brand__word,
+.gtg-brand:focus-visible .gtg-brand__word {
+  text-shadow: 0 0 20px rgba(0, 212, 199, 0.45);
+}
+
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .gtg-brand__word {
+    background-image: linear-gradient(
+      100deg,
+      var(--color-text-primary) 0%,
+      var(--color-text-primary) 40%,
+      var(--color-accent) 50%,
+      var(--color-gold) 57%,
+      var(--color-text-primary) 68%,
+      var(--color-text-primary) 100%
+    );
+    background-size: 280% 100%;
+    background-position: 100% 0;
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: background-position 900ms var(--motion-easing, ease),
+                text-shadow 340ms ease;
+  }
+
+  .gtg-brand:hover .gtg-brand__word,
+  .gtg-brand:focus-visible .gtg-brand__word {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gtg-brand__mark,
+  .gtg-footer-brand__mark,
+  .gtg-brand:hover .gtg-brand__mark,
+  .gtg-brand:focus-visible .gtg-brand__mark,
+  .gtg-footer-brand:hover .gtg-footer-brand__mark {
+    animation: none;
+    transform: none;
+  }
+
+  .gtg-brand__word {
+    transition: none;
+  }
+}
+
 /* --- Firma Quantum del dominio comercial -------------------------------
  *
  * El catalogo y el checkout ya viven sobre el lienzo oscuro de la marca

@@ -1,0 +1,49 @@
+{% comment %}
+Campo gravitacional Quantum: malla curvada alrededor de un nucleo fuera de
+centro, arco de lente y particulas en trayectoria. Es la misma pieza que
+el hero del Home (logged_home.html); aqui vive como partial porque la
+comparten la tienda y la ficha de producto.
+
+Es decorativa: aria-hidden, sin eventos de puntero y con el movimiento
+anulado si el sistema pide menos animacion. El desplazamiento suave al
+mover el mouse y la pausa fuera de viewport los maneja
+static/js/quantum_field.js.
+
+Parametro opcional:
+  variant - sufijo para los id de los degradados, necesario solo si se
+            renderizara mas de un campo en la misma pagina.
+{% endcomment %}
+<div class="quantum-field" data-quantum-field aria-hidden="true">
+  <svg viewBox="0 0 900 700" focusable="false">
+    <defs>
+      <linearGradient id="qf-line{{ variant }}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#17375c" stop-opacity="0"/>
+        <stop offset=".52" stop-color="#0fbfb0" stop-opacity=".72"/>
+        <stop offset="1" stop-color="#284f7e" stop-opacity="0"/>
+      </linearGradient>
+      <radialGradient id="qf-core{{ variant }}">
+        <stop offset="0" stop-color="#101012" stop-opacity=".96"/>
+        <stop offset=".62" stop-color="#17375c" stop-opacity=".3"/>
+        <stop offset="1" stop-color="#0fbfb0" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <g class="quantum-field__mesh" fill="none" stroke="url(#qf-line{{ variant }})">
+      <path d="M-40 94 C238 22 330 328 455 354 S684 584 950 492"/>
+      <path d="M-36 132 C220 58 326 310 456 348 S694 548 946 458"/>
+      <path d="M-30 172 C208 92 324 292 458 342 S704 510 940 422"/>
+      <path d="M-18 216 C198 130 322 274 460 336 S712 470 930 382"/>
+      <path d="M-4 264 C194 170 324 258 462 330 S716 426 918 340"/>
+      <path d="M18 314 C196 214 330 246 464 326 S714 382 900 296"/>
+      <path d="M46 366 C204 258 340 238 466 322 S706 334 878 250"/>
+      <path d="M82 420 C222 304 354 236 468 320 S690 286 848 208"/>
+      <path d="M128 474 C248 348 372 242 470 318 S668 240 810 170"/>
+    </g>
+    <circle class="quantum-field__lens" cx="468" cy="326" r="155" fill="none" stroke="#0fbfb0"/>
+    <circle cx="468" cy="326" r="112" fill="url(#qf-core{{ variant }})"/>
+    <g class="quantum-field__particles" fill="#f8f9fa">
+      <circle cx="260" cy="143" r="3"/><circle cx="637" cy="505" r="2.5"/>
+      <circle cx="350" cy="252" r="2"/><circle cx="741" cy="319" r="2"/>
+      <circle cx="564" cy="418" r="3"/><circle cx="164" cy="357" r="2"/>
+    </g>
+  </svg>
+</div>

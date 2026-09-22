@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static tienda_filters %}
 
 {% block title %}Panel de influencers{% endblock %}
 {% block navbar %}{% endblock %}
@@ -60,11 +60,11 @@
             </article>
             <article class="influencer-stat">
               <span class="influencer-stat__label">Ventas generadas</span>
-              <strong class="influencer-stat__value">${{ profile.total_sales }}</strong>
+              <strong class="influencer-stat__value">${{ profile.total_sales|cop }} COP</strong>
             </article>
             <article class="influencer-stat">
               <span class="influencer-stat__label">Comisi&oacute;n disponible</span>
-              <strong class="influencer-stat__value">${{ profile.commission_balance }}</strong>
+              <strong class="influencer-stat__value">${{ profile.commission_balance|cop }} COP</strong>
             </article>
           </section>
 

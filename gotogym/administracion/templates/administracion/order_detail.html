@@ -1,4 +1,5 @@
 {% extends "administracion/base.html" %}
+{% load tienda_filters %}
 {% block content %}
 <section class="page-head">
   <div>
@@ -44,12 +45,12 @@
         <td>{{ item.product_name_snapshot }}</td>
         <td>{{ item.size_snapshot }} / {{ item.color_snapshot }}</td>
         <td>{{ item.quantity }}</td>
-        <td>${{ item.line_total|floatformat:0 }}</td>
+        <td>${{ item.line_total|cop }} COP</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-  <p>Subtotal: ${{ order.subtotal|floatformat:0 }} &middot; Envio: ${{ order.shipping_cost|floatformat:0 }} &middot; <strong>Total: ${{ order.total|floatformat:0 }}</strong></p>
+  <p>Subtotal: ${{ order.subtotal|cop }} COP &middot; Envio: ${{ order.shipping_cost|cop }} COP &middot; <strong>Total: ${{ order.total|cop }} COP</strong></p>
 </div>
 
 <div class="panel">
@@ -75,7 +76,7 @@
         <td>{{ transaction.provider }}</td>
         <td>{{ transaction.preference_id }}</td>
         <td>{{ transaction.get_status_display }}</td>
-        <td>${{ transaction.amount|floatformat:0 }}</td>
+        <td>${{ transaction.amount|cop }} COP</td>
         <td>{{ transaction.created_at|date:"d/m/Y H:i" }}</td>
       </tr>
       {% empty %}<tr><td colspan="5">Sin transacciones todavia.</td></tr>{% endfor %}

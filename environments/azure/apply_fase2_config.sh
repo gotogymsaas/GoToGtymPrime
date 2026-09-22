@@ -24,11 +24,7 @@ required_env=(
   "CORS_ALLOWED_ORIGINS"
   "MERCADOPAGO_ACCESS_TOKEN"
   "ALEGRA_API_TOKEN"
-  "MYSQL_DATABASE"
-  "MYSQL_USER"
-  "MYSQL_PASSWORD"
-  "MYSQL_HOST"
-  "MYSQL_PORT"
+  "DATABASE_URL"
 )
 
 for var in "${required_env[@]}"; do
@@ -71,11 +67,7 @@ run_cmd webapp config appsettings set -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}"
   MERCADOPAGO_ACCESS_TOKEN="${MERCADOPAGO_ACCESS_TOKEN}" \
   ALEGRA_API_TOKEN="${ALEGRA_API_TOKEN}" \
   HUBSPOT_PRIVATE_TOKEN="${HUBSPOT_PRIVATE_TOKEN:-}" \
-  MYSQL_DATABASE="${MYSQL_DATABASE}" \
-  MYSQL_USER="${MYSQL_USER}" \
-  MYSQL_PASSWORD="${MYSQL_PASSWORD}" \
-  MYSQL_HOST="${MYSQL_HOST}" \
-  MYSQL_PORT="${MYSQL_PORT}"
+  DATABASE_URL="${DATABASE_URL}"
 
 run_cmd webapp log config -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" --application-logging filesystem --web-server-logging filesystem --level information
 

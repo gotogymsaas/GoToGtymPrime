@@ -1,4 +1,5 @@
 {% extends "administracion/base.html" %}
+{% load tienda_filters %}
 {% block title %}Panel GoToGym Admin{% endblock %}
 {% block content %}
 <section class="hero">
@@ -20,7 +21,7 @@
     <h2>Productos recientes</h2>
     <table>
       {% for product in latest_products %}
-      <tr><td>{{ product.name }}</td><td>${{ product.base_price|floatformat:2 }}</td><td>{{ product.stock }}</td></tr>
+      <tr><td>{{ product.name }}</td><td>${{ product.base_price|cop }} COP</td><td>{{ product.stock }}</td></tr>
       {% empty %}<tr><td>No hay productos.</td></tr>{% endfor %}
     </table>
   </div>

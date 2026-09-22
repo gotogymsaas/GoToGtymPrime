@@ -6,6 +6,7 @@ saltarselos y la peticion puede llegar sin pasar por el formulario.
 import re
 
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 from .colombia_data import DEPARTAMENTOS, municipios_de
 
@@ -13,31 +14,31 @@ TELEFONO_VALIDO = re.compile(r'^[0-9+()\s-]{7,20}$')
 
 
 class CheckoutForm(forms.Form):
-    first_name = forms.CharField(label='Nombre', max_length=100)
-    last_name = forms.CharField(label='Apellido', max_length=100)
-    email = forms.EmailField(label='Correo electronico')
-    phone = forms.CharField(label='Telefono', max_length=40)
+    first_name = forms.CharField(label=_('Nombre'), max_length=100)
+    last_name = forms.CharField(label=_('Apellido'), max_length=100)
+    email = forms.EmailField(label=_('Correo electrónico'))
+    phone = forms.CharField(label=_('Teléfono'), max_length=40)
 
-    country = forms.CharField(label='Pais', max_length=80, initial='Colombia')
+    country = forms.CharField(label=_('País'), max_length=80, initial='Colombia')
     department = forms.ChoiceField(
-        label='Departamento',
+        label=_('Departamento'),
         # La opcion en blanco fuerza una eleccion explicita: sin ella, el
         # navegador preselecciona visualmente la primera opcion de la lista
         # (Amazonas) y un usuario que no toque el campo terminaria enviando
         # ese valor sin haberlo elegido.
-        choices=[('', 'Selecciona un departamento')] + [(d, d) for d in DEPARTAMENTOS],
+        choices=[('', _('Selecciona un departamento'))] + [(d, d) for d in DEPARTAMENTOS],
     )
     # No es un ChoiceField: las opciones dependen del departamento elegido
     # (se llenan en el navegador con JS). La integridad real se valida en
     # clean(), cruzando city contra el departamento ya validado.
-    city = forms.CharField(label='Ciudad', max_length=80)
-    postal_code = forms.CharField(label='Codigo postal', max_length=20, required=False)
-    address_line = forms.CharField(label='Direccion', max_length=255)
+    city = forms.CharField(label=_('Ciudad'), max_length=80)
+    postal_code = forms.CharField(label=_('Código postal'), max_length=20, required=False)
+    address_line = forms.CharField(label=_('Dirección'), max_length=255)
     address_complement = forms.CharField(
-        label='Complemento (apartamento, torre, referencia)', max_length=255, required=False,
+        label=_('Complemento (apartamento, torre, referencia)'), max_length=255, required=False,
     )
     notes = forms.CharField(
-        label='Informacion adicional para la entrega', required=False,
+        label=_('Información adicional para la entrega'), required=False,
         widget=forms.Textarea(attrs={'rows': 3}),
     )
 

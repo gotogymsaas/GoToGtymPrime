@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static tienda_filters %}
 
 {% block title %}Compras referidas{% endblock %}
 {% block navbar %}{% endblock %}
@@ -46,7 +46,7 @@
                 <td>{{ compra.nombre }}</td>
                 <td>{{ compra.email }}</td>
                 <td>{{ compra.fecha|date:'d/m/Y' }}</td>
-                <td>${{ compra.monto }}</td>
+                <td>${{ compra.monto|cop }} COP</td>
               </tr>
               {% endfor %}
             </tbody>
