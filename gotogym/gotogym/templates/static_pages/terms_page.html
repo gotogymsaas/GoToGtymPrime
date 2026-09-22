@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block title %}Términos y condiciones | GoToGym{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260922-legal">{% endblock %}
+{% block content %}
+<div class="editorial-page editorial-quantum">
+  <div class="editorial-quantum__background" aria-hidden="true"><span></span></div>
+  <header class="editorial-hero"><div class="editorial-shell"><p class="editorial-kicker">GoToGym · Marco de confianza</p><h1 class="editorial-title">Términos y <em>condiciones.</em></h1><p class="editorial-lead">Los acuerdos que hacen clara y segura nuestra relación contigo.</p></div></header>
+  <section class="editorial-section"><div class="editorial-shell legal-layout">
+    {% include 'partials/_legal_nav.html' with policy_key='terms' %}
+    <article class="legal-document">{% include 'accounts/terms_and_conditions.html' %}<footer class="legal-document__footer"><a class="editorial-text-link" href="{{ back_url }}">← Volver</a><a class="editorial-text-link" href="{% url 'contacto' %}">Resolver una duda →</a></footer></article>
+  </div></section>
+</div>
+{% endblock %}

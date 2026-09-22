@@ -72,3 +72,36 @@ class EditorialPagesTests(TestCase):
         self.assertEqual(len(recommendations), 3)
         self.assertTrue(all(card['in_stock'] for card in recommendations))
         self.assertContains(response, '/static/product_media/')
+
+    def test_entrada_publica_conserva_experiencia_quantum(self):
+        response = self.client.get(reverse('home'))
+
+        self.assertContains(response, 'class="figma-home"', html=False)
+        self.assertContains(response, 'class="quantum-field"', html=False)
+
+    def test_contacto_conserva_fondo_quantum_con_shell_editorial(self):
+        response = self.client.get(reverse('contacto'))
+
+        self.assertContains(response, 'editorial-quantum__background')
+        self.assertContains(response, 'support@gotogym.store')
+        self.assertContains(response, 'Privacidad y tratamiento de datos')
+
+    def test_todas_las_politicas_comparten_shell_y_navegacion(self):
+        routes = [
+            'politica_privacidad', 'terminos', 'politica_cambios',
+            'politica_devoluciones', 'politica_garantia', 'politica_envios',
+            'politica_pagos', 'politica_tratamiento_datos',
+        ]
+
+        for route in routes:
+            with self.subTest(route=route):
+                response = self.client.get(reverse(route))
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, 'editorial-quantum__background')
+                self.assertContains(response, 'Ayuda y transparencia')
+                self.assertContains(response, reverse('contacto'))
+
+    def test_politica_activa_se_identifica_en_navegacion(self):
+        response = self.client.get(reverse('politica_envios'))
+
+        self.assertContains(response, 'href="{}" aria-current="page"'.format(reverse('politica_envios')))
