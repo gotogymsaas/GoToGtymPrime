@@ -13,7 +13,7 @@ class BasicRoutesSmokeTests(TestCase):
 		self.assertEqual(response.status_code, 200)
 
 	def test_crm_healthz(self):
-		response = self.client.get('/es/crm/healthz')
+		response = self.client.get('/healthz')
 		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, 'OK')
 
