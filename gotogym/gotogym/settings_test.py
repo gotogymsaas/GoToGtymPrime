@@ -17,13 +17,10 @@ INSTALLED_APPS = [
     'orders',
     'payments',
     'shipping',
-    'configuracion_marca',
     'contabilidad',
     'influencer',
     'tienda',
     'carrito',
-    'crm',
-    'metricas',
     'administracion',
 ]
 

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from blog.models import Post
 from django.contrib.auth import get_user_model
@@ -68,17 +69,15 @@ def dashboard(request):
         .annotate(count=Count('id'))
         .order_by('month')
     )
-    chart_labels = [p['month'].strftime('%b %Y') for p in post_stats]
-    chart_data = [p['count'] for p in post_stats]
     context = {
-        'posts': posts,
-        'users_count': users_count,
-        'visitas': visitas,
-        'chart_labels': json.dumps(chart_labels),
-        'chart_data': json.dumps(chart_data),
+        'featured_cards': [build_product_card(product) for product in products],
+        'latest_posts': (
+            Post.objects.filter(is_published=True)
+            .select_related('category', 'author')
+            .order_by('-published')[:3]
+        ),
     }
-    return render(request, 'dashboard.html', context)
-
+    return render(request, 'logged_home.html', context)
 
 def pedidos(request):
     return redirect('carrito:cart_detail')
@@ -93,7 +92,11 @@ def gestion(request):
 
 
 def tecnologia(request):
-    return redirect('metricas:metricas_dashboard')
+    return redirect('tienda:producto_list')
+
+
+def healthz(request):
+    return HttpResponse('OK')
 
 
 def acerca_de(request):

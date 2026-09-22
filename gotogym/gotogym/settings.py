@@ -16,10 +16,6 @@ def _as_bool(value: str, default: bool = False) -> bool:
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = BASE_DIR.parent
-ADMIN_PROJECT_DIR = PROJECT_ROOT / 'GoToGymAdmin'
-
-if ADMIN_PROJECT_DIR.exists() and str(ADMIN_PROJECT_DIR) not in sys.path:
-    sys.path.insert(0, str(ADMIN_PROJECT_DIR))
 
 # `integrations/` (cliente de Mercado Pago, Alegra, HubSpot) vive en la raiz
 # del repositorio, fuera de este proyecto. Sin esto, `import integrations...`
@@ -54,13 +50,10 @@ INSTALLED_APPS = [
     'orders',
     'payments',
     'shipping',
-    'configuracion_marca',
     'contabilidad',
     'influencer',
     'tienda',
     'carrito',
-    'crm',
-    'metricas',
     'administracion',
 ]
 
@@ -84,7 +77,6 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             BASE_DIR / 'gotogym' / 'templates',
-            ADMIN_PROJECT_DIR / 'templates',
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -169,7 +161,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
-    ADMIN_PROJECT_DIR / 'static',
 ]
 STORAGES = {
     'default': {
