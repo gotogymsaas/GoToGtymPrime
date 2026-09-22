@@ -37,6 +37,7 @@ python manage.py runserver 0.0.0.0:8000
 - **[docs/GUIA_ACCESO.md](docs/GUIA_ACCESO.md)** - Guía de acceso y bases de datos
 - **[docs/ANALISIS_ESTRUCTURA.md](docs/ANALISIS_ESTRUCTURA.md)** - Análisis completo del proyecto
 - **[docs/CORRECCIONES.md](docs/CORRECCIONES.md)** - Historial de cambios y correcciones
+- **[docs/ecomerce/PROPUESTA_HOME_STORE_QUANTUM.md](docs/ecomerce/PROPUESTA_HOME_STORE_QUANTUM.md)** - Propuesta UX/editorial, arquitectura y plan de implementación del Home Store
 
 ---
 
