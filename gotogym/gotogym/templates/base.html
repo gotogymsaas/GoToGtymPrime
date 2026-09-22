@@ -10,8 +10,14 @@
   <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260919-quantum-store">
-  <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260919-quantum-store">
+  {% comment %}
+  El almacenamiento de estaticos (CompressedStaticFilesStorage) no agrega
+  hash al nombre del archivo, asi que este ?v= es el unico corta-cache que
+  hay: al editar style.css o tokens.css hay que subirlo o el navegador
+  seguira sirviendo la copia vieja.
+  {% endcomment %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260922-editorial">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
   {% block extra_head %}{% endblock %}
   {% if paleta_marca %}
   <style>

@@ -106,7 +106,7 @@
 .shop-filters { display: grid; gap: 26px; align-content: start; min-width: 0; }
 .shop-field { display: grid; gap: 8px; min-width: 0; }
 .shop-field label, .shop-field legend { margin: 0; padding: 0; color: var(--shop-muted); font-size: .68rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.shop-field input, .shop-field select { width: 100%; min-width: 0; max-width: 100%; min-height: 46px; border: 1px solid #c8c8c5; border-radius: 0; background: #fff; color: var(--shop-ink); padding: 0 14px; font-size: .9rem; text-overflow: ellipsis; }
+.shop-field input, .shop-field select { width: 100%; min-width: 0; max-width: 100%; min-height: 46px; border: 1px solid #c8c8c5; border-radius: 0; background: #fff; color: var(--shop-ink); padding: 0 14px; font: inherit; text-overflow: ellipsis; }
 .shop-field .shop-price-row { display: flex; gap: 8px; }
 /* Cuadros iguales para todas las tallas: una grilla de columnas parejas
  * reparte el ancho sin importar si la etiqueta es "S" o "UNICA". */
@@ -204,20 +204,35 @@
 .account-layout > * { min-width: 0; }
 .account-fields { min-width: 0; }
 .account-field { min-width: 0; }
+/* Micro-rotulo igual al de los filtros de la tienda (.shop-field label).
+ * editorial_pages.css lo define a .75rem y sin tracking para el formulario
+ * de la cuenta; en uppercase y ExtraBold eso se lee apretado y distinto al
+ * resto del flujo de compra. */
+.account-field label {
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+/* Los tres controles con la misma metrica: sin esto el <input> se queda con
+ * los 16px heredados del body y el <select> con .95rem, y dos campos
+ * contiguos muestran su texto a tamanos distintos. */
 .account-field input,
 .account-field select,
-.account-field textarea { width: 100%; min-width: 0; max-width: 100%; }
-
-.account-field select,
 .account-field textarea {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 50px;
   border: 1px solid #c8c8c5;
   border-radius: 0;
   background: #fff;
   color: var(--ed-ink, #101012);
   padding: 10px 14px;
+  /* El tamano lo fija `body.gtg-theme input` (style.css), que gana en
+     especificidad: 16px, que ademas evita el zoom al enfocar en iOS. */
   font: inherit;
-  font-size: .95rem;
 }
 .account-field textarea { min-height: 90px; resize: vertical; }
 .checkout-field-error { margin: 6px 0 0; color: #b91c1c; font-size: .78rem; }

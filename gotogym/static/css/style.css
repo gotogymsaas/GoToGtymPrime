@@ -533,10 +533,10 @@ textarea:focus-visible {
 }
 
 .gtg-user-button {
-  width: 96px;
-  height: 54px;
-  min-width: 96px;
-  min-height: 54px;
+  width: 132px;
+  height: 58px;
+  min-width: 132px;
+  min-height: 58px;
   flex-direction: column;
   gap: 2px;
   padding: 4px 6px;
@@ -573,9 +573,10 @@ textarea:focus-visible {
   display: block;
   width: 100%;
   color: #ffffff;
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1.2;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  line-height: 1.25;
   text-align: center;
   white-space: nowrap;
   max-width: 100%;
@@ -867,10 +868,12 @@ textarea:focus-visible {
   transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
+/* Mismo enfasis turquesa que los botones del header: el footer es la otra
+   punta de la misma barra de marca y debe responder igual al puntero. */
 .gtg-socials a:hover {
-  border-color: rgba(255, 255, 255, 0.55);
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
+  border-color: rgba(0, 212, 199, 0.55);
+  background: rgba(0, 212, 199, 0.12);
+  color: var(--color-accent);
   transform: translateY(-3px);
 }
 
@@ -908,8 +911,8 @@ textarea:focus-visible {
 }
 
 .gtg-footer-legal a:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: rgba(0, 212, 199, 0.08);
+  color: var(--color-accent);
 }
 
 .gtg-auth-page {

@@ -21,3 +21,7 @@ environments/azure/.env.release
 # Build
 build/
 
+# Salida de collectstatic: se regenera en cada despliegue y con el hash de
+# contenido son cientos de copias del mismo archivo.
+staticfiles/
+

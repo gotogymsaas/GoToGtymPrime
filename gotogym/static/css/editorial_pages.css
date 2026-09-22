@@ -18,6 +18,16 @@
 .editorial-lead { max-width: 650px; color: var(--ed-muted); font-size: clamp(1rem, 1.6vw, 1.25rem); line-height: 1.7; }
 .editorial-hero { padding: clamp(80px, 10vw, 150px) 0 clamp(64px, 8vw, 110px); background: var(--ed-ink); color: var(--ed-paper); }
 .editorial-hero .editorial-lead { margin: 32px 0 0; color: rgba(248,249,250,.65); }
+
+/* Variante compacta, a la mitad de alto: para pantallas donde la cabecera
+   es un rotulo y no una portada, y el contenido tiene que entrar antes.
+   Escala el conjunto (relleno, titular y bajada), no solo el relleno, para
+   que las proporciones se mantengan. Las pantallas de carrito y checkout
+   reciben su propia reduccion desde commerce_editorial.css. */
+.editorial-hero--compact { padding: clamp(28px, 3vw, 44px) 0 clamp(22px, 2.4vw, 34px); }
+.editorial-hero--compact .editorial-kicker { margin-bottom: 12px; }
+.editorial-hero--compact .editorial-title { font-size: clamp(1.9rem, 4.2vw, 3.6rem); }
+.editorial-hero--compact .editorial-lead { max-width: 560px; margin-top: 16px; font-size: clamp(.92rem, 1.1vw, 1rem); }
 .editorial-section { padding: clamp(64px, 8vw, 110px) 0; }
 .editorial-section--mist { background: var(--ed-mist); }
 .editorial-section--dark { background: var(--ed-ink); color: var(--ed-paper); }

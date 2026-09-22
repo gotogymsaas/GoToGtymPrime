@@ -46,6 +46,19 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',
 ]
 
+# En produccion los estaticos llevan hash de contenido
+# (CompressedManifestStaticFilesStorage), pero ese backend resuelve cada
+# {% static %} contra staticfiles.json, que solo existe despues de
+# collectstatic. La suite corre antes de ese paso en CI, y ademas no tiene
+# nada que verificar sobre el hashing: se queda con el backend simple para
+# no depender de un artefacto de build.
+STORAGES = {
+    **STORAGES,
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
+    },
+}
+
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
 AUTH_USER_MODEL = 'accounts.User'
