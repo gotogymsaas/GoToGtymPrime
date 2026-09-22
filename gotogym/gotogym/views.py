@@ -53,6 +53,32 @@ def logged_home(request):
     }
     return render(request, 'logged_home.html', context)
 
+@login_required
+@user_passes_test(lambda u: u.is_superuser or u.is_staff)
+def dashboard(request):
+    q = request.GET.get('q', '')
+    posts = Post.objects.all()
+    if q:
+        posts = posts.filter(title__icontains=q)
+    users_count = get_user_model().objects.count()
+    visitas = 0  # Puedes conectar aquí tu sistema de visitas si lo tienes
+    # Gráfica: publicaciones por mes
+    post_stats = (
+        Post.objects.annotate(month=TruncMonth('published'))
+        .values('month')
+        .annotate(count=Count('id'))
+        .order_by('month')
+    )
+    context = {
+        'featured_cards': [build_product_card(product) for product in products],
+        'latest_posts': (
+            Post.objects.filter(is_published=True)
+            .select_related('category', 'author')
+            .order_by('-published')[:3]
+        ),
+    }
+    return render(request, 'logged_home.html', context)
+
 def pedidos(request):
     return redirect('carrito:cart_detail')
 

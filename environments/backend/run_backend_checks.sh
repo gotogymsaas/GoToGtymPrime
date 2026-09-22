@@ -28,8 +28,12 @@ echo "[backend] Ejecutando django check (settings_local)..."
 python manage.py check --settings=gotogym.settings_local
 
 echo "[backend] Ejecutando test suite (settings_test)..."
-# `administracion` ahora vive dentro del arbol principal de `gotogym/`,
-# asi que la corrida general ya la incluye.
-python manage.py test --settings=gotogym.settings_test
+# `manage.py test` sin argumentos solo descubre pruebas dentro del arbol de
+# este directorio (gotogym/). `administracion` vive fisicamente en
+# GoToGymAdmin/, por lo que se agrega como etiqueta explicita. Se ejecutan
+# ambos grupos en el mismo proceso y sobre la misma base de pruebas: separarlos
+# podia ocultar errores de orden, fixtures o estado compartido entre apps y no
+# reproducía la suite combinada que usa la validacion de PR.
+python manage.py test . administracion --settings=gotogym.settings_test
 
 echo "[backend] Validaciones finalizadas."
