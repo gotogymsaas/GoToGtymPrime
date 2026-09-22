@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from blog.models import Post
 from django.contrib.auth import get_user_model
