@@ -1,15 +1,19 @@
 {% extends 'base.html' %}
-{% load i18n %}
-{% block title %}{{ title }}{% endblock %}
+{% load static i18n %}
+{% block title %}{{ title }} | GoToGym{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260922-legal">{% endblock %}
 {% block content %}
-<div class="container mx-auto max-w-3xl py-12 px-4">
-  <p class="inline-block mb-4 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-semibold">
-    {% trans "Contenido provisional, sujeto a revisión" %}
-  </p>
-  <h1 class="text-3xl font-bold text-[#093f62] mb-6">{{ title }}</h1>
-  {% for paragraph in paragraphs %}
-  <p class="mb-4 text-gray-700 leading-relaxed">{{ paragraph }}</p>
-  {% endfor %}
-  <a href="{% url 'home' %}" class="inline-block mt-6 text-[#093f62] hover:underline">&larr; {% trans "Volver al inicio" %}</a>
+<div class="editorial-page editorial-quantum">
+  <div class="editorial-quantum__background" aria-hidden="true"><span></span></div>
+  <header class="editorial-hero"><div class="editorial-shell"><p class="editorial-kicker">GoToGym · Ayuda y transparencia</p><h1 class="editorial-title">{{ title }}</h1><p class="editorial-lead">Información clara para que puedas comprar y usar GoToGym con confianza.</p></div></header>
+  <section class="editorial-section"><div class="editorial-shell legal-layout">
+    {% include 'partials/_legal_nav.html' %}
+    <article class="legal-document">
+      {% if provisional %}<p class="legal-document__status">Contenido provisional · sujeto a revisión</p>{% endif %}
+      {% if summary %}<p class="legal-document__summary">{{ summary }}</p>{% endif %}
+      {% for section in sections %}<section><h2>{{ section.title }}</h2>{% for paragraph in section.paragraphs %}<p>{{ paragraph }}</p>{% endfor %}</section>{% endfor %}
+      <footer class="legal-document__footer"><a class="editorial-text-link" href="{{ back_url }}">← Volver</a><a class="editorial-text-link" href="{% url 'contacto' %}">¿Necesitas ayuda? →</a></footer>
+    </article>
+  </div></section>
 </div>
 {% endblock %}

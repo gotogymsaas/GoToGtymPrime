@@ -1,46 +1,26 @@
 {% extends 'base.html' %}
-{% load i18n %}
-{% load static %}
-
-{% block title %}{% trans "Editar Perfil" %}{% endblock %}
-
+{% load static i18n %}
+{% block title %}{% trans "Mi cuenta" %} | GoToGym{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260922">{% endblock %}
 {% block content %}
-<div class="max-w-lg mx-auto mt-10 gtg-card rounded-xl shadow-lg p-8">
-  <h2 class="text-2xl font-bold mb-6 text-center text-white">{% trans "Editar Perfil" %}</h2>
-  <form method="post" enctype="multipart/form-data" class="space-y-5">
-    {% csrf_token %}
-    <div>
-      <label for="id_first_name" class="gtg-label">{% trans "Nombre" %}</label>
-      <input type="text" name="first_name" id="id_first_name" value="{{ user.first_name }}" class="gtg-input" required>
-    </div>
-    <div>
-      <label for="id_last_name" class="gtg-label">{% trans "Apellido" %}</label>
-      <input type="text" name="last_name" id="id_last_name" value="{{ user.last_name }}" class="gtg-input" required>
-    </div>
-    <div>
-      <label for="id_email" class="gtg-label">Email</label>
-      <input type="email" name="email" id="id_email" value="{{ user.email }}" class="gtg-input" required>
-    </div>
-    <div>
-      <label for="id_age" class="gtg-label">{% trans "Edad" %}</label>
-      <input type="number" name="age" id="id_age" value="{{ user.age|default:'' }}" min="10" max="120" class="gtg-input">
-    </div>
-    <div>
-      <label for="id_current_password" class="gtg-label">{% trans "Contraseña actual" %} <span class="text-xs text-gray-400">({% trans "si cambias tu contraseña" %})</span></label>
-      <input type="password" name="current_password" id="id_current_password" class="gtg-input" autocomplete="current-password">
-    </div>
-    <div>
-      <label for="id_password" class="gtg-label">{% trans "Nueva contraseña" %} <span class="text-xs text-gray-400">({% trans "opcional" %})</span></label>
-      <input type="password" name="password" id="id_password" class="gtg-input" autocomplete="new-password">
-    </div>
-    <div>
-      <label for="id_password2" class="gtg-label">{% trans "Confirmar contraseña" %}</label>
-      <input type="password" name="password2" id="id_password2" class="gtg-input" autocomplete="new-password">
-    </div>
-    <div class="flex justify-between mt-8">
-      <a href="/" class="gtg-btn gtg-btn-outline px-4 py-2 rounded-full font-semibold shadow-sm transition-all">{% trans "Volver" %}</a>
-      <button type="submit" class="gtg-btn gtg-btn-primary px-6 py-2 rounded-full font-bold shadow-md transition-all">{% trans "Guardar cambios" %}</button>
-    </div>
-  </form>
+<div class="editorial-page">
+  <header class="editorial-hero"><div class="editorial-shell"><p class="editorial-kicker">Tu cuenta</p><h1 class="editorial-title">Tu información,<br><em>a tu manera.</em></h1><p class="editorial-lead">Actualiza tus datos y administra la seguridad de tu cuenta sin salir de tu universo GoToGym.</p></div></header>
+  <section class="editorial-section editorial-section--mist">
+    <form method="post" enctype="multipart/form-data" class="editorial-shell account-layout">
+      {% csrf_token %}
+      <div class="account-panel"><p class="editorial-kicker">Identidad</p><h2>Datos personales</h2><div class="account-fields">
+        <div class="account-field"><label for="id_first_name">{% trans "Nombre" %}</label><input type="text" name="first_name" id="id_first_name" value="{{ user.first_name|default:'' }}" required></div>
+        <div class="account-field"><label for="id_last_name">{% trans "Apellido" %}</label><input type="text" name="last_name" id="id_last_name" value="{{ user.last_name|default:'' }}" required></div>
+        <div class="account-field account-field--full"><label for="id_email">Email</label><input type="email" name="email" id="id_email" value="{{ user.email }}" required></div>
+        <div class="account-field"><label for="id_age">{% trans "Edad" %}</label><input type="number" name="age" id="id_age" value="{{ user.age|default:'' }}" min="10" max="120"></div>
+      </div></div>
+      <aside class="account-panel"><p class="editorial-kicker">Protección</p><h2>Seguridad</h2><details class="account-security"><summary>Cambiar contraseña</summary><div class="account-fields">
+        <div class="account-field account-field--full"><label for="id_current_password">{% trans "Contraseña actual" %}</label><input type="password" name="current_password" id="id_current_password" autocomplete="current-password"></div>
+        <div class="account-field account-field--full"><label for="id_password">{% trans "Nueva contraseña" %}</label><input type="password" name="password" id="id_password" autocomplete="new-password"></div>
+        <div class="account-field account-field--full"><label for="id_password2">{% trans "Confirmar contraseña" %}</label><input type="password" name="password2" id="id_password2" autocomplete="new-password"></div>
+      </div></details></aside>
+      <div class="account-actions account-field--full"><a class="editorial-text-link" href="{% url 'logged_home' %}">← Volver al Home</a><button type="submit" class="editorial-action">{% trans "Guardar cambios" %}</button></div>
+    </form>
+  </section>
 </div>
 {% endblock %}

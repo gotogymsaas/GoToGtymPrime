@@ -1,0 +1,13 @@
+{% load i18n %}
+<nav class="legal-nav" aria-label="Documentos legales y políticas">
+  <p>Ayuda y transparencia</p>
+  <a href="{% url 'politica_privacidad' %}"{% if policy_key == 'privacy' %} aria-current="page"{% endif %}>Privacidad</a>
+  <a href="{% url 'terminos' %}"{% if policy_key == 'terms' %} aria-current="page"{% endif %}>Términos</a>
+  <a href="{% url 'politica_cambios' %}"{% if policy_key == 'changes' %} aria-current="page"{% endif %}>Cambios</a>
+  <a href="{% url 'politica_devoluciones' %}"{% if policy_key == 'returns' %} aria-current="page"{% endif %}>Devoluciones</a>
+  <a href="{% url 'politica_garantia' %}"{% if policy_key == 'warranty' %} aria-current="page"{% endif %}>Garantía</a>
+  <a href="{% url 'politica_envios' %}"{% if policy_key == 'shipping' %} aria-current="page"{% endif %}>Envíos</a>
+  <a href="{% url 'politica_pagos' %}"{% if policy_key == 'payments' %} aria-current="page"{% endif %}>Pagos</a>
+  <a href="{% url 'politica_tratamiento_datos' %}"{% if policy_key == 'data' %} aria-current="page"{% endif %}>Tratamiento de datos</a>
+  <a href="{% url 'contacto' %}">Contacto</a>
+</nav>

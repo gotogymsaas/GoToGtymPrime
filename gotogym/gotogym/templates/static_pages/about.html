@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block title %}Acerca de GoToGym{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260922">{% endblock %}
+{% block content %}
+<div class="editorial-page">
+  <header class="editorial-hero">
+    <div class="editorial-shell">
+      <p class="editorial-kicker">Nuestra razón de movernos</p>
+      <h1 class="editorial-title">Tecnología alrededor de <em>la persona.</em></h1>
+      <p class="editorial-lead">GoToGym une diseño deportivo, personalización y bienestar para crear experiencias que acompañan la manera única en que cada persona avanza.</p>
+    </div>
+  </header>
+  <section class="editorial-section">
+    <div class="editorial-shell about-manifesto">
+      <p class="editorial-kicker">El manifiesto</p>
+      <div class="about-manifesto__copy">
+        <blockquote>Diseñamos para el movimiento real, no para una versión idealizada de las personas.</blockquote>
+        <p>Exploramos materiales, construcción y servicios conectados con una convicción sencilla: la tecnología adquiere valor cuando se integra con naturalidad a la vida. Por eso cada prenda comienza con una necesidad humana y termina en una experiencia clara, útil y propia.</p>
+      </div>
+    </div>
+  </section>
+  <section class="editorial-section editorial-section--dark">
+    <div class="editorial-shell">
+      <p class="editorial-kicker">Nuestro sistema</p>
+      <div class="about-pillars">
+        <article class="about-pillar"><small>01</small><h3>Diseño</h3><p>Prendas con intención, presencia y libertad de movimiento.</p></article>
+        <article class="about-pillar"><small>02</small><h3>Tecnología</h3><p>Innovación aplicada con propósito y evidencia.</p></article>
+        <article class="about-pillar"><small>03</small><h3>Personalización</h3><p>Opciones más cercanas a cada contexto y estilo.</p></article>
+        <article class="about-pillar"><small>04</small><h3>Bienestar</h3><p>Progreso sostenible, sin culpa ni promesas irreales.</p></article>
+      </div>
+    </div>
+  </section>
+  <section class="editorial-section editorial-section--mist">
+    <div class="editorial-shell">
+      <p class="editorial-kicker">La visión</p>
+      <h2>Crear bienestar personalizado y hacerlo universalmente accesible.</h2>
+      <a class="editorial-action" href="{% url 'tienda:producto_list' %}">Descubrir la colección</a>
+    </div>
+  </section>
+</div>
+{% endblock %}
