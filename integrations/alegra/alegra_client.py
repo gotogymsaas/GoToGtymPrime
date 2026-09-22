@@ -26,6 +26,20 @@ class AlegraClient:
         response.raise_for_status()
         return response.json()
 
+    def get_clients(self) -> list[dict[str, Any]]:
+        """List clients from Alegra."""
+        url = self.BASE_URL + "contacts"
+        response = requests.get(url, headers=self.headers)
+        response.raise_for_status()
+        return response.json()
+
+    def get_invoices(self) -> list[dict[str, Any]]:
+        """List invoices from Alegra."""
+        url = self.BASE_URL + "invoices"
+        response = requests.get(url, headers=self.headers)
+        response.raise_for_status()
+        return response.json()
+
     def record_expense(self, data: dict[str, Any]) -> dict[str, Any]:
         """Record an expense using Alegra API."""
         url = self.BASE_URL + "expenses"
