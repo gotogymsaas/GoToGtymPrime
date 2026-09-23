@@ -73,6 +73,7 @@ urlpatterns += i18n_patterns(
     path('metricas/', lambda request: redirect('admin_dashboard', permanent=False)),
     path('products/', include('products.urls', namespace='products')),
     path('contabilidad/', include('contabilidad.urls', namespace='contabilidad')),
+    path('analitica/', include('analitica.urls', namespace='analitica')),
     path('tienda/', include('tienda.urls', namespace='tienda')),
     path('carrito/', include('carrito.urls', namespace='carrito')),
     path('pedidos-tienda/', include('orders.urls', namespace='orders')),

@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'tienda',
     'carrito',
     'administracion',
+    'analitica',
 ]
 
 MIDDLEWARE = [

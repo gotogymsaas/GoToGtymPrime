@@ -1,0 +1,10 @@
+/* Entrada del build de Tailwind. El archivo servido es
+ * tailwind.build.css, que se regenera con `npm run build:css`.
+ *
+ * Preflight (la base) se conserva: las hojas propias del proyecto se
+ * escribieron con ese reset activo, asi que quitarlo cambiaria margenes y
+ * tamanos de titulo en todo el sitio.
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

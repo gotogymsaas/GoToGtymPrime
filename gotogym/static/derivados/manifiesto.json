@@ -1,0 +1,286 @@
+{
+  "media/products/Imagenes Home/WhatsApp Image 2026-07-21 at 6.53.18 PM (4).jpeg": {
+    "alto": 1600,
+    "ancho": 1066,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960
+      ],
+      "webp": [
+        400,
+        640,
+        960
+      ]
+    },
+    "nombre": "media-products-imagenes-home-whatsapp-image-2026-07-21-at-6-53-18-pm-4"
+  },
+  "media/products/Imagenes Home/WhatsApp Image 2026-07-21 at 6.53.19 PM (1).jpeg": {
+    "alto": 1600,
+    "ancho": 1066,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960
+      ],
+      "webp": [
+        400,
+        640,
+        960
+      ]
+    },
+    "nombre": "media-products-imagenes-home-whatsapp-image-2026-07-21-at-6-53-19-pm-1"
+  },
+  "media/products/Imagenes Home/WhatsApp Image 2026-07-21 at 6.53.19 PM (8).jpeg": {
+    "alto": 1066,
+    "ancho": 1600,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960,
+        1280
+      ],
+      "webp": [
+        400,
+        640,
+        960,
+        1280
+      ]
+    },
+    "nombre": "media-products-imagenes-home-whatsapp-image-2026-07-21-at-6-53-19-pm-8"
+  },
+  "media/products/Imagenes Home/WhatsApp Image 2026-07-21 at 6.53.20 PM (2).jpeg": {
+    "alto": 1066,
+    "ancho": 1600,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960,
+        1280
+      ],
+      "webp": [
+        400,
+        640,
+        960,
+        1280
+      ]
+    },
+    "nombre": "media-products-imagenes-home-whatsapp-image-2026-07-21-at-6-53-20-pm-2"
+  },
+  "media/products/Imagenes Home/WhatsApp Image 2026-07-21 at 6.53.20 PM (4).jpeg": {
+    "alto": 1600,
+    "ancho": 1066,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960
+      ],
+      "webp": [
+        400,
+        640,
+        960
+      ]
+    },
+    "nombre": "media-products-imagenes-home-whatsapp-image-2026-07-21-at-6-53-20-pm-4"
+  },
+  "media/products/Imagenes Home/WhatsApp Image 2026-07-21 at 6.53.20 PM (6).jpeg": {
+    "alto": 1600,
+    "ancho": 1066,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960
+      ],
+      "webp": [
+        400,
+        640,
+        960
+      ]
+    },
+    "nombre": "media-products-imagenes-home-whatsapp-image-2026-07-21-at-6-53-20-pm-6"
+  },
+  "media/products/Imagenes Home/bienestar_empresarial_3.jpeg": {
+    "alto": 1066,
+    "ancho": 1600,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960,
+        1280
+      ],
+      "webp": [
+        400,
+        640,
+        960,
+        1280
+      ]
+    },
+    "nombre": "media-products-imagenes-home-bienestar-empresarial-3"
+  },
+  "media/products/Imagenes Home/bienestar_empresarial_4.jpeg": {
+    "alto": 1600,
+    "ancho": 1066,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960
+      ],
+      "webp": [
+        400,
+        640,
+        960
+      ]
+    },
+    "nombre": "media-products-imagenes-home-bienestar-empresarial-4"
+  },
+  "media/products/Imagenes Home/bienestar_empresarial_5.jpeg": {
+    "alto": 1066,
+    "ancho": 1600,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960,
+        1280
+      ],
+      "webp": [
+        400,
+        640,
+        960,
+        1280
+      ]
+    },
+    "nombre": "media-products-imagenes-home-bienestar-empresarial-5"
+  },
+  "product_media/products/IMG_9286.jpg": {
+    "alto": 3372,
+    "ancho": 2478,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960,
+        1280,
+        1920
+      ],
+      "webp": [
+        400,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    },
+    "nombre": "product-media-products-img-9286"
+  },
+  "product_media/products/IMG_9347_2.jpg": {
+    "alto": 2299,
+    "ancho": 2349,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960,
+        1280,
+        1920
+      ],
+      "webp": [
+        400,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    },
+    "nombre": "product-media-products-img-9347-2"
+  },
+  "product_media/products/Leggins_gris_dama.jpg": {
+    "alto": 2384,
+    "ancho": 1516,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960,
+        1280
+      ],
+      "webp": [
+        400,
+        640,
+        960,
+        1280
+      ]
+    },
+    "nombre": "product-media-products-leggins-gris-dama"
+  },
+  "product_media/products/Pantalon_verde_caballero.webp": {
+    "alto": 407,
+    "ancho": 306,
+    "formatos": {
+      "avif": [
+        306
+      ],
+      "webp": [
+        306
+      ]
+    },
+    "nombre": "product-media-products-pantalon-verde-caballero"
+  },
+  "product_media/products/WhatsApp_Image_2026-07-21_at_6.53.19_PM_9.jpeg": {
+    "alto": 1600,
+    "ancho": 1066,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960
+      ],
+      "webp": [
+        400,
+        640,
+        960
+      ]
+    },
+    "nombre": "product-media-products-whatsapp-image-2026-07-21-at-6-53-19-pm-9"
+  },
+  "product_media/products/X5_Generation_gris_dama.jfif": {
+    "alto": 447,
+    "ancho": 447,
+    "formatos": {
+      "avif": [
+        400
+      ],
+      "webp": [
+        400
+      ]
+    },
+    "nombre": "product-media-products-x5-generation-gris-dama"
+  },
+  "product_media/products/saco_negro_gris_dama.jpg": {
+    "alto": 1575,
+    "ancho": 1492,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960,
+        1280
+      ],
+      "webp": [
+        400,
+        640,
+        960,
+        1280
+      ]
+    },
+    "nombre": "product-media-products-saco-negro-gris-dama"
+  }
+}

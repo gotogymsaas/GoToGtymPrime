@@ -38,52 +38,22 @@
 
 /* --- Campo gravitacional Quantum ---------------------------------------
  *
- * Misma pieza que el hero del Home (.gravity-field en store_home.css),
- * atenuada: aqui el contenido es catalogo, no portada, asi que el campo
- * se queda mas atras. Opacidad .34 en la tienda y .16 en la ficha, contra
- * .52 del Home. Se mueve solo stroke-dashoffset, rotacion y opacidad:
- * nada que provoque reflow ni desplazamiento de layout.
- *
- * El flujo de pago (carrito y checkout) queda deliberadamente sin campo:
- * el documento de direccion pide que el checkout desaparezca, y es la
- * pantalla donde menos conviene gastar cuadros de animacion.
+ * El componente vive completo en static/css/quantum_lens.css, que estas
+ * plantillas cargan junto a esta hoja. Aqui solo queda donde se coloca en
+ * cada pagina: el campo se atenua a medida que el contenido pesa mas.
+ * Opacidad .34 en la tienda y .16 en la ficha, contra .52 del Home.
  */
-.quantum-field {
-  --qf-x: 0px;
-  --qf-y: 0px;
-  position: absolute;
-  z-index: -1;
-  pointer-events: none;
-  transform: translate(calc(-50% + var(--qf-x)), calc(-50% + var(--qf-y)));
-  transition: transform .4s ease-out;
-}
-.quantum-field svg { display: block; width: 100%; overflow: visible; }
-.quantum-field__mesh path { stroke-width: 1.15; stroke-dasharray: 18 8; animation: qf-flow 36s linear infinite; }
-.quantum-field__lens { opacity: .32; stroke-width: 1.2; stroke-dasharray: 5 12; transform-origin: 468px 326px; animation: qf-lens 28s linear infinite; filter: drop-shadow(0 0 12px rgba(15,191,176,.65)); }
-.quantum-field__particles { filter: drop-shadow(0 0 6px #0fbfb0); animation: qf-pulse 6s ease-in-out infinite alternate; }
-.quantum-field.is-paused * { animation-play-state: paused; }
-
-@keyframes qf-flow { to { stroke-dashoffset: -260; } }
-@keyframes qf-lens { to { transform: rotate(360deg); } }
-@keyframes qf-pulse { to { opacity: .35; transform: translateY(-4px); } }
 
 /* Tienda: a la derecha del titular, sin cruzarse con el texto. */
-.shop-hero .quantum-field { top: 48%; left: 74%; width: min(56vw, 760px); opacity: .34; }
+.shop-hero .quantum-lens { top: 48%; left: 74%; width: min(56vw, 760px); opacity: .34; }
 
 /* Ficha de producto: solo un rastro detras de la galeria. */
 .shop-pdp { position: relative; isolation: isolate; overflow: clip; }
-.shop-pdp .quantum-field { top: 38%; left: 28%; width: min(46vw, 620px); opacity: .16; }
+.shop-pdp .quantum-lens { top: 38%; left: 28%; width: min(46vw, 620px); opacity: .16; }
 
 @media (max-width: 720px) {
-  .shop-hero .quantum-field { top: 40%; left: 62%; width: 120vw; opacity: .26; }
-  .shop-pdp .quantum-field { opacity: .12; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .quantum-field__mesh path,
-  .quantum-field__lens,
-  .quantum-field__particles { animation: none; }
-  .quantum-field { transition: none; }
+  .shop-hero .quantum-lens { top: 40%; left: 62%; width: 120vw; opacity: .26; }
+  .shop-pdp .quantum-lens { opacity: .12; }
 }
 
 /* --- Barra de herramientas y filtros --- */

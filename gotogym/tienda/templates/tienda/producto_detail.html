@@ -3,12 +3,13 @@
 {% block title %}{{ producto.name }}{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260922-editorial">
+<link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260922-quantum">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260922-quantum">
 {% endblock %}
 
 {% block content %}
 <div class="shop-page shop-pdp">
-  {% include "partials/_quantum_field.html" %}
+  {% include "partials/_quantum_lens.html" %}
 
   {% if messages %}
   <div class="shop-shell" style="padding-top: 20px;">
@@ -54,7 +55,12 @@
         {% endcomment %}
         <form method="post" id="pdp-form" class="shop-pdp__form"
               data-add-url-template="{% url 'carrito:add_to_cart' 0 %}"
-              {% if single_variant %}action="{% url 'carrito:add_to_cart' single_variant.id %}"{% endif %}>
+              data-add-to-cart
+              data-product-name="{{ producto.name }}"
+              data-label-exito="{% trans 'Añadido al carrito' %}"
+              data-label-error="{% trans 'No se pudo agregar' %}"
+              {% if single_variant %}action="{% url 'carrito:add_to_cart' single_variant.id %}"
+              data-variant-label="{{ single_variant.size }} / {{ single_variant.color }}"{% endif %}>
           {% csrf_token %}
           <input type="hidden" name="variant_id" id="pdp-variant-id"
                  value="{% if single_variant %}{{ single_variant.id }}{% endif %}">
@@ -94,7 +100,7 @@
       <div class="gtg-product-grid gtg-product-grid--wide">
         {% for card in related_cards %}
         {% url 'tienda:producto_detail' card.product.id as related_detail_url %}
-        {% include "tienda/partials/_product_card.html" with card=card detail_url=related_detail_url mode="compact" %}
+        {% include "tienda/partials/_product_card.html" with card=card detail_url=related_detail_url mode="compact" track_list="relacionados" track_pos=forloop.counter %}
         {% endfor %}
       </div>
     </div>
@@ -104,7 +110,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'js/quantum_field.js' %}" defer></script>
+<script src="{% static 'js/quantum_lens.js' %}" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   var datos = document.getElementById('pdp-variants');
@@ -181,6 +187,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     campoVariante.value = encontrada.id;
+    form.dataset.variantLabel = encontrada.size + ' / ' + encontrada.color;
     form.action = form.dataset.addUrlTemplate.replace(/0\/$/, encontrada.id + '/');
     boton.disabled = false;
     aviso.textContent = encontrada.sku + ' · ' + encontrada.stock + ' disponibles';

@@ -4,14 +4,15 @@
 {% block title %}{% trans "Store" %}{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260922-editorial">
+<link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260922-quantum">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260922-quantum">
 {% endblock %}
 
 {% block content %}
 <div class="shop-page">
   <section class="shop-hero" aria-labelledby="shop-hero-title">
     <div class="shop-hero__background" aria-hidden="true"></div>
-    {% include "partials/_quantum_field.html" %}
+    {% include "partials/_quantum_lens.html" %}
     <div class="shop-shell">
       <p class="shop-eyebrow">{% trans "Selección GoToGym" %}</p>
       <h1 id="shop-hero-title">{% trans "Encuentra tu próximo movimiento" %}</h1>
@@ -111,7 +112,7 @@
         <div class="gtg-product-grid gtg-product-grid--wide">
           {% for card in cards %}
           {% url 'tienda:producto_detail' card.product.id as card_detail_url %}
-          {% include "tienda/partials/_product_card.html" with card=card detail_url=card_detail_url mode="grid" %}
+          {% include "tienda/partials/_product_card.html" with card=card detail_url=card_detail_url mode="grid" track_list="plp" track_pos=forloop.counter %}
           {% endfor %}
         </div>
 
@@ -143,7 +144,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'js/quantum_field.js' %}" defer></script>
+<script src="{% static 'js/quantum_lens.js' %}" defer></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     var toggle = document.querySelector('[data-filters-toggle]');

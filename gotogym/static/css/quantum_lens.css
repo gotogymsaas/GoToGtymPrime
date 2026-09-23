@@ -1,0 +1,62 @@
+/* Lente gravitacional Quantum: definicion unica del componente.
+ *
+ * El nombre .quantum-lens no es decorativo: .quantum-field ya nombra las
+ * orbitas de la entrada publica en home_figma.css e influencer_figma.css.
+ * Eran dos componentes distintos con la misma clase, y solo no chocaban
+ * porque ninguna plantilla cargaba las dos hojas a la vez. Con nombres
+ * separados esta hoja se puede cargar donde haga falta sin romper la
+ * entrada.
+ *
+ * El campo se renderiza desde partials/_quantum_lens.html y lo comparten
+ * el Home, la tienda (PLP) y la ficha de producto (PDP). Antes vivia
+ * duplicado: una copia con clases .gravity-* en store_home.css para el
+ * Home y otra con clases .quantum-* en commerce_editorial.css para el
+ * dominio comercial, cada una con su propio juego de @keyframes y su
+ * propio JS. Eran la misma pieza, asi que cualquier ajuste habia que
+ * hacerlo dos veces y era facil que divergieran.
+ *
+ * Aqui vive solo lo invariante: geometria del contenedor, animacion y
+ * accesibilidad. La posicion y la opacidad dependen de cada pagina (en la
+ * portada el campo pesa mas que en un catalogo), asi que esas dos
+ * propiedades las fija la hoja de cada pagina sobre su propio contenedor:
+ *
+ *   store_home.css        .store-hero .quantum-lens
+ *   commerce_editorial.css .shop-hero .quantum-lens / .shop-pdp .quantum-lens
+ *
+ * El contenedor que envuelve al campo necesita position: relative (o
+ * absolute) e isolation: isolate, porque el campo se dibuja en z-index -1
+ * dentro de ese contexto de apilamiento.
+ *
+ * El flujo de pago (carrito y checkout) queda deliberadamente sin campo:
+ * es la pantalla donde menos conviene gastar cuadros de animacion.
+ *
+ * Solo se animan stroke-dashoffset, rotacion y opacidad: nada que
+ * provoque reflow ni desplazamiento de layout.
+ */
+.quantum-lens {
+  --ql-x: 0px;
+  --ql-y: 0px;
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  transform: translate(calc(-50% + var(--ql-x)), calc(-50% + var(--ql-y)));
+  transition: transform .4s ease-out;
+}
+.quantum-lens svg { display: block; width: 100%; overflow: visible; }
+.quantum-lens__mesh path { stroke-width: 1.15; stroke-dasharray: 18 8; animation: ql-flow 36s linear infinite; }
+.quantum-lens__arc { opacity: .32; stroke-width: 1.2; stroke-dasharray: 5 12; transform-origin: 468px 326px; animation: ql-spin 28s linear infinite; filter: drop-shadow(0 0 12px rgba(15,191,176,.65)); }
+.quantum-lens__particles { filter: drop-shadow(0 0 6px #0fbfb0); animation: ql-pulse 6s ease-in-out infinite alternate; }
+
+/* La pausa fuera de viewport la aplica static/js/quantum_lens.js. */
+.quantum-lens.is-paused * { animation-play-state: paused; }
+
+@keyframes ql-flow { to { stroke-dashoffset: -260; } }
+@keyframes ql-spin { to { transform: rotate(360deg); } }
+@keyframes ql-pulse { to { opacity: .35; transform: translateY(-4px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .quantum-lens__mesh path,
+  .quantum-lens__arc,
+  .quantum-lens__particles { animation: none; }
+  .quantum-lens { transition: none; }
+}

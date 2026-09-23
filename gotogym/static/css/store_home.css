@@ -29,7 +29,7 @@
 .store-button--dark:hover { background: var(--home-turquoise); color: var(--home-graphite); }
 .store-home a:focus-visible { outline: 3px solid var(--home-turquoise); outline-offset: 4px; }
 
-.store-hero { min-height: min(900px, calc(100svh - 74px)); position: relative; display: grid; align-items: center; isolation: isolate; background: #08090b; color: var(--home-white); }
+.store-hero { min-height: min(900px, calc(100svh - 76px)); position: relative; display: grid; align-items: center; isolation: isolate; background: #08090b; color: var(--home-white); }
 .store-hero__media { position: absolute; z-index: -3; inset: 0; overflow: hidden; }
 .store-hero__media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(6,7,9,.98) 0%, rgba(6,7,9,.9) 36%, rgba(6,7,9,.38) 70%, rgba(6,7,9,.16)), linear-gradient(0deg, rgba(6,7,9,.65), transparent 45%); }
 .store-hero__media picture { display: block; width: 100%; height: 100%; }
@@ -41,12 +41,10 @@
 .store-actions { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
 .store-proof { display: flex; gap: 26px; margin: 44px 0 0; padding: 0; color: rgba(248,249,250,.58); font-size: .72rem; letter-spacing: .04em; list-style: none; }
 .store-proof li + li::before { content: "·"; margin-right: 26px; color: var(--home-turquoise); }
-.gravity-field { --gravity-x: 0px; --gravity-y: 0px; position: absolute; z-index: -1; top: 50%; left: 58%; width: min(68vw, 920px); opacity: .52; pointer-events: none; transform: translate(calc(-50% + var(--gravity-x)), calc(-50% + var(--gravity-y))); transition: transform .4s ease-out; }
-.gravity-field svg { display: block; width: 100%; overflow: visible; }
-.gravity-field__mesh path { stroke-width: 1.15; stroke-dasharray: 18 8; animation: gravity-flow 36s linear infinite; }
-.gravity-field__lens { opacity: .32; stroke-width: 1.2; stroke-dasharray: 5 12; transform-origin: 468px 326px; animation: gravity-lens 28s linear infinite; filter: drop-shadow(0 0 12px rgba(15,191,176,.65)); }
-.gravity-field__particles { filter: drop-shadow(0 0 6px #0fbfb0); animation: gravity-pulse 6s ease-in-out infinite alternate; }
-.gravity-field.is-paused * { animation-play-state: paused; }
+/* Campo Quantum: el componente esta en static/css/quantum_lens.css, que
+ * esta plantilla carga aparte. Aqui solo su lugar en la portada, donde
+ * pesa mas que en el resto del sitio. */
+.store-hero .quantum-lens { top: 50%; left: 58%; width: min(68vw, 920px); opacity: .52; }
 
 .store-intents { background: var(--home-graphite); color: var(--home-white); }
 .store-intents .store-heading-row > p { color: rgba(248,249,250,.58); }
@@ -116,13 +114,14 @@
 
 .store-closing { min-height: 760px; position: relative; display: grid; place-items: center; overflow: hidden; background: var(--home-graphite); color: var(--home-white); text-align: center; }
 .store-closing::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(7,8,10,.58), rgba(7,8,10,.82)), radial-gradient(circle, transparent, #090a0c 75%); }
-.store-closing > img { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: center 32%; filter: grayscale(.2) saturate(.62); }
+/* Descendiente y no hijo directo: la imagen va envuelta en un <picture>
+   (partials/_picture.html). picture usa display: contents, que la saca del
+   arbol de CAJAS pero no del arbol de SELECTORES, asi que un combinador
+   "> img" deja de casar y la foto de cierre se pintaba a tamano intrinseco
+   estirando la seccion. */
+.store-closing img { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: center 32%; filter: grayscale(.2) saturate(.62); }
 .store-closing > div { position: relative; z-index: 1; padding: 80px 20px; }
 .store-closing h2 { margin: 0 0 38px; color: var(--home-white); font-size: clamp(3.2rem, 7vw, 7rem); font-weight: 500; letter-spacing: -.065em; line-height: .9; }
-
-@keyframes gravity-flow { to { stroke-dashoffset: -260; } }
-@keyframes gravity-lens { to { transform: rotate(360deg); } }
-@keyframes gravity-pulse { to { opacity: .35; transform: translateY(-4px); } }
 
 @media (max-width: 980px) {
   .store-heading-row { align-items: start; flex-direction: column; }
@@ -145,7 +144,7 @@
   .store-hero__lead { font-size: .96rem; }
   .store-proof { gap: 9px; justify-content: space-between; font-size: .61rem; }
   .store-proof li + li::before { margin-right: 9px; }
-  .gravity-field { top: 34%; left: 55%; width: 130vw; opacity: .42; }
+  .store-hero .quantum-lens { top: 34%; left: 55%; width: 130vw; opacity: .42; }
   .intent-grid { grid-template-columns: 1fr; }
   .intent-card { min-height: 175px; }
   .intent-card + .intent-card { border-top: 1px solid rgba(248,249,250,.15); border-left: 0; }

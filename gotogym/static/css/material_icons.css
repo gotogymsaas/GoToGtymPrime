@@ -1,0 +1,47 @@
+/* Material Icons Outlined servido desde el propio dominio.
+ *
+ * Antes lo traia una hoja de fonts.googleapis.com que, ademas de bloquear
+ * el render, obligaba a dos conexiones a terceros antes de poder pintar un
+ * solo icono: una a googleapis.com para este CSS y otra a gstatic.com para
+ * el .woff2.
+ *
+ * El archivo esta reducido a los iconos que usa el sitio. No baja mas
+ * porque las ligaduras (escribir "menu" y que aparezca el icono) obligan a
+ * conservar las letras y todo lo que el cierre de ligaduras alcanza desde
+ * ellas; bajar de aqui exigiria referenciar cada icono por su codepoint y
+ * perder la legibilidad del marcado.
+ *
+ * Regenerar tras anadir un icono nuevo (el nombre debe entrar en --text):
+ *   python -m fontTools.subset material-icons-outlined-full.woff2 \
+ *     --text="<nombres de todos los iconos, sin espacios>" \
+ *     --layout-features="liga,dlig,rlig,calt" --flavor=woff2 \
+ *     --output-file=material-icons-outlined-subset.woff2
+ *
+ * font-display: block y no swap: con swap el navegador mostraria el texto
+ * de la ligadura mientras carga, es decir la palabra "shopping_cart" en
+ * mitad de la barra.
+ */
+@font-face {
+  font-family: 'Material Icons Outlined';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("../fonts/material-icons/material-icons-outlined-subset.woff2") format("woff2");
+}
+
+.material-icons-outlined {
+  font-family: 'Material Icons Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}

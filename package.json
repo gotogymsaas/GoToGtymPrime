@@ -1,0 +1,12 @@
+{
+  "name": "gotogym-estilos",
+  "private": true,
+  "description": "Compilacion de Tailwind para las plantillas Django. El CSS resultante se versiona: la imagen de despliegue es solo Python y no tiene Node.",
+  "scripts": {
+    "build:css": "tailwindcss -i gotogym/static/css/tailwind.src.css -o gotogym/static/css/tailwind.build.css --minify",
+    "watch:css": "tailwindcss -i gotogym/static/css/tailwind.src.css -o gotogym/static/css/tailwind.build.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}

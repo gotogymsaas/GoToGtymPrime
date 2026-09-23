@@ -1,0 +1,11 @@
+{% comment %}
+Imagen responsiva. Lo rellena tienda.templatetags.imagenes.
+
+Sin derivados en el manifiesto la lista de fuentes llega vacia y queda un
+<img> normal apuntando al archivo original, que es como se servia todo
+antes de existir el pipeline.
+
+width y height salen del manifiesto: reservan la caja antes de que la
+imagen llegue y evitan que el contenido salte al cargar.
+{% endcomment %}
+{% if fuentes %}<picture>{% for fuente in fuentes %}<source type="{{ fuente.tipo }}"{% if fuente.media %} media="{{ fuente.media }}"{% endif %} srcset="{{ fuente.srcset }}" sizes="{{ sizes }}">{% endfor %}<img src="{{ respaldo }}" alt="{{ alt }}"{% if clase %} class="{{ clase }}"{% endif %}{% if ancho %} width="{{ ancho }}" height="{{ alto }}"{% endif %} loading="{{ cargar }}"{% if prioridad %} fetchpriority="{{ prioridad }}"{% endif %} decoding="async"></picture>{% else %}<img src="{{ respaldo }}" alt="{{ alt }}"{% if clase %} class="{{ clase }}"{% endif %}{% if ancho %} width="{{ ancho }}" height="{{ alto }}"{% endif %} loading="{{ cargar }}"{% if prioridad %} fetchpriority="{{ prioridad }}"{% endif %} decoding="async">{% endif %}

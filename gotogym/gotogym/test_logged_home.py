@@ -65,7 +65,15 @@ class LoggedHomeTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Diseñada para tu')
         self.assertContains(response, 'Hola, Ana')
-        self.assertContains(response, 'Imagenes%20Home/bienestar_empresarial_5.jpeg')
+        # El hero precarga un derivado AVIF, no el JPEG original: el pipeline
+        # de imagenes (tienda.imagenes) genera derivados versionados por
+        # nombre, asi que aqui solo se comprueba que exista la precarga con
+        # prioridad alta, no el nombre exacto del archivo generado.
+        self.assertContains(response, 'rel="preload" as="image" type="image/avif"')
+        self.assertContains(response, 'fetchpriority="high"')
+        # El <img> de respaldo del hero si conserva el nombre original: sin
+        # derivados generados (manifiesto vacio en un entorno nuevo), el
+        # pipeline degrada a servir el JPEG tal cual.
         self.assertContains(response, 'Imagenes%20Home/WhatsApp%20Image%202026-07-21')
         self.assertContains(response, 'Campo', count=0)
         self.assertContains(response, self.post.title)

@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'tienda',
     'carrito',
     'administracion',
+    'analitica',
 ]
 
 ROOT_URLCONF = 'gotogym.urls'

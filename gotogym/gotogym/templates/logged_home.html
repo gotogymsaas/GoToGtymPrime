@@ -1,13 +1,20 @@
 {% extends "base.html" %}
-{% load static i18n %}
+{% load static i18n imagenes %}
 
 {% block title %}GoToGym — Diseñada para tu forma de avanzar{% endblock %}
 
 {% block extra_head %}
-{% get_media_prefix as MEDIA_PREFIX %}
-<link rel="preload" as="image" media="(max-width: 720px)" href="{{ MEDIA_PREFIX }}products/Imagenes%20Home/bienestar_empresarial_5.jpeg" fetchpriority="high">
-<link rel="preload" as="image" media="(min-width: 721px)" href="{{ MEDIA_PREFIX }}products/Imagenes%20Home/WhatsApp%20Image%202026-07-21%20at%206.53.20%20PM%20(2).jpeg" fetchpriority="high">
-<link rel="stylesheet" href="{% static 'css/store_home.css' %}?v=20260922-editorial">
+{% comment %}
+Precarga del elemento que define el LCP. Apunta al derivado AVIF del ancho
+que toca, no al JPEG original: antes se precargaban 186 KB a cualquier
+ancho de pantalla, incluido el movil.
+{% endcomment %}
+{% precarga_editorial "bienestar_empresarial_5.jpeg" ancho=640 as preload_movil %}
+{% precarga_editorial "WhatsApp Image 2026-07-21 at 6.53.20 PM (2).jpeg" ancho=1280 as preload_escritorio %}
+{% if preload_movil %}<link rel="preload" as="image" type="image/avif" media="(max-width: 720px)" href="{{ preload_movil }}" fetchpriority="high">{% endif %}
+{% if preload_escritorio %}<link rel="preload" as="image" type="image/avif" media="(min-width: 721px)" href="{{ preload_escritorio }}" fetchpriority="high">{% endif %}
+<link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260922-quantum">
+<link rel="stylesheet" href="{% static 'css/store_home.css' %}?v=20260922-imagenes">
 {% endblock %}
 
 {% block content %}
@@ -16,46 +23,9 @@
 <div class="store-home">
   <section class="store-hero" aria-labelledby="store-hero-title">
     <div class="store-hero__media" aria-hidden="true">
-      <picture>
-        <source media="(max-width: 720px)" srcset="{{ MEDIA_PREFIX }}products/Imagenes%20Home/bienestar_empresarial_5.jpeg">
-        <img src="{{ MEDIA_PREFIX }}products/Imagenes%20Home/WhatsApp%20Image%202026-07-21%20at%206.53.20%20PM%20(2).jpeg"
-             alt="" width="1600" height="1066" fetchpriority="high">
-      </picture>
+      {% imagen_hero escritorio="WhatsApp Image 2026-07-21 at 6.53.20 PM (2).jpeg" movil="bienestar_empresarial_5.jpeg" alt="" sizes="100vw" %}
     </div>
-    <div class="gravity-field" data-gravity-field aria-hidden="true">
-      <svg viewBox="0 0 900 700" focusable="false">
-        <defs>
-          <linearGradient id="gravity-line" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#17375c" stop-opacity="0"/>
-            <stop offset=".52" stop-color="#0fbfb0" stop-opacity=".72"/>
-            <stop offset="1" stop-color="#284f7e" stop-opacity="0"/>
-          </linearGradient>
-          <radialGradient id="gravity-core">
-            <stop offset="0" stop-color="#101012" stop-opacity=".96"/>
-            <stop offset=".62" stop-color="#17375c" stop-opacity=".3"/>
-            <stop offset="1" stop-color="#0fbfb0" stop-opacity="0"/>
-          </radialGradient>
-        </defs>
-        <g class="gravity-field__mesh" fill="none" stroke="url(#gravity-line)">
-          <path d="M-40 94 C238 22 330 328 455 354 S684 584 950 492"/>
-          <path d="M-36 132 C220 58 326 310 456 348 S694 548 946 458"/>
-          <path d="M-30 172 C208 92 324 292 458 342 S704 510 940 422"/>
-          <path d="M-18 216 C198 130 322 274 460 336 S712 470 930 382"/>
-          <path d="M-4 264 C194 170 324 258 462 330 S716 426 918 340"/>
-          <path d="M18 314 C196 214 330 246 464 326 S714 382 900 296"/>
-          <path d="M46 366 C204 258 340 238 466 322 S706 334 878 250"/>
-          <path d="M82 420 C222 304 354 236 468 320 S690 286 848 208"/>
-          <path d="M128 474 C248 348 372 242 470 318 S668 240 810 170"/>
-        </g>
-        <circle class="gravity-field__lens" cx="468" cy="326" r="155" fill="none" stroke="#0fbfb0"/>
-        <circle cx="468" cy="326" r="112" fill="url(#gravity-core)"/>
-        <g class="gravity-field__particles" fill="#f8f9fa">
-          <circle cx="260" cy="143" r="3"/><circle cx="637" cy="505" r="2.5"/>
-          <circle cx="350" cy="252" r="2"/><circle cx="741" cy="319" r="2"/>
-          <circle cx="564" cy="418" r="3"/><circle cx="164" cy="357" r="2"/>
-        </g>
-      </svg>
-    </div>
+    {% include "partials/_quantum_lens.html" %}
 
     <div class="store-shell store-hero__content">
       <p class="store-eyebrow">{% if user.first_name %}Hola, {{ user.first_name }} · {% endif %}Nueva generación GoToGym X5</p>
@@ -102,10 +72,13 @@
       {% if featured_cards %}
       <div class="home-product-grid">
         {% for card in featured_cards %}
-        <article class="home-product-card">
-          <a class="home-product-card__image" data-track="featured_product" data-product-id="{{ card.product.pk }}" href="{% url 'tienda:producto_detail' card.product.pk %}">
-            <img src="{% if card.image %}{{ PRODUCT_MEDIA_PREFIX }}{{ card.image.name }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
-                 alt="{{ card.product.name }}" width="520" height="650" loading="lazy">
+        <article class="home-product-card"
+                 data-track="featured_product" data-track-impression
+                 data-track-producto="{{ card.product.pk }}"
+                 data-track-lista="home_destacados"
+                 data-track-posicion="{{ forloop.counter }}">
+          <a class="home-product-card__image" href="{% url 'tienda:producto_detail' card.product.pk %}">
+            {% imagen_producto nombre=card.image.name alt=card.product.name sizes="(max-width: 420px) 100vw, (max-width: 980px) 50vw, 25vw" %}
             {% if not card.in_stock %}<span>Agotado</span>{% endif %}
           </a>
           <div class="home-product-card__content">
@@ -130,7 +103,7 @@
 
   <section class="store-story" id="tecnologia" aria-labelledby="technology-title">
     <div class="store-story__image">
-      <img src="{{ MEDIA_PREFIX }}products/Imagenes%20Home/WhatsApp%20Image%202026-07-21%20at%206.53.19%20PM%20(8).jpeg" alt="Detalle de una prenda técnica GoToGym" width="1600" height="1066" loading="lazy">
+      {% imagen_editorial "WhatsApp Image 2026-07-21 at 6.53.19 PM (8).jpeg" alt="Detalle de una prenda técnica GoToGym" sizes="(max-width: 980px) 100vw, 55vw" %}
     </div>
     <div class="store-story__content">
       <p class="store-eyebrow">GoToGym Technology</p>
@@ -152,7 +125,7 @@
         <p>Experiencias y prendas para organizaciones que entienden el bienestar como parte de su cultura.</p>
         <a class="store-button store-button--dark" href="{% url 'contacto' %}?next=logged_home">Hablar con GoToGym</a>
       </div>
-      <img src="{{ MEDIA_PREFIX }}products/Imagenes%20Home/bienestar_empresarial_3.jpeg" alt="Equipo usando prendas GoToGym en una experiencia de bienestar empresarial" width="1600" height="1066" loading="lazy">
+      {% imagen_editorial "bienestar_empresarial_3.jpeg" alt="Equipo usando prendas GoToGym en una experiencia de bienestar empresarial" sizes="(max-width: 980px) 100vw, 60vw" %}
     </div>
   </section>
 
@@ -194,29 +167,12 @@
   </section>
 
   <section class="store-closing" aria-labelledby="closing-title">
-    <img src="{{ MEDIA_PREFIX }}products/Imagenes%20Home/WhatsApp%20Image%202026-07-21%20at%206.53.19%20PM%20(1).jpeg" alt="" width="1066" height="1600" loading="lazy">
+    {% imagen_editorial "WhatsApp Image 2026-07-21 at 6.53.19 PM (1).jpeg" alt="" sizes="100vw" %}
     <div><p class="store-eyebrow">Tu próxima versión empieza en movimiento</p><h2 id="closing-title">Tu movimiento.<br>Tu diseño.<br><em>Tu GoToGym.</em></h2><a class="store-button store-button--primary" href="{% url 'tienda:producto_list' %}">Entrar a la tienda</a></div>
   </section>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-  (() => {
-    const field = document.querySelector('[data-gravity-field]');
-    if (!field || window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.matchMedia('(pointer: fine)').matches) return;
-    const hero = field.closest('.store-hero');
-    const observer = new IntersectionObserver(([entry]) => {
-      field.classList.toggle('is-paused', !entry.isIntersecting);
-    }, { threshold: 0.05 });
-    observer.observe(hero);
-    hero.addEventListener('pointermove', (event) => {
-      const rect = hero.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / rect.width - 0.5) * 8;
-      const y = ((event.clientY - rect.top) / rect.height - 0.5) * 8;
-      field.style.setProperty('--gravity-x', `${x}px`);
-      field.style.setProperty('--gravity-y', `${y}px`);
-    });
-  })();
-</script>
+<script src="{% static 'js/quantum_lens.js' %}" defer></script>
 {% endblock %}

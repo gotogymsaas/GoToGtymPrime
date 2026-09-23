@@ -1,4 +1,4 @@
-{% load static i18n %}{% get_static_prefix as STATIC_PREFIX %}{% comment %}
+{% load static i18n imagenes %}{% comment %}
 Tarjeta de producto, homologada con el sistema editorial de Home
 (store_home.css). Parametros:
   card       - dict de tienda.catalog.build_product_card: product, image,
@@ -8,15 +8,25 @@ Tarjeta de producto, homologada con el sistema editorial de Home
                que incluye este partial, con {% url %})
   mode       - 'grid' (PLP, tarjeta completa; por defecto) o 'compact'
                (PDP, productos relacionados)
+  track_list - nombre de la lista para la medicion ('plp', 'relacionados')
+  track_pos  - posicion dentro de esa lista, para leer la tasa de clic por
+               puesto y no solo por producto
+
+La medicion vive en el <article> y no en cada enlace: la tarjeta entera es
+el objetivo clicable, y asi un solo elemento declara la impresion y el
+clic (ver static/js/analytics.js).
 
 La tarjeta completa es clicable en la imagen y el nombre; no lleva un
 boton propio, igual que en Home (ver PROPUESTA_HOME_STORE_QUANTUM.md,
 seccion 4.4).
 {% endcomment %}
-<article class="gtg-product-card{% if mode == 'compact' %} gtg-product-card--compact{% endif %}">
+<article class="gtg-product-card{% if mode == 'compact' %} gtg-product-card--compact{% endif %}"
+         data-track="product_click" data-track-impression
+         data-track-producto="{{ card.product.id }}"
+         data-track-lista="{{ track_list|default:'catalogo' }}"
+         data-track-posicion="{{ track_pos|default:0 }}">
   <a class="gtg-product-card__image" href="{{ detail_url }}">
-    <img src="{% if card.image %}{{ STATIC_PREFIX }}product_media/{{ card.image.name }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
-         alt="{{ card.product.name }}" loading="lazy">
+    {% imagen_producto nombre=card.image.name alt=card.product.name sizes="(max-width: 560px) 100vw, (max-width: 980px) 50vw, 25vw" %}
     {% if not card.in_stock %}<span class="gtg-product-card__badge">{% trans "Agotado" %}</span>{% endif %}
   </a>
   <div class="gtg-product-card__body">
