@@ -82,3 +82,46 @@ class QuantumLensTests(TestCase):
         self.assertIn('class="quantum-field"', html)
         self.assertNotIn('quantum_lens.css', html)
         self.assertNotIn('quantum-lens', html)
+
+    def test_la_franja_de_interferencia_es_hermana_de_store_story_no_hija(self):
+        # .store-story es un grid de 2 columnas fijas (imagen + contenido).
+        # Un tercer hijo directo le rompe el layout -- es exactamente el bug
+        # que ya paso una vez con .store-wellness cuando un <picture> se
+        # promociono como item de grid. La franja debe quedar ANTES de que
+        # abra la seccion, nunca entre sus dos hijos.
+        self.client.force_login(self.user)
+        html = self.client.get(reverse('logged_home')).content.decode()
+
+        self.assertIn('class="quantum-fringe quantum-fringe--story"', html)
+        self.assertIn('aria-hidden="true"', html.split('quantum-fringe--story"')[1][:40])
+
+        fin_franja = html.index('quantum-fringe--story') + len('quantum-fringe--story"')
+        inicio_story = html.index('class="store-story"')
+        # Entre el cierre de la franja y la apertura de .store-story solo
+        # puede haber el cierre de su propio <div> y el whitespace de la
+        # plantilla, nunca contenido de .store-story__image.
+        entre = html[fin_franja:inicio_story]
+        self.assertNotIn('store-story__image', entre)
+        self.assertNotIn('store-story__content', entre)
+
+    def test_toda_instancia_del_campo_declara_su_opacidad_como_variable_css(self):
+        # --ql-coherent es el punto de partida que usa la decoherencia al
+        # hacer scroll (quantum_lens.css). Si una hoja nueva vuelve a fijar
+        # `opacity` a secas sobre .quantum-lens sin la variable, esa
+        # instancia del campo nunca decae: se queda opaca sobre el
+        # contenido cuando el usuario ya bajo mas alla de su seccion.
+        #
+        # Esto vive en los .css enlazados, no en el HTML de la pagina (que
+        # es lo unico que trae el cliente de pruebas de Django), asi que se
+        # verifica leyendo los archivos fuente directamente.
+        import re
+
+        from django.conf import settings
+
+        patron_opacidad_suelta = re.compile(r'\.quantum-lens\s*\{[^}]*\bopacity:\s*\.\d')
+        for nombre in ('store_home.css', 'commerce_editorial.css'):
+            ruta = settings.BASE_DIR / 'static' / 'css' / nombre
+            css = ruta.read_text(encoding='utf-8')
+            with self.subTest(archivo=nombre):
+                self.assertIn('--ql-coherent:', css)
+                self.assertNotRegex(css, patron_opacidad_suelta)

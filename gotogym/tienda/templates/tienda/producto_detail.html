@@ -3,8 +3,8 @@
 {% block title %}{{ producto.name }}{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260922-quantum">
-<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260922-quantum">
+<link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260923-fringe-fix">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260925-movil">
 {% endblock %}
 
 {% block content %}
@@ -35,17 +35,26 @@
         <h1 class="shop-pdp__title">{{ producto.name }}</h1>
         <p class="shop-pdp__review-note">{% trans "Sin reseñas todavía" %}</p>
 
-        <span id="pdp-price" class="shop-pdp__price">
+        {% comment %}
+        data-has-range: si el precio varia entre variantes, el JS lo anima
+        como un estado en superposicion mientras no hay talla+color
+        elegidos. Si todas las variantes cuestan igual no hay nada
+        incierto que representar, asi que no se anima aunque el producto
+        tenga varias tallas o colores.
+        {% endcomment %}
+        <span id="pdp-price" class="shop-pdp__price" data-has-range="{% if has_price_range %}true{% else %}false{% endif %}">
           {% include "tienda/partials/_price.html" with price_min=price_min price_max=price_max has_range=has_price_range %}
         </span>
 
         <p class="shop-pdp__description">{{ producto.description }}</p>
 
-        {% if producto.brand %}
-        <dl class="shop-pdp__specs">
-          <div><dt>{% trans "Marca" %}</dt><dd>{{ producto.brand.name }}</dd></div>
-        </dl>
-        {% endif %}
+        {% comment %}
+        Orden de la ficha: hasta aqui va lo que identifica el producto
+        (categoria, titulo, precio, descripcion). Lo que sigue es la
+        decision de compra en si -- guia de tallas, seleccion y boton --
+        antes que ningun dato secundario como la marca.
+        {% endcomment %}
+        {% include "tienda/partials/_size_guide.html" with rows=size_guide_rows %}
 
         {{ variantes_json|json_script:"pdp-variants" }}
 
@@ -70,13 +79,23 @@
             {% include "tienda/partials/_color_selector.html" with colors=colors %}
           {% endif %}
 
+          {% comment %}
+          data-low-stock-threshold: el umbral tambien lo necesita el JS para
+          el caso con varias tallas/colores (tienda.catalog.
+          LOW_STOCK_THRESHOLD). Aqui, con una sola variante, el servidor ya
+          sabe el stock exacto y no hace falta esperar a ningun JS.
+          {% endcomment %}
           <p id="pdp-availability" class="text-sm mb-3 min-h-[1.25rem] text-[var(--color-text-secondary)]"
              data-msg-select="{% trans 'Selecciona una opción para ver disponibilidad.' %}"
              data-msg-unavailable="{% trans 'Combinación sin unidades disponibles.' %}"
              data-msg-missing="{% trans 'Esa combinación no existe para este producto.' %}"
+             data-msg-low-stock="{% trans '¡Quedan pocas unidades!' %}"
+             data-low-stock-threshold="{{ low_stock_threshold }}"
              aria-live="polite">
             {% if not in_stock %}
             <span class="text-red-400 font-semibold">{% trans "Agotado" %}</span>
+            {% elif single_variant and single_variant.stock <= low_stock_threshold %}
+            <span class="shop-pdp__low-stock">{% trans "¡Quedan pocas unidades!" %}</span>
             {% endif %}
           </p>
 
@@ -87,6 +106,49 @@
             {% trans "Añadir al carrito" %}
           </button>
         </form>
+
+        {% if producto.brand %}
+        <dl class="shop-pdp__specs">
+          <div><dt>{% trans "Marca" %}</dt><dd>{{ producto.brand.name }}</dd></div>
+        </dl>
+        {% endif %}
+
+        {% comment %}
+        Caracteristicas segmentadas: solo lo que la propia descripcion o
+        categoria del producto ya afirman (material, corte, uso), nunca una
+        propiedad inventada. Ver tienda.catalog.product_features.
+        {% endcomment %}
+        {% if features %}
+        <ul class="shop-pdp__features">
+          {% for feature in features %}
+          <li>
+            <span class="material-icons-outlined" aria-hidden="true">{{ feature.icon }}</span>
+            <div><strong>{{ feature.label }}</strong><span>{{ feature.text }}</span></div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% comment %}
+        Envio, cambios y garantia: al fondo, como refuerzo despues del
+        boton de compra, no como una caja aparte compitiendo con la
+        descripcion. Mismo lenguaje visual que .store-proof en el Home
+        (franja de texto discreta, sin bordes).
+        {% endcomment %}
+        <ul class="shop-pdp__policies">
+          <li>
+            <span class="material-icons-outlined" aria-hidden="true">local_shipping</span>
+            <a href="{% url 'politica_envios' %}" target="_blank" rel="noopener">{% trans "Envíos" %}</a>
+          </li>
+          <li>
+            <span class="material-icons-outlined" aria-hidden="true">autorenew</span>
+            <a href="{% url 'politica_cambios' %}" target="_blank" rel="noopener">{% trans "Cambios" %}</a>
+          </li>
+          <li>
+            <span class="material-icons-outlined" aria-hidden="true">verified</span>
+            <a href="{% url 'politica_garantia' %}" target="_blank" rel="noopener">{% trans "Garantía" %}</a>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
@@ -122,9 +184,45 @@ document.addEventListener('DOMContentLoaded', function () {
   var precio = document.getElementById('pdp-price');
   var aviso = document.getElementById('pdp-availability');
   var boton = document.getElementById('pdp-submit');
+  var umbralPocasUnidades = parseInt(aviso.dataset.lowStockThreshold, 10) || 0;
 
   var botonesTalla = Array.prototype.slice.call(document.querySelectorAll('.pdp-size'));
   var botonesColor = Array.prototype.slice.call(document.querySelectorAll('.pdp-color'));
+
+  // --- Superposicion / colapso (ver commerce_editorial.css) -------------
+  // Mientras no hay una variante resuelta, el precio (si varia entre
+  // variantes) y los grupos de talla/color se muestran como un estado en
+  // superposicion. Cada vez que SE RESUELVE una variante completa y
+  // disponible DISTINTA de la anterior es una "medicion" nueva: precio,
+  // disponibilidad y el boton recien pulsado reciben el mismo pulso de
+  // asentamiento. Cambiar de una variante resuelta a otra (p. ej. de M a
+  // L, ambas disponibles) vuelve a jugar el pulso -- es una medicion
+  // distinta, no una continuacion de la anterior.
+  var gruposVariante = Array.prototype.slice.call(document.querySelectorAll('.pdp-variant-group'));
+  var precioConRango = precio.dataset.hasRange === 'true';
+  var ultimaVarianteResuelta = null;
+
+  function marcarSuperposicion(resuelto) {
+    gruposVariante.forEach(function (grupo) {
+      grupo.classList.toggle('is-superposed', !resuelto);
+    });
+    if (precioConRango) {
+      precio.classList.toggle('is-superposed', !resuelto);
+    }
+  }
+
+  function marcarColapso(elementos) {
+    elementos.forEach(function (el) {
+      if (!el) return;
+      el.classList.remove('is-collapsing');
+      void el.offsetWidth; // reflujo: permite reiniciar la animacion si ya jugo antes
+      el.classList.add('is-collapsing');
+      el.addEventListener('animationend', function limpiar() {
+        el.classList.remove('is-collapsing');
+        el.removeEventListener('animationend', limpiar);
+      });
+    });
+  }
 
   var tallaElegida = null;
   var colorElegido = null;
@@ -151,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  function actualizar() {
+  function actualizar(origen) {
     marcarSeleccion(botonesTalla, tallaElegida, 'size');
     marcarSeleccion(botonesColor, colorElegido, 'color');
 
@@ -161,6 +259,8 @@ document.addEventListener('DOMContentLoaded', function () {
       boton.disabled = true;
       aviso.textContent = aviso.dataset.msgSelect;
       aviso.className = 'text-sm mb-3 min-h-[1.25rem] text-[var(--color-text-secondary)]';
+      marcarSuperposicion(false);
+      ultimaVarianteResuelta = null;
       return;
     }
 
@@ -173,6 +273,8 @@ document.addEventListener('DOMContentLoaded', function () {
       boton.disabled = true;
       aviso.textContent = aviso.dataset.msgMissing;
       aviso.className = 'text-sm mb-3 min-h-[1.25rem] text-red-400 font-semibold';
+      marcarSuperposicion(false);
+      ultimaVarianteResuelta = null;
       return;
     }
 
@@ -183,6 +285,8 @@ document.addEventListener('DOMContentLoaded', function () {
       boton.disabled = true;
       aviso.textContent = aviso.dataset.msgUnavailable;
       aviso.className = 'text-sm mb-3 min-h-[1.25rem] text-red-400 font-semibold';
+      marcarSuperposicion(false);
+      ultimaVarianteResuelta = null;
       return;
     }
 
@@ -190,21 +294,31 @@ document.addEventListener('DOMContentLoaded', function () {
     form.dataset.variantLabel = encontrada.size + ' / ' + encontrada.color;
     form.action = form.dataset.addUrlTemplate.replace(/0\/$/, encontrada.id + '/');
     boton.disabled = false;
-    aviso.textContent = encontrada.sku + ' · ' + encontrada.stock + ' disponibles';
-    aviso.className = 'text-sm mb-3 min-h-[1.25rem] text-[var(--color-accent)]';
+
+    var pocasUnidades = encontrada.stock <= umbralPocasUnidades;
+    aviso.textContent = (pocasUnidades ? aviso.dataset.msgLowStock + ' ' : '')
+      + encontrada.sku + ' · ' + encontrada.stock + ' disponibles';
+    aviso.className = 'text-sm mb-3 min-h-[1.25rem] '
+      + (pocasUnidades ? 'shop-pdp__low-stock' : 'text-[var(--color-accent)]');
+
+    marcarSuperposicion(true);
+    if (ultimaVarianteResuelta !== encontrada.id) {
+      marcarColapso(origen ? [precio, aviso, origen] : [precio, aviso]);
+    }
+    ultimaVarianteResuelta = encontrada.id;
   }
 
   botonesTalla.forEach(function (b) {
     b.addEventListener('click', function () {
       tallaElegida = (tallaElegida === b.dataset.size) ? null : b.dataset.size;
-      actualizar();
+      actualizar(b);
     });
   });
 
   botonesColor.forEach(function (b) {
     b.addEventListener('click', function () {
       colorElegido = (colorElegido === b.dataset.color) ? null : b.dataset.color;
-      actualizar();
+      actualizar(b);
     });
   });
 

@@ -7,12 +7,15 @@ from django.shortcuts import get_object_or_404, render
 from products.models import Product, ProductCategory, ProductMedia, ProductVariant
 
 from .catalog import (
+    LOW_STOCK_THRESHOLD,
     available_filter_values,
     build_product_card,
     build_variant_matrix,
     catalog_variants_queryset,
     color_swatch,
     primary_image,
+    product_features,
+    size_guide_rows,
     variant_stock,
 )
 
@@ -153,6 +156,9 @@ def producto_detail(request, pk):
         # se preselecciona y los selectores no se muestran.
         'single_variant': variantes[0] if len(variantes) == 1 else None,
         'related_cards': [build_product_card(p) for p in related_products],
+        'low_stock_threshold': LOW_STOCK_THRESHOLD,
+        'size_guide_rows': size_guide_rows(_unique_preserving_order([v['size'] for v in variantes])),
+        'features': product_features(producto),
     }
     return render(request, 'tienda/producto_detail.html', context)
 

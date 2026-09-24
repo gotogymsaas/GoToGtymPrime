@@ -38,6 +38,46 @@ def color_swatch(color):
     return COLOR_SWATCHES.get(color, NEUTRAL_SWATCH)
 
 
+# A partir de cuantas unidades disponibles se avisa "quedan pocas
+# unidades" en la ficha de producto. Un solo numero, no por producto: es
+# facil de ajustar si hace falta, pero no queda expuesto en el admin
+# todavia (eso es una mejora aparte, no parte de este alcance).
+LOW_STOCK_THRESHOLD = 3
+
+# Guia de tallas de referencia general (medidas del cuerpo, no de la
+# prenda), en centimetros. NO son medidas propias de GoToGym: son valores
+# de referencia usados de forma comun en el mercado colombiano de ropa
+# deportiva/casual para mujer, el mismo publico de todo el catalogo actual
+# (ver Product.objects.all(), todas las prendas son "para dama"). Deben
+# reemplazarse por la tabla real de la marca en cuanto exista una medida
+# propia; mientras tanto se muestran marcadas como "referencia general",
+# nunca como una medida verificada de la prenda concreta.
+SIZE_GUIDE_UNIDAD = 'cm'
+SIZE_GUIDE = {
+    'XS': {'busto': '78–82', 'cintura': '60–64', 'cadera': '84–88'},
+    'S': {'busto': '83–87', 'cintura': '65–69', 'cadera': '89–93'},
+    'M': {'busto': '88–93', 'cintura': '70–75', 'cadera': '94–99'},
+    'L': {'busto': '94–99', 'cintura': '76–81', 'cadera': '100–105'},
+    'XL': {'busto': '100–106', 'cintura': '82–88', 'cadera': '106–112'},
+    'XXL': {'busto': '107–113', 'cintura': '89–95', 'cadera': '113–119'},
+}
+
+
+def size_guide_rows(sizes):
+    """Filas de la guia de tallas para las tallas reales de un producto.
+
+    Se devuelve en el mismo orden de SIZE_ORDER y solo para tallas que
+    tienen equivalencia en la guia (UNICA, por ejemplo, no la tiene: es
+    talla unica, no hay nada que tabular).
+    """
+    tallas_del_producto = set(sizes)
+    return [
+        {'size': size, **SIZE_GUIDE[size]}
+        for size in SIZE_ORDER
+        if size in SIZE_GUIDE and size in tallas_del_producto
+    ]
+
+
 def size_sort_key(size):
     try:
         return (0, SIZE_ORDER.index(size))
@@ -141,3 +181,83 @@ def build_variant_matrix(product):
             'stock': stock,
         })
     return filas
+
+
+# --- Caracteristicas de producto (ficha) ---------------------------------
+#
+# La ficha solo tenia una descripcion en texto corrido y la marca. Esto la
+# segmenta en tarjetas con icono, pero SOLO con lo que la propia
+# descripcion o categoria ya afirman: material, corte, cierre, uso.
+# Nunca una propiedad termica, medica o de rendimiento que el catalogo no
+# respalde (ver PROPUESTA_HOME_STORE_QUANTUM.md, seccion 3: "Evitar...
+# tecnologia revolucionaria sin evidencia"). Un producto con una
+# descripcion pobre (ej. X5 Generation) simplemente saca menos tarjetas,
+# nunca contenido inventado para rellenar.
+#
+# Cada entrada: (fragmentos a buscar en la descripcion en minuscula,
+# icono de Material Icons Outlined, etiqueta corta, frase de una linea).
+# El icono debe existir en el subconjunto servido
+# (static/css/material_icons.css); anadir uno nuevo aqui implica
+# regenerar ese subconjunto.
+FEATURE_KEYWORDS = [
+    (('microfibra', 'mirofibra'), 'texture', 'Microfibra',
+     'Tejido ligero y de secado rápido.'),
+    (('licra',), 'straighten', 'Licra elástica',
+     'Se ajusta al movimiento sin perder forma.'),
+    (('grafeno',), 'bolt', 'Con grafeno',
+     'Material técnico incorporado en la construcción de la prenda.'),
+    (('manga larga',), 'height', 'Manga larga',
+     'Cobertura adicional para días frescos o post-entreno.'),
+    (('ombliguera',), 'content_cut', 'Corte cropped',
+     'Diseño corto, pensado para moverse con libertad.'),
+    (('deportivo',), 'fitness_center', 'Uso deportivo',
+     'Pensada para acompañar el entrenamiento.'),
+    (('casual',), 'checkroom', 'Uso diario',
+     'Tan cómoda para el gimnasio como para el resto del día.'),
+]
+
+# La categoria siempre aporta una tarjeta, incluso si la descripcion no
+# dice nada mas: es el unico dato que todo producto tiene garantizado.
+FEATURE_CATEGORIA = {
+    'Alta costura personalizada exclusiva': ('workspace_premium', 'Edición exclusiva',
+        'Diseño personalizado, fuera de la producción regular.'),
+    'Sport Premium': ('workspace_premium', 'Línea premium',
+        'Selección superior de materiales y construcción.'),
+    'Semi Personalizada': ('design_services', 'Semi personalizada',
+        'Ajustes disponibles sobre el diseño base.'),
+    'Conjuntos': ('checkroom', 'Conjunto completo',
+        'Piezas pensadas para combinarse entre sí.'),
+}
+
+MAX_FEATURES = 4
+
+
+def product_features(producto):
+    """Tarjetas de caracteristicas (icono, etiqueta, texto) para la PDP.
+
+    Cuando dos entradas coinciden en icono se descarta la mas nueva, no
+    porque sea menos cierta, sino para que la fila de tarjetas no repita
+    el mismo simbolo y pierda su funcion de guiar el ojo.
+    """
+    texto = (producto.description or '').lower()
+    iconos_usados = set()
+    features = []
+
+    feature_categoria = FEATURE_CATEGORIA.get(producto.category.name)
+    if feature_categoria:
+        features.append(feature_categoria)
+        iconos_usados.add(feature_categoria[0])
+
+    for fragmentos, icono, etiqueta, detalle in FEATURE_KEYWORDS:
+        if len(features) >= MAX_FEATURES:
+            break
+        if icono in iconos_usados:
+            continue
+        if any(fragmento in texto for fragmento in fragmentos):
+            features.append((icono, etiqueta, detalle))
+            iconos_usados.add(icono)
+
+    return [
+        {'icon': icono, 'label': etiqueta, 'text': detalle}
+        for icono, etiqueta, detalle in features[:MAX_FEATURES]
+    ]

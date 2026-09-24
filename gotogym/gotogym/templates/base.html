@@ -8,14 +8,14 @@
   <meta name="description" content="GoToGym - Ropa deportiva, tecnologia textil y bienestar.">
   <title>{% block title %}GoToGym{% endblock %}</title>
   <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/material_icons.css' %}?v=20260922-header">
+  <link rel="stylesheet" href="{% static 'css/material_icons.css' %}?v=20260925-features">
   {% comment %}
   El almacenamiento de estaticos (CompressedStaticFilesStorage) no agrega
   hash al nombre del archivo, asi que este ?v= es el unico corta-cache que
   hay: al editar style.css o tokens.css hay que subirlo o el navegador
   seguira sirviendo la copia vieja.
   {% endcomment %}
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260922-imagenes">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260924-footer">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
   {% block extra_head %}{% endblock %}
   {% comment %}
@@ -106,6 +106,17 @@
           <a href="{% url 'edit_profile' %}">{% trans "Editar perfil" %}</a>
           {% if user.influencer_profile %}
           <a href="{% url 'influencer_dashboard' %}">{% trans "Panel influencer" %}</a>
+          {% else %}
+          {% comment %}
+          Antes vivia como modal en la entrada publica (home.html), pero esa
+          vista redirige a los usuarios con sesion antes de que el modal
+          pudiera mostrarse -- quedo huerfano. El programa de influencers
+          debe quedar fuera del Home del comprador y del camino critico de
+          compra (ver PROPUESTA_HOME_STORE_QUANTUM.md, seccion 2), asi que
+          vuelve como un enlace tranquilo junto a "Panel influencer", no
+          como una interrupcion.
+          {% endcomment %}
+          <a href="{% url 'influencer_suscribete' %}">{% trans "Hazte influencer" %}</a>
           {% endif %}
           {% if user.is_superuser %}
           <a href="/admin/">{% trans "Admin" %}</a>
@@ -222,8 +233,6 @@
       <a href="{% url 'politica_cambios' %}">{% trans "Cambios" %}</a>
       <a href="{% url 'politica_devoluciones' %}">{% trans "Devoluciones" %}</a>
       <a href="{% url 'politica_garantia' %}">{% trans "Garantía" %}</a>
-      <a href="{% url 'politica_envios' %}">{% trans "Envíos" %}</a>
-      <a href="{% url 'politica_pagos' %}">{% trans "Pagos" %}</a>
       <a href="{% url 'politica_tratamiento_datos' %}">{% trans "Tratamiento de datos" %}</a>
     </nav>
   </footer>

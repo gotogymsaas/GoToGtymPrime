@@ -4,7 +4,7 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260922b">
-<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260922-quantum">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260925-movil">
 {% endblock %}
 
 {% block content %}
@@ -29,6 +29,7 @@
   {% endif %}
 
   {{ municipios_por_departamento|json_script:"municipios-data" }}
+  {{ resumen.subtotal_float|json_script:"checkout-subtotal" }}
 
   <section class="editorial-section editorial-section--mist">
     <form method="post" novalidate class="editorial-shell account-layout">
@@ -101,9 +102,17 @@
           {% endfor %}
         </ul>
 
+        {% comment %}
+        Envio y Total llevan row_id porque checkout.html los recalcula al
+        elegir ciudad (ver el script mas abajo): el resumen mostraba antes
+        "Sin costo por ahora" sin importar la ciudad, y el Total ni
+        siquiera incluia el envio (resumen.total = subtotal a secas, ver
+        carrito/services.py) -- el monto que el comprador veia aqui nunca
+        coincidia con lo que create_order_from_cart terminaba cobrando.
+        {% endcomment %}
         {% include "partials/_price_row.html" with row_class="flex justify-between mb-2 text-sm" label="Subtotal" amount=resumen.subtotal %}
-        {% include "partials/_price_row.html" with row_class="flex justify-between mb-5 text-sm text-gray-600" label="Envío" value_text="Sin costo por ahora" %}
-        {% include "partials/_price_row.html" with row_class="flex justify-between font-bold text-lg border-t pt-4 mb-6" label="Total" amount=resumen.total %}
+        {% include "partials/_price_row.html" with row_class="flex justify-between mb-5 text-sm text-gray-600" row_id="checkout-shipping-row" label="Envío" value_text="Se calcula con tu ciudad" %}
+        {% include "partials/_price_row.html" with row_class="flex justify-between font-bold text-lg border-t pt-4 mb-6" row_id="checkout-total-row" label="Total" amount=resumen.subtotal %}
 
         <button type="submit" class="editorial-action" style="width: 100%;">{% trans "Confirmar pedido" %}</button>
         <p class="text-xs text-gray-500 text-center mt-4">
@@ -155,6 +164,7 @@
     // Al cambiar de departamento, la ciudad anterior deja de ser valida.
     deptoSelect.addEventListener('change', function () {
       llenarCiudades(deptoSelect.value, null);
+      cotizarEnvio();
     });
 
     // Carga inicial: si el formulario ya trae departamento (reenviado por un
@@ -162,6 +172,56 @@
     // elegido en vez de dejar el select vacio.
     if (deptoSelect.value) {
       llenarCiudades(deptoSelect.value, ciudadSelect.dataset.selected);
+    }
+
+    // --- Envio real, calculado al elegir ciudad -------------------------
+    // Llama al mismo motor de tarifas que usa el servidor al confirmar el
+    // pedido (orders/services.py), asi que el numero que se ve aqui es el
+    // que se cobra despues, no una promesa aparte. Es mejora progresiva:
+    // sin JS el resumen queda en "Se calcula con tu ciudad" y el pedido
+    // se sigue creando bien, porque el servidor recalcula todo al
+    // confirmar sin depender de lo que haya mostrado esta pagina.
+    var filaEnvio = document.getElementById('checkout-shipping-row');
+    var filaTotal = document.getElementById('checkout-total-row');
+    var valorEnvio = filaEnvio ? filaEnvio.querySelector('span:last-child') : null;
+    var valorTotal = filaTotal ? filaTotal.querySelector('span:last-child') : null;
+    var datosSubtotal = document.getElementById('checkout-subtotal');
+    var subtotalActual = datosSubtotal ? JSON.parse(datosSubtotal.textContent) : 0;
+    var urlCotizar = '{% url "orders:cotizar_envio" %}';
+
+    function formatearPrecio(valor) {
+      return '$' + Math.round(valor).toLocaleString('es-CO') + ' COP';
+    }
+
+    function cotizarEnvio() {
+      if (!valorEnvio || !valorTotal || !ciudadSelect.value) return;
+
+      valorEnvio.textContent = '{% trans "Calculando…" %}';
+
+      fetch(urlCotizar + '?city=' + encodeURIComponent(ciudadSelect.value), {
+        credentials: 'same-origin'
+      }).then(function (respuesta) {
+        if (!respuesta.ok) throw new Error('cotizacion no disponible');
+        return respuesta.json();
+      }).then(function (datos) {
+        valorEnvio.textContent = datos.is_free
+          ? '{% trans "Gratis" %}'
+          : formatearPrecio(datos.cost);
+        valorTotal.textContent = formatearPrecio(subtotalActual + datos.cost);
+      }).catch(function () {
+        // Sin conexion o el carrito cambio de otra pestana: el servidor
+        // vuelve a calcular todo al confirmar, asi que esto no bloquea la
+        // compra, solo deja el resumen sin actualizar.
+        valorEnvio.textContent = '{% trans "Se calcula con tu ciudad" %}';
+      });
+    }
+
+    ciudadSelect.addEventListener('change', cotizarEnvio);
+
+    // Si el formulario vuelve con ciudad ya elegida (reenvio por otro
+    // error), cotiza de una vez en vez de esperar un cambio manual.
+    if (ciudadSelect.dataset.selected) {
+      cotizarEnvio();
     }
   });
 </script>

@@ -254,6 +254,80 @@ class VistaDeCheckoutTests(CheckoutBaseTestCase):
         self.assertIn('next=', response.url)
 
 
+class CotizacionEnVivoTests(CheckoutBaseTestCase):
+    """El resumen del checkout mostraba "Sin costo por ahora" sin importar
+    la ciudad, y su Total ni siquiera sumaba el envio (era subtotal a
+    secas). Este endpoint calcula en vivo, con el mismo motor y el mismo
+    subtotal que create_order_from_cart usa al confirmar, para que lo que
+    el comprador ve aqui sea lo que termina pagando."""
+
+    def _url(self, city=None):
+        url = reverse('orders:cotizar_envio')
+        return f'{url}?city={city}' if city else url
+
+    def test_requiere_sesion_iniciada(self):
+        self.client.logout()
+        response = self.client.get(self._url('Bogotá'))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('next=', response.url)
+
+    def test_sin_ciudad_devuelve_400(self):
+        self._poner_en_carrito({str(self.variante.pk): 1})
+        response = self.client.get(self._url())
+        self.assertEqual(response.status_code, 400)
+
+    def test_carrito_vacio_devuelve_400(self):
+        response = self.client.get(self._url('Bogotá'))
+        self.assertEqual(response.status_code, 400)
+
+    def test_coincide_con_lo_que_cobra_el_pedido_real(self):
+        # La invariante central: cotizar antes de confirmar y confirmar
+        # tienen que dar el mismo numero para la misma ciudad y el mismo
+        # carrito, o el resumen estaria prometiendo algo que no cumple.
+        self._poner_en_carrito({str(self.variante.pk): 1})
+
+        respuesta = self.client.get(self._url('Bogotá'))
+        self.assertEqual(respuesta.status_code, 200)
+        cotizado = respuesta.json()['cost']
+
+        pedido = create_order_from_cart(
+            self.usuario, {str(self.variante.pk): 1}, DATOS_VALIDOS,
+        )
+        self.assertEqual(Decimal(str(cotizado)), pedido.shipping_cost)
+
+    def test_ciudad_principal_cotiza_menos_que_resto_del_pais(self):
+        self._poner_en_carrito({str(self.variante.pk): 1})
+
+        cerca = self.client.get(self._url('Bogotá')).json()['cost']
+        lejos = self.client.get(self._url('Leticia')).json()['cost']
+
+        self.assertLess(cerca, lejos)
+
+    def test_envio_gratis_por_encima_del_umbral(self):
+        producto_caro = Product.objects.create(
+            name='Producto caro cotizacion', category=self.categoria, brand=self.marca,
+            base_price=FREE_SHIPPING_THRESHOLD, stock=0,
+        )
+        variante_cara = _crear_variante(producto_caro, 'COT-CARO-U-UNI', 'UNICA', 'UNICO', 1)
+        self._poner_en_carrito({str(variante_cara.pk): 1})
+
+        datos = self.client.get(self._url('Bogotá')).json()
+        self.assertTrue(datos['is_free'])
+        self.assertEqual(datos['cost'], 0)
+
+    def test_ignora_cualquier_subtotal_que_mande_el_cliente(self):
+        # El endpoint no acepta un parametro de subtotal: siempre usa el
+        # carrito real en sesion, para que nadie pueda pedir la tarifa de
+        # envio gratis mandando un monto inventado.
+        self._poner_en_carrito({str(self.variante.pk): 1})
+
+        url = reverse('orders:cotizar_envio')
+        respuesta = self.client.get(f'{url}?city=Bogotá&subtotal=999999999')
+
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertEqual(respuesta.json()['subtotal'], float(self.variante.effective_price))
+
+
 class DetalleDePedidoTests(CheckoutBaseTestCase):
     def test_el_dueno_ve_su_pedido(self):
         pedido = create_order_from_cart(self.usuario, {str(self.variante.pk): 1}, DATOS_VALIDOS)

@@ -3,9 +3,14 @@ Selector de talla de la PDP. Parametro: sizes (lista de tallas).
 Los botones .pdp-size y su atributo data-size son el gancho que usa el
 JS de la PDP para calcular la variante elegida; no cambiar sin revisar
 producto_detail.html.
+
+.pdp-variant-group en el fieldset es el otro gancho: producto_detail.html
+lo usa para saber que grupos siguen "sin decidir" (superposicion) y
+cuales ya se resolvieron (colapso) cuando se elige talla y color. Ver la
+seccion correspondiente en commerce_editorial.css.
 {% endcomment %}
 {% if sizes|length > 1 %}
-<fieldset class="mb-4">
+<fieldset class="mb-4 pdp-variant-group">
   <legend class="block text-xs font-bold uppercase tracking-[.1em] text-[rgba(248,249,250,.5)] mb-3">{% trans "Talla" %}</legend>
   <div class="flex flex-wrap gap-2" role="group">
     {% for size in sizes %}

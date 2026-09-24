@@ -118,8 +118,19 @@ class PolicyPagesTestCase(TestCase):
         # navbar/footer); se usa una pagina que si hereda el footer comun.
         response = self.client.get(reverse('acerca_de'))
         for url_name in ['politica_cambios', 'politica_devoluciones', 'politica_garantia',
-                          'politica_envios', 'politica_pagos', 'politica_tratamiento_datos']:
+                          'politica_tratamiento_datos']:
             self.assertContains(response, reverse(url_name))
+
+    def test_footer_ya_no_enlaza_envios_ni_pagos(self):
+        # Envios y Pagos se retiraron del footer global: son informacion de
+        # soporte al pedido (consulta puntual), no navegacion permanente de
+        # marca, y competian por atencion con el resto de politicas. Las
+        # paginas se conservan: siguen alcanzables desde el checkout (aviso
+        # de consentimiento) y desde el nav propio de las paginas legales
+        # (_legal_nav.html), asi que esto no las vuelve inaccesibles.
+        response = self.client.get(reverse('acerca_de'))
+        self.assertNotContains(response, reverse('politica_envios'))
+        self.assertNotContains(response, reverse('politica_pagos'))
 
     def test_checkout_enlaza_politicas_relevantes(self):
         User = get_user_model()

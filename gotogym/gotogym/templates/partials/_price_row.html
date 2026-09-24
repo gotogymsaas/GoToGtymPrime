@@ -8,7 +8,11 @@ Parametros:
   suffix     - codigo de moneda opcional (por defecto "COP")
   value_text - texto ya traducible para casos no monetarios (ej.
                "Sin costo por ahora")
-{% endcomment %}<div class="{{ row_class }}">
+  row_id     - opcional, id HTML de la fila completa (<div>). Usarlo solo
+               cuando algun script necesite ubicar y reescribir esta fila
+               despues del render inicial (ver checkout.html, donde el
+               envio y el total se recalculan al elegir ciudad).
+{% endcomment %}<div class="{{ row_class }}"{% if row_id %} id="{{ row_id }}"{% endif %}>
   <span>{% trans label %}</span>
   <span>{% if value_text %}{% trans value_text %}{% else %}${{ amount|cop }} {{ suffix|default:"COP" }}{% endif %}</span>
 </div>

@@ -42,18 +42,22 @@
  * plantillas cargan junto a esta hoja. Aqui solo queda donde se coloca en
  * cada pagina: el campo se atenua a medida que el contenido pesa mas.
  * Opacidad .34 en la tienda y .16 en la ficha, contra .52 del Home.
+ *
+ * --ql-coherent (no opacity a secas): quantum_lens.css la usa como punto
+ * de partida de la decoherencia al hacer scroll. opacity sigue fijandose
+ * aqui mismo, asi que sin esa animacion el campo se ve igual que siempre.
  */
 
 /* Tienda: a la derecha del titular, sin cruzarse con el texto. */
-.shop-hero .quantum-lens { top: 48%; left: 74%; width: min(56vw, 760px); opacity: .34; }
+.shop-hero .quantum-lens { top: 48%; left: 74%; width: min(56vw, 760px); --ql-coherent: .34; opacity: var(--ql-coherent); }
 
 /* Ficha de producto: solo un rastro detras de la galeria. */
 .shop-pdp { position: relative; isolation: isolate; overflow: clip; }
-.shop-pdp .quantum-lens { top: 38%; left: 28%; width: min(46vw, 620px); opacity: .16; }
+.shop-pdp .quantum-lens { top: 38%; left: 28%; width: min(46vw, 620px); --ql-coherent: .16; opacity: var(--ql-coherent); }
 
 @media (max-width: 720px) {
-  .shop-hero .quantum-lens { top: 40%; left: 62%; width: 120vw; opacity: .26; }
-  .shop-pdp .quantum-lens { opacity: .12; }
+  .shop-hero .quantum-lens { top: 40%; left: 62%; width: 120vw; --ql-coherent: .26; opacity: var(--ql-coherent); }
+  .shop-pdp .quantum-lens { --ql-coherent: .12; opacity: var(--ql-coherent); }
 }
 
 /* --- Barra de herramientas y filtros --- */
@@ -137,6 +141,20 @@
 .shop-pdp__layout { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(32px, 5vw, 72px); padding-bottom: clamp(64px, 8vw, 110px); }
 .shop-pdp__layout > * { min-width: 0; }
 .shop-pdp__layout .pdp-gallery { width: 100%; }
+
+/* .shop-pdp__layout nunca tenia una regla equivalente a la de
+   .shop-layout (PLP, mas arriba en esta hoja): la galeria y la info se
+   quedaban en 2 columnas de ~170px/~155px incluso en un telefono. Con
+   las tarjetas de caracteristicas (mas anchas, con padding) eso se
+   volvio imposible de ignorar -- el texto se cortaba contra el borde --
+   pero el problema ya afectaba a toda la ficha, no solo a las tarjetas.
+   Mismo punto de quiebre que la PLP, por consistencia. Tiene que ir
+   DESPUES de la regla base de arriba: con la misma especificidad, un
+   @media declarado antes pierde contra una regla normal declarada
+   despues (asi fallo el primer intento de este arreglo). */
+@media (max-width: 980px) {
+  .shop-pdp__layout { grid-template-columns: 1fr; }
+}
 .shop-pdp__info { align-self: start; padding-top: clamp(4px, 2vw, 20px); }
 .shop-pdp__category { margin: 0 0 14px; color: var(--shop-turquoise); font-size: .72rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
 .shop-pdp__title { margin: 0 0 20px; font-size: clamp(2.1rem, 4vw, 3.4rem); font-weight: 500; letter-spacing: -.045em; line-height: .98; overflow-wrap: anywhere; }
@@ -147,7 +165,109 @@
 .shop-pdp__specs div { display: flex; gap: 8px; padding: 6px 0; font-size: .88rem; }
 .shop-pdp__specs dt { margin: 0; color: rgba(248,249,250,.5); font-weight: 700; }
 .shop-pdp__specs dd { margin: 0; color: rgba(248,249,250,.85); }
+
+/* Caracteristicas segmentadas: van despues del boton de compra, asi que
+   aqui es donde tienen que pesar mas en la pagina -- cada una como una
+   tarjeta propia (fondo e borde sutil), icono grande, no una lista de
+   texto pequeño. Ver tienda.catalog.product_features -- solo lo que la
+   descripcion o la categoria del producto ya afirman. */
+.shop-pdp__features { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 34px 0 0; padding: 0; list-style: none; }
+.shop-pdp__features li {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 18px; border: 1px solid rgba(248,249,250,.12); background: rgba(255,255,255,.035);
+}
+.shop-pdp__features .material-icons-outlined { flex-shrink: 0; margin-top: 1px; font-size: 30px; color: var(--shop-turquoise); }
+.shop-pdp__features strong { display: block; margin-bottom: 4px; font-size: 1.02rem; font-weight: 700; color: var(--shop-paper); }
+.shop-pdp__features span { display: block; color: rgba(248,249,250,.6); font-size: .86rem; line-height: 1.5; }
+
+/* A 2 columnas, el padding + el icono de 30px dejaban muy poco ancho
+   para el texto y las palabras se cortaban contra el borde de la
+   tarjeta. A 1 columna cada tarjeta tiene el ancho completo. Va
+   despues de la regla base de arriba por la misma razon que la de
+   .shop-pdp__layout: un @media antes de la regla base pierde el
+   empate de especificidad. */
+@media (max-width: 560px) {
+  .shop-pdp__features { grid-template-columns: 1fr; }
+}
+
+/* Envio / cambios / garantia: al fondo de la ficha, refuerzo despues del
+   boton de compra, no una caja que compite con la descripcion. Mismo
+   lenguaje que .store-proof en el Home: franja de texto, sin bordes --
+   un poco mas grande que el resto de esa familia de franjas, porque va
+   sola al cierre de la pagina y necesita sostenerse por si misma. */
+.shop-pdp__policies { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 32px 0 0; padding: 0; list-style: none; }
+.shop-pdp__policies li { display: flex; align-items: center; gap: 8px; }
+.shop-pdp__policies a {
+  color: rgba(248,249,250,.68); font-size: .84rem; font-weight: 700;
+  letter-spacing: .02em; text-decoration: none;
+  transition: color .18s ease;
+}
+.shop-pdp__policies a:hover { color: var(--shop-turquoise); }
+.shop-pdp__policies .material-icons-outlined { font-size: 20px; color: var(--shop-turquoise); }
+
+/* Aviso de pocas unidades: mismo tono de urgencia que "Agotado" (rojo),
+   pero sin decir que no hay stock -- si dijera lo mismo, el usuario no
+   sabria si puede comprar o no antes de intentarlo. */
+.shop-pdp__low-stock { color: #ff8b6a; font-weight: 700; }
+
+/* Guia de tallas: <details> nativo, cerrado por defecto para no competir
+   con el selector ni con el precio. */
+.shop-pdp__size-guide { margin: 0 0 28px; padding-top: 22px; border-top: 1px solid rgba(248,249,250,.16); }
+.shop-pdp__size-guide summary {
+  cursor: pointer; color: var(--shop-turquoise); font-size: .84rem; font-weight: 700;
+  letter-spacing: .02em; list-style: none;
+}
+.shop-pdp__size-guide summary::-webkit-details-marker { display: none; }
+.shop-pdp__size-guide summary::before { content: "+ "; }
+.shop-pdp__size-guide[open] summary::before { content: "– "; }
+.shop-pdp__size-guide-note { margin: 14px 0 12px; color: rgba(248,249,250,.55); font-size: .78rem; line-height: 1.5; }
+.shop-pdp__size-guide table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.shop-pdp__size-guide th, .shop-pdp__size-guide td { padding: 8px 10px; text-align: left; border-bottom: 1px solid rgba(248,249,250,.12); }
+.shop-pdp__size-guide thead th { color: rgba(248,249,250,.5); font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.shop-pdp__size-guide tbody th { color: var(--shop-paper); font-weight: 700; }
+.shop-pdp__size-guide td { color: rgba(248,249,250,.75); }
+
 .shop-pdp__form { padding-top: 26px; border-top: 1px solid rgba(248,249,250,.16); }
+
+/* --- La seleccion de variante como colapso -----------------------------
+ *
+ * Un sistema cuantico existe en varios estados a la vez hasta que se mide;
+ * medir no es un gesto neutral, es lo que fija un unico resultado. Antes
+ * de elegir talla y color la ficha ya representaba eso con datos reales
+ * (un rango de precio, un grupo de opciones sin decidir); esto solo le da
+ * firma visual al momento exacto en que producto_detail.html resuelve una
+ * variante concreta -- sin inventar ningun dato que el catalogo no tenga.
+ * Si un producto no tiene mas de una talla o color no hay nada que
+ * superponer, y estas clases nunca se activan (ver el JS de la ficha).
+ *
+ * Ya existe una regla @media (prefers-reduced-motion: reduce) en esta
+ * misma hoja, unas lineas mas abajo, que apaga toda animacion dentro de
+ * .shop-page: cubre estos keyframes sin necesitar una excepcion aparte.
+ */
+.pdp-variant-group.is-superposed,
+#pdp-price.is-superposed {
+  animation: pdp-superpose 2.6s ease-in-out infinite;
+}
+@keyframes pdp-superpose {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .55; }
+}
+
+/* El instante en que se resuelve un unico estado: un asentamiento breve
+   que se nota una vez, no un parpadeo que se repite. Mismo keyframe en el
+   precio, en la disponibilidad y en el boton que se acaba de elegir -- es
+   la misma medicion, debe leerse como el mismo evento en los tres. */
+#pdp-price.is-collapsing,
+#pdp-availability.is-collapsing,
+.pdp-size.is-collapsing,
+.pdp-color.is-collapsing {
+  animation: pdp-collapse .5s cubic-bezier(.16,1,.3,1);
+}
+@keyframes pdp-collapse {
+  0%   { opacity: .35; transform: scale(.94); }
+  55%  { opacity: 1;   transform: scale(1.04); }
+  100% { opacity: 1;   transform: scale(1); }
+}
 
 .shop-related { padding: clamp(56px, 7vw, 96px) 0; background: var(--shop-paper); color: var(--shop-ink); }
 .shop-related__heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: clamp(32px, 5vw, 52px); }

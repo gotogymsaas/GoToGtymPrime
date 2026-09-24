@@ -119,3 +119,30 @@ class CommercialHeaderTests(TestCase):
         # nativo, no con la clase .hidden que servia Tailwind por CDN.
         self.assertNotIn('onclick="toggleMobileMenu', html)
         self.assertNotIn('onclick="toggleUserMenu', html)
+
+    def test_quien_no_es_influencer_ve_el_enlace_para_serlo(self):
+        # Reemplaza al modal que vivia en home.html (retirado en 04c678d):
+        # esa vista redirige a los usuarios con sesion antes de que el
+        # modal pudiera mostrarse, asi que habia quedado inalcanzable. Vive
+        # aqui y no en el Home porque el programa de influencers debe
+        # quedar fuera del camino critico de compra (ver
+        # PROPUESTA_HOME_STORE_QUANTUM.md, seccion 2).
+        self.client.force_login(self.user)
+
+        html = self._html(reverse('logged_home'))
+
+        self.assertIn(reverse('influencer_suscribete'), html)
+        self.assertIn('Hazte influencer', html)
+        self.assertNotIn('Panel influencer', html)
+
+    def test_quien_ya_es_influencer_ve_su_panel_y_no_la_invitacion(self):
+        from influencer.models import InfluencerProfile
+
+        InfluencerProfile.objects.create(user=self.user)
+        self.client.force_login(self.user)
+
+        html = self._html(reverse('logged_home'))
+
+        self.assertIn(reverse('influencer_dashboard'), html)
+        self.assertIn('Panel influencer', html)
+        self.assertNotIn('Hazte influencer', html)

@@ -1,8 +1,12 @@
+from decimal import Decimal
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from carrito.services import build_cart_context, read_cart, write_cart
+from shipping.services import get_mock_quote
 
 from .colombia_data import MUNICIPIOS_POR_DEPARTAMENTO
 from .forms import CheckoutForm
@@ -21,6 +25,11 @@ def checkout(request):
     if not resumen['items']:
         messages.info(request, 'Tu carrito esta vacio.')
         return redirect('carrito:cart_detail')
+
+    # float, no Decimal: es lo que necesita json_script para que el JS de
+    # la cotizacion de envio pueda sumarlo sin parsearlo (mismo patron que
+    # variantes_json en tienda/views.py).
+    resumen['subtotal_float'] = float(resumen['subtotal'])
 
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
@@ -44,6 +53,42 @@ def checkout(request):
         'form': form,
         'resumen': resumen,
         'municipios_por_departamento': MUNICIPIOS_POR_DEPARTAMENTO,
+    })
+
+
+@login_required
+def cotizar_envio(request):
+    """Cotizacion en vivo para el resumen del checkout, antes de confirmar.
+
+    Usa exactamente el mismo calculo que create_order_from_cart (mismo
+    subtotal, mismo motor de tarifas): el numero que ve el comprador aqui
+    tiene que ser el mismo que se cobra al confirmar, o el resumen estaria
+    mostrando una promesa que despues no cumple.
+
+    El subtotal sale siempre del carrito en sesion, nunca de un parametro
+    del cliente: si se aceptara un subtotal por GET, cualquiera podria
+    pedir la tarifa de envio gratis mandando un monto inventado.
+    """
+    ciudad = (request.GET.get('city') or '').strip()
+    if not ciudad:
+        return JsonResponse({'error': 'Falta la ciudad.'}, status=400)
+
+    cart, _reiniciado = read_cart(request.session)
+    resumen = build_cart_context(cart)
+    if not resumen['items']:
+        return JsonResponse({'error': 'El carrito esta vacio.'}, status=400)
+
+    subtotal = Decimal(resumen['subtotal']).quantize(Decimal('0.01'))
+    cotizacion = get_mock_quote(ciudad, subtotal)
+    envio = Decimal(cotizacion['cost']).quantize(Decimal('0.01'))
+
+    return JsonResponse({
+        'cost': float(envio),
+        'is_free': envio == 0,
+        'estimated_days': cotizacion['estimated_days'],
+        'method_name': cotizacion['method_name'],
+        'subtotal': float(subtotal),
+        'total': float(subtotal + envio),
     })
 
 

@@ -828,60 +828,66 @@ picture source {
 .gtg-footer {
   background: var(--color-bg-base);
   color: var(--color-text-primary);
-  padding: var(--space-9) 0 var(--space-7);
+  padding: var(--space-6) 0 var(--space-5);
   border-top: 1px solid var(--color-border-subtle);
 }
 
 /* Composicion centrada en una sola columna: marca, suscripcion y redes,
    cada bloque con su propio aire. Evita el problema de encajar seis
-   botones de red en una columna estrecha de una grilla de tres. */
+   botones de red en una columna estrecha de una grilla de tres.
+   Compactado: mismos tres bloques y el mismo contenido, con el aire (el
+   padding exterior, el espacio entre bloques, la tipografia decorativa)
+   reducido a la mitad o menos. Lo que SI es un objetivo tactil --
+   .gtg-socials a, los botones de la suscripcion, los enlaces de
+   .gtg-footer-legal -- se mantiene en 44px como minimo: comprimir el aire
+   esta bien, comprimir donde alguien tiene que apuntar con el dedo no. */
 .gtg-footer-wrap {
   width: min(100% - 32px, 1120px);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-7);
+  gap: var(--space-5);
   text-align: center;
 }
 
 .gtg-footer-brand {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-3);
   color: var(--color-gold);
-  font-size: 26px;
+  font-size: 18px;
   font-weight: 800;
 }
 
 .gtg-footer-brand img {
-  width: 64px;
-  height: 64px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
 }
 
 .gtg-footer-newsletter {
   display: grid;
   justify-items: center;
-  gap: var(--space-4);
+  gap: var(--space-2);
   width: 100%;
 }
 
 .gtg-footer-newsletter label {
-  font-size: 18px;
+  font-size: 14px;
   color: var(--color-text-primary);
 }
 
 .gtg-footer-newsletter div {
-  width: min(100%, 480px);
+  width: min(100%, 420px);
   display: grid;
-  grid-template-columns: 1fr 150px;
-  gap: var(--space-3);
+  grid-template-columns: 1fr 130px;
+  gap: var(--space-2);
 }
 
 .gtg-footer-newsletter input,
 .gtg-footer-newsletter button {
-  height: 48px;
+  height: 44px;
   border: 0;
   border-radius: var(--radius-sm);
 }
@@ -912,12 +918,14 @@ picture source {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: var(--space-4);
+  gap: var(--space-2);
 }
 
+/* 44px, no menos: es un objetivo tactil, y ese es el minimo que el resto
+   del sitio ya respeta (ver header, botones de talla/color de la PDP). */
 .gtg-socials a {
-  width: 56px;
-  height: 56px;
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -938,8 +946,8 @@ picture source {
 }
 
 .gtg-socials svg {
-  width: 26px;
-  height: 26px;
+  width: 20px;
+  height: 20px;
   display: block;
   fill: currentColor;
 }
@@ -951,19 +959,26 @@ picture source {
    como una lista. */
 .gtg-footer-legal {
   width: min(100% - 32px, 1120px);
-  margin: var(--space-7) auto 0;
-  padding-top: var(--space-5);
+  margin: var(--space-4) auto 0;
+  padding-top: var(--space-3);
   border-top: 1px solid var(--color-border-subtle);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: var(--space-1) var(--space-2);
-  font-size: 14px;
+  font-size: 13px;
 }
 
+/* min-height 44px: con el padding original (10px arriba/abajo sobre texto
+   de 14px) esta pildora quedaba en ~37px, por debajo del objetivo tactil
+   minimo que el resto del sitio ya respeta. No es parte de lo pedido, pero
+   comprimir el padding sin corregirlo lo habria empeorado. */
 .gtg-footer-legal a {
-  padding: 10px 16px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
   border-radius: var(--radius-pill);
   color: var(--color-text-secondary);
   white-space: nowrap;
@@ -1280,7 +1295,7 @@ picture source {
   }
 
   .gtg-footer-wrap {
-    gap: var(--space-6);
+    gap: var(--space-4);
   }
 }
 

@@ -1,0 +1,38 @@
+{% load i18n %}{% comment %}
+Guia de tallas de la PDP. Parametro: rows (lista de dicts size/busto/
+cintura/cadera, ver tienda.catalog.size_guide_rows). Si el producto no
+tiene ninguna talla con equivalencia en la guia (por ejemplo, es UNICA),
+rows llega vacio y no se renderiza nada.
+
+Es un <details> nativo, sin JS: cerrado por defecto para no competir con
+el selector de talla ni con el precio, a un clic de distancia para quien
+lo necesite.
+{% endcomment %}
+{% if rows %}
+<details class="shop-pdp__size-guide">
+  <summary>{% trans "Ver guía de tallas" %}</summary>
+  <p class="shop-pdp__size-guide-note">
+    {% trans "Medidas del cuerpo, en centímetros. Es una referencia general, no una medida verificada de esta prenda: cada corte puede variar." %}
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">{% trans "Talla" %}</th>
+        <th scope="col">{% trans "Busto" %}</th>
+        <th scope="col">{% trans "Cintura" %}</th>
+        <th scope="col">{% trans "Cadera" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <th scope="row">{{ row.size }}</th>
+        <td>{{ row.busto }}</td>
+        <td>{{ row.cintura }}</td>
+        <td>{{ row.cadera }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</details>
+{% endif %}

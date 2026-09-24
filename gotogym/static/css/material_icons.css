@@ -11,7 +11,14 @@
  * ellas; bajar de aqui exigiria referenciar cada icono por su codepoint y
  * perder la legibilidad del marcado.
  *
- * Regenerar tras anadir un icono nuevo (el nombre debe entrar en --text):
+ * Iconos incluidos hoy: shopping_cart, visibility, tune, search,
+ * receipt_long, menu, chevron_right, chevron_left, check_circle,
+ * arrow_back, error_outline, local_shipping, autorenew, verified,
+ * texture, straighten, bolt, height, content_cut, fitness_center,
+ * checkroom, workspace_premium, design_services.
+ *
+ * Regenerar tras anadir un icono nuevo (el nombre debe entrar en --text,
+ * junto con TODOS los de la lista de arriba, no solo el nuevo):
  *   python -m fontTools.subset material-icons-outlined-full.woff2 \
  *     --text="<nombres de todos los iconos, sin espacios>" \
  *     --layout-features="liga,dlig,rlig,calt" --flavor=woff2 \
@@ -26,7 +33,11 @@
   font-style: normal;
   font-weight: 400;
   font-display: block;
-  src: url("../fonts/material-icons/material-icons-outlined-subset.woff2") format("woff2");
+  /* El ?v= es necesario aqui tambien, no solo en el <link> del CSS: el
+     archivo no tiene hash de contenido en el nombre, asi que sin esto un
+     navegador que ya haya cacheado el .woff2 viejo (con menos iconos)
+     seguiria sirviendolo aunque la hoja CSS se actualice. */
+  src: url("../fonts/material-icons/material-icons-outlined-subset.woff2?v=20260925-features") format("woff2");
 }
 
 .material-icons-outlined {

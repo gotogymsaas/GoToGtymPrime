@@ -43,8 +43,13 @@
 .store-proof li + li::before { content: "·"; margin-right: 26px; color: var(--home-turquoise); }
 /* Campo Quantum: el componente esta en static/css/quantum_lens.css, que
  * esta plantilla carga aparte. Aqui solo su lugar en la portada, donde
- * pesa mas que en el resto del sitio. */
-.store-hero .quantum-lens { top: 50%; left: 58%; width: min(68vw, 920px); opacity: .52; }
+ * pesa mas que en el resto del sitio.
+ *
+ * --ql-coherent (no opacity a secas) porque quantum_lens.css la usa como
+ * punto de partida de la decoherencia al hacer scroll; opacity la sigue
+ * fijando esta misma regla, asi que en un navegador sin esa animacion el
+ * campo se ve exactamente igual que antes. */
+.store-hero .quantum-lens { top: 50%; left: 58%; width: min(68vw, 920px); --ql-coherent: .52; opacity: var(--ql-coherent); }
 
 .store-intents { background: var(--home-graphite); color: var(--home-white); }
 .store-intents .store-heading-row > p { color: rgba(248,249,250,.58); }
@@ -73,6 +78,12 @@
 .home-product-card__meta strong { font-size: .92rem; }
 .home-product-card__meta small { color: #77777c; }
 .store-empty { padding: 64px; border: 1px solid #cececc; text-align: center; }
+
+/* El componente base vive en quantum_lens.css; aqui solo el fondo que le
+   corresponde en esta costura (entra a la seccion de tecnologia, que es
+   oscura) y el turquesa de marca, que ya es el mismo tono del acento en
+   el resto del Home. */
+.quantum-fringe--story { background-color: var(--home-sapphire); }
 
 .store-story { min-height: 720px; display: grid; grid-template-columns: 1.08fr .92fr; background: var(--home-sapphire); color: var(--home-white); }
 .store-story__image { min-height: 620px; overflow: hidden; }
@@ -144,7 +155,7 @@
   .store-hero__lead { font-size: .96rem; }
   .store-proof { gap: 9px; justify-content: space-between; font-size: .61rem; }
   .store-proof li + li::before { margin-right: 9px; }
-  .store-hero .quantum-lens { top: 34%; left: 55%; width: 130vw; opacity: .42; }
+  .store-hero .quantum-lens { top: 34%; left: 55%; width: 130vw; --ql-coherent: .42; opacity: var(--ql-coherent); }
   .intent-grid { grid-template-columns: 1fr; }
   .intent-card { min-height: 175px; }
   .intent-card + .intent-card { border-top: 1px solid rgba(248,249,250,.15); border-left: 0; }
