@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -Eeuo pipefail
+set -euo pipefail
 
 # Oryx comprime el build en output.tar.zst y lo extrae al arrancar el
 # contenedor. Este script corre ya dentro de esa copia extraida, que es el
@@ -20,8 +20,7 @@ echo "[startup] Aplicando migraciones..."
 
 echo "[startup] Iniciando gunicorn..."
 exec gunicorn --chdir gotogym gotogym.wsgi \
-  --bind "0.0.0.0:${PORT:-8000}" \
-  --workers "${WEB_CONCURRENCY:-2}" \
-  --timeout 120 \
+  --bind=0.0.0.0 \
+  --timeout 600 \
   --access-logfile - \
   --error-logfile -
