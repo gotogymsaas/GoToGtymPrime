@@ -78,6 +78,11 @@ jobs:
         with:
           name: python-app
 
+      - name: Sign in to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Deploy to Azure Web App via Kudu Zip Deploy
         env:
           SCM_USER: ${{ secrets.AZURE_SCM_USER }}
@@ -113,6 +118,12 @@ jobs:
             echo "ERROR: Deploy falló con HTTP $HTTP_STATUS"
             exit 1
           fi
+
+          echo "Configurando el comando de inicio de App Service..."
+          az webapp config set \
+            --resource-group rg-gotogym-prime \
+            --name "${APP_NAME}" \
+            --startup-file "bash /home/site/wwwroot/environments/azure/startup.sh"
 
           echo "Esperando a que Kudu termine de publicar..."
           for _ in $(seq 1 30); do
