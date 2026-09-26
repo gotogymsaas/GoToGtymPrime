@@ -1,6 +1,0 @@
-{% load i18n %}{% comment %}
-Distintivo superpuesto sobre una imagen de producto (ej. "Agotado", y en el
-futuro "Nuevo"/"Best seller"). Parametros:
-  label    - texto visible, ya en espanol (se traduce con {% trans %})
-  bg_class - clase Tailwind de fondo, por defecto gris oscuro
-{% endcomment %}<span class="absolute top-2 left-2 {{ bg_class|default:"bg-gray-800" }} text-white text-xs font-bold px-2 py-1 rounded">{% trans label %}</span>
