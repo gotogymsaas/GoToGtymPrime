@@ -88,6 +88,8 @@
 .order-row small { margin-top: 5px; color: var(--ed-muted); }
 .order-row__meta { display: flex; align-items: center; gap: 18px; }
 .order-status { padding: 7px 10px; background: #f2e7c9; color: #594614; font-size: .72rem; font-weight: 800; }
+.editorial-article { max-width: 820px; margin-inline: auto; }
+.editorial-article__cover { width: 100%; aspect-ratio: 16/9; object-fit: cover; margin-bottom: 32px; }
 .recommendation-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
 .recommendation-card { background: var(--ed-paper); }
 .recommendation-card img { width: 100%; aspect-ratio: 4/5; object-fit: cover; }

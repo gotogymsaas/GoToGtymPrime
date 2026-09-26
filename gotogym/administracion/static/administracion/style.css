@@ -218,6 +218,16 @@ td small { display: block; margin-top: 4px; }
 .empty-img { color: var(--muted); font-size: 13px; }
 .actions { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
 .actions form { margin: 0; }
+/* En una fila de tabla, `.actions` vive directo en un <td>: convertirlo en
+   flex lo saca del algoritmo de layout de tabla (deja de comportarse como
+   celda) y su borde inferior ya no queda a la altura del resto de la fila,
+   que es exactamente la desalineacion que se veia en Productos. Aqui se
+   revierte a celda normal y el espaciado entre botones se hace con
+   margenes en vez de `gap` (que flex si resuelve gratis). */
+td.actions { display: table-cell; white-space: nowrap; }
+td.actions > a,
+td.actions > form { display: inline-flex; align-items: center; vertical-align: middle; margin: 0; }
+td.actions > * + * { margin-left: 8px; }
 /* Usuarios y roles: fila unica con todos los atributos y botones en
    linea (email, rol, cambiar rol, estado, registro, acciones), cada uno
    en su propia columna real de la tabla -- asi el ancho de cada columna

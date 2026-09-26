@@ -82,26 +82,14 @@ class QuantumLensTests(TestCase):
         self.assertNotIn('quantum_lens.css', html)
         self.assertNotIn('quantum-lens', html)
 
-    def test_la_franja_de_interferencia_es_hermana_de_store_story_no_hija(self):
-        # .store-story es un grid de 2 columnas fijas (imagen + contenido).
-        # Un tercer hijo directo le rompe el layout -- es exactamente el bug
-        # que ya paso una vez con .store-wellness cuando un <picture> se
-        # promociono como item de grid. La franja debe quedar ANTES de que
-        # abra la seccion, nunca entre sus dos hijos.
+    def test_la_franja_de_interferencia_ya_no_se_muestra_en_el_home(self):
+        # La franja decorativa (.quantum-fringe--story) se probo y se
+        # retiro del Home: quedaba como una banda de color ajena al resto
+        # de la pagina en vez de leerse como transicion editorial.
         self.client.force_login(self.user)
         html = self.client.get(reverse('logged_home')).content.decode()
 
-        self.assertIn('class="quantum-fringe quantum-fringe--story"', html)
-        self.assertIn('aria-hidden="true"', html.split('quantum-fringe--story"')[1][:40])
-
-        fin_franja = html.index('quantum-fringe--story') + len('quantum-fringe--story"')
-        inicio_story = html.index('class="store-story"')
-        # Entre el cierre de la franja y la apertura de .store-story solo
-        # puede haber el cierre de su propio <div> y el whitespace de la
-        # plantilla, nunca contenido de .store-story__image.
-        entre = html[fin_franja:inicio_story]
-        self.assertNotIn('store-story__image', entre)
-        self.assertNotIn('store-story__content', entre)
+        self.assertNotIn('quantum-fringe', html)
 
     def test_toda_instancia_del_campo_declara_su_opacidad_como_variable_css(self):
         # --ql-coherent es el punto de partida que usa la decoherencia al

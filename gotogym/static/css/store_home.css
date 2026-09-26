@@ -81,12 +81,6 @@
 .home-product-card__meta small { color: #77777c; }
 .store-empty { padding: var(--space-8); border: 1px solid #cececc; text-align: center; }
 
-/* El componente base vive en quantum_lens.css; aqui solo el fondo que le
-   corresponde en esta costura (entra a la seccion de tecnologia, que es
-   oscura) y el turquesa de marca, que ya es el mismo tono del acento en
-   el resto del Home. */
-.quantum-fringe--story { background-color: var(--home-sapphire); }
-
 .store-story { min-height: 720px; display: grid; grid-template-columns: 1.08fr .92fr; background: var(--home-graphite); color: var(--home-white); }
 .store-story__image { min-height: 620px; overflow: hidden; }
 .store-story__image img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.75) contrast(1.06); }

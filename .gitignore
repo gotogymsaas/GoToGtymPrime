@@ -32,3 +32,6 @@ staticfiles/
 .ruff_cache/
 htmlcov/
 
+# Archivos temporales de trabajo, no forman parte del proyecto
+Temp/
+
