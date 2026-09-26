@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
-
 from integrations.alegra.alegra_client import AlegraClient
 
 
