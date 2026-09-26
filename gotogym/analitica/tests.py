@@ -68,7 +68,13 @@ class RegistrarEventosTests(TestCase):
         })
         self.assertNotIn('medible@example.com', volcado)
         self.assertNotIn('Med', volcado)
-        self.assertNotIn(str(usuario.pk), evento.sesion)
+        # No se compara el pk contra el hash como substring: un hash hex es
+        # una cadena de digitos y letras a-f, asi que decimales cortos como
+        # el pk de un usuario de prueba pueden coincidir por pura casualidad
+        # (paso justamente por esto en CI). Lo que importa es que la sesion
+        # sea un hash, no la clave ni el pk en claro.
+        self.assertNotEqual(evento.sesion, str(usuario.pk))
+        self.assertRegex(evento.sesion, r'^[0-9a-f]{32}$')
 
     def test_la_sesion_se_guarda_hasheada_y_no_en_claro(self):
         self.client.get(reverse('home'))  # crea sesion
