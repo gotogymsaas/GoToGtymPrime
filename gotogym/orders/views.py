@@ -5,14 +5,12 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from products.forms import ProductReviewForm
 from shipping.services import get_mock_quote
 from tienda.catalog import curated_product_cards
 
 from .colombia_data import MUNICIPIOS_POR_DEPARTAMENTO
 from .forms import CheckoutForm
-from products.forms import ProductReviewForm
-from products.models import ProductReview
-
 from .models import Order, OrderItem, OrderStatus
 from .services import CheckoutError, create_order_from_cart
 
@@ -40,6 +38,7 @@ def checkout(request):
     # la cotizacion de envio pueda sumarlo sin parsearlo (mismo patron que
     # variantes_json en tienda/views.py).
     resumen['subtotal_float'] = float(resumen['subtotal'])
+    resumen['coupon_discount'] = 0
 
     if request.method == 'POST':
         form = CheckoutForm(request.POST)

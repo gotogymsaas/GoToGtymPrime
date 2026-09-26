@@ -17,6 +17,15 @@ from .models import Address, Order, OrderItem, OrderStatus, PaymentStatus
 
 # Intentos para resolver la colision de dos pedidos creados a la vez.
 MAX_INTENTOS_NUMERO = 5
+COUPON_CODE = 'CUPON'
+COUPON_DISCOUNT_RATE = Decimal('0.10')
+
+
+def calculate_coupon_discount(subtotal, coupon_code=''):
+    """Calcula el descuento del único cupón mock habilitado."""
+    if (coupon_code or '').strip().upper() != COUPON_CODE:
+        return Decimal('0.00')
+    return (Decimal(subtotal) * COUPON_DISCOUNT_RATE).quantize(Decimal('0.01'))
 
 
 class CheckoutError(Exception):
@@ -164,7 +173,7 @@ def create_order_from_cart(user, cart, datos):
     subtotal = Decimal(contexto['subtotal']).quantize(Decimal('0.01'))
     cotizacion = get_mock_quote(datos['city'], subtotal)
     envio = Decimal(cotizacion['cost']).quantize(Decimal('0.01'))
-    descuento = Decimal('0.00')
+    descuento = calculate_coupon_discount(subtotal, datos.get('coupon_code', ''))
     total = subtotal + envio - descuento
 
     pedido = None

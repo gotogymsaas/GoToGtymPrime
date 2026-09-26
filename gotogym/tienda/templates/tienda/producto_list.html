@@ -5,18 +5,19 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260923-fringe-fix">
-<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260925-cuantico2">
+<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260925-no-italic">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260925-compact-headings">
 {% endblock %}
 
 {% block content %}
 <div class="shop-page">
-  <section class="shop-hero" aria-labelledby="shop-hero-title">
+  <section class="shop-hero editorial-hero" aria-labelledby="shop-hero-title">
     <div class="shop-hero__background" aria-hidden="true"></div>
     {% include "partials/_quantum_lens.html" %}
-    <div class="shop-shell">
-      <p class="shop-eyebrow">{% trans "Selección GoToGym" %}</p>
-      <h1 id="shop-hero-title">{% trans "Encuentra tu próximo movimiento" %}</h1>
-      <p class="shop-hero__lead">
+    <div class="shop-shell editorial-shell">
+      <p class="shop-eyebrow editorial-kicker">{% trans "Selección GoToGym" %}</p>
+      <h1 id="shop-hero-title" class="editorial-title">{% trans "Encuentra tu próximo movimiento" %}</h1>
+      <p class="shop-hero__lead editorial-lead">
         {% blocktrans count counter=total_resultados %}{{ counter }} producto disponible{% plural %}{{ counter }} productos disponibles{% endblocktrans %}
       </p>
     </div>

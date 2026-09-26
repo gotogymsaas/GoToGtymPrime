@@ -189,6 +189,16 @@ class FormularioDeCheckoutTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn('address_line', form.errors)
 
+    def test_cupon_mock_valido(self):
+        form = CheckoutForm({**DATOS_VALIDOS, 'coupon_code': 'cupon'})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['coupon_code'], 'CUPON')
+
+    def test_cupon_desconocido_se_rechaza(self):
+        form = CheckoutForm({**DATOS_VALIDOS, 'coupon_code': 'OTRO'})
+        self.assertFalse(form.is_valid())
+        self.assertIn('coupon_code', form.errors)
+
 
 class CreacionDePedidoTests(CheckoutBaseTestCase):
     def test_crea_un_pedido_con_sus_lineas_y_direccion(self):
@@ -220,6 +230,14 @@ class CreacionDePedidoTests(CheckoutBaseTestCase):
         pedido = create_order_from_cart(self.usuario, cart, DATOS_VALIDOS)
         # DATOS_VALIDOS usa Bogota (ciudad principal): subtotal 120000 + envio 12000.
         self.assertEqual(pedido.total, Decimal('132000.00'))
+
+    def test_cupon_aplica_diez_por_ciento_sobre_el_subtotal(self):
+        datos = {**DATOS_VALIDOS, 'coupon_code': 'CUPON'}
+        pedido = create_order_from_cart(self.usuario, {str(self.variante.pk): 1}, datos)
+        self.assertEqual(pedido.subtotal, Decimal('120000.00'))
+        self.assertEqual(pedido.discount_total, Decimal('12000.00'))
+        self.assertEqual(pedido.shipping_cost, Decimal('12000.00'))
+        self.assertEqual(pedido.total, Decimal('120000.00'))
 
     def test_carrito_vacio_no_crea_pedido(self):
         with self.assertRaises(EmptyCartError):

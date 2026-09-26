@@ -41,6 +41,7 @@ class CheckoutForm(forms.Form):
         label=_('Información adicional para la entrega'), required=False,
         widget=forms.Textarea(attrs={'rows': 3}),
     )
+    coupon_code = forms.CharField(label=_('Cupón'), required=False, max_length=30)
 
     def clean_phone(self):
         phone = self.cleaned_data['phone'].strip()
@@ -64,6 +65,10 @@ class CheckoutForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
+        codigo_cupon = cleaned_data.get('coupon_code', '').strip().upper()
+        if codigo_cupon and codigo_cupon != 'CUPON':
+            self.add_error('coupon_code', 'El cupón no es válido.')
+        cleaned_data['coupon_code'] = codigo_cupon
         departamento = cleaned_data.get('department')
         ciudad = cleaned_data.get('city', '').strip()
         if departamento and ciudad and ciudad not in municipios_de(departamento):

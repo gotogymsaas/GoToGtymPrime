@@ -3,8 +3,8 @@
 {% block title %}{% trans "Checkout" %}{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260925-playfair">
-<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260925-cuantico2">
+<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260925-no-italic">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260925-coupon">
 {% endblock %}
 
 {% block content %}
@@ -55,7 +55,7 @@
         <p class="editorial-kicker" style="margin-top: 44px;">{% trans "Entrega" %}</p>
         <h2>{% trans "Dirección de entrega" %}</h2>
         <div class="account-fields">
-          {% for field in form %}{% if field.name not in 'first_name,last_name,email,phone' %}
+          {% for field in form %}{% if field.name not in 'first_name,last_name,email,phone,coupon_code' %}
           <div class="account-field{% if field.name == 'address_line' or field.name == 'address_complement' or field.name == 'notes' %} account-field--full{% endif %}">
             <label for="{{ field.id_for_label }}">
               {{ field.label }}{% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
@@ -102,6 +102,18 @@
           {% endfor %}
         </ul>
 
+        <section class="checkout-coupon" aria-labelledby="coupon-title">
+          <h3 id="coupon-title">{% trans "Cupón de descuento" %}</h3>
+          <div class="checkout-coupon__field">
+            <label class="sr-only" for="id_coupon_code">{% trans "Código del cupón" %}</label>
+            <input id="id_coupon_code" name="coupon_code" type="text" maxlength="30"
+                   value="{{ form.coupon_code.value|default:'' }}" placeholder="{% trans 'Ingresa tu cupón' %}"
+                   autocomplete="off">
+            <button type="button" id="apply-coupon">{% trans "Aplicar" %}</button>
+          </div>
+          <p id="coupon-feedback" class="checkout-coupon__feedback" role="status" aria-live="polite"></p>
+        </section>
+
         {% comment %}
         Envio y Total llevan row_id porque checkout.html los recalcula al
         elegir ciudad (ver el script mas abajo): el resumen mostraba antes
@@ -111,6 +123,7 @@
         coincidia con lo que create_order_from_cart terminaba cobrando.
         {% endcomment %}
         {% include "partials/_price_row.html" with row_class="flex justify-between mb-2 text-sm" label="Subtotal" amount=resumen.subtotal %}
+        {% include "partials/_price_row.html" with row_class="flex justify-between mb-2 text-sm text-green-700" row_id="checkout-discount-row" label="Descuento" value_text="-$0 COP" %}
         {% include "partials/_price_row.html" with row_class="flex justify-between mb-5 text-sm text-gray-600" row_id="checkout-shipping-row" label="Envío" value_text="Se calcula con tu ciudad" %}
         {% include "partials/_price_row.html" with row_class="flex justify-between font-bold text-lg border-t pt-4 mb-6" row_id="checkout-total-row" label="Total" amount=resumen.subtotal %}
 
@@ -182,9 +195,15 @@
     // se sigue creando bien, porque el servidor recalcula todo al
     // confirmar sin depender de lo que haya mostrado esta pagina.
     var filaEnvio = document.getElementById('checkout-shipping-row');
+    var filaDescuento = document.getElementById('checkout-discount-row');
     var filaTotal = document.getElementById('checkout-total-row');
     var valorEnvio = filaEnvio ? filaEnvio.querySelector('span:last-child') : null;
+    var valorDescuento = filaDescuento ? filaDescuento.querySelector('span:last-child') : null;
     var valorTotal = filaTotal ? filaTotal.querySelector('span:last-child') : null;
+    var campoCupon = document.getElementById('id_coupon_code');
+    var botonCupon = document.getElementById('apply-coupon');
+    var mensajeCupon = document.getElementById('coupon-feedback');
+    var descuentoActual = 0;
     var datosSubtotal = document.getElementById('checkout-subtotal');
     var subtotalActual = datosSubtotal ? JSON.parse(datosSubtotal.textContent) : 0;
     var urlCotizar = '{% url "orders:cotizar_envio" %}';
@@ -192,6 +211,30 @@
     function formatearPrecio(valor) {
       return '$' + Math.round(valor).toLocaleString('es-CO') + ' COP';
     }
+
+    function actualizarTotal(envio) {
+      if (valorDescuento) valorDescuento.textContent = descuentoActual
+        ? '-' + formatearPrecio(descuentoActual)
+        : '$0 COP';
+      if (valorTotal) valorTotal.textContent = formatearPrecio(subtotalActual + envio - descuentoActual);
+    }
+
+    function aplicarCupon() {
+      var codigo = campoCupon.value.trim().toUpperCase();
+      campoCupon.value = codigo;
+      if (codigo === 'CUPON') {
+        descuentoActual = subtotalActual * 0.10;
+        mensajeCupon.textContent = '{% trans "Cupón aplicado: 10% de descuento." %}';
+        mensajeCupon.className = 'checkout-coupon__feedback is-success';
+      } else {
+        descuentoActual = 0;
+        mensajeCupon.textContent = codigo ? '{% trans "Cupón no válido." %}' : '';
+        mensajeCupon.className = 'checkout-coupon__feedback is-error';
+      }
+      actualizarTotal(ciudadSelect.value ? Number(valorEnvio.dataset.cost || 0) : 0);
+    }
+
+    botonCupon.addEventListener('click', aplicarCupon);
 
     function cotizarEnvio() {
       if (!valorEnvio || !valorTotal || !ciudadSelect.value) return;
@@ -204,15 +247,18 @@
         if (!respuesta.ok) throw new Error('cotizacion no disponible');
         return respuesta.json();
       }).then(function (datos) {
+        valorEnvio.dataset.cost = datos.cost;
         valorEnvio.textContent = datos.is_free
           ? '{% trans "Gratis" %}'
           : formatearPrecio(datos.cost);
-        valorTotal.textContent = formatearPrecio(subtotalActual + datos.cost);
+        actualizarTotal(datos.cost);
       }).catch(function () {
         // Sin conexion o el carrito cambio de otra pestana: el servidor
         // vuelve a calcular todo al confirmar, asi que esto no bloquea la
         // compra, solo deja el resumen sin actualizar.
         valorEnvio.textContent = '{% trans "Se calcula con tu ciudad" %}';
+        valorEnvio.dataset.cost = '0';
+        actualizarTotal(0);
       });
     }
 
