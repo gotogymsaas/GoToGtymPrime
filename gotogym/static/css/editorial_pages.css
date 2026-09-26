@@ -13,7 +13,7 @@
 }
 .editorial-shell { width: min(100% - 40px, 1180px); margin-inline: auto; }
 .editorial-kicker { margin: 0 0 18px; color: var(--ed-turquoise); font-size: .72rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
-.editorial-title { max-width: 920px; margin: 0; font-size: clamp(2.25rem, 4.8vw, 4.8rem); font-weight: 500; letter-spacing: -.065em; line-height: .95; }
+.editorial-title { max-width: 920px; margin: 0; font-size: var(--font-size-h1); font-weight: 500; letter-spacing: -.065em; line-height: .95; }
 .editorial-title em { color: var(--ed-gold); font-family: inherit; font-weight: inherit; font-style: normal; }
 .editorial-lead { max-width: 650px; color: var(--ed-muted); font-size: clamp(1rem, 1.6vw, 1.25rem); line-height: 1.7; }
 .editorial-hero { padding: clamp(80px, 10vw, 150px) 0 clamp(64px, 8vw, 110px); background: var(--ed-ink); color: var(--ed-paper); }

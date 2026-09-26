@@ -50,9 +50,14 @@
    * fijo aqui solo se volvería a duplicar sin esta escala como referencia.
    * (Nombrada --font-size-* y no --text-* para no compartir prefijo con
    * --text-primary/--text-muted de la linea 72-73, que son colores.)
+   *
+   * --font-size-h1 no es el clamp() original propuesto en la auditoria:
+   * se actualizo al valor real que .editorial-title y .shop-hero h1 ya
+   * tenian en produccion (reduccion manual posterior a la auditoria) para
+   * no introducir un cambio visual al conectar el token.
    */
   --font-size-display: clamp(2.5rem, 5vw + 1rem, 6rem);
-  --font-size-h1: clamp(2rem, 3vw + 1.2rem, 3.5rem);
+  --font-size-h1: clamp(2.25rem, 4.8vw, 4.8rem);
   --font-size-h2: clamp(1.625rem, 2vw + 1.1rem, 2.5rem);
   --font-size-h3: clamp(1.25rem, .8vw + 1rem, 1.625rem);
   --font-size-lead: clamp(1rem, .3vw + .9rem, 1.1875rem);
