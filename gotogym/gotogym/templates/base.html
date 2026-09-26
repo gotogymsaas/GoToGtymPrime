@@ -8,6 +8,16 @@
   <meta name="description" content="GoToGym - Ropa deportiva, tecnologia textil y bienestar.">
   <title>{% block title %}GoToGym{% endblock %}</title>
   <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
+  {% comment %}
+  Playfair Display, peso 700 (unico peso con archivo real descargado, ver
+  AUDITORIA_TIPOGRAFIA_UI.md hallazgo 5). Es la serif de marca para el
+  acento itálico dorado (.editorial-title em / .store-hero h1 em) -- sin
+  este link caia en Georgia, la serif del sistema operativo de cada
+  visitante. 700-italic.css usa los .woff/.woff2 itálicos que ya estaban
+  en disco sin una hoja @font-face que los declarara.
+  {% endcomment %}
+  <link href="{% static 'fonts/@fontsource/playfair-display/700.css' %}" rel="stylesheet">
+  <link href="{% static 'fonts/@fontsource/playfair-display/700-italic.css' %}" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/material_icons.css' %}?v=20260925-features">
   {% comment %}
   El almacenamiento de estaticos (CompressedStaticFilesStorage) no agrega
@@ -15,7 +25,7 @@
   hay: al editar style.css o tokens.css hay que subirlo o el navegador
   seguira sirviendo la copia vieja.
   {% endcomment %}
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260924-footer">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260925-tipografia">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
   {% block extra_head %}{% endblock %}
   {% comment %}

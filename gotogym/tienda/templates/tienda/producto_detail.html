@@ -4,7 +4,7 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260923-fringe-fix">
-<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260925-cuantico2">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260925-pdp-size-single-2">
 {% endblock %}
 
 {% block content %}
@@ -33,7 +33,14 @@
       <div class="shop-pdp__info">
         <p class="shop-pdp__category">{{ producto.category.name }}</p>
         <h1 class="shop-pdp__title">{{ producto.name }}</h1>
-        <p class="shop-pdp__review-note">{% trans "Sin reseñas todavía" %}</p>
+        <div class="shop-pdp__review-note" aria-label="{% trans 'Reseñas del producto' %}">
+          {% if review_count %}
+          <span aria-hidden="true">{% for star in "12345" %}{% if forloop.counter <= review_average %}★{% else %}☆{% endif %}{% endfor %}</span>
+          <span>{{ review_average|floatformat:1 }}/5 · {{ review_count }} {% trans "reseñas" %}</span>
+          {% else %}
+          <span>{% trans "Sin reseñas todavía" %}</span>
+          {% endif %}
+        </div>
 
         {% comment %}
         data-has-range: si el precio varia entre variantes, el JS lo anima
@@ -74,8 +81,8 @@
           <input type="hidden" name="variant_id" id="pdp-variant-id"
                  value="{% if single_variant %}{{ single_variant.id }}{% endif %}">
 
+          {% include "tienda/partials/_size_selector.html" with sizes=sizes selected_size=single_variant.size %}
           {% if not single_variant %}
-            {% include "tienda/partials/_size_selector.html" with sizes=sizes %}
             {% include "tienda/partials/_color_selector.html" with colors=colors %}
           {% endif %}
 
@@ -151,6 +158,21 @@
         </ul>
       </div>
     </div>
+
+    {% if reviews %}
+    <section class="shop-pdp__reviews" aria-labelledby="reviews-heading">
+      <h2 id="reviews-heading">{% trans "Opiniones de clientes" %}</h2>
+      {% for review in reviews %}
+      <article class="shop-pdp__review">
+        <div class="shop-pdp__review-heading">
+          <strong aria-label="{{ review.rating }} {% trans 'de 5 estrellas' %}">{% for star in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</strong>
+          <span>{% trans "Compra verificada" %}</span>
+        </div>
+        {% if review.comment %}<p>{{ review.comment }}</p>{% endif %}
+      </article>
+      {% endfor %}
+    </section>
+    {% endif %}
   </div>
 
   {% if related_cards %}
@@ -232,6 +254,10 @@ document.addEventListener('DOMContentLoaded', function () {
   var coloresUnicos = variantes.map(function (v) { return v.color; })
     .filter(function (v, i, a) { return a.indexOf(v) === i; });
 
+  var tallaMarcada = botonesTalla.filter(function (b) {
+    return b.getAttribute('aria-pressed') === 'true';
+  })[0];
+  if (tallaMarcada) tallaElegida = tallaMarcada.dataset.size;
   if (!botonesTalla.length && tallasUnicas.length === 1) tallaElegida = tallasUnicas[0];
   if (!botonesColor.length && coloresUnicos.length === 1) colorElegido = coloresUnicos[0];
 

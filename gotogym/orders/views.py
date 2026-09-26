@@ -10,8 +10,19 @@ from tienda.catalog import curated_product_cards
 
 from .colombia_data import MUNICIPIOS_POR_DEPARTAMENTO
 from .forms import CheckoutForm
-from .models import Order
+from products.forms import ProductReviewForm
+from products.models import ProductReview
+
+from .models import Order, OrderItem, OrderStatus
 from .services import CheckoutError, create_order_from_cart
+
+REVIEWABLE_ORDER_STATUSES = {
+    OrderStatus.CONFIRMED,
+    OrderStatus.PREPARING,
+    OrderStatus.SHIPPED,
+    OrderStatus.IN_TRANSIT,
+    OrderStatus.DELIVERED,
+}
 
 
 @login_required
@@ -108,8 +119,40 @@ def my_orders(request):
 @login_required
 def order_detail(request, order_number):
     pedido = get_object_or_404(
-        Order.objects.prefetch_related('items').select_related('address', 'shipping_quote'),
+        Order.objects.prefetch_related('items__review').select_related('address', 'shipping_quote'),
         order_number=order_number,
         user=request.user,
     )
-    return render(request, 'orders/order_detail.html', {'pedido': pedido})
+    return render(request, 'orders/order_detail.html', {
+        'pedido': pedido,
+        'puede_resenar': pedido.order_status in REVIEWABLE_ORDER_STATUSES,
+    })
+
+
+@login_required
+def create_review(request, order_number, item_id):
+    pedido = get_object_or_404(Order, order_number=order_number, user=request.user)
+    item = get_object_or_404(
+        OrderItem.objects.select_related('variant__product'), id=item_id, order=pedido,
+    )
+    if pedido.order_status not in REVIEWABLE_ORDER_STATUSES or not item.variant_id:
+        messages.error(request, 'Solo puedes calificar productos de pedidos confirmados.')
+        return redirect('orders:order_detail', order_number=pedido.order_number)
+    if hasattr(item, 'review'):
+        messages.info(request, 'Ya calificaste este producto.')
+        return redirect('orders:order_detail', order_number=pedido.order_number)
+
+    if request.method != 'POST':
+        return redirect('orders:order_detail', order_number=pedido.order_number)
+
+    form = ProductReviewForm(request.POST)
+    if form.is_valid():
+        review = form.save(commit=False)
+        review.product = item.variant.product
+        review.order_item = item
+        review.user = request.user
+        review.save()
+        messages.success(request, 'Gracias por compartir tu opinión.')
+    else:
+        messages.error(request, 'Revisa la calificación e inténtalo de nuevo.')
+    return redirect('orders:order_detail', order_number=pedido.order_number)

@@ -3,8 +3,8 @@
 {% block title %}{% trans "Carrito" %}{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260922b">
-<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260925-cuantico2">
+<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260925-playfair">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260925-cart-layout-2">
 {% endblock %}
 
 {% block content %}
@@ -49,15 +49,24 @@
             </div>
 
             <form method="post" action="{% url 'carrito:update_cart' item.variant.id %}" class="cart-row__qty">
+              {% csrf_token %}
               <label class="sr-only" for="cantidad-{{ item.variant.id }}">{% trans "Cantidad" %}</label>
-              <input id="cantidad-{{ item.variant.id }}" type="number" name="cantidad" value="{{ item.cantidad }}" min="1">
-              <button type="submit">{% trans "Actualizar" %}</button>
+              <button type="button" class="cart-row__stepper" data-quantity-step="-1" aria-label="{% trans 'Disminuir cantidad' %}" title="{% trans 'Disminuir cantidad' %}">
+                <span class="material-icons-outlined" aria-hidden="true">remove</span>
+              </button>
+              <input id="cantidad-{{ item.variant.id }}" type="number" name="cantidad" value="{{ item.cantidad }}" min="1" inputmode="numeric" data-cart-quantity>
+              <button type="button" class="cart-row__stepper" data-quantity-step="1" aria-label="{% trans 'Aumentar cantidad' %}" title="{% trans 'Aumentar cantidad' %}">
+                <span class="material-icons-outlined" aria-hidden="true">add</span>
+              </button>
             </form>
 
             <div class="cart-row__subtotal">${{ item.subtotal|cop }} COP</div>
 
             <form method="post" action="{% url 'carrito:remove_from_cart' item.variant.id %}">
-              <button type="submit" class="cart-row__remove" aria-label="{% trans 'Eliminar del carrito' %}">&times;</button>
+              {% csrf_token %}
+              <button type="submit" class="cart-row__remove" aria-label="{% trans 'Eliminar del carrito' %}" title="{% trans 'Eliminar del carrito' %}">
+                <span class="material-icons-outlined" aria-hidden="true">delete</span>
+              </button>
             </form>
           </li>
           {% endfor %}
@@ -97,4 +106,8 @@
     </div>
   </section>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/cart_quantity.js' %}?v=20260925-2" defer></script>
 {% endblock %}

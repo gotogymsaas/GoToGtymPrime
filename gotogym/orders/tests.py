@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from inventory.models import Inventory
-from products.models import Brand, Product, ProductCategory, ProductVariant
+from products.models import Brand, Product, ProductCategory, ProductReview, ProductVariant
 from shipping.models import ShippingQuote
 from tienda.templatetags.tienda_filters import cop
 
@@ -32,6 +32,79 @@ DATOS_VALIDOS = {
     'address_complement': 'Apto 501',
     'notes': 'Dejar en porteria',
 }
+
+
+class ProductReviewFromOrderTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = get_user_model().objects.create_user(
+            email='reviewer@example.com', username='reviewer@example.com', password='secret123',
+        )
+        cls.other_user = get_user_model().objects.create_user(
+            email='other-reviewer@example.com', username='other-reviewer@example.com', password='secret123',
+        )
+        category = ProductCategory.objects.create(name='Categoria reseñas')
+        brand = Brand.objects.create(name='Marca reseñas')
+        cls.product = Product.objects.create(
+            name='Producto reseñado', category=category, brand=brand,
+            base_price=Decimal('100000.0000'), stock=0,
+        )
+        cls.variant = _crear_variante(cls.product, 'REV-001-S-NEG', 'S', 'negro', 5)
+
+    def setUp(self):
+        super().setUp()
+        self.client.force_login(self.user)
+        self.order = Order.objects.create(
+            user=self.user, order_number='GTG-202609-9001', email=self.user.email,
+            phone='3001234567', order_status=OrderStatus.DELIVERED,
+            payment_status=PaymentStatus.APPROVED,
+        )
+        self.item = OrderItem.objects.create(
+            order=self.order, variant=self.variant, product_name_snapshot=self.product.name,
+            sku_snapshot=self.variant.sku, size_snapshot='S', color_snapshot='negro',
+            unit_price_snapshot=Decimal('100000.00'), quantity=1, line_total=Decimal('100000.00'),
+        )
+
+    def test_el_comprador_puede_calificar_su_linea_entregada(self):
+        response = self.client.post(
+            reverse('orders:create_review', args=[self.order.order_number, self.item.id]),
+            {'rating': '5', 'comment': 'Excelente producto.'},
+        )
+        self.assertRedirects(response, reverse('orders:order_detail', args=[self.order.order_number]))
+        review = ProductReview.objects.get(order_item=self.item)
+        self.assertEqual(review.user, self.user)
+        self.assertEqual(review.product, self.product)
+        self.assertEqual(review.rating, 5)
+
+    def test_no_puede_calificar_dos_veces_la_misma_linea(self):
+        ProductReview.objects.create(
+            product=self.product, order_item=self.item, user=self.user, rating=4,
+        )
+        response = self.client.post(
+            reverse('orders:create_review', args=[self.order.order_number, self.item.id]),
+            {'rating': '5'},
+        )
+        self.assertRedirects(response, reverse('orders:order_detail', args=[self.order.order_number]))
+        self.assertEqual(ProductReview.objects.filter(order_item=self.item).count(), 1)
+
+    def test_usuario_ajeno_no_puede_usar_la_linea(self):
+        self.client.force_login(self.other_user)
+        response = self.client.post(
+            reverse('orders:create_review', args=[self.order.order_number, self.item.id]),
+            {'rating': '5'},
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(ProductReview.objects.exists())
+
+    def test_pedido_confirmado_permite_calificar(self):
+        self.order.order_status = OrderStatus.CONFIRMED
+        self.order.save(update_fields=['order_status'])
+        response = self.client.post(
+            reverse('orders:create_review', args=[self.order.order_number, self.item.id]),
+            {'rating': '5'},
+        )
+        self.assertRedirects(response, reverse('orders:order_detail', args=[self.order.order_number]))
+        self.assertTrue(ProductReview.objects.filter(order_item=self.item).exists())
 
 
 def _crear_variante(producto, sku, size, color, stock):

@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
@@ -95,3 +97,27 @@ class ProductMedia(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.image.name}"
+
+
+class ProductReview(models.Model):
+    """Opinion verificada de un comprador sobre un producto adquirido."""
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    order_item = models.OneToOneField(
+        'orders.OrderItem', on_delete=models.CASCADE, related_name='review',
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='product_reviews',
+    )
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+    )
+    comment = models.TextField(blank=True, max_length=1000)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at', '-id']
+
+    def __str__(self):
+        return f'{self.product.name} - {self.rating}/5'

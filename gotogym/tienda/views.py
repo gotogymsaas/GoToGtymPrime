@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Prefetch
+from django.db.models import Avg, Count, Prefetch
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from products.models import Product, ProductCategory, ProductMedia, ProductVariant
@@ -121,6 +121,8 @@ def producto_detail(request, pk):
     precios = [v['price'] for v in variantes] or [producto.base_price]
 
     colores = _unique_preserving_order([v['color'] for v in variantes])
+    reviews = list(producto.reviews.select_related('user').order_by('-created_at'))
+    review_summary = producto.reviews.aggregate(average=Avg('rating'), count=Count('id'))
 
     related_products = (
         _catalog_queryset()
@@ -158,6 +160,9 @@ def producto_detail(request, pk):
         'low_stock_threshold': LOW_STOCK_THRESHOLD,
         'size_guide_rows': size_guide_rows(_unique_preserving_order([v['size'] for v in variantes])),
         'features': product_features(producto),
+        'reviews': reviews,
+        'review_average': review_summary['average'],
+        'review_count': review_summary['count'],
     }
     return render(request, 'tienda/producto_detail.html', context)
 

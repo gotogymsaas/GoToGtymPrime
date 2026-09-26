@@ -36,7 +36,7 @@
 .store-hero__media img { width: 100%; height: 100%; object-fit: cover; object-position: 70% 36%; filter: saturate(.72) contrast(1.06); }
 .store-hero__content { position: relative; z-index: 2; padding-block: 100px; }
 .store-hero h1 { max-width: 780px; margin: 0 0 28px; color: var(--home-white); font-size: clamp(3.45rem, 7.2vw, 7rem); font-weight: 500; letter-spacing: -.068em; line-height: .85; text-wrap: balance; }
-.store-hero h1 em, .store-closing h2 em { color: var(--home-gold); font-family: Georgia, serif; font-weight: 400; }
+.store-hero h1 em, .store-closing h2 em { color: var(--home-gold); font-family: "Playfair Display", Georgia, serif; font-weight: 700; font-style: italic; }
 .store-hero__lead { max-width: 590px; margin-bottom: 34px; color: rgba(248,249,250,.76); font-size: clamp(1rem, 1.5vw, 1.18rem); line-height: 1.65; }
 .store-actions { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
 .store-proof { display: flex; gap: 26px; margin: 44px 0 0; padding: 0; color: rgba(248,249,250,.58); font-size: .72rem; letter-spacing: .04em; list-style: none; }

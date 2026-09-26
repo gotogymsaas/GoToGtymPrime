@@ -43,13 +43,22 @@
   --font-display: "TT Norms GoToGym", "Outfit", system-ui, sans-serif;
   --font-body: "TT Norms GoToGym", "Outfit", system-ui, sans-serif;
 
-  --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-base: 16px;
-  --font-size-lg: 20px;
-  --font-size-xl: 28px;
-  --font-size-2xl: 40px;
-  --font-size-3xl: 56px;
+  /* Escala en base 1.25 (major third), un tamaño por rol semantico en vez
+   * de por t-shirt size -- ver AUDITORIA_TIPOGRAFIA_UI.md seccion C. Nace
+   * ya con clamp() porque el proyecto es fluid-first (heroes, h1, h2 de
+   * store_home.css y editorial_pages.css ya usan clamp() suelto); un valor
+   * fijo aqui solo se volvería a duplicar sin esta escala como referencia.
+   * (Nombrada --font-size-* y no --text-* para no compartir prefijo con
+   * --text-primary/--text-muted de la linea 72-73, que son colores.)
+   */
+  --font-size-display: clamp(2.5rem, 5vw + 1rem, 6rem);
+  --font-size-h1: clamp(2rem, 3vw + 1.2rem, 3.5rem);
+  --font-size-h2: clamp(1.625rem, 2vw + 1.1rem, 2.5rem);
+  --font-size-h3: clamp(1.25rem, .8vw + 1rem, 1.625rem);
+  --font-size-lead: clamp(1rem, .3vw + .9rem, 1.1875rem);
+  --font-size-body: clamp(.9375rem, .1vw + .9rem, 1rem);
+  --font-size-small: clamp(.8125rem, .05vw + .8rem, .875rem);
+  --font-size-label: 11px;
 
   --space-1: 4px;
   --space-2: 8px;

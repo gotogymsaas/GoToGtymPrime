@@ -86,6 +86,17 @@ class CartMutationsRequirePostTests(CarritoAutenticadoMixin, TestCase):
         self.client.post(reverse('carrito:update_cart', args=[self.variant.pk]), {'cantidad': 0})
         self.assertEqual(self.client.session['cart'], {})
 
+    def test_update_por_ajax_conserva_la_cantidad_elegida(self):
+        self._poner_en_carrito({str(self.variant.pk): 1})
+        response = self.client.post(
+            reverse('carrito:update_cart', args=[self.variant.pk]),
+            {'cantidad': 2},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'success': True, 'cart_count': 2})
+        self.assertEqual(self.client.session['cart'], {str(self.variant.pk): 2})
+
 
 class DisponibilidadDelCarritoTests(CarritoAutenticadoMixin, TestCase):
     @classmethod

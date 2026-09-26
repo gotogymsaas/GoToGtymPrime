@@ -68,9 +68,11 @@ class FichaDeProductoTests(TiendaAutenticadaMixin, TestCase):
         self.assertIsNotNone(response.context['single_variant'])
         self.assertContains(response, f'value="{self.v_unica.id}"')
 
-    def test_producto_de_variante_unica_no_pinta_selectores(self):
+    def test_producto_de_variante_unica_muestra_talla_unica_marcada(self):
         response = self.client.get(self._url(self.unico))
-        self.assertNotContains(response, 'class="pdp-size')
+        self.assertContains(response, 'data-size="UNICA"')
+        self.assertContains(response, 'pdp-size--single')
+        self.assertContains(response, 'aria-pressed="true"')
         self.assertNotContains(response, 'class="pdp-color')
 
     def test_producto_agotado_deshabilita_el_boton(self):
@@ -156,16 +158,10 @@ class SuperposicionYColapsoTests(TiendaAutenticadaMixin, TestCase):
         self.assertTrue(response.context['has_price_range'])
         self.assertContains(response, 'data-has-range="true"')
 
-    def test_la_variante_unica_no_lleva_grupos_que_superponer(self):
-        # Sin eleccion no hay nada que colapsar: un producto de variante
-        # unica no debe traer el fieldset de superposicion en absoluto.
-        # No se puede usar assertNotContains con 'pdp-variant-group' a
-        # secas: el JS de la pagina SIEMPRE incluye ese nombre de clase en
-        # su propio codigo fuente (document.querySelectorAll(...)), asi
-        # que la cadena aparece aunque no exista el elemento; se busca el
-        # patron exacto del atributo class del fieldset.
+    def test_la_variante_unica_muestra_su_talla_resuelta(self):
         response = self.client.get(self._url(self.unico))
-        self.assertNotContains(response, 'class="mb-4 pdp-variant-group"')
+        self.assertContains(response, 'class="mb-4 pdp-variant-group"')
+        self.assertContains(response, 'data-size="UNICA"')
 
 
 class EspecificacionesDeLaFichaTests(TiendaAutenticadaMixin, TestCase):

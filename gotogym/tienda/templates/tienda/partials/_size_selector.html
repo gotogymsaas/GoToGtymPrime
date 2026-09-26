@@ -9,13 +9,14 @@ lo usa para saber que grupos siguen "sin decidir" (superposicion) y
 cuales ya se resolvieron (colapso) cuando se elige talla y color. Ver la
 seccion correspondiente en commerce_editorial.css.
 {% endcomment %}
-{% if sizes|length > 1 %}
+{% if sizes %}
 <fieldset class="mb-4 pdp-variant-group">
   <legend class="block text-xs font-bold uppercase tracking-[.1em] text-[rgba(248,249,250,.5)] mb-3">{% trans "Talla" %}</legend>
   <div class="flex flex-wrap gap-2" role="group">
     {% for size in sizes %}
     <button type="button" data-size="{{ size }}"
-            class="pdp-size min-w-[3rem] px-4 py-2 border border-[var(--color-border)] font-semibold text-sm text-[var(--color-text-primary)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+            class="pdp-size{% if size == 'UNICA' %} pdp-size--single{% endif %} inline-flex h-12 w-12 items-center justify-center border border-[var(--color-border)] p-0 font-semibold text-sm text-[var(--color-text-primary)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]{% if size == selected_size %} border-[var(--color-zafiro)] bg-[var(--color-zafiro)] text-white{% endif %}"
+            aria-pressed="{% if size == selected_size %}true{% else %}false{% endif %}">
       {{ size }}
     </button>
     {% endfor %}

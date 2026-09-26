@@ -14,7 +14,7 @@
 .editorial-shell { width: min(100% - 40px, 1180px); margin-inline: auto; }
 .editorial-kicker { margin: 0 0 18px; color: var(--ed-turquoise); font-size: .72rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
 .editorial-title { max-width: 920px; margin: 0; font-size: clamp(3rem, 7vw, 7rem); font-weight: 500; letter-spacing: -.065em; line-height: .9; }
-.editorial-title em { color: var(--ed-gold); font-family: Georgia, serif; font-weight: 400; }
+.editorial-title em { color: var(--ed-gold); font-family: "Playfair Display", Georgia, serif; font-weight: 700; font-style: italic; }
 .editorial-lead { max-width: 650px; color: var(--ed-muted); font-size: clamp(1rem, 1.6vw, 1.25rem); line-height: 1.7; }
 .editorial-hero { padding: clamp(80px, 10vw, 150px) 0 clamp(64px, 8vw, 110px); background: var(--ed-ink); color: var(--ed-paper); }
 .editorial-hero .editorial-lead { margin: var(--space-6) 0 0; color: rgba(248,249,250,.65); }

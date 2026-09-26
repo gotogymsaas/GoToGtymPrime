@@ -14,7 +14,7 @@ ancho de pantalla, incluido el movil.
 {% if preload_movil %}<link rel="preload" as="image" type="image/avif" media="(max-width: 720px)" href="{{ preload_movil }}" fetchpriority="high">{% endif %}
 {% if preload_escritorio %}<link rel="preload" as="image" type="image/avif" media="(min-width: 721px)" href="{{ preload_escritorio }}" fetchpriority="high">{% endif %}
 <link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260923-fringe-fix">
-<link rel="stylesheet" href="{% static 'css/store_home.css' %}?v=20260923-decoherencia">
+<link rel="stylesheet" href="{% static 'css/store_home.css' %}?v=20260925-playfair">
 {% endblock %}
 
 {% block content %}

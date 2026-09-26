@@ -227,7 +227,13 @@
 .shop-pdp__size-guide tbody th { color: var(--shop-paper); font-weight: 700; }
 .shop-pdp__size-guide td { color: rgba(248,249,250,.75); }
 
-.shop-pdp__form { padding-top: 26px; border-top: 1px solid rgba(248,249,250,.16); }
+.shop-pdp__form { padding-top: 26px; padding-bottom: 28px; border-top: 1px solid rgba(248,249,250,.16); }
+.shop-pdp__reviews { margin-top: 42px; padding-top: 26px; border-top: 1px solid rgba(248,249,250,.16); }
+.shop-pdp__reviews h2 { margin: 0 0 20px; color: var(--shop-paper); font-size: 1.3rem; }
+.shop-pdp__review { padding: 16px 0; border-bottom: 1px solid rgba(248,249,250,.12); }
+.shop-pdp__review-heading { display: flex; align-items: center; gap: 12px; color: var(--shop-gold); }
+.shop-pdp__review-heading span { color: var(--shop-turquoise); font-size: .75rem; font-weight: 700; }
+.shop-pdp__review p { margin: 8px 0 0; color: rgba(248,249,250,.75); line-height: 1.5; }
 
 /* --- La seleccion de variante como colapso -----------------------------
  *
@@ -269,25 +275,8 @@
   100% { opacity: 1;   transform: scale(1); }
 }
 
-/* --- Salto de talla cuantizado ------------------------------------------
- *
- * Un nivel de energia no es "un poco mas" que el anterior: es un escalon
- * distinto, sin estados intermedios. El padding vertical de cada boton de
- * talla sube un quantum de espaciado (--space-2, un paso completo de la
- * escala) por talla, en el orden en que SIZE_ORDER las entrega: la fila se
- * lee como una escalera de niveles discretos en vez de botones idénticos
- * con una etiqueta distinta. El primer intento usaba --space-1 (4px) por
- * escalon y era demasiado sutil para notarse a simple vista; con
- * --space-2 (8px) el boton de la ultima talla casi quintuplica la altura
- * del primero. Tope en la sexta talla porque XS..XXL son seis niveles
- * reales (ver SIZE_ORDER en catalog.py); UNICA nunca llega aqui sola, y si
- * aparece junto a otras no necesita un septimo escalon. */
-.pdp-size:nth-child(1) { padding-block: var(--space-2); }
-.pdp-size:nth-child(2) { padding-block: calc(var(--space-2) * 2); }
-.pdp-size:nth-child(3) { padding-block: calc(var(--space-2) * 3); }
-.pdp-size:nth-child(4) { padding-block: calc(var(--space-2) * 4); }
-.pdp-size:nth-child(5) { padding-block: calc(var(--space-2) * 5); }
-.pdp-size:nth-child(n+6) { padding-block: calc(var(--space-2) * 5); }
+.pdp-size { box-sizing: border-box; width: 48px; height: 48px; min-width: 48px; min-height: 48px; padding: 0; }
+.pdp-size--single { width: 90px; height: 50px; min-width: 90px; min-height: 50px; }
 
 .shop-related { padding: clamp(56px, 7vw, 96px) 0; background: var(--shop-paper); color: var(--shop-ink); }
 .shop-related__heading { display: flex; align-items: end; justify-content: space-between; gap: var(--space-5); margin-bottom: clamp(32px, 5vw, 52px); }
@@ -361,7 +350,7 @@
 .checkout-summary__items .checkout-item-price { grid-column: 2; font-weight: 700; font-size: .88rem; color: var(--ed-ink, #101012); white-space: nowrap; }
 
 .cart-list { display: grid; gap: 0; background: var(--ed-paper, #f8f9fa); }
-.cart-row { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; padding: 22px 0; border-bottom: 1px solid #dededb; }
+.cart-row { display: grid; grid-template-columns: 84px minmax(160px, 1fr) auto 120px 32px; align-items: center; gap: 18px; padding: 22px 0; border-bottom: 1px solid #dededb; }
 .cart-row img { width: 84px; height: 84px; object-fit: cover; background: #ececeb; flex-shrink: 0; }
 .cart-row__info { flex: 1; min-width: 200px; }
 .cart-row__info a { color: var(--ed-ink, #101012); font-weight: 600; text-decoration: none; }
@@ -370,13 +359,27 @@
 .cart-row__meta dt { display: inline; font-weight: 600; }
 .cart-row__meta dd { display: inline; margin: 0; }
 .cart-row__price-each { margin: 6px 0 0; color: #9a9a9e; font-size: .78rem; }
-.cart-row__qty { display: flex; align-items: center; gap: 10px; }
-.cart-row__qty input { width: 60px; min-height: 42px; border: 1px solid #c8c8c5; border-radius: 0; text-align: center; color: var(--ed-ink, #101012); }
-.cart-row__qty button { min-height: 42px; padding: 0 var(--space-4); border: 1px solid var(--ed-ink, #101012); background: transparent; color: var(--ed-ink, #101012); font-size: .74rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
-.cart-row__qty button:hover { background: var(--ed-ink, #101012); color: var(--ed-paper, #f8f9fa); }
+.cart-row__qty { display: inline-flex; align-items: center; gap: 0; }
+.cart-row__qty input { box-sizing: border-box; width: 52px; min-height: 42px; padding: 0; border: 1px solid #c8c8c5; border-radius: 0; text-align: center; color: var(--ed-ink, #101012); }
+.cart-row__stepper { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 42px; padding: 0; border: 1px solid #c8c8c5; background: transparent; color: var(--ed-ink, #101012); cursor: pointer; }
+.cart-row__stepper:first-of-type { border-right: 0; }
+.cart-row__stepper:last-of-type { border-left: 0; }
+.cart-row__stepper:hover { background: var(--ed-ink, #101012); color: var(--ed-paper, #f8f9fa); }
+.cart-row__stepper .material-icons-outlined { font-size: 18px; }
 .cart-row__subtotal { width: 120px; text-align: right; font-weight: 700; color: var(--ed-ink, #101012); }
-.cart-row__remove { border: 0; background: transparent; color: #9a9a9e; font-size: 1.4rem; line-height: 1; cursor: pointer; }
+.cart-row > form:last-child { display: flex; justify-content: center; }
+.cart-row__remove { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 42px; border: 0; background: transparent; color: #9a9a9e; cursor: pointer; }
+.cart-row__remove .material-icons-outlined { font-size: 21px; line-height: 1; }
 .cart-row__remove:hover { color: #b91c1c; }
+
+@media (max-width: 720px) {
+  .cart-row { grid-template-columns: 84px minmax(0, 1fr) 32px; gap: 14px; }
+  .cart-row__info { min-width: 0; }
+  .cart-row__qty { grid-column: 2 / -1; }
+  .cart-row__qty input { width: 48px; }
+  .cart-row__subtotal { grid-column: 2; width: auto; text-align: left; }
+  .cart-row > form:last-child { grid-column: 3; grid-row: 3; }
+}
 
 /* --- Tunelamiento: transicion visual del carrito al checkout ------------
  *

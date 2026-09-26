@@ -8,6 +8,11 @@
     .no-print { display: none !important; }
     body { background: white; }
   }
+  .review-rating { display: inline-flex; gap: 2px; }
+  .review-star { position: relative; cursor: pointer; color: #c7c7c7; font-size: 1.8rem; line-height: 1; }
+  .review-star input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .review-star.is-filled, .review-star:hover, .review-star:has(~ .review-star:hover) { color: #f2b01e; }
+  .review-star:focus-within { outline: 2px solid #f2b01e; outline-offset: 3px; }
 </style>
 {% endblock %}
 
@@ -64,6 +69,35 @@
             <p class="font-semibold text-[var(--color-ink)]">{{ item.product_name_snapshot }}</p>
             <p class="text-gray-600">{{ item.size_snapshot }} / {{ item.color_snapshot }} &middot; x{{ item.quantity }}</p>
             <p class="text-xs text-gray-500 font-mono">{{ item.sku_snapshot }}</p>
+            {% if puede_resenar and item.variant_id %}
+              {% if item.review %}
+              <p class="mt-2 text-sm text-amber-700 font-semibold" aria-label="{% trans 'Producto calificado' %}">
+                {% for star in "12345" %}{% if forloop.counter <= item.review.rating %}★{% else %}☆{% endif %}{% endfor %}
+                <span class="text-xs text-green-700">{% trans "Compra verificada" %}</span>
+              </p>
+              {% else %}
+              <details class="mt-3 no-print">
+                <summary class="cursor-pointer text-[var(--color-zafiro)] font-semibold">{% trans "Calificar producto" %}</summary>
+                <form method="post" action="{% url 'orders:create_review' pedido.order_number item.id %}" class="mt-3 space-y-3">
+                  {% csrf_token %}
+                  <fieldset>
+                    <legend class="text-xs font-semibold text-gray-600 mb-1">{% trans "Calificación" %}</legend>
+                    <div class="review-rating" data-review-rating role="radiogroup" aria-label="{% trans 'Selecciona una calificación de 1 a 5 estrellas' %}">
+                      {% for rating in "12345" %}
+                      <label class="review-star" data-rating="{{ forloop.counter }}" title="{{ forloop.counter }} {% trans 'de 5 estrellas' %}">
+                        <input type="radio" name="rating" value="{{ forloop.counter }}" required aria-label="{{ forloop.counter }} {% trans 'de 5 estrellas' %}">
+                        <span aria-hidden="true">★</span>
+                      </label>
+                      {% endfor %}
+                    </div>
+                  </fieldset>
+                  <label class="block text-xs font-semibold text-gray-600" for="review-{{ item.id }}">{% trans "Comentario (opcional)" %}</label>
+                  <textarea id="review-{{ item.id }}" name="comment" rows="3" maxlength="1000" class="w-full border border-gray-300 p-2 text-sm"></textarea>
+                  <button type="submit" class="px-3 py-2 bg-[var(--color-zafiro)] text-white text-sm font-semibold">{% trans "Publicar reseña" %}</button>
+                </form>
+              </details>
+              {% endif %}
+            {% endif %}
           </div>
           <span class="font-semibold whitespace-nowrap text-[var(--color-ink)]">${{ item.line_total|cop }} COP</span>
         </li>
@@ -112,4 +146,27 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('[data-review-rating]').forEach(function (ratingGroup) {
+    var stars = Array.prototype.slice.call(ratingGroup.querySelectorAll('.review-star'));
+
+    function paint(selectedRating) {
+      stars.forEach(function (star, index) {
+        star.classList.toggle('is-filled', index < selectedRating);
+      });
+    }
+
+    stars.forEach(function (star) {
+      var input = star.querySelector('input');
+      input.addEventListener('change', function () {
+        paint(Number(input.value));
+      });
+    });
+  });
+});
+</script>
 {% endblock %}
