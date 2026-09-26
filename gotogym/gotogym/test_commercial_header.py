@@ -10,7 +10,6 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-
 from inventory.models import Inventory
 from products.models import Brand, Product, ProductCategory, ProductVariant
 
@@ -67,7 +66,8 @@ class CommercialHeaderTests(TestCase):
         html = self._html(reverse('logged_home'))
 
         self.assertIn('class="gtg-nav-search"', html)
-        self.assertIn('action="%s"' % reverse('tienda:producto_list'), html)
+        url_tienda = reverse('tienda:producto_list')
+        self.assertIn(f'action="{url_tienda}"', html)
         self.assertIn('name="filtro"', html)
 
     def test_el_buscador_de_la_barra_filtra_de_verdad(self):

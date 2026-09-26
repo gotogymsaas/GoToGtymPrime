@@ -1,5 +1,6 @@
 import os
 
+
 class HubSpotClient:
     """Simple client for creating contacts in HubSpot."""
 

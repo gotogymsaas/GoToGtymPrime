@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
-from django.utils import timezone
+
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -9,7 +9,14 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('El email es obligatorio')
         email = self.normalize_email(email)
-        user = self.model(email=email, username=username, first_name=first_name, last_name=last_name, age=age, **extra_fields)
+        # first_name/last_name no aceptan NULL en la base (ver DJ001): un
+        # caller que no los pase, o los pase explicitamente en None, debe
+        # terminar guardando '' y no None.
+        user = self.model(
+            email=email, username=username,
+            first_name=first_name or '', last_name=last_name or '',
+            age=age, **extra_fields,
+        )
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -26,8 +33,8 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=150, blank=True, null=True)
-    last_name = models.CharField(max_length=150, blank=True, null=True)
+    first_name = models.CharField(max_length=150, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
     age = models.PositiveIntegerField(null=True, blank=True)
     accepted_terms = models.BooleanField(default=False)
     terms_accepted_at = models.DateTimeField(null=True, blank=True)
@@ -38,7 +45,14 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
-    objects = UserManager()
+    # django-stubs tipa AbstractUser.objects como
+    # django.contrib.auth.models.UserManager[User] especificamente; este
+    # UserManager hereda de BaseUserManager (no de esa clase concreta)
+    # porque implementa create_user/create_superuser propios basados en
+    # email, no en username. El mismatch es solo de tipos -- cambiar la
+    # herencia para complacer a mypy tocaria una clase de autenticacion
+    # por un aviso sin impacto en runtime, así que se ignora puntual.
+    objects = UserManager()  # type: ignore[assignment,misc]
 
     def __str__(self):
         return self.email

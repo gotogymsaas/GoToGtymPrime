@@ -1,24 +1,30 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import logout, authenticate, login, get_user_model, update_session_auth_hash
-from django.contrib.auth.hashers import check_password
+import hashlib
+from pathlib import Path
+
 from django.contrib import messages
+from django.contrib.auth import (
+    get_user_model,
+    login,
+    logout,
+    update_session_auth_hash,
+)
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import check_password
+from django.db.models import Q
 from django.http import JsonResponse
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect
-from django.http import HttpResponseRedirect
-from django.utils.http import url_has_allowed_host_and_scheme
-from django.utils import timezone
-from django.urls import reverse
-from django.db.models import Q
-from pathlib import Path
-import hashlib
-from .models import User
-import os
-from django.contrib.auth.decorators import login_required
 
 TERMS_PATH = Path(__file__).resolve().parent / 'templates' / 'accounts' / 'terms_and_conditions.html'
 
+# get_user_model(), no un import directo de .models: es lo que respeta
+# AUTH_USER_MODEL si algun dia cambia, y antes habia ambas cosas (un import
+# de .models.User que get_user_model() pisaba dos lineas mas abajo sin que
+# nada lo usara).
 User = get_user_model()
 
 def logout_view(request):
@@ -45,7 +51,12 @@ def register_view(request):
             messages.error(request, 'El correo ya está registrado.')
         else:
             terms_text = TERMS_PATH.read_text(encoding='utf-8')
-            user = User.objects.create_user(
+            # `login` ya esta importado arriba pero nunca se llama con este
+            # usuario: hoy quien se registra queda sin sesion y tiene que
+            # loguearse aparte en la pantalla siguiente. Puede ser
+            # deliberado o un paso que falto -- no se decide aqui, se deja
+            # visible en vez de silenciar el aviso.
+            user = User.objects.create_user(  # noqa: F841
                 email=email,
                 username=username,
                 first_name=first_name,

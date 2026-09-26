@@ -1,37 +1,15 @@
 from .settings import *
 
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'corsheaders',
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'accounts',
-    'blog',
-    'products',
-    'inventory',
-    'orders',
-    'payments',
-    'shipping',
-    'contabilidad',
-    'influencer',
-    'tienda',
-    'carrito',
-    'administracion',
-    'analitica',
-]
-
-ROOT_URLCONF = 'gotogym.urls'
-WSGI_APPLICATION = 'gotogym.wsgi.application'
+# INSTALLED_APPS, ROOT_URLCONF y WSGI_APPLICATION no se redeclaran: ya
+# llegan heredados del `import *` de arriba, idénticos a settings.py. Antes
+# esta lista volvía a escribirse entera aquí, así que cada app nueva había
+# que agregarla dos veces -- exactamente lo que paso con 'analitica', que
+# quedó sin registrar en esta lista hasta que un test lo hizo evidente.
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': str(BASE_DIR / 'db.sqlite3'),
     }
 }
 
@@ -39,8 +17,13 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (),
-    'DEFAULT_PERMISSION_CLASSES': (),
+    # Tupla vacia a proposito (sin auth/permission requeridos en tests);
+    # mypy infiere el literal `()` como tuple[()] y no como tuple[str, ...],
+    # que es lo que espera el stub de DRF para este valor -- no hay nada
+    # que corregir en el tipo, es una limitacion de inferencia con tuplas
+    # vacias.
+    'DEFAULT_AUTHENTICATION_CLASSES': (),  # type: ignore[dict-item]
+    'DEFAULT_PERMISSION_CLASSES': (),  # type: ignore[dict-item]
 }
 
 PASSWORD_HASHERS = [

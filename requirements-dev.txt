@@ -1,0 +1,8 @@
+# Herramientas de calidad para desarrollo local y CI. No se instalan en la
+# imagen de despliegue -- esa sigue usando solo requirements.txt.
+-r requirements.txt
+
+ruff==0.16.9
+django-stubs==5.2.9
+mypy==2.3.1
+coverage==7.16.1

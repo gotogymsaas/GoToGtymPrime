@@ -7,7 +7,6 @@ from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-
 from gotogym.ratelimit import rate_limit
 from orders.models import Order
 from orders.services import confirm_payment

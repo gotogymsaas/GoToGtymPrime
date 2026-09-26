@@ -6,10 +6,9 @@ un precio que venga de la sesion o del formulario.
 """
 from decimal import Decimal
 
+from carrito.services import build_cart_context
 from django.db import IntegrityError, transaction
 from django.utils import timezone
-
-from carrito.services import build_cart_context
 from inventory.services import InsufficientStockError, decrement_stock, get_available_quantity
 from shipping.models import ShippingQuote
 from shipping.services import get_mock_quote

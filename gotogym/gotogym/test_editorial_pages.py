@@ -1,11 +1,10 @@
 """Contrato editorial compartido para Journal, marca, cuenta y pedidos."""
 from decimal import Decimal
 
+from blog.models import Category, Post
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-
-from blog.models import Category, Post
 from inventory.models import Inventory
 from products.models import Brand, Product, ProductCategory, ProductVariant
 

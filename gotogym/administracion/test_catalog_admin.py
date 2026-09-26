@@ -9,11 +9,10 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
-from PIL import Image
-
 from inventory.models import Inventory
 from orders.models import Order
 from orders.services import create_order_from_cart
+from PIL import Image
 from products.models import Brand, Product, ProductCategory, ProductMedia, ProductVariant
 
 DATOS_PEDIDO = {

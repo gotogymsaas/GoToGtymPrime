@@ -1,6 +1,5 @@
 from django import forms
 from django.forms import BaseInlineFormSet, inlineformset_factory
-
 from inventory.models import Inventory
 from products.models import Brand, Product, ProductCategory, ProductMedia, ProductVariant
 

@@ -1,15 +1,18 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import get_user_model
-from django.views.decorators.cache import never_cache
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
-
 from influencer.models import InfluencerProfile
 from orders.models import Order, OrderStatus
-from orders.services import InvalidOrderTransitionError, apply_order_status_transition, valid_next_statuses
+from orders.services import (
+    InvalidOrderTransitionError,
+    apply_order_status_transition,
+    valid_next_statuses,
+)
 from payments.models import PaymentTransaction
 from products.models import Brand, Product, ProductCategory, ProductMedia, ProductVariant
 

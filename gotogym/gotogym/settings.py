@@ -1,27 +1,19 @@
 import os
-import sys
 import urllib.parse
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
 
 
 def _split_csv(value: str) -> list[str]:
     return [item.strip() for item in value.split(',') if item.strip()]
 
 
-def _as_bool(value: str, default: bool = False) -> bool:
+def _as_bool(value: str | None, default: bool = False) -> bool:
     if value is None:
         return default
     return value.lower() in ('1', 'true', 'yes', 'on')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-PROJECT_ROOT = BASE_DIR.parent
-
-# `integrations/` (cliente de Mercado Pago, Alegra, HubSpot) vive en la raiz
-# del repositorio, fuera de este proyecto. Sin esto, `import integrations...`
-# falla con ModuleNotFoundError.
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me')
 DEBUG = _as_bool(os.environ.get('DEBUG'), False)
@@ -134,15 +126,16 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': str(BASE_DIR / 'db.sqlite3'),
         }
     }
 
 
-AUTH_PASSWORD_VALIDATORS = []
+AUTH_PASSWORD_VALIDATORS: list[dict] = []
 
-# Internacionalización
-from django.utils.translation import gettext_lazy as _
+# Internacionalización. Import a mitad de archivo, a proposito: vive justo
+# junto a lo unico que lo usa (LANGUAGES, dos lineas abajo).
+from django.utils.translation import gettext_lazy as _  # noqa: E402
 
 LANGUAGES = [
     ('es', _('Español')),

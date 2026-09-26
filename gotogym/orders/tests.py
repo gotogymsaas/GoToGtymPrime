@@ -1,14 +1,12 @@
 """Checkout: validacion, creacion del pedido y congelado de los datos vendidos."""
 from decimal import Decimal
 
+from carrito.services import CART_VERSION
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-
-from carrito.services import CART_VERSION
 from inventory.models import Inventory
 from products.models import Brand, Product, ProductCategory, ProductVariant
-
 from shipping.models import ShippingQuote
 from tienda.templatetags.tienda_filters import cop
 

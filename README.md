@@ -1,8 +1,9 @@
 # GoToGtymPrime
 GoToGym Prime es el servicio al Cliente de la Marca GoToGym Sportwear as a Service.
 
-Este repositorio contiene un proyecto Django clásico (`gotogym`) y un nuevo
-esqueleto modular en `go-to-gym-platform` con frontend Next.js y microservicios.
+Este repositorio contiene un monolito Django (`gotogym/`), con un modulo
+`gotogym/integrations/` para los proveedores externos (Mercado Pago,
+Alegra, HubSpot).
 
 ## 🚀 Inicio Rápido
 
@@ -19,13 +20,15 @@ Accede a:
 - 🌐 Frontend: http://localhost:8000/
 - 🔐 Admin: http://localhost:8000/admin/
 
-### Producción (MySQL Azure)
+### Producción (PostgreSQL, Azure App Service)
 
-```bash
-cd gotogym
-python manage.py migrate
-python manage.py runserver 0.0.0.0:8000
-```
+Producción no se levanta a mano con `runserver`: corre en Azure App Service,
+detrás de gunicorn, desplegado por el workflow de GitHub Actions
+(`.github/workflows/main_gotogymweb.yml`). La base de datos es PostgreSQL,
+resuelta desde la variable de entorno `DATABASE_URL` (ver `gotogym/gotogym/settings.py`).
+El comando de arranque real vive en la configuración del App Service
+(Azure Portal); `environments/azure/startup.sh` documenta la version de
+referencia versionada en el repo.
 
 **📖 Guía completa:** Ver [docs/DESPLIEGUE_LOCAL.md](docs/DESPLIEGUE_LOCAL.md)
 
@@ -35,9 +38,6 @@ python manage.py runserver 0.0.0.0:8000
 
 - **[docs/DESPLIEGUE_LOCAL.md](docs/DESPLIEGUE_LOCAL.md)** - Instrucciones detalladas de instalación local
 - **[docs/GUIA_ACCESO.md](docs/GUIA_ACCESO.md)** - Guía de acceso y bases de datos
-- **[docs/ANALISIS_ESTRUCTURA.md](docs/ANALISIS_ESTRUCTURA.md)** - Análisis completo del proyecto
-- **[docs/CORRECCIONES.md](docs/CORRECCIONES.md)** - Historial de cambios y correcciones
-- **[docs/ecomerce/PROPUESTA_HOME_STORE_QUANTUM.md](docs/ecomerce/PROPUESTA_HOME_STORE_QUANTUM.md)** - Propuesta UX/editorial, arquitectura y plan de implementación del Home Store
 
 ---
 
@@ -48,46 +48,23 @@ python manage.py runserver 0.0.0.0:8000
 **Apps implementadas:**
 - `accounts` - Gestión de usuarios y autenticación
 - `products` - Catálogo de productos
+- `inventory` - Inventario y stock
 - `carrito` - Carrito de compras
-- `tienda` - Tienda online
+- `tienda` - Tienda online (catálogo, PDP)
+- `orders` - Checkout y pedidos
+- `payments` - Pagos
+- `shipping` - Cotización de envío
 - `blog` - Sistema de blog
-- `configuracion_marca` - Personalización de marca
 - `contabilidad` - Integración con Alegra
-- `influencer` - Gestión de influencers
-- `crm` - Integración con HubSpot
-- `metricas` - Dashboard de métricas
+- `influencer` - Gestión de influencers y referidos
+- `administracion` - Panel administrativo interno
+- `analitica` - Analítica de producto sin PII
 
-### Integraciones: `integrations/`
+### Integraciones: `gotogym/integrations/`
 
 - **Alegra** - API de contabilidad
 - **MercadoPago** - Procesamiento de pagos
 - **HubSpot** - CRM y gestión de contactos
-
-### Proyecto Futuro: `go-to-gym-platform/` (Microservicios)
-
-- `wellness_monitor` - Microservicio de monitoreo de salud
-- `core_api` - APIs modulares
-- `frontend/webapp` - PWA con Next.js
-
----
-
-## ⚙️ Configuración
-
-### Microservicio Wellness Monitor (Opcional)
-
-```bash
-cd go-to-gym-platform/backend/services/wellness_monitor
-python manage.py migrate
-python manage.py runserver 0.0.0.0:8001
-```
-
-### Frontend Next.js PWA (Opcional)
-
-```bash
-cd go-to-gym-platform/frontend/webapp
-npm install
-npm run dev
-```
 
 ---
 
@@ -133,11 +110,11 @@ export ALEGRA_TOKEN="<TOKEN_DE_API>"
 ```bash
 cd gotogym
 
-# Todos los tests
-python manage.py test --settings=gotogym.settings_test
+# Todos los tests (esta es la suite que corre CI, ver
+# environments/backend/run_backend_checks.sh)
+python manage.py test . administracion --settings=gotogym.settings_test
 
-# Test específico de integración
-cd ..
+# Test específico de integración (ya en gotogym/, integrations/ vive ahi)
 DJANGO_SETTINGS_MODULE=gotogym.settings_test \
 python -m unittest integrations.alegra.tests.test_client -v
 ```
@@ -155,10 +132,10 @@ El proyecto soporta 3 idiomas:
 
 ## 📦 Tecnologías
 
-- **Backend:** Django 6.0.2 + Django REST Framework
-- **Base de datos:** MySQL (producción) / SQLite (desarrollo)
-- **Frontend:** Django Templates + Next.js (PWA)
-- **Autenticación:** JWT
+- **Backend:** Django 5.2 + Django REST Framework
+- **Base de datos:** PostgreSQL (producción, Azure) / SQLite (desarrollo y tests)
+- **Frontend:** Django Templates + Tailwind (CSS compilado y versionado, sin build de Node en el despliegue)
+- **Autenticación:** Sesiones de Django (sitio) + JWT vía `djangorestframework-simplejwt` (`accounts/api_views.py`)
 - **Pagos:** Mercado Pago
 - **Contabilidad:** Alegra API
 - **CRM:** HubSpot
@@ -169,35 +146,20 @@ El proyecto soporta 3 idiomas:
 
 ```
 GoToGtymPrime/
-├── gotogym/                 # Django principal (ACTIVO)
+├── gotogym/                 # Django principal
 │   ├── accounts/           # Usuarios
 │   ├── products/           # Productos
 │   ├── carrito/            # Carrito
 │   ├── tienda/             # Tienda
+│   ├── integrations/       # Integraciones externas
+│   │   ├── alegra/
+│   │   ├── mercadopago/
+│   │   └── hubspot/
 │   └── ...                 # Otras apps
-├── integrations/           # Integraciones externas
-│   ├── alegra/
-│   ├── mercadopago/
-│   └── hubspot/
-├── go-to-gym-platform/     # Modular (EN DESARROLLO)
-│   ├── backend/
-│   │   ├── services/
-│   │   └── core_api/
-│   └── frontend/
-│       └── webapp/
+├── environments/           # Scripts de CI, despliegue y checks
+├── design/                 # Fuentes tipográficas fuente
 └── docs/                   # Documentación
 ```
-
----
-
-## ✅ Estado del Proyecto
-
-| Componente | Estado | Descripción |
-|------------|--------|-------------|
-| Django Monolito | ✅ Activo | Proyecto principal funcionando |
-| Integraciones | ✅ Activo | Alegra, MercadoPago |
-| Microservicio wellness | 🔶 Desarrollo | Opcional |
-| Frontend Next.js | 🔶 Esqueleto | En desarrollo |
 
 ---
 

@@ -4,7 +4,6 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-
 from inventory.models import Inventory
 from products.models import Brand, Product, ProductCategory, ProductVariant
 

@@ -5,7 +5,6 @@ colores con stock, imagen principal) para que las vistas de listado y de
 detalle partan de la misma fuente y no diverjan.
 """
 from django.db.models import Prefetch
-
 from products.models import Product, ProductMedia, ProductVariant
 
 # Orden de talla para presentacion; cualquier valor desconocido va al final.

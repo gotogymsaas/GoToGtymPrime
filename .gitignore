@@ -25,3 +25,10 @@ build/
 # contenido son cientos de copias del mismo archivo.
 staticfiles/
 
+# Artefactos locales de las herramientas de calidad (ruff/mypy no dejan
+# cache persistente relevante para versionar; coverage si, y no debe).
+.coverage
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+

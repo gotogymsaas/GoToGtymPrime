@@ -10,8 +10,6 @@ El resultado (los .avif/.webp y el manifiesto) se versiona, porque la
 imagen de despliegue no ejecuta este paso.
 """
 import json
-import os
-import time
 from pathlib import Path
 
 from django.conf import settings
@@ -67,7 +65,7 @@ class Command(BaseCommand):
         for etiqueta, raiz, prefijo in self._origenes():
             if not raiz.exists():
                 self.stdout.write(self.style.WARNING(
-                    'sin carpeta %s: %s' % (etiqueta, raiz)))
+                    f'sin carpeta {etiqueta}: {raiz}'))
                 continue
 
             for origen in sorted(raiz.rglob('*')):
@@ -77,7 +75,7 @@ class Command(BaseCommand):
                     continue
 
                 relativa = origen.relative_to(raiz).as_posix()
-                clave_manifiesto = '%s/%s' % (prefijo, relativa)
+                clave_manifiesto = f'{prefijo}/{relativa}'
                 nombre = clave_desde_ruta(clave_manifiesto)
 
                 try:
@@ -94,7 +92,7 @@ class Command(BaseCommand):
                             for ancho in ANCHOS:
                                 if ancho > ancho_original:
                                     continue
-                                salida = destino_raiz / ('%s-%d.%s' % (nombre, ancho, extension))
+                                salida = destino_raiz / f'{nombre}-{ancho}.{extension}'
                                 anchos_hechos.append(ancho)
 
                                 if not forzar and salida.exists() and \
@@ -115,7 +113,7 @@ class Command(BaseCommand):
                             # los anchos, se genera igual en ese unico ancho
                             # para no perder el cambio de formato.
                             if not anchos_hechos:
-                                salida = destino_raiz / ('%s-%d.%s' % (nombre, ancho_original, extension))
+                                salida = destino_raiz / f'{nombre}-{ancho_original}.{extension}'
                                 imagen.save(salida, formato_pil, quality=CALIDAD[formato_pil])
                                 anchos_hechos = [ancho_original]
                                 generados += 1
@@ -125,7 +123,7 @@ class Command(BaseCommand):
 
                 except Exception as error:  # imagen corrupta o formato raro
                     self.stdout.write(self.style.WARNING(
-                        'no se pudo procesar %s: %s' % (relativa, error)))
+                        f'no se pudo procesar {relativa}: {error}'))
                     continue
 
                 bytes_origen += origen.stat().st_size
@@ -142,13 +140,14 @@ class Command(BaseCommand):
 
         self.stdout.write('')
         self.stdout.write(self.style.SUCCESS(
-            '%d imagenes en el manifiesto (%d derivados nuevos, %d ya al dia)'
-            % (len(manifiesto), generados, omitidos)))
+            f'{len(manifiesto)} imagenes en el manifiesto '
+            f'({generados} derivados nuevos, {omitidos} ya al dia)'))
         if bytes_origen:
+            mb_origen = bytes_origen / 1048576.0
+            mb_derivados = bytes_derivados / 1048576.0
             self.stdout.write(
-                'origen %.1f MB  ->  derivados %.1f MB en %d anchos y %d formatos'
-                % (bytes_origen / 1048576.0, bytes_derivados / 1048576.0,
-                   len(ANCHOS), len(FORMATOS)))
+                f'origen {mb_origen:.1f} MB  ->  derivados {mb_derivados:.1f} MB '
+                f'en {len(ANCHOS)} anchos y {len(FORMATOS)} formatos')
             self.stdout.write(
                 'el navegador descarga UNO por imagen, no todos: '
                 'el mayor ahorro esta en servir 400-960 px donde antes iba el original'

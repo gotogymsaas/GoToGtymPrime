@@ -13,15 +13,19 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.test import Client, RequestFactory, TestCase, override_settings
 from django.urls import reverse
-
 from inventory.models import Inventory
-from orders.models import Order, OrderStatus
+from orders.models import OrderStatus
 from orders.services import create_order_from_cart
 from products.models import Brand, Product, ProductCategory, ProductVariant
 
 from .models import PaymentTransaction
 from .providers.mercadopago import MercadoPagoPaymentProvider
-from .signature import build_signature_template, compute_signature, parse_x_signature, verify_signature
+from .signature import (
+    build_signature_template,
+    compute_signature,
+    parse_x_signature,
+    verify_signature,
+)
 
 DATOS = {
     'first_name': 'Ana', 'last_name': 'Marin', 'email': 'ana@example.com', 'phone': '3001234567',

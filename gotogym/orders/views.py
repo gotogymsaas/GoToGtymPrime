@@ -1,18 +1,17 @@
 from decimal import Decimal
 
+from carrito.services import build_cart_context, read_cart, write_cart
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-
-from carrito.services import build_cart_context, read_cart, write_cart
 from shipping.services import get_mock_quote
+from tienda.catalog import curated_product_cards
 
 from .colombia_data import MUNICIPIOS_POR_DEPARTAMENTO
 from .forms import CheckoutForm
 from .models import Order
 from .services import CheckoutError, create_order_from_cart
-from tienda.catalog import curated_product_cards
 
 
 @login_required

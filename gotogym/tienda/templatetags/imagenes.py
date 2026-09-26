@@ -25,12 +25,13 @@ def _construir(clave, respaldo, alt, sizes, clase, prioridad, cargar):
 
     if registro:
         ancho, alto = registro.get('ancho'), registro.get('alto')
+        nombre_derivado = registro['nombre']
         for extension, _formato_pil, tipo in FORMATOS:
             anchos = registro['formatos'].get(extension) or []
             if not anchos:
                 continue
             srcset = ', '.join(
-                '%s %dw' % (static('derivados/%s-%d.%s' % (registro['nombre'], a, extension)), a)
+                f'{static(f"derivados/{nombre_derivado}-{a}.{extension}")} {a}w'
                 for a in anchos
             )
             fuentes.append({'tipo': tipo, 'srcset': srcset})
@@ -57,9 +58,10 @@ def imagen_producto(nombre, alt='', sizes='100vw', clase='', prioridad=False, ca
         return {'fuentes': [], 'respaldo': static('images/img/placeholder.webp'),
                 'alt': alt, 'sizes': sizes, 'clase': clase, 'ancho': None,
                 'alto': None, 'cargar': cargar, 'prioridad': ''}
+    nombre_normalizado = str(nombre).replace('\\', '/')
     return _construir(
-        clave='product_media/%s' % str(nombre).replace('\\', '/'),
-        respaldo=static('product_media/%s' % nombre),
+        clave=f'product_media/{nombre_normalizado}',
+        respaldo=static(f'product_media/{nombre}'),
         alt=alt, sizes=sizes, clase=clase, prioridad=prioridad, cargar=cargar,
     )
 
@@ -67,9 +69,9 @@ def imagen_producto(nombre, alt='', sizes='100vw', clase='', prioridad=False, ca
 @register.inclusion_tag('partials/_picture.html')
 def imagen_editorial(archivo, alt='', sizes='100vw', clase='', prioridad=False, cargar='lazy'):
     """Fotografia editorial del Home, servida desde MEDIA_ROOT."""
-    respaldo = '%sproducts/Imagenes%%20Home/%s' % (settings.MEDIA_URL, quote(archivo))
+    respaldo = f'{settings.MEDIA_URL}products/Imagenes%20Home/{quote(archivo)}'
     return _construir(
-        clave='%s/%s' % (PREFIJO_EDITORIAL, archivo),
+        clave=f'{PREFIJO_EDITORIAL}/{archivo}',
         respaldo=respaldo,
         alt=alt, sizes=sizes, clase=clase, prioridad=prioridad, cargar=cargar,
     )
@@ -83,14 +85,15 @@ def precarga_editorial(archivo, media='', ancho=1280, extension='avif'):
     emita un <link rel=preload> hacia un archivo inexistente (que seria
     una descarga desperdiciada y un aviso en consola).
     """
-    registro = entrada('%s/%s' % (PREFIJO_EDITORIAL, archivo))
+    registro = entrada(f'{PREFIJO_EDITORIAL}/{archivo}')
     if not registro:
         return ''
     anchos = registro['formatos'].get(extension) or []
     if not anchos:
         return ''
     elegido = min(anchos, key=lambda a: abs(a - ancho))
-    return static('derivados/%s-%d.%s' % (registro['nombre'], elegido, extension))
+    nombre_derivado = registro['nombre']
+    return static(f'derivados/{nombre_derivado}-{elegido}.{extension}')
 
 
 @register.inclusion_tag('partials/_picture.html')
@@ -104,14 +107,14 @@ def imagen_hero(escritorio, movil='', alt='', sizes='100vw', clase='',
     que case; un srcset no basta para elegir entre dos fotografias.
     """
     base = _construir(
-        clave='%s/%s' % (PREFIJO_EDITORIAL, escritorio),
-        respaldo='%sproducts/Imagenes%%20Home/%s' % (settings.MEDIA_URL, quote(escritorio)),
+        clave=f'{PREFIJO_EDITORIAL}/{escritorio}',
+        respaldo=f'{settings.MEDIA_URL}products/Imagenes%20Home/{quote(escritorio)}',
         alt=alt, sizes=sizes, clase=clase, prioridad=True, cargar='eager',
     )
 
     if movil:
         estrechas = _construir(
-            clave='%s/%s' % (PREFIJO_EDITORIAL, movil),
+            clave=f'{PREFIJO_EDITORIAL}/{movil}',
             respaldo='', alt=alt, sizes=sizes, clase=clase,
             prioridad=True, cargar='eager',
         )

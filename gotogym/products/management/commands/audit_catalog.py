@@ -17,8 +17,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db.models import Count, Sum
-
 from inventory.models import Inventory
+
 from products.models import Brand, Product, ProductCategory, ProductMedia, ProductVariant
 from products.variant_parsing import COLOR_UNKNOWN, SIZE_UNKNOWN
 

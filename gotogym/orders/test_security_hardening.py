@@ -9,12 +9,11 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
 from django.urls import reverse
-
 from inventory.models import Inventory
 from payments.models import PaymentTransaction
 from products.models import Brand, Product, ProductCategory, ProductVariant
 
-from .services import confirm_payment, create_order_from_cart
+from .services import create_order_from_cart
 
 DATOS = {
     'first_name': 'Ana', 'last_name': 'Marin', 'email': 'ana@example.com', 'phone': '3001234567',
@@ -75,7 +74,7 @@ class ManipulacionDirectaDeCarritoTests(TestCase):
             {'cantidad': '99999'},
         )
 
-        response = self.client.post(reverse('orders:checkout'), DATOS)
+        self.client.post(reverse('orders:checkout'), DATOS)
         from orders.models import Order
         pedido = Order.objects.filter(user=self.usuario).first()
         # O no se creo pedido (rechazado por falta de stock), o si se creo

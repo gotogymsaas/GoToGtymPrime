@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
 from blog.models import Post
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.urls import reverse
 from tienda.catalog import curated_product_cards
+
 
 def home(request):
     # La home publica es la puerta de entrada para visitantes. Con sesion

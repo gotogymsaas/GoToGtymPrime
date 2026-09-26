@@ -1,8 +1,10 @@
-from django.shortcuts import render, get_object_or_404
-from django.core.paginator import Paginator
-from .models import Post, Category
 from django.contrib.auth import get_user_model
+from django.core.paginator import Paginator
 from django.db.models import Q
+from django.shortcuts import get_object_or_404, render
+
+from .models import Category, Post
+
 
 def post_list(request):
     posts = Post.objects.filter(is_published=True).select_related('category', 'author').order_by('-published')

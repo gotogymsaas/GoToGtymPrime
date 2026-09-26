@@ -2,8 +2,9 @@ from django.contrib.auth import logout
 from django.contrib.auth import views as auth_views
 from django.shortcuts import redirect
 from django.urls import path
-from django.views.decorators.csrf import csrf_exempt
+
 from . import views
+
 
 # Vista personalizada para logout por GET
 def logout_view(request):

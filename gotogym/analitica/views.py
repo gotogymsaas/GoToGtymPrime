@@ -21,7 +21,6 @@ import json
 from django.db import transaction
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-
 from gotogym.ratelimit import rate_limit
 
 from .models import EventoAnalitica
@@ -57,7 +56,7 @@ def _hash_sesion(request):
     if not clave:
         return ''
     from django.conf import settings
-    semilla = f'{settings.SECRET_KEY}:{clave}'.encode('utf-8')
+    semilla = f'{settings.SECRET_KEY}:{clave}'.encode()
     return hashlib.sha256(semilla).hexdigest()[:32]
 
 

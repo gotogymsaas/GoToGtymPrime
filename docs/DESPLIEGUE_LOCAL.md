@@ -1,6 +1,20 @@
 # 🚀 Guía de Despliegue Local - GoToGymPrime
 
-## 🧭 Checklist Maestro de Ejecución (Azure)
+> **Nota (agregada al revisar la estructura del repo):** la seccion que
+> sigue ("Checklist Maestro de Ejecucion") es la bitacora **cerrada** de un
+> proceso de despliegue de marzo 2026 -- se lee de abajo hacia arriba en
+> importancia: termina confirmando `gotogym-prime` / `rg-gotogym-prime`
+> como el entorno definitivo, que es el que sigue en uso hoy. Las "Reglas
+> operativas activas" (punto 2, "commit + push en cada respuesta") **no
+> son la forma de trabajar actual** y no deben seguirse como instruccion
+> vigente. Todo lo fechado "Marzo 2026" en este documento, incluido el
+> "Diagnostico Tecnico" mas abajo, es una foto de ese momento, no el
+> estado de hoy -- en particular, `configuracion_marca` y `crm` que ahi se
+> listan como servicios activos no estan registrados en `INSTALLED_APPS`
+> actualmente. La guia de instalacion que sigue despues de la bitacora
+> si esta vigente.
+
+## 🧭 Checklist Maestro de Ejecución (Azure) — bitácora histórica, ver nota arriba
 
 Este documento será la bitácora oficial hasta completar el objetivo de release.
 
@@ -336,52 +350,15 @@ python manage.py createsuperuser --settings=gotogym.settings_local
 ### 6. Cargar Datos de Ejemplo (Opcional)
 
 ```bash
-python manage.py shell --settings=gotogym.settings_local
+python manage.py seed_catalog --settings=gotogym.settings_local
 ```
 
-Luego copia y pega este código:
-
-```python
-from products.models import Product, ProductCategory, Brand
-from decimal import Decimal
-
-# Crear categorías
-cat_ropa, _ = ProductCategory.objects.get_or_create(
-    name="Ropa Deportiva",
-    defaults={'description': 'Ropa para entrenar'}
-)
-cat_acces, _ = ProductCategory.objects.get_or_create(
-    name="Accesorios",
-    defaults={'description': 'Accesorios de gym'}
-)
-
-# Crear marca
-brand, _ = Brand.objects.get_or_create(name="GoToGym")
-
-# Crear productos
-products = [
-    {"name": "Camiseta Deportiva", "category": cat_ropa, "price": "29.99", "stock": 50},
-    {"name": "Pantalón de Yoga", "category": cat_ropa, "price": "39.99", "stock": 30},
-    {"name": "Botella de Agua", "category": cat_acces, "price": "12.99", "stock": 100},
-    {"name": "Toalla de Gym", "category": cat_acces, "price": "15.99", "stock": 75},
-    {"name": "Guantes de Entrenamiento", "category": cat_acces, "price": "19.99", "stock": 40},
-]
-
-for data in products:
-    Product.objects.get_or_create(
-        name=data['name'],
-        defaults={
-            'category': data['category'],
-            'brand': brand,
-            'price': Decimal(data['price']),
-            'stock': data['stock'],
-            'description': f"Producto de alta calidad: {data['name']}"
-        }
-    )
-
-print(f"✅ Productos creados: {Product.objects.count()}")
-exit()
-```
+Siembra el catálogo base (categorías, marcas y productos) de forma
+idempotente — correrlo de nuevo actualiza en vez de duplicar. Usa
+`--dry-run` para ver qué haría sin escribir nada. (El snippet que antes
+vivía aquí pegaba código directo en `manage.py shell` usando un campo
+`price` que ya no existe en `Product` — se llama `base_price` — y por eso
+fallaba si alguien lo copiaba tal cual.)
 
 ### 7. Iniciar el Servidor
 
@@ -396,7 +373,7 @@ python manage.py runserver --settings=gotogym.settings_local
 Performing system checks...
 
 System check identified no issues (0 silenced).
-Django version 6.0.2, using settings 'gotogym.settings_local'
+Django version 5.2, using settings 'gotogym.settings_local'
 Starting development server at http://127.0.0.1:8000/
 Quit the server with CONTROL-C.
 ```
@@ -520,7 +497,9 @@ pip install python-decouple
 ## 📝 Archivos de Configuración
 
 ### `gotogym/settings.py`
-Configuración principal del proyecto (apunta a MySQL Azure por defecto)
+Configuración principal del proyecto (PostgreSQL vía `DATABASE_URL` en
+producción; hay un camino heredado a MySQL para entornos viejos que
+todavía lo declaren, pero no es el que usa `gotogym-prime` hoy)
 
 ### `gotogym/settings_local.py` ⭐
 Configuración para desarrollo local (usa SQLite, DEBUG=True)
@@ -589,8 +568,8 @@ python manage.py test --settings=gotogym.settings_test
 # Un app específica
 python manage.py test accounts --settings=gotogym.settings_test
 
-# Test de integración Alegra
-cd ..
+# Test de integración Alegra (integrations/ vive dentro de gotogym/, no
+# hace falta salir de esta carpeta)
 DJANGO_SETTINGS_MODULE=gotogym.settings_test \
 python -m unittest integrations.alegra.tests.test_client -v
 ```
@@ -612,8 +591,6 @@ Una vez que el servidor esté corriendo en `http://localhost:8000/`:
 | `/tienda/` | Tienda online |
 | `/blog/` | Blog |
 | `/dashboard/` | Dashboard (requiere login) |
-| `/configuracion-marca/` | Configuración de marca |
-| `/crm/` | CRM / HubSpot integration |
 | `/setlang/` | Cambiar idioma (es/en/pt) |
 
 ---
@@ -646,11 +623,11 @@ GoToGtymPrime/
 │   ├── carrito/               # App carrito de compras
 │   ├── tienda/                # App tienda
 │   ├── blog/                  # App blog
+│   ├── integrations/          # Integraciones externas
+│   │   ├── alegra/           # Contabilidad
+│   │   ├── mercadopago/      # Pagos
+│   │   └── hubspot/          # CRM
 │   └── ... (otras apps)
-├── integrations/              # Integraciones externas
-│   ├── alegra/               # Contabilidad
-│   ├── mercadopago/          # Pagos
-│   └── hubspot/              # CRM
 ├── requirements.txt           # Dependencias Python
 └── start.sh                   # Script de inicio rápido
 ```
@@ -668,7 +645,10 @@ entre documentación y código en ejecución.
 - Renderizado web con Django Templates (SSR) y apps por dominio.
 - Base de datos:
     - Desarrollo local: SQLite (`settings_local.py`).
-    - Entornos conectados: MySQL (`settings.py`), orientado a Azure MySQL.
+    - Producción (`gotogym-prime`): PostgreSQL vía `DATABASE_URL`
+      (`settings.py`). Nota agregada despues de este diagnostico: en
+      Marzo 2026 el entorno activo todavia era MySQL/Azure; para cuando
+      se retoma este documento ya habia migrado a Postgres.
 - Docker Compose actual levanta solo el servicio web (no incluye servicio de
     base de datos local en `docker-compose.yml`).
 

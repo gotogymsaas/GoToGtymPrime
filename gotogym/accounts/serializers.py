@@ -1,10 +1,13 @@
-from pathlib import Path
 import hashlib
+from pathlib import Path
+
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from rest_framework import serializers
+
 from .models import User
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)

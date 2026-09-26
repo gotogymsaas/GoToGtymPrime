@@ -1,0 +1,68 @@
+[tool.ruff]
+line-length = 99
+target-version = "py311"
+extend-exclude = [
+    "*/migrations/*",
+    "GoToGymAdmin",
+    "go-to-gym-platform",
+    "node_modules",
+    "staticfiles",
+]
+
+[tool.ruff.lint]
+# E/F: pyflakes + pycodestyle basicos. I: import ordering. UP: sintaxis
+# moderna de Python. B: bugbear (errores comunes que pyflakes no ve).
+# DJ: reglas especificas de Django (flake8-django).
+select = ["E", "F", "I", "UP", "B", "DJ"]
+ignore = [
+    "E501",  # line-length ya lo controla `line-length` de arriba; no duplicar el aviso.
+]
+
+[tool.ruff.lint.per-file-ignores]
+# settings*.py hace `from .settings import *` a proposito (ver el propio
+# comentario en settings_local.py/settings_test.py); F403/F405 son ruido
+# aqui, no un error real.
+"gotogym/gotogym/settings_local.py" = ["F403", "F405"]
+"gotogym/gotogym/settings_test.py" = ["F403", "F405"]
+
+[tool.mypy]
+python_version = "3.11"
+plugins = ["mypy_django_plugin.main"]
+# manage.py vive en gotogym/ (no en la raiz del repo, donde esta este
+# pyproject.toml): los imports reales -- "import products",
+# "import gotogym.settings_test" -- resuelven contra esa carpeta, no
+# contra la raiz. Sin esto mypy no encuentra ni las apps ni el modulo de
+# settings.
+mypy_path = "gotogym"
+exclude = ["migrations/", "GoToGymAdmin", "go-to-gym-platform"]
+# Permisivo a proposito, no por backlog pendiente (el backlog inicial de
+# 17 errores ya se corrigio: mypy bloquea el build en
+# run_backend_checks.sh). --strict sobre un codebase de 600+ archivos sin
+# anotar generaria miles de avisos de tipos faltantes, no una senal util
+# -- esto se endurece de a poco, app por app.
+ignore_missing_imports = true
+check_untyped_defs = false
+
+[tool.django-stubs]
+django_settings_module = "gotogym.settings_test"
+
+[tool.coverage.run]
+# "." y no "gotogym": coverage corre con cwd=gotogym/ (ahi vive manage.py,
+# ver run_backend_checks.sh), no en la raiz del repo donde esta este
+# archivo. "gotogym" aqui apuntaria a gotogym/gotogym/ -- el paquete de
+# settings, no las apps -- y el reporte solo mediria eso.
+source = ["."]
+omit = [
+    "*/migrations/*",
+    "*/tests.py",
+    "*/test_*.py",
+    "*/__init__.py",
+    "gotogym/settings*.py",
+    "manage.py",
+    "gotogym/wsgi.py",
+    "gotogym/asgi.py",
+]
+
+[tool.coverage.report]
+skip_empty = true
+precision = 1

@@ -5,9 +5,8 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-
 from inventory.models import Inventory
-from orders.models import Order, OrderStatus, PaymentStatus
+from orders.models import OrderStatus, PaymentStatus
 from orders.services import (
     InvalidOrderTransitionError,
     apply_order_status_transition,

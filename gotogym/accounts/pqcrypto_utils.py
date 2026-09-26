@@ -1,6 +1,7 @@
 """Post-quantum crypto helpers using python-oqs."""
 import base64
 from pathlib import Path
+
 import oqs
 
 SIG_ALG = "Dilithium2"

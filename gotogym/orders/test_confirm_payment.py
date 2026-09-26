@@ -15,7 +15,6 @@ from django.contrib.auth import get_user_model
 from django.db import connections, transaction
 from django.test import TestCase, TransactionTestCase, override_settings, skipUnlessDBFeature
 from django.urls import reverse
-
 from inventory.models import Inventory
 from products.models import Brand, Product, ProductCategory, ProductVariant
 

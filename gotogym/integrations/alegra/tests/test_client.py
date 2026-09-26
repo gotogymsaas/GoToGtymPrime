@@ -1,6 +1,7 @@
 import os
-from django.test import SimpleTestCase
 from unittest.mock import patch
+
+from django.test import SimpleTestCase
 
 from integrations.alegra.alegra_client import AlegraClient
 

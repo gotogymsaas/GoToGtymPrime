@@ -4,7 +4,6 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from django.urls import reverse
-
 from orders.models import Order, OrderStatus, PaymentStatus
 
 from .models import PaymentTransaction
@@ -90,8 +89,9 @@ class MockProviderTests(TestCase):
 
 class PaymentProviderInterfaceTests(TestCase):
     def test_la_interfaz_no_menciona_ningun_proveedor_real(self):
-        from .providers.base import PaymentProvider
         import inspect
+
+        from .providers.base import PaymentProvider
 
         fuente = inspect.getsource(PaymentProvider)
         for nombre_prohibido in ['mercadopago', 'MercadoPago', 'stripe', 'Stripe', 'paypal']:

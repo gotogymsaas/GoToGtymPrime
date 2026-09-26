@@ -1,6 +1,8 @@
-from django.db import models
-from django.conf import settings
 import uuid
+
+from django.conf import settings
+from django.db import models
+
 
 def generate_referral_code():
     return str(uuid.uuid4())

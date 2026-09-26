@@ -4,7 +4,6 @@ from decimal import Decimal
 
 from django.db import IntegrityError, connection, connections, transaction
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
-
 from products.models import Brand, Product, ProductCategory, ProductVariant
 
 from .models import Inventory

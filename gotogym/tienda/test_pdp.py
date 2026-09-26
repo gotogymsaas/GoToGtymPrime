@@ -4,9 +4,9 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-
 from inventory.models import Inventory
 from products.models import Brand, Product, ProductCategory, ProductVariant
+
 from tienda.catalog import LOW_STOCK_THRESHOLD, MAX_FEATURES, product_features
 
 
@@ -66,7 +66,7 @@ class FichaDeProductoTests(TiendaAutenticadaMixin, TestCase):
     def test_producto_de_variante_unica_la_preselecciona(self):
         response = self.client.get(self._url(self.unico))
         self.assertIsNotNone(response.context['single_variant'])
-        self.assertContains(response, 'value="{}"'.format(self.v_unica.id))
+        self.assertContains(response, f'value="{self.v_unica.id}"')
 
     def test_producto_de_variante_unica_no_pinta_selectores(self):
         response = self.client.get(self._url(self.unico))

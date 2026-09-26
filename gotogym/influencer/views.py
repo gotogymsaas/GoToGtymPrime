@@ -1,8 +1,10 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import InfluencerProfile
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
+from django.shortcuts import redirect, render
+
+from .models import InfluencerProfile
+
 
 # Simulación de compras referidas (reemplazar por consulta real a modelo de compras)
 def get_compras_referidas(profile):
