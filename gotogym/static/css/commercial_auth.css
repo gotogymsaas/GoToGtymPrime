@@ -225,7 +225,7 @@
   border-radius: 8px;
   background: transparent;
   color: #ffffff;
-  padding: 18px 16px 0;
+  padding: 18px var(--space-4) 0;
   outline: none;
   transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
@@ -266,7 +266,7 @@
 }
 
 .commercial-auth__password input {
-  padding-right: 48px;
+  padding-right: var(--space-7);
 }
 
 .commercial-auth__password button {
@@ -380,7 +380,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-2);
   color: rgba(255, 255, 255, 0.66);
   font-size: 19px;
 }
@@ -427,7 +427,7 @@
 
 @media (max-width: 480px) {
   .commercial-auth {
-    padding: 12px;
+    padding: var(--space-3);
   }
 
   .commercial-auth__scene {
@@ -446,7 +446,7 @@
 
   .commercial-auth__form {
     width: min(100%, 330px);
-    margin-top: 64px;
+    margin-top: var(--space-8);
     gap: 20px;
   }
 

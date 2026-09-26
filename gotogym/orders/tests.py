@@ -10,7 +10,6 @@ from inventory.models import Inventory
 from products.models import Brand, Product, ProductCategory, ProductVariant
 
 from shipping.models import ShippingQuote
-from shipping.services import FREE_SHIPPING_THRESHOLD
 from tienda.templatetags.tienda_filters import cop
 
 from .forms import CheckoutForm
@@ -303,17 +302,17 @@ class CotizacionEnVivoTests(CheckoutBaseTestCase):
 
         self.assertLess(cerca, lejos)
 
-    def test_envio_gratis_por_encima_del_umbral(self):
+    def test_el_envio_se_cobra_sin_importar_que_tan_caro_sea_el_producto(self):
         producto_caro = Product.objects.create(
             name='Producto caro cotizacion', category=self.categoria, brand=self.marca,
-            base_price=FREE_SHIPPING_THRESHOLD, stock=0,
+            base_price=Decimal('50000000.00'), stock=0,
         )
         variante_cara = _crear_variante(producto_caro, 'COT-CARO-U-UNI', 'UNICA', 'UNICO', 1)
         self._poner_en_carrito({str(variante_cara.pk): 1})
 
         datos = self.client.get(self._url('Bogotá')).json()
-        self.assertTrue(datos['is_free'])
-        self.assertEqual(datos['cost'], 0)
+        self.assertFalse(datos['is_free'])
+        self.assertGreater(datos['cost'], 0)
 
     def test_ignora_cualquier_subtotal_que_mande_el_cliente(self):
         # El endpoint no acepta un parametro de subtotal: siempre usa el
@@ -374,15 +373,15 @@ class EnvioIntegradoAlTotalTests(CheckoutBaseTestCase):
 
         self.assertLess(pedido_cerca.shipping_cost, pedido_lejos.shipping_cost)
 
-    def test_envio_gratis_por_encima_del_umbral_se_refleja_en_la_orden(self):
+    def test_el_envio_se_cobra_en_la_orden_sin_importar_que_tan_caro_sea_el_producto(self):
         producto_caro = Product.objects.create(
             name='Producto caro checkout', category=self.categoria, brand=self.marca,
-            base_price=FREE_SHIPPING_THRESHOLD, stock=0,
+            base_price=Decimal('50000000.00'), stock=0,
         )
         variante_cara = _crear_variante(producto_caro, 'CHK-CARO-U-UNI', 'UNICA', 'UNICO', 1)
 
         pedido = create_order_from_cart(self.usuario, {str(variante_cara.pk): 1}, DATOS_VALIDOS)
-        self.assertEqual(pedido.shipping_cost, Decimal('0.00'))
+        self.assertGreater(pedido.shipping_cost, Decimal('0.00'))
 
     def test_invariante_total_igual_subtotal_mas_envio_menos_descuento(self):
         for datos in [DATOS_VALIDOS, {**DATOS_VALIDOS, 'city': 'Leticia'}]:

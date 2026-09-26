@@ -33,7 +33,7 @@
  * El lead lleva clase propia: como `.shop-hero p` le ganaba en
  * especificidad a `.shop-eyebrow`, el eyebrow se renderizaba a 16.8px en
  * vez de los 11.52px del resto del sitio. */
-.shop-hero h1 { max-width: 900px; margin: 0 0 16px; font-size: clamp(2.5rem, 6vw, 5.2rem); font-weight: 500; letter-spacing: -.065em; line-height: .9; }
+.shop-hero h1 { max-width: 900px; margin: 0 0 var(--space-4); font-size: clamp(2.5rem, 6vw, 5.2rem); font-weight: 500; letter-spacing: -.065em; line-height: .9; }
 .shop-hero__lead { max-width: 560px; margin: 0; color: rgba(248,249,250,.66); font-size: 1.05rem; line-height: 1.6; }
 
 /* --- Campo gravitacional Quantum ---------------------------------------
@@ -63,7 +63,7 @@
 /* --- Barra de herramientas y filtros --- */
 .shop-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 22px 0; border-bottom: 1px solid #dcdcd9; }
 .shop-toolbar__count { margin: 0; color: var(--shop-muted); font-size: .85rem; }
-.shop-filters-toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border: 1px solid var(--shop-ink); background: transparent; color: var(--shop-ink); font-size: .78rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; }
+.shop-filters-toggle { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: 0 18px; border: 1px solid var(--shop-ink); background: transparent; color: var(--shop-ink); font-size: .78rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; }
 .shop-filters-toggle:hover { background: var(--shop-ink); color: var(--shop-paper); }
 
 /* El padding inferior va en el layout, no en la columna de filtros: si
@@ -78,13 +78,13 @@
  * cada nivel de anidamiento, no solo en el exterior. */
 .shop-layout > * { min-width: 0; }
 .shop-filters { display: grid; gap: 26px; align-content: start; min-width: 0; }
-.shop-field { display: grid; gap: 8px; min-width: 0; }
+.shop-field { display: grid; gap: var(--space-2); min-width: 0; }
 .shop-field label, .shop-field legend { margin: 0; padding: 0; color: var(--shop-muted); font-size: .68rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 .shop-field input, .shop-field select { width: 100%; min-width: 0; max-width: 100%; min-height: 46px; border: 1px solid #c8c8c5; border-radius: 0; background: #fff; color: var(--shop-ink); padding: 0 14px; font: inherit; text-overflow: ellipsis; }
-.shop-field .shop-price-row { display: flex; gap: 8px; }
+.shop-field .shop-price-row { display: flex; gap: var(--space-2); }
 /* Cuadros iguales para todas las tallas: una grilla de columnas parejas
  * reparte el ancho sin importar si la etiqueta es "S" o "UNICA". */
-.shop-chip-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 8px; }
+.shop-chip-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: var(--space-2); }
 .shop-chip { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 44px; padding: 0 6px; border: 1px solid #c8c8c5; color: var(--shop-ink); font-size: .74rem; font-weight: 700; letter-spacing: .04em; text-align: center; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; transition: background .18s ease, color .18s ease, border-color .18s ease; }
 .shop-chip:hover { border-color: var(--shop-ink); }
 .shop-chip input { position: absolute; opacity: 0; pointer-events: none; }
@@ -92,7 +92,7 @@
 .shop-filters__actions { display: flex; gap: 10px; padding-top: 4px; }
 .shop-filters__submit { flex: 1; min-height: 48px; border: 0; background: var(--shop-ink); color: var(--shop-paper); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; font-size: .78rem; cursor: pointer; transition: background .2s ease, color .2s ease; }
 .shop-filters__submit:hover { background: var(--shop-turquoise); color: var(--shop-ink); }
-.shop-filters__reset { display: inline-flex; align-items: center; padding: 0 16px; border: 1px solid #c8c8c5; color: var(--shop-muted); font-size: .78rem; text-decoration: none; }
+.shop-filters__reset { display: inline-flex; align-items: center; padding: 0 var(--space-4); border: 1px solid #c8c8c5; color: var(--shop-muted); font-size: .78rem; text-decoration: none; }
 .shop-filters__reset:hover { border-color: var(--shop-ink); color: var(--shop-ink); }
 
 .shop-empty { padding: clamp(48px, 8vw, 90px); border-left: 3px solid var(--shop-turquoise); background: var(--shop-mist); }
@@ -112,7 +112,7 @@
 .gtg-product-card:hover .gtg-product-card__image img,
 .gtg-product-card:focus-within .gtg-product-card__image img { transform: scale(1.035); }
 .gtg-product-card__badge { position: absolute; top: 12px; left: 12px; padding: 6px 9px; background: #101012; color: #f8f9fa; font-size: .64rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
-.gtg-product-card__body { padding-top: 16px; }
+.gtg-product-card__body { padding-top: var(--space-4); }
 /* Valores calcados de .home-product-card (store_home.css) para que la
  * tarjeta se lea igual en Home y en la tienda. */
 .gtg-product-card__category { margin: 0 0 5px; color: #77777c; font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; }
@@ -122,7 +122,7 @@
 .gtg-product-card__price { font-size: .92rem; font-weight: 700; color: var(--color-zafiro, #17375c); }
 .gtg-product-card__sizes { margin: 0; color: #77777c; font-size: .72rem; }
 .gtg-product-card--compact .gtg-product-card__name { font-size: .86rem; }
-.gtg-product-card--compact .gtg-product-card__body { padding-top: 12px; }
+.gtg-product-card--compact .gtg-product-card__body { padding-top: var(--space-3); }
 
 @media (max-width: 980px) {
   .shop-layout { grid-template-columns: 1fr; }
@@ -158,11 +158,11 @@
 .shop-pdp__info { align-self: start; padding-top: clamp(4px, 2vw, 20px); }
 .shop-pdp__category { margin: 0 0 14px; color: var(--shop-turquoise); font-size: .72rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
 .shop-pdp__title { margin: 0 0 20px; font-size: clamp(2.1rem, 4vw, 3.4rem); font-weight: 500; letter-spacing: -.045em; line-height: .98; overflow-wrap: anywhere; }
-.shop-pdp__review-note { margin: 0 0 24px; color: rgba(248,249,250,.5); font-size: .85rem; }
+.shop-pdp__review-note { margin: 0 0 var(--space-5); color: rgba(248,249,250,.5); font-size: .85rem; }
 .shop-pdp__price { display: block; margin-bottom: 26px; font-size: 1.5rem; font-weight: 600; color: var(--shop-gold); }
 .shop-pdp__description { max-width: 520px; margin-bottom: 28px; color: rgba(248,249,250,.66); line-height: 1.7; }
 .shop-pdp__specs { margin: 0 0 30px; padding-top: 22px; border-top: 1px solid rgba(248,249,250,.16); }
-.shop-pdp__specs div { display: flex; gap: 8px; padding: 6px 0; font-size: .88rem; }
+.shop-pdp__specs div { display: flex; gap: var(--space-2); padding: 6px 0; font-size: .88rem; }
 .shop-pdp__specs dt { margin: 0; color: rgba(248,249,250,.5); font-weight: 700; }
 .shop-pdp__specs dd { margin: 0; color: rgba(248,249,250,.85); }
 
@@ -177,7 +177,7 @@
   padding: 18px; border: 1px solid rgba(248,249,250,.12); background: rgba(255,255,255,.035);
 }
 .shop-pdp__features .material-icons-outlined { flex-shrink: 0; margin-top: 1px; font-size: 30px; color: var(--shop-turquoise); }
-.shop-pdp__features strong { display: block; margin-bottom: 4px; font-size: 1.02rem; font-weight: 700; color: var(--shop-paper); }
+.shop-pdp__features strong { display: block; margin-bottom: var(--space-1); font-size: 1.02rem; font-weight: 700; color: var(--shop-paper); }
 .shop-pdp__features span { display: block; color: rgba(248,249,250,.6); font-size: .86rem; line-height: 1.5; }
 
 /* A 2 columnas, el padding + el icono de 30px dejaban muy poco ancho
@@ -196,7 +196,7 @@
    un poco mas grande que el resto de esa familia de franjas, porque va
    sola al cierre de la pagina y necesita sostenerse por si misma. */
 .shop-pdp__policies { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 32px 0 0; padding: 0; list-style: none; }
-.shop-pdp__policies li { display: flex; align-items: center; gap: 8px; }
+.shop-pdp__policies li { display: flex; align-items: center; gap: var(--space-2); }
 .shop-pdp__policies a {
   color: rgba(248,249,250,.68); font-size: .84rem; font-weight: 700;
   letter-spacing: .02em; text-decoration: none;
@@ -220,9 +220,9 @@
 .shop-pdp__size-guide summary::-webkit-details-marker { display: none; }
 .shop-pdp__size-guide summary::before { content: "+ "; }
 .shop-pdp__size-guide[open] summary::before { content: "– "; }
-.shop-pdp__size-guide-note { margin: 14px 0 12px; color: rgba(248,249,250,.55); font-size: .78rem; line-height: 1.5; }
+.shop-pdp__size-guide-note { margin: 14px 0 var(--space-3); color: rgba(248,249,250,.55); font-size: .78rem; line-height: 1.5; }
 .shop-pdp__size-guide table { width: 100%; border-collapse: collapse; font-size: .82rem; }
-.shop-pdp__size-guide th, .shop-pdp__size-guide td { padding: 8px 10px; text-align: left; border-bottom: 1px solid rgba(248,249,250,.12); }
+.shop-pdp__size-guide th, .shop-pdp__size-guide td { padding: var(--space-2) 10px; text-align: left; border-bottom: 1px solid rgba(248,249,250,.12); }
 .shop-pdp__size-guide thead th { color: rgba(248,249,250,.5); font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .shop-pdp__size-guide tbody th { color: var(--shop-paper); font-weight: 700; }
 .shop-pdp__size-guide td { color: rgba(248,249,250,.75); }
@@ -269,8 +269,28 @@
   100% { opacity: 1;   transform: scale(1); }
 }
 
+/* --- Salto de talla cuantizado ------------------------------------------
+ *
+ * Un nivel de energia no es "un poco mas" que el anterior: es un escalon
+ * distinto, sin estados intermedios. El padding vertical de cada boton de
+ * talla sube un quantum de espaciado (--space-2, un paso completo de la
+ * escala) por talla, en el orden en que SIZE_ORDER las entrega: la fila se
+ * lee como una escalera de niveles discretos en vez de botones idénticos
+ * con una etiqueta distinta. El primer intento usaba --space-1 (4px) por
+ * escalon y era demasiado sutil para notarse a simple vista; con
+ * --space-2 (8px) el boton de la ultima talla casi quintuplica la altura
+ * del primero. Tope en la sexta talla porque XS..XXL son seis niveles
+ * reales (ver SIZE_ORDER en catalog.py); UNICA nunca llega aqui sola, y si
+ * aparece junto a otras no necesita un septimo escalon. */
+.pdp-size:nth-child(1) { padding-block: var(--space-2); }
+.pdp-size:nth-child(2) { padding-block: calc(var(--space-2) * 2); }
+.pdp-size:nth-child(3) { padding-block: calc(var(--space-2) * 3); }
+.pdp-size:nth-child(4) { padding-block: calc(var(--space-2) * 4); }
+.pdp-size:nth-child(5) { padding-block: calc(var(--space-2) * 5); }
+.pdp-size:nth-child(n+6) { padding-block: calc(var(--space-2) * 5); }
+
 .shop-related { padding: clamp(56px, 7vw, 96px) 0; background: var(--shop-paper); color: var(--shop-ink); }
-.shop-related__heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: clamp(32px, 5vw, 52px); }
+.shop-related__heading { display: flex; align-items: end; justify-content: space-between; gap: var(--space-5); margin-bottom: clamp(32px, 5vw, 52px); }
 .shop-related__heading h2 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 500; letter-spacing: -.045em; line-height: 1; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -331,7 +351,7 @@
 /* La columna del resumen es angosta (~220px utiles). Con imagen + texto +
  * precio nowrap en una sola fila el nombre se parte palabra por palabra,
  * asi que el precio baja a su propia linea bajo el texto. */
-.checkout-summary__items li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 6px 12px; align-items: start; }
+.checkout-summary__items li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 6px var(--space-3); align-items: start; }
 .checkout-summary__items img { grid-row: span 2; width: 44px; height: 44px; object-fit: cover; background: #ececeb; }
 .checkout-summary__items li > div { min-width: 0; }
 .checkout-summary__items .checkout-item-sku { overflow-wrap: anywhere; }
@@ -346,15 +366,70 @@
 .cart-row__info { flex: 1; min-width: 200px; }
 .cart-row__info a { color: var(--ed-ink, #101012); font-weight: 600; text-decoration: none; }
 .cart-row__info a:hover { color: var(--ed-turquoise, #0fbfb0); }
-.cart-row__meta { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 6px 0 0; color: var(--ed-muted, #66666c); font-size: .8rem; }
+.cart-row__meta { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); margin: 6px 0 0; color: var(--ed-muted, #66666c); font-size: .8rem; }
 .cart-row__meta dt { display: inline; font-weight: 600; }
 .cart-row__meta dd { display: inline; margin: 0; }
 .cart-row__price-each { margin: 6px 0 0; color: #9a9a9e; font-size: .78rem; }
 .cart-row__qty { display: flex; align-items: center; gap: 10px; }
 .cart-row__qty input { width: 60px; min-height: 42px; border: 1px solid #c8c8c5; border-radius: 0; text-align: center; color: var(--ed-ink, #101012); }
-.cart-row__qty button { min-height: 42px; padding: 0 16px; border: 1px solid var(--ed-ink, #101012); background: transparent; color: var(--ed-ink, #101012); font-size: .74rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+.cart-row__qty button { min-height: 42px; padding: 0 var(--space-4); border: 1px solid var(--ed-ink, #101012); background: transparent; color: var(--ed-ink, #101012); font-size: .74rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
 .cart-row__qty button:hover { background: var(--ed-ink, #101012); color: var(--ed-paper, #f8f9fa); }
 .cart-row__subtotal { width: 120px; text-align: right; font-weight: 700; color: var(--ed-ink, #101012); }
 .cart-row__remove { border: 0; background: transparent; color: #9a9a9e; font-size: 1.4rem; line-height: 1; cursor: pointer; }
 .cart-row__remove:hover { color: #b91c1c; }
-.cart-empty { padding: clamp(56px, 8vw, 100px) 24px; text-align: center; color: var(--ed-muted, #66666c); }
+
+/* --- Tunelamiento: transicion visual del carrito al checkout ------------
+ *
+ * Tunelar es atravesar una barrera sin recorrer el espacio intermedio en
+ * el sentido clasico: la pagina de salida se comprime hacia un punto y la
+ * de llegada emerge desde ese mismo punto, en vez del cruce lineal (slide
+ * o fade) de una transicion comun.
+ *
+ * `@view-transition` con cross-document navigation solo activa la
+ * transicion cuando AMBOS documentos -- el de salida y el de llegada --
+ * la declaran; por eso esta regla vive en commerce_editorial.css y no en
+ * style.css: ese archivo es global y activaria esto en cada enlace del
+ * sitio, cuando el efecto es especificamente el paso carrito -> checkout.
+ * checkout.html tambien carga este archivo, asi que el par se cumple sin
+ * JS. En cualquier navegador que no soporte la especificacion, la regla se
+ * ignora y el enlace navega como siempre: no hay fallback que escribir.
+ *
+ * Soporte real al momento de escribir esto: Chrome/Edge 126+ (navegacion
+ * cross-document). Firefox y Safari todavia no lo implementan -- ahi el
+ * click simplemente navega sin transicion, ni error ni diferencia visible,
+ * que es indistinguible de "no pasa nada". Si no ves el efecto, antes de
+ * pensar que esta mal revisa en que navegador estas probando.
+ *
+ * Primera version: escala .92/1.08 y 3px de blur. Demasiado sutil para
+ * notarse en un cambio de pagina completo (donde ya hay muchisimo estimulo
+ * visual nuevo compitiendo por la atencion); esta version exagera la
+ * compresion a proposito para que se lea como un evento, no como un
+ * parpadeo.
+ */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: pdp-tunnel-collapse var(--motion-story) var(--motion-easing) forwards;
+}
+::view-transition-new(root) {
+  animation: pdp-tunnel-expand var(--motion-story) var(--motion-easing) forwards;
+}
+
+@keyframes pdp-tunnel-collapse {
+  to { opacity: 0; transform: scale(.7); filter: blur(10px); }
+}
+@keyframes pdp-tunnel-expand {
+  from { opacity: 0; transform: scale(1.35); filter: blur(10px); }
+  to   { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+.cart-empty { padding: clamp(56px, 8vw, 100px) var(--space-5); text-align: center; color: var(--ed-muted, #66666c); }

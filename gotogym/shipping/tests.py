@@ -6,7 +6,6 @@ from django.test import SimpleTestCase
 from .services import (
     FLAT_RATE_MAIN_CITY,
     FLAT_RATE_OTHER_CITY,
-    FREE_SHIPPING_THRESHOLD,
     get_mock_quote,
     get_mock_quote_estimate,
     normalize_city,
@@ -40,12 +39,8 @@ class GetMockQuoteTests(SimpleTestCase):
     def test_tarifa_principal_es_mas_barata_que_la_de_resto_del_pais(self):
         self.assertLess(FLAT_RATE_MAIN_CITY, FLAT_RATE_OTHER_CITY)
 
-    def test_envio_gratis_por_encima_del_umbral(self):
-        cotizacion = get_mock_quote('Leticia', FREE_SHIPPING_THRESHOLD)
-        self.assertEqual(cotizacion['cost'], Decimal('0.00'))
-
-    def test_envio_no_es_gratis_justo_debajo_del_umbral(self):
-        cotizacion = get_mock_quote('Leticia', FREE_SHIPPING_THRESHOLD - Decimal('1'))
+    def test_el_envio_se_cobra_sin_importar_que_tan_alto_sea_el_subtotal(self):
+        cotizacion = get_mock_quote('Leticia', Decimal('50000000'))
         self.assertGreater(cotizacion['cost'], Decimal('0.00'))
 
     def test_reconoce_la_ciudad_sin_importar_acentos_ni_mayusculas(self):
@@ -59,5 +54,5 @@ class GetMockQuoteEstimateTests(SimpleTestCase):
     def test_estimacion_es_la_tarifa_mas_barata_posible(self):
         self.assertEqual(get_mock_quote_estimate(Decimal('50000')), FLAT_RATE_MAIN_CITY)
 
-    def test_estimacion_gratis_por_encima_del_umbral(self):
-        self.assertEqual(get_mock_quote_estimate(FREE_SHIPPING_THRESHOLD), Decimal('0.00'))
+    def test_estimacion_se_cobra_sin_importar_que_tan_alto_sea_el_subtotal(self):
+        self.assertEqual(get_mock_quote_estimate(Decimal('50000000')), FLAT_RATE_MAIN_CITY)

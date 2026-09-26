@@ -2,8 +2,13 @@
 fijo desconectado del pedido.
 
 No consulta ninguna transportadora real. Es una tarifa plana segun si la
-ciudad es una de las principales o "resto del pais", con envio gratis por
-encima de un umbral de subtotal.
+ciudad es una de las principales o "resto del pais". El envio siempre se
+cobra, sin umbral de subtotal que lo exima: con los precios reales del
+catalogo (todos por encima de los $300.000 que tenia el umbral anterior),
+esa rama nunca dejaba de activarse, asi que en la practica el envio nunca
+se cobraba. Si en el futuro se quiere reintroducir un umbral, tiene que
+fijarse por debajo del precio del producto mas barato del catalogo o va a
+volver a ser gratis siempre.
 """
 import unicodedata
 from decimal import Decimal
@@ -12,7 +17,6 @@ MAIN_CITIES = {'bogota', 'medellin', 'cali', 'barranquilla', 'bucaramanga'}
 
 FLAT_RATE_MAIN_CITY = Decimal('12000.00')
 FLAT_RATE_OTHER_CITY = Decimal('22000.00')
-FREE_SHIPPING_THRESHOLD = Decimal('300000.00')
 
 CARRIER_NAME = 'GoToGym Envios (mock)'
 
@@ -27,15 +31,13 @@ def get_mock_quote(city, subtotal):
     """Cotizacion completa para una ciudad y un subtotal dados.
 
     Devuelve un dict con `carrier_name`, `method_name`, `cost` y
-    `estimated_days`. El envio es gratis si el subtotal alcanza el umbral,
-    sin importar la ciudad.
+    `estimated_days`. El envio siempre se cobra: `subtotal` se recibe por
+    compatibilidad con quien llama (el mismo calculo que usa el pedido
+    real), pero hoy no cambia el resultado.
     """
     es_ciudad_principal = normalize_city(city) in MAIN_CITIES
     costo = FLAT_RATE_MAIN_CITY if es_ciudad_principal else FLAT_RATE_OTHER_CITY
     dias_estimados = 3 if es_ciudad_principal else 6
-
-    if subtotal >= FREE_SHIPPING_THRESHOLD:
-        costo = Decimal('0.00')
 
     return {
         'carrier_name': CARRIER_NAME,
@@ -47,7 +49,6 @@ def get_mock_quote(city, subtotal):
 
 def get_mock_quote_estimate(subtotal):
     """Estimacion sin direccion todavia: la tarifa mas baja posible, para
-    mostrar "desde $X" en el carrito antes de pedir ciudad de entrega."""
-    if subtotal >= FREE_SHIPPING_THRESHOLD:
-        return Decimal('0.00')
+    mostrar "desde $X" en el carrito antes de pedir ciudad de entrega.
+    `subtotal` se recibe por la misma razon que en get_mock_quote."""
     return FLAT_RATE_MAIN_CITY

@@ -342,7 +342,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 32px;
+  gap: var(--space-6);
   color: var(--home-muted);
 }
 
@@ -408,7 +408,7 @@
 .quantum-profile-form__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px 14px;
+  gap: var(--space-4) 14px;
 }
 
 .quantum-profile-form__field {
@@ -430,7 +430,7 @@
   border-radius: 0;
   background: rgba(31, 31, 36, 0.9);
   color: #ffffff;
-  padding: 8px 10px;
+  padding: var(--space-2) 10px;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -464,7 +464,7 @@
 .quantum-profile-form__actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .quantum-profile-form__actions button {
@@ -542,7 +542,7 @@
 }
 
 .quantum-hero--session .quantum-hero__links--inside {
-  margin-top: 48px;
+  margin-top: var(--space-7);
 }
 
 .quantum-hero--session .quantum-hero__links--influencer {
@@ -620,7 +620,7 @@
 }
 
 .quantum-hero__logout-form {
-  margin: 16px 0 0;
+  margin: var(--space-4) 0 0;
 }
 
 .quantum-hero__logout {
@@ -766,7 +766,7 @@
 
   .quantum-hero--session .quantum-hero__links--influencer {
     width: min(100%, 330px);
-    margin-top: 12px;
+    margin-top: var(--space-3);
     gap: 14px;
   }
 
@@ -819,7 +819,7 @@
   --home-muted: rgba(255, 255, 255, 0.68);
   position: relative;
   min-height: 100vh;
-  padding: 24px 16px 54px;
+  padding: var(--space-5) var(--space-4) 54px;
   overflow-x: hidden;
   background:
     radial-gradient(circle at 50% 42%, rgba(47, 62, 67, 0.95) 0%, rgba(22, 28, 31, 0.88) 25%, rgba(8, 9, 11, 1) 68%, #030405 100%);
@@ -908,7 +908,7 @@
 }
 
 .quantum-privacy h2 {
-  margin: 0 0 12px;
+  margin: 0 0 var(--space-3);
   color: var(--home-mint);
   font-size: 18px;
   font-weight: 800;
@@ -916,7 +916,7 @@
 }
 
 .quantum-privacy h3 {
-  margin: 16px 0 8px;
+  margin: var(--space-4) 0 var(--space-2);
   color: var(--home-gold);
   font-size: 15px;
   font-weight: 800;
@@ -947,7 +947,7 @@
 .quantum-privacy__toc div {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 14px;
+  gap: var(--space-2) 14px;
 }
 
 .quantum-privacy__toc a,
@@ -968,7 +968,7 @@
 
 .quantum-privacy__top {
   display: inline-flex;
-  margin-top: 8px;
+  margin-top: var(--space-2);
 }
 
 @media (max-width: 560px) {
@@ -977,7 +977,7 @@
   }
 
   .quantum-privacy {
-    padding: 18px 12px 42px;
+    padding: 18px var(--space-3) 42px;
   }
 
   .quantum-privacy__header h1 {

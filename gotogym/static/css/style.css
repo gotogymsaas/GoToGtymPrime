@@ -155,7 +155,7 @@ picture source {
   z-index: 1000;
   top: 12px;
   left: 12px;
-  padding: 10px 16px;
+  padding: 10px var(--space-4);
   background: var(--color-accent);
   color: var(--color-bg-base);
   font-weight: 800;
@@ -252,7 +252,7 @@ picture source {
 
 .pdp-gallery__thumbs {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
   margin-top: 12px;
   overflow-x: auto;
   padding: 2px;
@@ -262,7 +262,7 @@ picture source {
   flex: 0 0 64px;
   width: 64px;
   height: 64px;
-  padding: 4px;
+  padding: var(--space-1);
   border: 2px solid #e5e7eb;
   border-radius: 10px;
   background: var(--color-premium-white, #f8f9fa);
@@ -527,7 +527,7 @@ picture source {
    de marca y debe leerse igual en los dos extremos de la pagina. */
 .gtg-footer-brand__mark {
   border-radius: 50%;
-  padding: 8px;
+  padding: var(--space-2);
   animation: gtg-brand-breathe 4.5s ease-in-out infinite;
 }
 
@@ -567,7 +567,7 @@ picture source {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .gtg-icon-button,
@@ -599,7 +599,7 @@ picture source {
   min-height: 40px;
   max-width: 190px;
   flex-direction: row;
-  gap: 8px;
+  gap: var(--space-2);
   padding: 0 14px 0 10px;
   overflow: hidden;
   align-items: center;
@@ -714,7 +714,7 @@ picture source {
 .gtg-dropdown button {
   display: block;
   width: 100%;
-  padding: 10px 12px;
+  padding: 10px var(--space-3);
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
@@ -753,7 +753,7 @@ picture source {
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--color-text-primary);
-  padding: 12px 14px;
+  padding: var(--space-3) 14px;
   text-align: left;
   transition: background 0.2s ease, color 0.2s ease;
 }
@@ -780,7 +780,7 @@ picture source {
   justify-content: center;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
-  padding: 10px 24px;
+  padding: 10px var(--space-5);
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
@@ -1082,7 +1082,7 @@ picture source {
 .gtg-nav-search {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   height: 40px;
   padding: 0 6px 0 14px;
   border: 1px solid var(--color-border);
@@ -1132,7 +1132,7 @@ picture source {
 /* Buscador dentro del panel movil: mismo destino, ancho completo. */
 .gtg-mobile-search {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
   margin-bottom: var(--space-2);
 }
 
@@ -1150,7 +1150,7 @@ picture source {
 .gtg-mobile-search button {
   width: auto;
   height: 44px;
-  padding: 0 16px;
+  padding: 0 var(--space-4);
   border-radius: var(--radius-sm);
   background: var(--color-accent);
   color: #001a18;
@@ -1194,7 +1194,7 @@ picture source {
 .gtg-minicart__head {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   margin-bottom: var(--space-3);
   color: var(--color-accent);
   font-size: 13px;
@@ -1206,7 +1206,7 @@ picture source {
 .gtg-minicart__head .material-icons-outlined { font-size: 18px; }
 
 .gtg-minicart__product {
-  margin: 0 0 4px;
+  margin: 0 0 var(--space-1);
   color: var(--color-text-primary);
   font-size: 15px;
   font-weight: 700;
@@ -1230,7 +1230,7 @@ picture source {
   align-items: center;
   justify-content: center;
   min-height: 44px;
-  padding: 0 16px;
+  padding: 0 var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: transparent;
