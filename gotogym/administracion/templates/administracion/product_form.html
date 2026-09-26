@@ -9,62 +9,190 @@
 <form class="panel form-grid" method="post" enctype="multipart/form-data">
   {% csrf_token %}
   {% for field in form %}
+    {% if field.name == 'tags' %}
+    <div class="field-full field-tags">
+      <span class="field-label">{{ field.label }}</span>
+      {{ field }}
+      {{ field.errors }}
+    </div>
+    {% elif field.name == 'featured' %}
+    <label class="check field-featured">
+      {{ field }}
+      <span>{{ field.label }}</span>
+      {{ field.errors }}
+    </label>
+    {% elif field.name == 'base_price' %}
+    <label>
+      <span>{{ field.label }}</span>
+      <div class="price-field">
+        <span class="price-field__symbol">$</span>
+        {{ field }}
+        <select class="price-field__currency" aria-label="Moneda">
+          <option selected>COP</option>
+        </select>
+      </div>
+      {{ field.errors }}
+    </label>
+    {% else %}
     <label>
       <span>{{ field.label }}</span>
       {{ field }}
       {{ field.errors }}
     </label>
+    {% endif %}
   {% endfor %}
-  {% if product.image %}
-    <div class="image-editor">
-      <img src="{{ product.image.url }}" alt="{{ product.name }}">
-      <label class="check"><input type="checkbox" name="clear_image" value="1"> Eliminar imagen actual</label>
-    </div>
+  {% if not product %}
+    <p class="hint field-full">La imagen del producto se agrega despues de guardar, en la seccion "Imagenes" de abajo.</p>
   {% endif %}
 
+  <script>
+  // Precio en pesos: mientras se escribe, muestra puntos de miles
+  // ("300.000"); el servidor limpia esos puntos antes de guardar (ver
+  // COPPriceField.to_python), asi que aqui solo importa la vista. Se
+  // expone en window porque el boton "+ Agregar variante" de mas abajo
+  // clona filas nuevas con su propio campo de precio, y necesita poder
+  // engancharles el mismo formateo.
+  window.gtgAttachMoneyInputs = function (root) {
+    function formatearPesos(valor) {
+      var digitos = valor.replace(/[^\d]/g, '');
+      if (!digitos) return '';
+      return digitos.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+    (root || document).querySelectorAll('input[data-money]').forEach(function (input) {
+      if (input.dataset.moneyBound) return;
+      input.dataset.moneyBound = 'true';
+      input.value = formatearPesos(input.value);
+      input.addEventListener('input', function () {
+        var posicion = input.value.length - input.selectionEnd;
+        input.value = formatearPesos(input.value);
+        input.selectionEnd = input.selectionStart = Math.max(0, input.value.length - posicion);
+      });
+    });
+  };
+  window.gtgAttachMoneyInputs();
+  </script>
+
   {% if variant_formset %}
-  <div class="panel">
+  <div class="panel field-full variants-panel">
     <h2>Variantes</h2>
+    <p class="hint">Cada fila es una presentacion vendible del producto (talla + color), con su propio stock. El SKU lo genera el sistema solo, a partir del producto, la talla y el color.</p>
     {{ variant_formset.non_form_errors }}
     {{ variant_formset.management_form }}
-    <table>
-      <thead><tr><th>SKU</th><th>Talla</th><th>Color</th><th>Precio propio</th><th>Stock</th><th>Activa</th><th>Eliminar</th></tr></thead>
-      <tbody>
+    <div class="variants-table-wrap">
+    <table class="variants-table" id="variants-table">
+      <thead><tr><th>SKU</th><th>Talla</th><th>Color</th><th>Precio propio</th><th>Stock</th><th>Activa</th><th></th></tr></thead>
+      <tbody id="variants-body">
         {% for vform in variant_formset.forms %}
-        <tr>
-          <td>{{ vform.id }}{{ vform.sku }}{{ vform.sku.errors }}</td>
-          <td>{{ vform.size }}</td>
-          <td>{{ vform.color }}</td>
-          <td>{{ vform.price_override }}</td>
-          <td>{{ vform.quantity_available }}</td>
-          <td>{{ vform.is_active }}</td>
-          <td>{% if vform.instance.pk %}{{ vform.DELETE }}{% endif %}</td>
+        <tr class="variant-row">
+          <td data-label="SKU">
+            {{ vform.id }}
+            {% if vform.instance.pk %}<code>{{ vform.instance.sku }}</code>{% else %}<span class="empty-img">Se genera al guardar</span>{% endif %}
+          </td>
+          <td data-label="Talla">{{ vform.size }}</td>
+          <td data-label="Color">{{ vform.color }}</td>
+          <td data-label="Precio propio">{{ vform.price_override }}</td>
+          <td data-label="Stock">{{ vform.quantity_available }}</td>
+          <td data-label="Activa" class="cell-check">{{ vform.is_active }}</td>
+          <td data-label="Quitar" class="cell-check">
+            {% if vform.instance.pk %}
+              {{ vform.DELETE }}
+            {% else %}
+              <button type="button" class="ghost btn-sm remove-variant-row">Quitar</button>
+            {% endif %}
+          </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+    </div>
+    <button type="button" class="ghost btn-sm" id="add-variant-row">+ Agregar variante</button>
   </div>
+  <template id="variant-empty-row-template">
+    <tr class="variant-row">
+      <td data-label="SKU"><span class="empty-img">Se genera al guardar</span></td>
+      <td data-label="Talla">{{ variant_formset.empty_form.size }}</td>
+      <td data-label="Color">{{ variant_formset.empty_form.color }}</td>
+      <td data-label="Precio propio">{{ variant_formset.empty_form.price_override }}</td>
+      <td data-label="Stock">{{ variant_formset.empty_form.quantity_available }}</td>
+      <td data-label="Activa" class="cell-check">{{ variant_formset.empty_form.is_active }}</td>
+      <td data-label="Quitar" class="cell-check"><button type="button" class="ghost btn-sm remove-variant-row">Quitar</button></td>
+    </tr>
+  </template>
+  <script>
+  (function () {
+    var addButton = document.getElementById('add-variant-row');
+    var body = document.getElementById('variants-body');
+    var template = document.getElementById('variant-empty-row-template');
+    var totalForms = document.getElementById('id_variants-TOTAL_FORMS');
+    if (!addButton || !body || !template || !totalForms) return;
+
+    function quitarFila(event) {
+      var boton = event.target.closest('.remove-variant-row');
+      if (!boton) return;
+      boton.closest('tr').remove();
+      // No se toca TOTAL_FORMS: el formset tolera un indice sin ningun
+      // campo presente en el POST (lo trata como un formulario vacio de
+      // mas), asi que quitar la fila del DOM basta.
+    }
+
+    addButton.addEventListener('click', function () {
+      var indice = parseInt(totalForms.value, 10);
+      var fila = template.content.firstElementChild.cloneNode(true);
+      fila.querySelectorAll('[name*="__prefix__"], [id*="__prefix__"]').forEach(function (campo) {
+        if (campo.name) campo.name = campo.name.replace('__prefix__', indice);
+        if (campo.id) campo.id = campo.id.replace('__prefix__', indice);
+      });
+      body.appendChild(fila);
+      totalForms.value = indice + 1;
+      if (window.gtgAttachMoneyInputs) window.gtgAttachMoneyInputs(fila);
+    });
+
+    body.addEventListener('click', quitarFila);
+  })();
+  </script>
   {% elif not product %}
-  <p class="hint">Guarda el producto primero para poder agregar sus variantes.</p>
+  <p class="hint field-full">Guarda el producto primero para poder agregar sus variantes.</p>
   {% endif %}
 
   <div class="form-actions">
     <a class="ghost" href="{% url 'admin_products' %}">Cancelar</a>
-    <button class="button" type="submit">Guardar</button>
+    <button class="button" type="submit" data-submit-once>Guardar</button>
   </div>
 </form>
+<script>
+(function () {
+  // Un doble clic (o un envio lento en una red mala) en "Guardar" crea dos
+  // productos identicos, cada uno con su propio POST: el servidor no tiene
+  // forma de saber que es el mismo click, porque el nombre del producto no
+  // es unico a proposito (dos productos distintos pueden compartir
+  // nombre). Deshabilitar el boton apenas se envia el formulario es la
+  // proteccion real, no una validacion de "nombre repetido" que rechazaria
+  // tambien un duplicado legitimo.
+  document.querySelectorAll('form').forEach(function (form) {
+    var boton = form.querySelector('[data-submit-once]');
+    if (!boton) return;
+    form.addEventListener('submit', function () {
+      if (form.checkValidity && !form.checkValidity()) return;
+      setTimeout(function () { boton.disabled = true; }, 0);
+    });
+  });
+})();
+</script>
 
 {% if product %}
 <div class="panel">
   <h2>Imagenes</h2>
-  <div class="media-gallery">
+  {% if perms.products.change_product and media_items|length > 1 %}
+  <p class="hint">Arrastra una imagen para cambiar su orden en la galeria.</p>
+  {% endif %}
+  <div class="media-gallery" id="media-gallery" data-reorder-url="{% url 'admin_product_media_reorder' product.pk %}">
     {% for media in media_items %}
-    <div class="media-item">
+    <div class="media-item" data-media-id="{{ media.pk }}" {% if perms.products.change_product %}draggable="true"{% endif %}>
       <img src="{{ media.image.url }}" alt="{{ media.alt_text }}">
-      <p>{% if media.is_primary %}<strong>Principal</strong>{% endif %} orden {{ media.sort_order }}</p>
+      <p>{% if media.is_primary %}<strong>Principal</strong>{% endif %} orden <span class="sort-order-label">{{ media.sort_order }}</span></p>
       <form method="post" action="{% url 'admin_product_media_delete' product.pk media.pk %}">
         {% csrf_token %}
-        <button class="ghost" type="submit">Eliminar</button>
+        <button class="ghost btn-sm" type="submit">Eliminar</button>
       </form>
     </div>
     {% empty %}
@@ -72,17 +200,87 @@
     {% endfor %}
   </div>
 
-  <form method="post" action="{% url 'admin_product_media_add' product.pk %}" enctype="multipart/form-data" class="form-grid">
+  <form method="post" action="{% url 'admin_product_media_add' product.pk %}" enctype="multipart/form-data" class="media-upload-form">
     {% csrf_token %}
-    {% for field in media_form %}
+    <p class="hint">Puedes seleccionar varias fotos a la vez. Se agregan al final de la galeria; arrastra despues para reordenar o elegir cual va primero.</p>
     <label>
-      <span>{{ field.label }}</span>
-      {{ field }}
-      {{ field.errors }}
+      <span>Imagenes</span>
+      <input type="file" name="image" accept="image/*" multiple required>
     </label>
-    {% endfor %}
-    <button class="button" type="submit">Agregar imagen</button>
+    <button class="button" type="submit">Agregar imagenes</button>
   </form>
 </div>
+<script>
+(function () {
+  var gallery = document.getElementById('media-gallery');
+  if (!gallery) return;
+  var reorderUrl = gallery.dataset.reorderUrl;
+  var csrftoken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+  var dragged = null;
+
+  gallery.addEventListener('dragstart', function (event) {
+    var item = event.target.closest('.media-item');
+    if (!item) return;
+    dragged = item;
+    item.classList.add('is-dragging');
+    event.dataTransfer.effectAllowed = 'move';
+  });
+
+  gallery.addEventListener('dragend', function () {
+    if (dragged) dragged.classList.remove('is-dragging');
+    dragged = null;
+    gallery.querySelectorAll('.is-drop-target').forEach(function (el) {
+      el.classList.remove('is-drop-target');
+    });
+  });
+
+  gallery.addEventListener('dragover', function (event) {
+    var target = event.target.closest('.media-item');
+    if (!dragged || !target || target === dragged) return;
+    event.preventDefault();
+    target.classList.add('is-drop-target');
+  });
+
+  gallery.addEventListener('dragleave', function (event) {
+    var target = event.target.closest('.media-item');
+    if (target) target.classList.remove('is-drop-target');
+  });
+
+  gallery.addEventListener('drop', function (event) {
+    var target = event.target.closest('.media-item');
+    if (!dragged || !target || target === dragged) return;
+    event.preventDefault();
+    target.classList.remove('is-drop-target');
+
+    var items = Array.from(gallery.querySelectorAll('.media-item'));
+    var draggedIndex = items.indexOf(dragged);
+    var targetIndex = items.indexOf(target);
+    if (draggedIndex < targetIndex) {
+      target.after(dragged);
+    } else {
+      target.before(dragged);
+    }
+
+    var ids = Array.from(gallery.querySelectorAll('.media-item')).map(function (el, index) {
+      var label = el.querySelector('.sort-order-label');
+      if (label) label.textContent = index;
+      return el.dataset.mediaId;
+    });
+
+    var body = new URLSearchParams();
+    ids.forEach(function (id) { body.append('media_id', id); });
+
+    fetch(reorderUrl, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    }).catch(function () {
+      // Sin conexion: el orden queda cambiado solo en pantalla; al
+      // recargar la pagina vuelve al ultimo orden guardado en el servidor.
+    });
+  });
+})();
+</script>
 {% endif %}
 {% endblock %}

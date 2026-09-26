@@ -3,28 +3,69 @@
 <section class="page-head">
   <div>
     <p class="eyebrow">Usuarios inscritos en GoToGym</p>
-    <h1>Usuarios</h1>
+    <h1>Usuarios y roles</h1>
   </div>
 </section>
+<div class="filter-tabs">
+  <a href="?q={{ query }}" class="{% if not role %}active{% endif %}">Todos</a>
+  <a href="?q={{ query }}&role=user" class="{% if role == 'user' %}active{% endif %}">Usuario</a>
+  <a href="?q={{ query }}&role=influencer" class="{% if role == 'influencer' %}active{% endif %}">Influencer</a>
+  <a href="?q={{ query }}&role=admin" class="{% if role == 'admin' %}active{% endif %}">Administrador</a>
+  <a href="?q={{ query }}&role=inactive" class="{% if role == 'inactive' %}active{% endif %}">Inactivos</a>
+</div>
 <form class="search" method="get">
+  <input type="hidden" name="role" value="{{ role }}">
   <input name="q" value="{{ query }}" placeholder="Buscar por email, usuario o nombre">
   <button type="submit">Buscar</button>
 </form>
 <div class="panel">
-  <table>
-    <thead><tr><th>Email</th><th>Nombre</th><th>Usuario</th><th>Edad</th><th>Fecha registro</th><th>Activo</th><th>Es influencer</th></tr></thead>
+  <table class="users-table">
+    <thead><tr><th>Usuario</th><th>Rol</th><th>Cambiar rol</th><th>Estado</th><th>Registro</th><th></th></tr></thead>
     <tbody>
-      {% for user in page_obj %}
+      {% for member in page_obj %}
       <tr>
-        <td>{{ user.email }}</td>
-        <td>{{ user.first_name|default:"" }} {{ user.last_name|default:"" }}</td>
-        <td>{{ user.username }}</td>
-        <td>{{ user.age|default:"-" }}</td>
-        <td>{{ user.date_joined|date:"d/m/Y H:i" }}</td>
-        <td>{{ user.is_active|yesno:"Si,No" }}</td>
-        <td>{{ user.es_influencer|yesno:"Si,No" }}</td>
+        <td>
+          <strong>{{ member.email }}</strong>
+          <small>{{ member.first_name|default:"" }} {{ member.last_name|default:"" }}</small>
+        </td>
+        <td>
+          {% if member.is_superuser %}<span class="badge badge-gold">Superusuario</span>
+          {% elif member.is_staff %}<span class="badge badge-gold">Administrador</span>
+          {% elif member.es_influencer %}<span class="badge badge-accent">Influencer</span>
+          {% else %}<span class="badge badge-muted">Usuario</span>{% endif %}
+        </td>
+        <td>
+          {% if not member.is_superuser and perms.accounts.change_user %}
+          <form class="role-form" method="post" action="{% url 'admin_user_role_update' member.pk %}">
+            {% csrf_token %}
+            <select name="role">
+              <option value="user" {% if not member.is_staff and not member.es_influencer %}selected{% endif %}>Usuario</option>
+              <option value="influencer" {% if not member.is_staff and member.es_influencer %}selected{% endif %}>Influencer</option>
+              <option value="admin" {% if member.is_staff %}selected{% endif %}>Administrador</option>
+            </select>
+            <button class="ghost btn-sm" type="submit">Aplicar</button>
+          </form>
+          {% endif %}
+        </td>
+        <td>{% if member.is_active %}<span class="pill pill-ok">Activo</span>{% else %}<span class="pill pill-off">Inactivo</span>{% endif %}</td>
+        <td><small>{{ member.date_joined|date:"d/m/Y H:i" }}</small></td>
+        <td class="actions">
+          {% if not member.is_superuser and perms.accounts.change_user %}
+          <form method="post" action="{% url 'admin_user_toggle_active' member.pk %}">
+            {% csrf_token %}
+            <button class="ghost btn-sm" type="submit">{% if member.is_active %}Desactivar{% else %}Activar{% endif %}</button>
+          </form>
+          {% endif %}
+          {% if not member.is_superuser and perms.accounts.delete_user %}
+          <form method="post" action="{% url 'admin_user_delete' member.pk %}" onsubmit="return confirm('¿Eliminar definitivamente la cuenta {{ member.email|escapejs }}? Esta accion no se puede deshacer.');">
+            {% csrf_token %}
+            <button class="button btn-sm product-delete-button" type="submit">Eliminar</button>
+          </form>
+          {% endif %}
+          {% if member.is_superuser %}<span class="empty-img">No editable</span>{% endif %}
+        </td>
       </tr>
-      {% empty %}<tr><td colspan="7">No hay usuarios registrados.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="6">No hay usuarios registrados.</td></tr>{% endfor %}
     </tbody>
   </table>
 </div>

@@ -16,6 +16,29 @@ class Brand(models.Model):
     def __str__(self):
         return self.name
 
+class ProductTag(models.Model):
+    """Etiqueta/badge visual para el catalogo (Best Seller, Nuevo, Oferta...).
+
+    Es una entidad propia (no flags sueltos en Product) para que un admin
+    pueda crear o desactivar badges nuevos sin migraciones: la lista de
+    etiquetas disponibles vive en datos, no en el esquema.
+    """
+
+    name = models.CharField(max_length=40, unique=True)
+    slug = models.SlugField(max_length=50, unique=True)
+    color_token = models.CharField(
+        max_length=20, default='accent',
+        help_text="Token de color del tema admin (accent, gold, danger...).",
+    )
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     """Ficha comercial. La unidad vendible es ProductVariant, no este modelo.
 
@@ -31,6 +54,7 @@ class Product(models.Model):
     discount = models.PositiveIntegerField(default=0, help_text="Porcentaje de descuento")
     stock = models.PositiveIntegerField(default=0)
     featured = models.BooleanField(default=False)
+    tags = models.ManyToManyField(ProductTag, blank=True, related_name='products')
     image = models.ImageField(upload_to='products/', blank=True, null=True)
 
     def __str__(self):

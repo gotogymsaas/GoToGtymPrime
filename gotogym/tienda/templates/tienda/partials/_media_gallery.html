@@ -1,33 +1,30 @@
-{% load static %}{% get_static_prefix as STATIC_PREFIX %}{% comment %}
-Galeria de medios de la PDP. Conserva el contexto existente y repite la
-imagen en la interfaz cuando el producto solo tiene una, sin crear media
-adicional ni modificar los datos originales.
+{% load static imagenes %}{% comment %}
+Galeria de medios de la PDP: siempre muestra exactamente las fotos reales
+del producto (`gallery`, ver tienda.catalog.product_gallery), nunca
+repite una imagen para simular una galeria de "al menos dos fotos". Con
+una sola foto no hay flechas ni miniaturas que mostrar -- no hay a donde
+navegar -- asi que esos controles se ocultan.
+
+Las URL salen de `url_imagen_producto` (tienda.templatetags.imagenes), la
+misma resolucion que usa la tarjeta de catalogo.
 {% endcomment %}
 <div class="pdp-gallery" data-gallery>
   <div class="pdp-gallery__viewport">
     <div class="pdp-gallery__track" data-gallery-track>
-      {% if gallery and gallery|length > 1 %}
-        {% for media in gallery %}
-        <figure class="pdp-gallery__slide{% if forloop.first %} is-active{% endif %}" data-gallery-slide data-gallery-index="{{ forloop.counter0 }}"{% if not forloop.first %} hidden style="display: none;"{% endif %}>
-          <img{% if forloop.first %} id="pdp-main-image"{% endif %}
-               src="{{ STATIC_PREFIX }}product_media/{{ media.image.name }}"
-               alt="{{ media.alt_text|default:producto.name }}" class="object-contain max-h-full max-w-full">
-        </figure>
-        {% endfor %}
-      {% else %}
-        {% with fallback_image=image.name|default:'images/img/placeholder.webp' %}
-        <figure class="pdp-gallery__slide is-active" data-gallery-slide data-gallery-index="0">
-          <img id="pdp-main-image" src="{% if image %}{{ STATIC_PREFIX }}product_media/{{ fallback_image }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
-               alt="{{ producto.name }}" class="object-contain max-h-full max-w-full">
-        </figure>
-        <figure class="pdp-gallery__slide" data-gallery-slide data-gallery-index="1" aria-hidden="true" hidden style="display: none;">
-          <img src="{% if image %}{{ STATIC_PREFIX }}product_media/{{ fallback_image }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
-               alt="{{ producto.name }}" class="object-contain max-h-full max-w-full">
-        </figure>
-        {% endwith %}
-      {% endif %}
+      {% for media in gallery %}
+      <figure class="pdp-gallery__slide{% if forloop.first %} is-active{% endif %}" data-gallery-slide data-gallery-index="{{ forloop.counter0 }}"{% if not forloop.first %} hidden style="display: none;"{% endif %}>
+        <img{% if forloop.first %} id="pdp-main-image"{% endif %}
+             src="{% url_imagen_producto media.image.name %}"
+             alt="{{ media.alt_text|default:producto.name }}" class="object-contain max-h-full max-w-full">
+      </figure>
+      {% empty %}
+      <figure class="pdp-gallery__slide is-active" data-gallery-slide data-gallery-index="0">
+        <img id="pdp-main-image" src="{% url_imagen_producto '' %}" alt="{{ producto.name }}" class="object-contain max-h-full max-w-full">
+      </figure>
+      {% endfor %}
     </div>
 
+    {% if gallery|length > 1 %}
     <button type="button" class="pdp-gallery__control pdp-gallery__control--prev" data-gallery-prev aria-label="Imagen anterior" style="position: absolute; top: 50%; left: 14px; z-index: 2;">
       <span class="material-icons-outlined" aria-hidden="true">chevron_left</span>
     </button>
@@ -35,24 +32,18 @@ adicional ni modificar los datos originales.
       <span class="material-icons-outlined" aria-hidden="true">chevron_right</span>
     </button>
     <div class="pdp-gallery__counter" aria-live="polite">
-      <span data-gallery-current>1</span> / <span data-gallery-total>1</span>
+      <span data-gallery-current>1</span> / <span data-gallery-total>{{ gallery|length|default:1 }}</span>
     </div>
-  </div>
-
-  <div class="pdp-gallery__thumbs" data-gallery-thumbs role="tablist" aria-label="Imagenes del producto">
-    {% if gallery and gallery|length > 1 %}
-      {% for media in gallery %}
-      <button type="button" class="pdp-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-gallery-thumb data-gallery-index="{{ forloop.counter0 }}" role="tab" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="Ver imagen {{ forloop.counter }}">
-        <img src="{{ STATIC_PREFIX }}product_media/{{ media.image.name }}" alt="{{ media.alt_text|default:producto.name }}" class="object-contain w-full h-full">
-      </button>
-      {% endfor %}
-    {% else %}
-      <button type="button" class="pdp-gallery__thumb is-active" data-gallery-thumb data-gallery-index="0" role="tab" aria-selected="true" aria-label="Ver imagen 1">
-        <img src="{% if image %}{{ STATIC_PREFIX }}product_media/{{ image.name }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}" alt="{{ producto.name }}" class="object-contain w-full h-full">
-      </button>
-      <button type="button" class="pdp-gallery__thumb" data-gallery-thumb data-gallery-index="1" role="tab" aria-selected="false" aria-label="Ver imagen 2">
-        <img src="{% if image %}{{ STATIC_PREFIX }}product_media/{{ image.name }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}" alt="{{ producto.name }}" class="object-contain w-full h-full">
-      </button>
     {% endif %}
   </div>
+
+  {% if gallery|length > 1 %}
+  <div class="pdp-gallery__thumbs" data-gallery-thumbs role="tablist" aria-label="Imagenes del producto">
+    {% for media in gallery %}
+    <button type="button" class="pdp-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-gallery-thumb data-gallery-index="{{ forloop.counter0 }}" role="tab" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="Ver imagen {{ forloop.counter }}">
+      <img src="{% url_imagen_producto media.image.name %}" alt="{{ media.alt_text|default:producto.name }}" class="object-contain w-full h-full">
+    </button>
+    {% endfor %}
+  </div>
+  {% endif %}
 </div>

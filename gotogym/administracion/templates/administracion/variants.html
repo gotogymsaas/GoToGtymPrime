@@ -4,28 +4,86 @@
 <section class="page-head">
   <div>
     <p class="eyebrow">Catalogo comercial</p>
-    <h1>Variantes</h1>
+    <h1>Inventario</h1>
   </div>
+  {% if perms.administracion.change_panelsettings %}
+  <form class="role-form" method="post" action="{% url 'admin_inventory_threshold_update' %}">
+    {% csrf_token %}
+    <label class="check">
+      <span>Umbral de stock bajo</span>
+      {{ threshold_form.low_stock_threshold }}
+    </label>
+    <button class="ghost btn-sm" type="submit">Guardar umbral</button>
+  </form>
+  {% endif %}
 </section>
 <form class="search" method="get">
   <input name="q" value="{{ query }}" placeholder="Buscar por SKU o producto">
-  <button type="submit">Buscar</button>
+  <select name="categoria">
+    <option value="">Todas las categorias</option>
+    {% for categoria in categorias %}
+    <option value="{{ categoria.pk }}" {% if selected_categoria == categoria.pk|stringformat:"s" %}selected{% endif %}>{{ categoria.name }}</option>
+    {% endfor %}
+  </select>
+  <select name="talla">
+    <option value="">Todas las tallas</option>
+    {% for talla in tallas %}
+    <option value="{{ talla }}" {% if selected_talla == talla %}selected{% endif %}>{{ talla }}</option>
+    {% endfor %}
+  </select>
+  <select name="color">
+    <option value="">Todos los colores</option>
+    {% for color in colores %}
+    <option value="{{ color }}" {% if selected_color == color %}selected{% endif %}>{{ color }}</option>
+    {% endfor %}
+  </select>
+  <select name="status">
+    <option value="">Todas</option>
+    <option value="low" {% if status == 'low' %}selected{% endif %}>Stock bajo (&le;{{ low_stock_threshold }})</option>
+    <option value="out" {% if status == 'out' %}selected{% endif %}>Agotadas</option>
+  </select>
+  <button type="submit">Filtrar</button>
 </form>
 <div class="panel">
   <table>
-    <thead><tr><th>SKU</th><th>Producto</th><th>Talla</th><th>Color</th><th>Precio</th><th>Stock</th><th>Activa</th></tr></thead>
+    <thead><tr><th>SKU</th><th>Producto</th><th>Talla</th><th>Color</th><th>Precio</th><th>Stock</th><th>Estado</th><th>Activa</th><th>Actualizar stock</th></tr></thead>
     <tbody>
       {% for variant in page_obj %}
+      {% with disponible=variant.inventory.quantity_available %}
       <tr>
         <td><strong>{{ variant.sku }}</strong></td>
         <td>{{ variant.product.name }}</td>
         <td>{{ variant.size }}</td>
         <td>{{ variant.color }}</td>
         <td>${{ variant.effective_price|cop }} COP{% if variant.price_override %} <small>propio</small>{% endif %}</td>
-        <td>{% if variant.inventory %}{{ variant.inventory.quantity_available }}{% else %}<span class="empty-img">sin inventario</span>{% endif %}</td>
+        <td class="stock-value {% if not variant.inventory %}empty-img{% elif disponible == 0 %}stock-out{% elif disponible <= low_stock_threshold %}stock-low{% endif %}">
+          {% if variant.inventory %}{{ disponible }}{% else %}sin inventario{% endif %}
+        </td>
+        <td>
+          {% if not variant.inventory or disponible == 0 %}
+            <span class="pill pill-off">Agotado</span>
+          {% elif disponible <= low_stock_threshold %}
+            <span class="badge badge-gold">Stock bajo</span>
+          {% else %}
+            <span class="pill pill-ok">Disponible</span>
+          {% endif %}
+        </td>
         <td>{% if variant.is_active %}Si{% else %}No{% endif %}</td>
+        <td>
+          {% if perms.inventory.change_inventory %}
+          <form class="stock-form" method="post" action="{% url 'admin_variant_stock_update' variant.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <input type="number" min="0" name="quantity_available" value="{{ disponible|default:0 }}">
+            <button class="ghost btn-sm" type="submit">Guardar</button>
+          </form>
+          {% else %}
+            <span class="empty-img">Sin permiso</span>
+          {% endif %}
+        </td>
       </tr>
-      {% empty %}<tr><td colspan="7">No hay variantes registradas.</td></tr>{% endfor %}
+      {% endwith %}
+      {% empty %}<tr><td colspan="9">No hay variantes registradas.</td></tr>{% endfor %}
     </tbody>
   </table>
 </div>

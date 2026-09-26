@@ -57,6 +57,8 @@ button, input, select, textarea { font: inherit; }
   border-bottom: 1px solid var(--border);
 }
 .topbar div { display: grid; gap: 3px; }
+.topbar-actions { display: flex !important; align-items: center; gap: 10px; }
+.topbar-actions form { margin: 0; }
 .topbar span, .eyebrow, small { color: var(--muted); }
 .hero, .page-head {
   display: flex;
@@ -76,11 +78,25 @@ h2 { font-size: 20px; }
   padding: 10px 18px;
   cursor: pointer;
   font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
 }
 .button, .search button, .login-card button { background: var(--accent); color: #031615; }
 .button:hover, .search button:hover, .login-card button:hover { background: var(--accent-hover); }
 .ghost { background: #1a1a1d; border-color: var(--border); color: var(--text); }
 .danger { background: #402024; color: #ffb4b4; border-color: #6e2d35; }
+
+/* Unico tamano "chico" del panel: cualquier boton que viva dentro de una
+   fila de tabla o un grupo de acciones compacto (Eliminar, Desactivar,
+   Aplicar, Editar, Quitar...) usa esta clase. Antes cada pantalla
+   inventaba su propio alto/padding/tamano de letra para lo mismo
+   (21px aca, 24px alla, 32px, 38px...) y el resultado eran botones de
+   tamanos distintos sin ningun criterio visible de por que. */
+.btn-sm {
+  min-height: 36px;
+  padding: 8px 14px;
+  font-size: 13px;
+}
 .stats {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -96,6 +112,86 @@ h2 { font-size: 20px; }
 .stats article { padding: 16px 14px; }
 .stats span { display: block; font-size: 30px; font-weight: 800; color: var(--accent); }
 .stats p { margin-bottom: 0; color: var(--muted); font-size: 13px; line-height: 1.25; }
+.stats-secondary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.stat-warning span { color: var(--gold); }
+.stat-danger span { color: #ff9b9b; }
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.badge-accent { background: rgba(0,212,199,.14); color: var(--accent); border-color: rgba(0,212,199,.35); }
+.badge-gold { background: rgba(212,180,106,.14); color: var(--gold); border-color: rgba(212,180,106,.4); }
+.badge-danger { background: rgba(255,120,120,.14); color: #ff9b9b; border-color: rgba(255,120,120,.4); }
+.badge-muted { background: rgba(184,184,184,.12); color: var(--muted); border-color: var(--border); }
+.badge-row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.pill-ok::before { background: var(--accent); }
+.pill-ok { color: var(--accent); }
+.pill-off::before { background: #ff9b9b; }
+.pill-off { color: #ff9b9b; }
+
+.stock-value { font-weight: 700; }
+.stock-low { color: var(--gold); }
+.stock-out { color: #ff9b9b; }
+.stock-form { display: flex; align-items: center; gap: 6px; margin: 0; }
+.stock-form input { width: 80px; padding: 8px 10px; }
+
+.filter-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.filter-tabs a {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.filter-tabs a.active { background: rgba(0,212,199,.14); color: var(--accent); border-color: rgba(0,212,199,.35); }
+.role-form { display: flex; align-items: center; gap: 8px; margin: 0; }
+.role-form select { width: auto; min-width: 140px; padding: 8px 10px; }
+
+.hint { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+.permission-list { grid-column: 1 / -1; }
+.permission-list p { margin-bottom: 8px; }
+.permission-list ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.permission-list li { display: flex; align-items: center; gap: 10px; }
+.permission-list input { width: auto; }
+
+.media-gallery { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 18px; }
+.media-item {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #101419;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: grab;
+  width: 160px;
+}
+.media-item.is-dragging { opacity: .4; }
+.media-item.is-drop-target { border-color: var(--accent); }
+.media-item img { width: 140px; height: 140px; object-fit: cover; border-radius: 6px; pointer-events: none; }
+.media-item p { margin: 0; font-size: 12px; color: var(--muted); }
+.media-item form { margin: 0; }
+.media-upload-form { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.media-upload-form .hint { flex-basis: 100%; margin-bottom: 0; }
+.media-upload-form label { display: grid; gap: 7px; color: var(--muted); flex: 1; min-width: 220px; }
 .grid-two {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -120,8 +216,18 @@ td small { display: block; margin-top: 4px; }
   border: 1px solid var(--border);
 }
 .empty-img { color: var(--muted); font-size: 13px; }
-.actions { display: flex; align-items: center; gap: 8px; }
+.actions { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
 .actions form { margin: 0; }
+/* Usuarios y roles: fila unica con todos los atributos y botones en
+   linea (email, rol, cambiar rol, estado, registro, acciones), cada uno
+   en su propia columna real de la tabla -- asi el ancho de cada columna
+   se alinea solo entre filas, en vez de un div interno cuyo ancho varia
+   segun cuanto texto tenga el badge de esa fila. Si no entra completa en
+   pantallas angostas, el panel ya scrollea horizontal (ver
+   `.panel { overflow-x: auto }`) en vez de apilar nada dentro de la fila. */
+.users-table { font-size: 13px; white-space: nowrap; }
+.users-table th { font-size: 11px; }
+.users-table td small { color: var(--muted); font-size: 12px; }
 .search {
   display: grid;
   grid-template-columns: minmax(180px, 360px) auto;
@@ -155,6 +261,97 @@ input, select, textarea {
 .check { display: flex !important; grid-template-columns: auto 1fr; align-items: center; }
 .check input { width: auto; }
 .form-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+/* Formulario de producto: Tags (CheckboxSelectMultiple) y el panel de
+   Variantes son los dos elementos que antes no ocupaban las dos columnas
+   del form-grid, asi que un elemento vecino (el panel de Variantes)
+   terminaba metido al lado de Tags en la segunda columna en vez de
+   debajo, con las dos casillas ilegibles. `.field-full` los saca del
+   grid de dos columnas para que siempre ocupen la fila completa. */
+.field-full { grid-column: 1 / -1; }
+.field-tags { display: grid; gap: 8px; }
+.field-tags .field-label { color: var(--muted); }
+.field-tags ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.field-tags li { display: flex; }
+.field-tags label {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #101419;
+  color: var(--text);
+  cursor: pointer;
+}
+.field-tags input { width: auto; }
+.field-featured { justify-self: start; gap: 10px; padding-top: 4px; }
+
+/* Precio: simbolo de pesos + numero con punto de miles + moneda, como un
+   solo campo compuesto en vez de tres piezas sueltas. El input real
+   sigue siendo texto libre (para poder mostrar el punto de miles
+   mientras se escribe); solo el prefijo/sufijo cambian de estilo. */
+.price-field { display: flex; align-items: stretch; }
+.price-field__symbol {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  background: #101419;
+  color: var(--muted);
+  font-weight: 700;
+}
+.price-field input.money-input {
+  border-radius: 0;
+  text-align: right;
+}
+.price-field__currency {
+  width: auto;
+  min-width: 76px;
+  border-radius: 0 8px 8px 0;
+  border-left: none;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.variants-panel { display: grid; gap: 14px; }
+.variants-table-wrap { overflow-x: auto; }
+.variants-table { width: 100%; border-collapse: collapse; }
+.variants-table th {
+  white-space: nowrap;
+  font-size: 11px;
+  padding-bottom: 10px;
+}
+.variants-table td { padding: 8px 10px 8px 0; vertical-align: middle; }
+.variants-table input,
+.variants-table select { padding: 9px 10px; font-size: 13px; }
+.variants-table td:nth-child(1) input { min-width: 150px; }
+.variants-table td:nth-child(2) select { min-width: 90px; }
+.variants-table td:nth-child(3) input { min-width: 100px; }
+.variants-table td:nth-child(4) input { min-width: 110px; }
+.variants-table td:nth-child(5) input { min-width: 80px; }
+.variants-table .cell-check { text-align: center; }
+.variants-table .cell-check input { width: auto; }
+.variants-table code {
+  background: #101419;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+#add-variant-row { margin-top: 4px; }
 .messages {
   display: grid;
   gap: 10px;
@@ -217,30 +414,6 @@ input, select, textarea {
   gap: 12px;
 }
 .catalog-row form { margin: 0; }
-.catalog-row .button.catalog-delete-button {
-  min-height: 21px !important;
-  height: 21px !important;
-  padding: 2px 9px !important;
-  font-size: 11px !important;
-  line-height: 1 !important;
-  border-radius: 6px !important;
-}
-.brand-form-spacer {
-  min-height: 95px;
-}
-.button.catalog-save-button {
-  width: 178px;
-  min-height: 42px;
-  padding: 10px 18px;
-}
-.actions .button.product-delete-button {
-  min-height: 24px !important;
-  height: 24px !important;
-  padding: 2px 8px !important;
-  font-size: 11px !important;
-  line-height: 1 !important;
-  border-radius: 6px !important;
-}
 .login-page {
   display: grid;
   grid-template-columns: 1fr;
@@ -265,5 +438,4 @@ input, select, textarea {
   .stats, .grid-two, .form-grid { grid-template-columns: 1fr; }
   .hero, .page-head, .topbar { align-items: flex-start; flex-direction: column; }
   .search { grid-template-columns: 1fr; }
-  .brand-form-spacer { display: none; }
 }

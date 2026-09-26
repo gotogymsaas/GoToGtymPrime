@@ -1,20 +1,12 @@
-from django.contrib.auth import logout
 from django.contrib.auth import views as auth_views
-from django.shortcuts import redirect
 from django.urls import path
 
 from . import views
 
-
-# Vista personalizada para logout por GET
-def logout_view(request):
-    logout(request)
-    return redirect('home')
-
 urlpatterns = [
     path('acceso/', views.commercial_login_view, name='commercial_login'),
     path('login/', views.login_view, name='login'),
-    path('logout/', logout_view, name='logout'),
+    path('logout/', views.logout_view, name='logout'),
     path('register/', views.register_view, name='register'),
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='accounts/password_reset_form.html'), name='password_reset_form'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='accounts/password_reset_done.html'), name='password_reset_done'),

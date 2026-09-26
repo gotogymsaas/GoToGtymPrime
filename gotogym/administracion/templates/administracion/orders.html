@@ -4,11 +4,11 @@
 <section class="page-head">
   <div>
     <p class="eyebrow">Operacion</p>
-    <h1>Pedidos</h1>
+    <h1>Pedidos y pagos</h1>
   </div>
 </section>
 <form class="search" method="get">
-  <input name="q" value="{{ query }}" placeholder="Buscar por numero o correo">
+  <input name="q" value="{{ query }}" placeholder="Buscar por numero, correo o referencia de pago">
   <select name="order_status">
     <option value="">Todos los estados</option>
     {% for value, label in order_status_choices %}
@@ -25,7 +25,7 @@
 </form>
 <div class="panel">
   <table>
-    <thead><tr><th>Pedido</th><th>Fecha</th><th>Cliente</th><th>Estado</th><th>Pago</th><th>Total</th><th></th></tr></thead>
+    <thead><tr><th>Pedido</th><th>Fecha</th><th>Cliente</th><th>Estado</th><th>Pago</th><th>Referencia de pago</th><th>Total</th><th></th></tr></thead>
     <tbody>
       {% for order in page_obj %}
       <tr>
@@ -34,10 +34,19 @@
         <td>{{ order.email }}</td>
         <td>{{ order.get_order_status_display }}</td>
         <td>{{ order.get_payment_status_display }}</td>
+        <td>
+          {% with ultima_transaccion=order.payment_transactions.all|first %}
+          {% if ultima_transaccion %}
+            <small>{{ ultima_transaccion.provider }} &middot; {{ ultima_transaccion.preference_id|default:ultima_transaccion.payment_id }}</small>
+          {% else %}
+            <span class="empty-img">Sin pago aun</span>
+          {% endif %}
+          {% endwith %}
+        </td>
         <td>${{ order.total|cop }} COP</td>
-        <td class="actions"><a class="ghost" href="{% url 'admin_order_detail' order.order_number %}">Ver</a></td>
+        <td class="actions"><a class="ghost btn-sm" href="{% url 'admin_order_detail' order.order_number %}">Ver</a></td>
       </tr>
-      {% empty %}<tr><td colspan="7">No hay pedidos registrados.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="8">No hay pedidos registrados.</td></tr>{% endfor %}
     </tbody>
   </table>
 </div>

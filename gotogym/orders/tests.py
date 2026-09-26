@@ -11,7 +11,7 @@ from shipping.models import ShippingQuote
 from tienda.templatetags.tienda_filters import cop
 
 from .forms import CheckoutForm
-from .models import Address, Order, OrderItem, OrderStatus, PaymentStatus
+from .models import Address, Coupon, Order, OrderItem, OrderStatus, PaymentStatus
 from .services import (
     EmptyCartError,
     OutOfStockError,
@@ -414,6 +414,52 @@ class CotizacionEnVivoTests(CheckoutBaseTestCase):
 
         self.assertEqual(respuesta.status_code, 200)
         self.assertEqual(respuesta.json()['subtotal'], float(self.variante.effective_price))
+
+
+class ValidacionDeCuponEnVivoTests(CheckoutBaseTestCase):
+    """Vista previa AJAX del cupon en el checkout: debe reconocer cualquier
+    cupon vigente creado desde el panel admin, no solo el codigo legado
+    'CUPON' que antes estaba fijo en el JS de la plantilla."""
+
+    def _url(self, code=None):
+        url = reverse('orders:validar_cupon')
+        return f'{url}?code={code}' if code else url
+
+    def test_requiere_sesion_iniciada(self):
+        self.client.logout()
+        response = self.client.get(self._url('CUPON'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_carrito_vacio_devuelve_400(self):
+        response = self.client.get(self._url('CUPON'))
+        self.assertEqual(response.status_code, 400)
+
+    def test_cupon_legado_sigue_siendo_valido(self):
+        self._poner_en_carrito({str(self.variante.pk): 1})
+        respuesta = self.client.get(self._url('cupon'))
+        datos = respuesta.json()
+        self.assertTrue(datos['valid'])
+        self.assertEqual(datos['code'], 'CUPON')
+
+    def test_cupon_nuevo_creado_en_el_panel_admin_es_reconocido(self):
+        Coupon.objects.create(code='PANELNUEVO', discount_type='percentage', value=15)
+        self._poner_en_carrito({str(self.variante.pk): 1})
+        datos = self.client.get(self._url('panelnuevo')).json()
+        self.assertTrue(datos['valid'])
+
+    def test_cupon_desconocido_no_es_valido(self):
+        self._poner_en_carrito({str(self.variante.pk): 1})
+        datos = self.client.get(self._url('NOEXISTE')).json()
+        self.assertFalse(datos['valid'])
+
+    def test_descuento_previsto_coincide_con_el_pedido_real(self):
+        self._poner_en_carrito({str(self.variante.pk): 1})
+        datos = self.client.get(self._url('CUPON')).json()
+
+        pedido = create_order_from_cart(
+            self.usuario, {str(self.variante.pk): 1}, {**DATOS_VALIDOS, 'coupon_code': 'CUPON'},
+        )
+        self.assertEqual(Decimal(str(datos['discount'])), pedido.discount_total)
 
 
 class DetalleDePedidoTests(CheckoutBaseTestCase):

@@ -12,8 +12,8 @@ from .catalog import (
     build_variant_matrix,
     catalog_variants_queryset,
     color_swatch,
-    primary_image,
     product_features,
+    product_gallery,
     size_guide_rows,
     variant_stock,
 )
@@ -132,8 +132,7 @@ def producto_detail(request, pk):
 
     context = {
         'producto': producto,
-        'gallery': list(producto.media.all()) or None,
-        'image': primary_image(producto),
+        'gallery': product_gallery(producto),
         'variantes': variantes,
         'variantes_json': [
             {

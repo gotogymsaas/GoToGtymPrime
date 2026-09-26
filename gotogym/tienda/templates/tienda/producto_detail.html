@@ -362,9 +362,13 @@ document.addEventListener('DOMContentLoaded', function () {
     var total = galeria.querySelector('[data-gallery-total]');
     var indice = 0;
 
-    total.textContent = slides.length;
+    // Con una sola foto (o ninguna) la plantilla ni siquiera pinta las
+    // flechas, las miniaturas ni el contador -- no hay a donde navegar --
+    // asi que estos elementos pueden no existir en el DOM.
+    if (total) total.textContent = slides.length;
 
     function mostrarImagen(nuevoIndice) {
+      if (!slides.length) return;
       indice = (nuevoIndice + slides.length) % slides.length;
       slides.forEach(function (slide, posicion) {
         var activa = posicion === indice;
@@ -378,7 +382,7 @@ document.addEventListener('DOMContentLoaded', function () {
         thumb.classList.toggle('is-active', activa);
         thumb.setAttribute('aria-selected', activa ? 'true' : 'false');
       });
-      actual.textContent = indice + 1;
+      if (actual) actual.textContent = indice + 1;
     }
 
     miniaturas.forEach(function (thumb) {
@@ -387,13 +391,15 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
 
-    anterior.addEventListener('click', function () { mostrarImagen(indice - 1); });
-    siguiente.addEventListener('click', function () { mostrarImagen(indice + 1); });
-    galeria.addEventListener('keydown', function (event) {
-      if (event.key === 'ArrowLeft') mostrarImagen(indice - 1);
-      if (event.key === 'ArrowRight') mostrarImagen(indice + 1);
-    });
-    galeria.tabIndex = 0;
+    if (anterior) anterior.addEventListener('click', function () { mostrarImagen(indice - 1); });
+    if (siguiente) siguiente.addEventListener('click', function () { mostrarImagen(indice + 1); });
+    if (slides.length > 1) {
+      galeria.addEventListener('keydown', function (event) {
+        if (event.key === 'ArrowLeft') mostrarImagen(indice - 1);
+        if (event.key === 'ArrowRight') mostrarImagen(indice + 1);
+      });
+      galeria.tabIndex = 0;
+    }
     mostrarImagen(0);
   }
 

@@ -97,6 +97,59 @@ class FichaDeProductoTests(TiendaAutenticadaMixin, TestCase):
         self.assertNotContains(response, 'Comprar ahora')
 
 
+class GaleriaDeImagenesTests(TiendaAutenticadaMixin, TestCase):
+    """La galeria de la ficha mostraba siempre al menos dos diapositivas,
+    repitiendo la unica foto real cuando el producto tenia una sola (o
+    ninguna, cayendo al placeholder). Ahora se muestra exactamente la
+    cantidad de fotos que el producto tiene de verdad."""
+
+    @classmethod
+    def setUpTestData(cls):
+        from products.models import ProductMedia
+
+        categoria = ProductCategory.objects.create(name='Categoria galeria')
+        marca = Brand.objects.create(name='Marca galeria')
+
+        cls.sin_fotos = _crear_producto('Producto sin fotos', categoria, marca)
+        _crear_variante(cls.sin_fotos, 'GAL-000-U-UNI', 'UNICA', 'UNICO', 1)
+
+        cls.una_foto = _crear_producto('Producto con una foto', categoria, marca)
+        _crear_variante(cls.una_foto, 'GAL-001-U-UNI', 'UNICA', 'UNICO', 1)
+        ProductMedia.objects.create(product=cls.una_foto, image='products/una.jpg', sort_order=0)
+
+        cls.tres_fotos = _crear_producto('Producto con tres fotos', categoria, marca)
+        _crear_variante(cls.tres_fotos, 'GAL-002-U-UNI', 'UNICA', 'UNICO', 1)
+        for indice in range(3):
+            ProductMedia.objects.create(
+                product=cls.tres_fotos, image=f'products/foto-{indice}.jpg', sort_order=indice,
+            )
+
+    def _url(self, producto):
+        return reverse('tienda:producto_detail', args=[producto.pk])
+
+    def test_sin_ninguna_foto_la_galeria_queda_vacia(self):
+        response = self.client.get(self._url(self.sin_fotos))
+        self.assertEqual(response.context['gallery'], [])
+        self.assertEqual(response.content.decode().count('data-gallery-slide '), 1)
+
+    def test_con_una_foto_no_la_repite(self):
+        response = self.client.get(self._url(self.una_foto))
+        self.assertEqual(len(response.context['gallery']), 1)
+        self.assertEqual(response.content.decode().count('data-gallery-slide '), 1)
+        # Sin nada que navegar, no hay flechas ni miniaturas en el markup real
+        # (el texto igual aparece dentro del <script>, que referencia esos
+        # selectores de forma defensiva sin importar cuantas fotos haya).
+        contenido = response.content.decode()
+        self.assertNotIn('data-gallery-prev ', contenido)
+        self.assertNotIn('data-gallery-thumb ', contenido)
+
+    def test_con_tres_fotos_muestra_las_tres_sin_repetir(self):
+        response = self.client.get(self._url(self.tres_fotos))
+        self.assertEqual(len(response.context['gallery']), 3)
+        self.assertEqual(response.content.decode().count('data-gallery-slide '), 3)
+        self.assertContains(response, 'data-gallery-prev')
+
+
 class SuperposicionYColapsoTests(TiendaAutenticadaMixin, TestCase):
     """Contrato de la firma visual de G1: la seleccion de variante como
     colapso de un estado en superposicion (ver commerce_editorial.css y

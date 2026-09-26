@@ -8,24 +8,40 @@ from decimal import Decimal
 
 from carrito.services import build_cart_context
 from django.db import IntegrityError, transaction
+from django.db.models import F
 from django.utils import timezone
 from inventory.services import InsufficientStockError, decrement_stock, get_available_quantity
 from shipping.models import ShippingQuote
 from shipping.services import get_mock_quote
 
-from .models import Address, Order, OrderItem, OrderStatus, PaymentStatus
+from .models import Address, Coupon, Order, OrderItem, OrderStatus, PaymentStatus
 
 # Intentos para resolver la colision de dos pedidos creados a la vez.
 MAX_INTENTOS_NUMERO = 5
-COUPON_CODE = 'CUPON'
-COUPON_DISCOUNT_RATE = Decimal('0.10')
+
+
+def get_usable_coupon(coupon_code):
+    """Busca un cupon utilizable por su codigo, o None si no aplica.
+
+    Centraliza la busqueda para que el formulario (validacion) y el
+    servicio de creacion del pedido (aplicacion real) usen exactamente el
+    mismo criterio de "utilizable".
+    """
+    codigo = (coupon_code or '').strip().upper()
+    if not codigo:
+        return None
+    cupon = Coupon.objects.filter(code=codigo).first()
+    if cupon is None or not cupon.is_usable():
+        return None
+    return cupon
 
 
 def calculate_coupon_discount(subtotal, coupon_code=''):
-    """Calcula el descuento del único cupón mock habilitado."""
-    if (coupon_code or '').strip().upper() != COUPON_CODE:
+    """Calcula el descuento del cupon indicado, si existe y es utilizable."""
+    cupon = get_usable_coupon(coupon_code)
+    if cupon is None:
         return Decimal('0.00')
-    return (Decimal(subtotal) * COUPON_DISCOUNT_RATE).quantize(Decimal('0.01'))
+    return cupon.compute_discount(subtotal)
 
 
 class CheckoutError(Exception):
@@ -60,9 +76,14 @@ class InvalidOrderTransitionError(CheckoutError):
 
 
 # Secuencia logistica del pedido. `confirmed` solo se alcanza si el pago ya
-# esta aprobado (ver `_puede_avanzar_a`); el resto es un avance lineal, un
-# paso a la vez, para que un pedido no pueda saltarse etapas (por ejemplo
-# pending_payment -> delivered sin pasar por confirmed).
+# esta aprobado (ver `valid_next_statuses`). Desde cualquier estado se puede
+# saltar a cualquier estado *posterior* de la secuencia (no solo al
+# inmediato siguiente): en la operacion real, quien actualiza el pedido a
+# veces se entera del estado final directo (por ejemplo, la transportadora
+# avisa "entregado" sin que nadie haya marcado antes "en transito"), y
+# obligar a pasar por cada paso intermedio uno por uno no refleja eso.
+# Lo que si sigue sin poder pasar es retroceder o saltarse `confirmed` sin
+# pago aprobado.
 ORDER_STATUS_SEQUENCE = [
     OrderStatus.PENDING_PAYMENT,
     OrderStatus.CONFIRMED,
@@ -76,32 +97,37 @@ ORDER_STATUS_SEQUENCE = [
 # una operacion de estado (el paquete existe fisicamente en transito).
 CANCELLABLE_FROM = {OrderStatus.PENDING_PAYMENT, OrderStatus.CONFIRMED, OrderStatus.PREPARING}
 
-
-def _puede_avanzar_a(order, candidato):
-    if candidato == OrderStatus.CONFIRMED:
-        return order.payment_status == PaymentStatus.APPROVED
-    return True
+# Una devolucion solo tiene sentido una vez el paquete salio (o llego): no
+# se "devuelve" algo que todavia esta en preparacion, eso se cancela.
+RETURNABLE_FROM = {OrderStatus.SHIPPED, OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED}
 
 
 def valid_next_statuses(order):
     """Estados a los que un pedido puede pasar desde el estado actual.
 
-    Es deliberadamente restrictivo: un solo paso hacia adelante en la
-    secuencia logistica, mas la posibilidad de cancelar si todavia aplica.
+    Permite avanzar a cualquier paso posterior de la secuencia logistica
+    (no solo al inmediato siguiente), mas cancelar o marcar devolucion
+    cuando el estado actual lo permite. La unica puerta real es
+    `confirmed`: si el pago todavia no esta aprobado, nada que venga
+    despues de `confirmed` en la secuencia es alcanzable tampoco, aunque
+    el salto sea directo (saltarse el paso no se salta el requisito).
     """
     if order.order_status not in ORDER_STATUS_SEQUENCE:
         return []
 
     indice = ORDER_STATUS_SEQUENCE.index(order.order_status)
-    siguientes = []
+    restantes = ORDER_STATUS_SEQUENCE[indice + 1:]
 
-    if indice + 1 < len(ORDER_STATUS_SEQUENCE):
-        candidato = ORDER_STATUS_SEQUENCE[indice + 1]
-        if _puede_avanzar_a(order, candidato):
-            siguientes.append(candidato)
+    if OrderStatus.CONFIRMED in restantes and order.payment_status != PaymentStatus.APPROVED:
+        siguientes = []
+    else:
+        siguientes = list(restantes)
 
     if order.order_status in CANCELLABLE_FROM:
         siguientes.append(OrderStatus.CANCELLED)
+
+    if order.order_status in RETURNABLE_FROM:
+        siguientes.append(OrderStatus.RETURNED)
 
     return siguientes
 
@@ -173,7 +199,8 @@ def create_order_from_cart(user, cart, datos):
     subtotal = Decimal(contexto['subtotal']).quantize(Decimal('0.01'))
     cotizacion = get_mock_quote(datos['city'], subtotal)
     envio = Decimal(cotizacion['cost']).quantize(Decimal('0.01'))
-    descuento = calculate_coupon_discount(subtotal, datos.get('coupon_code', ''))
+    cupon = get_usable_coupon(datos.get('coupon_code', ''))
+    descuento = cupon.compute_discount(subtotal) if cupon else Decimal('0.00')
     total = subtotal + envio - descuento
 
     pedido = None
@@ -197,6 +224,9 @@ def create_order_from_cart(user, cart, datos):
             if intento == MAX_INTENTOS_NUMERO - 1:
                 raise
             continue
+
+    if cupon is not None:
+        Coupon.objects.filter(pk=cupon.pk).update(times_used=F('times_used') + 1)
 
     for item in items:
         variante = item['variant']

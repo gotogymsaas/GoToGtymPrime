@@ -6,7 +6,7 @@
     <p class="eyebrow">Catalogo comercial</p>
     <h1>Productos</h1>
   </div>
-  <a class="button" href="{% url 'admin_product_new' %}">Crear producto</a>
+  {% if perms.products.add_product %}<a class="button" href="{% url 'admin_product_new' %}">Crear producto</a>{% endif %}
 </section>
 <form class="search" method="get">
   <input name="q" value="{{ query }}" placeholder="Buscar por nombre">
@@ -14,23 +14,41 @@
 </form>
 <div class="panel">
   <table>
-    <thead><tr><th>Imagen</th><th>Producto</th><th>Categoria</th><th>Precio</th><th>Stock</th><th></th></tr></thead>
+    <thead><tr><th>Imagen</th><th>Producto</th><th>Categoria</th><th>Etiquetas</th><th>Precio</th><th>Stock</th><th>Estado</th><th></th></tr></thead>
     <tbody>
       {% for product in page_obj %}
       <tr>
-        <td>{% if product.image %}<img class="thumb" src="{{ product.image.url }}" alt="{{ product.name }}">{% else %}<span class="empty-img">Sin imagen</span>{% endif %}</td>
+        <td>{% if product.primary_image %}<img class="thumb" src="{{ product.primary_image.url }}" alt="{{ product.name }}">{% else %}<span class="empty-img">Sin imagen</span>{% endif %}</td>
         <td><strong>{{ product.name }}</strong><small>{{ product.brand.name|default:"Sin marca" }}</small></td>
         <td>{{ product.category.name }}</td>
+        <td>
+          <div class="badge-row">
+            {% if product.featured %}<span class="badge badge-gold">Destacado</span>{% endif %}
+            {% if product.discount %}<span class="badge badge-danger">-{{ product.discount }}%</span>{% endif %}
+            {% for tag in product.tags.all %}<span class="badge badge-{{ tag.color_token }}">{{ tag.name }}</span>{% endfor %}
+          </div>
+        </td>
         <td>${{ product.base_price|cop }} COP</td>
-        <td>{{ product.stock }}</td>
+        <td class="{% if not product.real_stock %}stock-out{% elif product.real_stock <= 5 %}stock-low{% endif %} stock-value">{{ product.real_stock|default:0 }}</td>
+        <td>
+          {% if not product.variant_count %}
+            <span class="badge badge-gold">Sin variantes</span>
+          {% elif not product.real_stock %}
+            <span class="pill pill-off">Agotado</span>
+          {% else %}
+            <span class="pill pill-ok">Disponible</span>
+          {% endif %}
+        </td>
         <td class="actions">
-          <a class="ghost" href="{% url 'admin_product_edit' product.pk %}">Editar</a>
-          <form method="post" action="{% url 'admin_product_delete' product.pk %}">
-            {% csrf_token %}<button class="button product-delete-button" type="submit">Eliminar</button>
+          {% if perms.products.change_product %}<a class="ghost btn-sm" href="{% url 'admin_product_edit' product.pk %}">Editar</a>{% endif %}
+          {% if perms.products.delete_product %}
+          <form method="post" action="{% url 'admin_product_delete' product.pk %}" onsubmit="return confirm('¿Eliminar {{ product.name|escapejs }} del catalogo? Esta accion no se puede deshacer.');">
+            {% csrf_token %}<button class="button btn-sm product-delete-button" type="submit">Eliminar</button>
           </form>
+          {% endif %}
         </td>
       </tr>
-      {% empty %}<tr><td colspan="6">No hay productos registrados.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="8">No hay productos registrados.</td></tr>{% endfor %}
     </tbody>
   </table>
 </div>

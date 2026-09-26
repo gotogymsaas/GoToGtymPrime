@@ -1,5 +1,8 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 from products.models import ProductVariant
 
 
@@ -11,6 +14,7 @@ class OrderStatus(models.TextChoices):
     IN_TRANSIT = 'in_transit', 'En transito'
     DELIVERED = 'delivered', 'Entregado'
     CANCELLED = 'cancelled', 'Cancelado'
+    RETURNED = 'returned', 'Devolucion'
 
 
 class PaymentStatus(models.TextChoices):
@@ -18,6 +22,62 @@ class PaymentStatus(models.TextChoices):
     APPROVED = 'approved', 'Aprobado'
     REJECTED = 'rejected', 'Rechazado'
     CANCELLED = 'cancelled', 'Cancelado'
+
+
+class CouponDiscountType(models.TextChoices):
+    PERCENTAGE = 'percentage', 'Porcentaje'
+    FIXED = 'fixed', 'Valor fijo'
+
+
+class Coupon(models.Model):
+    """Cupon de descuento aplicable en el checkout.
+
+    `times_used` se incrementa en `create_order_from_cart` cuando el cupon
+    se usa efectivamente; `max_uses` en null significa uso ilimitado.
+    """
+
+    code = models.CharField(max_length=30, unique=True)
+    discount_type = models.CharField(
+        max_length=12, choices=CouponDiscountType.choices, default=CouponDiscountType.PERCENTAGE,
+    )
+    value = models.DecimalField(max_digits=12, decimal_places=2)
+    min_purchase = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    starts_at = models.DateTimeField(null=True, blank=True)
+    ends_at = models.DateTimeField(null=True, blank=True)
+    max_uses = models.PositiveIntegerField(null=True, blank=True)
+    times_used = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at', '-id']
+
+    def __str__(self):
+        return self.code
+
+    def is_usable(self, momento=None):
+        momento = momento or timezone.now()
+        if not self.is_active:
+            return False
+        if self.starts_at and momento < self.starts_at:
+            return False
+        if self.ends_at and momento > self.ends_at:
+            return False
+        if self.max_uses is not None and self.times_used >= self.max_uses:
+            return False
+        return True
+
+    def compute_discount(self, subtotal):
+        subtotal = Decimal(subtotal)
+        if self.min_purchase is not None and subtotal < self.min_purchase:
+            return Decimal('0.00')
+        if self.discount_type == CouponDiscountType.PERCENTAGE:
+            descuento = subtotal * (self.value / Decimal('100'))
+        else:
+            descuento = self.value
+        descuento = max(Decimal('0.00'), min(descuento, subtotal))
+        return descuento.quantize(Decimal('0.01'))
 
 
 class Order(models.Model):

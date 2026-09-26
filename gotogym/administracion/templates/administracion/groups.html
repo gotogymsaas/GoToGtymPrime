@@ -1,0 +1,39 @@
+{% extends "administracion/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Roles intermedios entre Usuario y Administrador</p>
+    <h1>Grupos y permisos</h1>
+  </div>
+  {% if perms.auth.add_group %}
+  <a class="button" href="{% url 'admin_group_new' %}">Crear grupo</a>
+  {% endif %}
+</section>
+<p class="hint">Un Grupo le da a un usuario staff acceso solo a las secciones cubiertas por sus permisos, sin necesidad de hacerlo Administrador. Asignalo desde "Usuarios y roles".</p>
+<div class="panel">
+  <table>
+    <thead><tr><th>Nombre</th><th>Permisos</th><th></th></tr></thead>
+    <tbody>
+      {% for group in groups %}
+      <tr>
+        <td><strong>{{ group.name }}</strong></td>
+        <td>
+          <div class="badge-row">
+            {% for permission in group.permissions.all %}<span class="badge badge-accent">{{ permission.name }}</span>{% empty %}<span class="empty-img">Sin permisos asignados</span>{% endfor %}
+          </div>
+        </td>
+        <td class="actions">
+          {% if perms.auth.change_group %}<a class="ghost btn-sm" href="{% url 'admin_group_edit' group.pk %}">Editar</a>{% endif %}
+          {% if perms.auth.delete_group %}
+          <form method="post" action="{% url 'admin_group_delete' group.pk %}" onsubmit="return confirm('¿Eliminar el grupo {{ group.name|escapejs }}? Los usuarios asignados perderan estos permisos.');">
+            {% csrf_token %}
+            <button class="button btn-sm product-delete-button" type="submit">Eliminar</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="3">No hay grupos creados todavia.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

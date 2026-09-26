@@ -6,31 +6,38 @@
     <h1>Catalogos</h1>
   </div>
 </section>
+{% if perms.products.add_productcategory or perms.products.add_brand %}
 <section class="grid-two">
+  {% if perms.products.add_productcategory %}
   <form class="panel form-grid catalog-form" method="post">
     {% csrf_token %}<input type="hidden" name="kind" value="category">
     <h2>Nueva categoria</h2>
     {{ category_form.as_p }}
-    <button class="button catalog-save-button" type="submit">Guardar categoria</button>
+    <button class="button field-full catalog-save-button" type="submit">Guardar categoria</button>
   </form>
+  {% endif %}
+  {% if perms.products.add_brand %}
   <form class="panel form-grid catalog-form" method="post">
     {% csrf_token %}<input type="hidden" name="kind" value="brand">
     <h2>Nueva marca</h2>
     {{ brand_form.as_p }}
-    <div class="brand-form-spacer" aria-hidden="true"></div>
-    <button class="button catalog-save-button" type="submit">Guardar marca</button>
+    <button class="button field-full catalog-save-button" type="submit">Guardar marca</button>
   </form>
+  {% endif %}
 </section>
+{% endif %}
 <section class="grid-two">
   <div class="panel">
     <h2>Categorias</h2>
     {% for item in categories %}
       <div class="list-row catalog-row">
         <span>{{ item.name }}</span>
-        <form method="post" action="{% url 'admin_category_delete' item.pk %}">
+        {% if perms.products.delete_productcategory %}
+        <form method="post" action="{% url 'admin_category_delete' item.pk %}" onsubmit="return confirm('¿Eliminar la categoria {{ item.name|escapejs }}? Esta accion no se puede deshacer.');">
           {% csrf_token %}
-          <button class="button catalog-delete-button" type="submit">Eliminar</button>
+          <button class="button btn-sm catalog-delete-button" type="submit">Eliminar</button>
         </form>
+        {% endif %}
       </div>
     {% empty %}
       <p class="list-row">No hay categorias registradas.</p>
@@ -41,13 +48,49 @@
     {% for item in brands %}
       <div class="list-row catalog-row">
         <span>{{ item.name }}</span>
-        <form method="post" action="{% url 'admin_brand_delete' item.pk %}">
+        {% if perms.products.delete_brand %}
+        <form method="post" action="{% url 'admin_brand_delete' item.pk %}" onsubmit="return confirm('¿Eliminar la marca {{ item.name|escapejs }}? Esta accion no se puede deshacer.');">
           {% csrf_token %}
-          <button class="button catalog-delete-button" type="submit">Eliminar</button>
+          <button class="button btn-sm catalog-delete-button" type="submit">Eliminar</button>
         </form>
+        {% endif %}
       </div>
     {% empty %}
       <p class="list-row">No hay marcas registradas.</p>
+    {% endfor %}
+  </div>
+</section>
+<section class="grid-two">
+  {% if perms.products.add_producttag %}
+  <form class="panel form-grid catalog-form" method="post">
+    {% csrf_token %}<input type="hidden" name="kind" value="tag">
+    <h2>Nueva etiqueta / badge</h2>
+    {{ tag_form.as_p }}
+    <button class="button field-full catalog-save-button" type="submit">Guardar etiqueta</button>
+  </form>
+  {% endif %}
+  <div class="panel">
+    <h2>Etiquetas de producto</h2>
+    {% for item in tags %}
+      <div class="list-row catalog-row">
+        <span class="badge badge-{{ item.color_token }}">{{ item.name }}</span>
+        <div class="actions">
+          {% if perms.products.change_producttag %}
+          <form method="post" action="{% url 'admin_tag_toggle' item.pk %}">
+            {% csrf_token %}
+            <button class="ghost btn-sm" type="submit">{% if item.is_active %}Desactivar{% else %}Activar{% endif %}</button>
+          </form>
+          {% endif %}
+          {% if perms.products.delete_producttag %}
+          <form method="post" action="{% url 'admin_tag_delete' item.pk %}" onsubmit="return confirm('¿Eliminar la etiqueta {{ item.name|escapejs }}?');">
+            {% csrf_token %}
+            <button class="button btn-sm catalog-delete-button" type="submit">Eliminar</button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <p class="list-row">No hay etiquetas registradas.</p>
     {% endfor %}
   </div>
 </section>

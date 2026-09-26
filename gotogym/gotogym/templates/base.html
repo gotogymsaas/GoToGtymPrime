@@ -128,6 +128,9 @@
           {% endcomment %}
           <a href="{% url 'influencer_suscribete' %}">{% trans "Hazte influencer" %}</a>
           {% endif %}
+          {% if user.is_staff %}
+          <a href="{% url 'admin_dashboard' %}">{% trans "Panel administrador" %}</a>
+          {% endif %}
           {% if user.is_superuser %}
           <a href="/admin/">{% trans "Admin" %}</a>
           {% endif %}
@@ -174,6 +177,9 @@
     <span class="gtg-mobile-menu__divider"></span>
     <a href="{% url 'orders:my_orders' %}">{% trans "Mis pedidos" %}</a>
     <a href="{% url 'edit_profile' %}">{% trans "Editar perfil" %}</a>
+    {% if user.is_staff %}
+    <a href="{% url 'admin_dashboard' %}">{% trans "Panel administrador" %}</a>
+    {% endif %}
     <form action="{% url 'logout' %}" method="post">
       {% csrf_token %}
       <button type="submit">{% trans "Cerrar sesion" %}</button>

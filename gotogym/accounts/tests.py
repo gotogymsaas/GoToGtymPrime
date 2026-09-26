@@ -84,3 +84,28 @@ class DeveloperApiLoginTests(TestCase):
 
 		self.assertEqual(response.status_code, 200)
 		self.assertIn('access', response.json())
+
+
+class LogoutRedirectTests(TestCase):
+	"""El boton "Salir" del panel admin manda un `next` a la tienda; el
+	logout normal del resto del sitio (sin `next`) sigue yendo a home,
+	como siempre."""
+
+	def setUp(self):
+		User = get_user_model()
+		self.usuario = User.objects.create_user(
+			email='logout-test@example.com', username='logout-test@example.com', password='secret123',
+		)
+		self.client.force_login(self.usuario)
+
+	def test_logout_sin_next_va_a_home(self):
+		response = self.client.post(reverse('logout'))
+		self.assertRedirects(response, reverse('home'), fetch_redirect_response=False)
+
+	def test_logout_con_next_seguro_respeta_el_destino(self):
+		response = self.client.post(reverse('logout'), {'next': reverse('tienda:producto_list')})
+		self.assertRedirects(response, reverse('tienda:producto_list'), fetch_redirect_response=False)
+
+	def test_logout_ignora_un_next_hacia_otro_dominio(self):
+		response = self.client.post(reverse('logout'), {'next': 'https://evil.example.com/'})
+		self.assertRedirects(response, reverse('home'), fetch_redirect_response=False)

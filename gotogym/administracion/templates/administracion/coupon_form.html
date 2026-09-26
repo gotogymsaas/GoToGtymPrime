@@ -1,0 +1,23 @@
+{% extends "administracion/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Promociones del checkout</p>
+    <h1>{% if coupon %}Editar cupon{% else %}Nuevo cupon{% endif %}</h1>
+  </div>
+</section>
+<form class="panel form-grid" method="post">
+  {% csrf_token %}
+  {% for field in form %}
+    <label>
+      <span>{{ field.label }}</span>
+      {{ field }}
+      {{ field.errors }}
+    </label>
+  {% endfor %}
+  <div class="form-actions">
+    <a class="ghost" href="{% url 'admin_coupons' %}">Cancelar</a>
+    <button class="button" type="submit">Guardar</button>
+  </div>
+</form>
+{% endblock %}

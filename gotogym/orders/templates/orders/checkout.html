@@ -207,6 +207,7 @@
     var datosSubtotal = document.getElementById('checkout-subtotal');
     var subtotalActual = datosSubtotal ? JSON.parse(datosSubtotal.textContent) : 0;
     var urlCotizar = '{% url "orders:cotizar_envio" %}';
+    var urlValidarCupon = '{% url "orders:validar_cupon" %}';
 
     function formatearPrecio(valor) {
       return '$' + Math.round(valor).toLocaleString('es-CO') + ' COP';
@@ -222,16 +223,41 @@
     function aplicarCupon() {
       var codigo = campoCupon.value.trim().toUpperCase();
       campoCupon.value = codigo;
-      if (codigo === 'CUPON') {
-        descuentoActual = subtotalActual * 0.10;
-        mensajeCupon.textContent = '{% trans "Cupón aplicado: 10% de descuento." %}';
-        mensajeCupon.className = 'checkout-coupon__feedback is-success';
-      } else {
+      var envioActual = ciudadSelect.value ? Number((valorEnvio && valorEnvio.dataset.cost) || 0) : 0;
+
+      if (!codigo) {
         descuentoActual = 0;
-        mensajeCupon.textContent = codigo ? '{% trans "Cupón no válido." %}' : '';
-        mensajeCupon.className = 'checkout-coupon__feedback is-error';
+        mensajeCupon.textContent = '';
+        mensajeCupon.className = 'checkout-coupon__feedback';
+        actualizarTotal(envioActual);
+        return;
       }
-      actualizarTotal(ciudadSelect.value ? Number(valorEnvio.dataset.cost || 0) : 0);
+
+      // El descuento que se muestra aqui es solo vista previa: el
+      // servidor vuelve a buscar y aplicar el cupon en create_order_from_cart,
+      // asi que esto nunca decide lo que realmente se cobra.
+      fetch(urlValidarCupon + '?code=' + encodeURIComponent(codigo), {
+        credentials: 'same-origin'
+      }).then(function (respuesta) {
+        if (!respuesta.ok) throw new Error('validacion no disponible');
+        return respuesta.json();
+      }).then(function (datos) {
+        if (datos.valid) {
+          descuentoActual = datos.discount;
+          mensajeCupon.textContent = '{% trans "Cupón aplicado." %}';
+          mensajeCupon.className = 'checkout-coupon__feedback is-success';
+        } else {
+          descuentoActual = 0;
+          mensajeCupon.textContent = '{% trans "Cupón no válido." %}';
+          mensajeCupon.className = 'checkout-coupon__feedback is-error';
+        }
+        actualizarTotal(envioActual);
+      }).catch(function () {
+        // Sin conexion: no se bloquea la compra, el servidor decide el
+        // descuento real al confirmar el pedido.
+        descuentoActual = 0;
+        actualizarTotal(envioActual);
+      });
     }
 
     botonCupon.addEventListener('click', aplicarCupon);

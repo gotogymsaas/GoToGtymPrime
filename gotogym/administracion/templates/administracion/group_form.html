@@ -1,0 +1,25 @@
+{% extends "administracion/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Roles intermedios entre Usuario y Administrador</p>
+    <h1>{% if group %}Editar grupo{% else %}Nuevo grupo{% endif %}</h1>
+  </div>
+</section>
+<form class="panel form-grid" method="post">
+  {% csrf_token %}
+  <label>
+    <span>{{ form.name.label }}</span>
+    {{ form.name }}
+    {{ form.name.errors }}
+  </label>
+  <div class="permission-list">
+    <p>{{ form.permissions.label }}</p>
+    {{ form.permissions }}
+  </div>
+  <div class="form-actions">
+    <a class="ghost" href="{% url 'admin_groups' %}">Cancelar</a>
+    <button class="button" type="submit">Guardar</button>
+  </div>
+</form>
+{% endblock %}

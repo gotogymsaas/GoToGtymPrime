@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}GoToGym Admin{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'administracion/style.css' %}?v=20260907-stats-5">
+  <link rel="stylesheet" href="{% static 'administracion/style.css' %}?v=20260926-panel-7">
 </head>
 <body>
   <aside class="sidebar">
@@ -13,23 +13,26 @@
     <nav>
       <a href="{% url 'admin_dashboard' %}">Panel</a>
       <a href="{% url 'admin_products' %}">Productos</a>
-      <a href="{% url 'admin_variants' %}">Variantes</a>
-      <a href="{% url 'admin_orders' %}">Pedidos</a>
-      <a href="{% url 'admin_payment_transactions' %}">Pagos</a>
-      <a href="{% url 'admin_users' %}">Usuarios</a>
-      <a href="{% url 'admin_catalogs' %}">Catalogos</a>
+      <a href="{% url 'admin_variants' %}">Inventario</a>
+      <a href="{% url 'admin_coupons' %}">Cupones y descuentos</a>
+      <a href="{% url 'admin_orders' %}">Pedidos y pagos</a>
+      <a href="{% url 'admin_users' %}">Usuarios y roles</a>
+      <a href="{% url 'admin_catalogs' %}">Catalogos y etiquetas</a>
     </nav>
   </aside>
   <main class="main">
     <header class="topbar">
       <div>
-        <strong>Eric Viana</strong>
-        <span>Administrador general</span>
+        <strong>{{ request.user.get_full_name|default:request.user.email }}</strong>
+        <span>{% if request.user.is_superuser %}Superusuario{% else %}Administrador{% endif %}</span>
       </div>
-      <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button class="ghost" type="submit">Salir</button>
-      </form>
+      <div class="topbar-actions">
+        <a class="ghost" href="{% url 'tienda:producto_list' %}">Salir del panel</a>
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button class="ghost" type="submit">Cerrar sesion</button>
+        </form>
+      </div>
     </header>
     {% block content %}{% endblock %}
     {% if messages %}

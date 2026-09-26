@@ -1,0 +1,61 @@
+{% extends "administracion/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Promociones del checkout</p>
+    <h1>Cupones y descuentos</h1>
+  </div>
+  {% if perms.orders.add_coupon %}<a class="button" href="{% url 'admin_coupon_new' %}">Crear cupon</a>{% endif %}
+</section>
+<div class="filter-tabs">
+  <a href="?q={{ query }}" class="{% if not status %}active{% endif %}">Todos</a>
+  <a href="?q={{ query }}&status=active" class="{% if status == 'active' %}active{% endif %}">Activos</a>
+  <a href="?q={{ query }}&status=inactive" class="{% if status == 'inactive' %}active{% endif %}">Inactivos</a>
+</div>
+<form class="search" method="get">
+  <input type="hidden" name="status" value="{{ status }}">
+  <input name="q" value="{{ query }}" placeholder="Buscar por codigo">
+  <button type="submit">Buscar</button>
+</form>
+<div class="panel">
+  <table>
+    <thead><tr><th>Codigo</th><th>Tipo</th><th>Valor</th><th>Vigencia</th><th>Usos</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+      {% for coupon in page_obj %}
+      <tr>
+        <td><strong>{{ coupon.code }}</strong></td>
+        <td>{{ coupon.get_discount_type_display }}</td>
+        <td>{% if coupon.discount_type == 'percentage' %}{{ coupon.value }}%{% else %}${{ coupon.value }} COP{% endif %}</td>
+        <td>
+          {% if coupon.starts_at or coupon.ends_at %}
+            <small>{{ coupon.starts_at|date:"d/m/Y"|default:"Sin inicio" }} - {{ coupon.ends_at|date:"d/m/Y"|default:"Sin fin" }}</small>
+          {% else %}<small>Sin limite de fechas</small>{% endif %}
+        </td>
+        <td>{{ coupon.times_used }}{% if coupon.max_uses %} / {{ coupon.max_uses }}{% endif %}</td>
+        <td>
+          {% if coupon.is_usable %}<span class="pill pill-ok">Vigente</span>
+          {% elif coupon.is_active %}<span class="badge badge-gold">Fuera de vigencia</span>
+          {% else %}<span class="pill pill-off">Desactivado</span>{% endif %}
+        </td>
+        <td class="actions">
+          {% if perms.orders.change_coupon %}
+          <a class="ghost btn-sm" href="{% url 'admin_coupon_edit' coupon.pk %}">Editar</a>
+          <form method="post" action="{% url 'admin_coupon_toggle' coupon.pk %}">
+            {% csrf_token %}
+            <button class="ghost btn-sm" type="submit">{% if coupon.is_active %}Desactivar{% else %}Activar{% endif %}</button>
+          </form>
+          {% endif %}
+          {% if perms.orders.delete_coupon %}
+          <form method="post" action="{% url 'admin_coupon_delete' coupon.pk %}" onsubmit="return confirm('¿Eliminar el cupon {{ coupon.code|escapejs }}? Esta accion no se puede deshacer.');">
+            {% csrf_token %}
+            <button class="button btn-sm product-delete-button" type="submit">Eliminar</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="7">No hay cupones registrados.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "administracion/pagination.html" %}
+{% endblock %}

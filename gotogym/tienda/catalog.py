@@ -104,6 +104,37 @@ def primary_image(product):
     return product.primary_image
 
 
+class _ImagenDeRespaldo:
+    """Envoltorio con la misma forma que `ProductMedia` (`.image`,
+    `.alt_text`), para el unico caso en que un producto no tiene ninguna
+    fila de galeria pero si tiene la imagen heredada `Product.image`. Sin
+    esto, la plantilla de la PDP necesitaria dos rutas de renderizado
+    distintas (una para ProductMedia real, otra para el campo heredado);
+    con el mismo duck type, es un solo bucle en ambos casos."""
+
+    def __init__(self, image, alt_text):
+        self.image = image
+        self.alt_text = alt_text
+
+
+def product_gallery(product):
+    """Fotos reales del producto, en el orden en que deben mostrarse.
+
+    Nunca repite una imagen para simular una galeria de "al menos dos
+    fotos": si el producto tiene una sola foto (o ninguna en ProductMedia
+    pero si el campo heredado `image`), la lista tiene exactamente un
+    elemento; si no tiene ninguna, la lista queda vacia y quien la
+    consuma pinta su propio placeholder.
+    """
+    medios = list(product.media.all())
+    if medios:
+        return medios
+    imagen = primary_image(product)
+    if imagen:
+        return [_ImagenDeRespaldo(image=imagen, alt_text=product.name)]
+    return []
+
+
 def build_product_card(product):
     """Informacion que necesita una tarjeta del listado."""
     variants = [v for v in product.variants.all() if v.is_active]

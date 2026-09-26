@@ -16,6 +16,11 @@
   <article><span>{{ category_count }}</span><p>Categorias</p></article>
   <article><span>{{ stock_total }}</span><p>Unidades en stock</p></article>
 </section>
+<section class="stats stats-secondary">
+  <article class="{% if low_stock_count %}stat-warning{% endif %}"><span>{{ low_stock_count }}</span><p>Variantes con stock bajo</p></article>
+  <article class="{% if out_of_stock_count %}stat-danger{% endif %}"><span>{{ out_of_stock_count }}</span><p>Variantes agotadas</p></article>
+  <article><span>{{ active_coupon_count }}</span><p>Cupones activos</p></article>
+</section>
 <section class="grid-two">
   <div class="panel">
     <h2>Productos recientes</h2>

@@ -12,7 +12,7 @@ from tienda.catalog import curated_product_cards
 from .colombia_data import MUNICIPIOS_POR_DEPARTAMENTO
 from .forms import CheckoutForm
 from .models import Order, OrderItem, OrderStatus
-from .services import CheckoutError, create_order_from_cart
+from .services import CheckoutError, create_order_from_cart, get_usable_coupon
 
 REVIEWABLE_ORDER_STATUSES = {
     OrderStatus.CONFIRMED,
@@ -98,6 +98,36 @@ def cotizar_envio(request):
         'method_name': cotizacion['method_name'],
         'subtotal': float(subtotal),
         'total': float(subtotal + envio),
+    })
+
+
+@login_required
+def validar_cupon(request):
+    """Vista previa en vivo del descuento de un cupon, antes de confirmar.
+
+    Igual que `cotizar_envio`: el subtotal sale del carrito en sesion, nunca
+    de un parametro del cliente, para que la vista previa no pueda inflarse
+    con un monto inventado. El descuento real que se cobra siempre se
+    recalcula de nuevo en `create_order_from_cart`.
+    """
+    codigo = (request.GET.get('code') or '').strip()
+    cart, _reiniciado = read_cart(request.session)
+    resumen = build_cart_context(cart)
+    if not resumen['items']:
+        return JsonResponse({'error': 'El carrito esta vacio.'}, status=400)
+
+    subtotal = Decimal(resumen['subtotal']).quantize(Decimal('0.01'))
+    cupon = get_usable_coupon(codigo)
+    if cupon is None:
+        return JsonResponse({'valid': False})
+
+    descuento = cupon.compute_discount(subtotal)
+    return JsonResponse({
+        'valid': True,
+        'code': cupon.code,
+        'discount': float(descuento),
+        'discount_type': cupon.discount_type,
+        'value': float(cupon.value),
     })
 
 

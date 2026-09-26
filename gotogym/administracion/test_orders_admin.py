@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from inventory.models import Inventory
 from orders.models import OrderStatus, PaymentStatus
 from orders.services import (
@@ -81,19 +81,30 @@ class OrderTransitionServiceTests(TestCase):
             self.pedido.refresh_from_db()
             self.assertEqual(self.pedido.order_status, estado)
 
-    def test_no_se_puede_saltar_de_confirmed_a_shipped(self):
+    def test_puede_saltar_de_confirmed_directo_a_shipped(self):
+        # Quien opera el pedido a veces se entera del estado final directo
+        # (la transportadora avisa "enviado" sin pasar por "en preparacion"
+        # en el panel): saltar pasos intermedios de la secuencia logistica
+        # es valido, lo unico que de verdad exige un requisito es llegar a
+        # "confirmed" con el pago aprobado.
         self.pedido.payment_status = PaymentStatus.APPROVED
         self.pedido.order_status = OrderStatus.CONFIRMED
         self.pedido.save(update_fields=['payment_status', 'order_status'])
 
-        with self.assertRaises(InvalidOrderTransitionError):
-            apply_order_status_transition(self.pedido, OrderStatus.SHIPPED)
+        apply_order_status_transition(self.pedido, OrderStatus.SHIPPED)
+        self.pedido.refresh_from_db()
+        self.assertEqual(self.pedido.order_status, OrderStatus.SHIPPED)
 
-    def test_delivered_no_tiene_transiciones_posteriores(self):
+    def test_pending_payment_con_pago_aprobado_puede_saltar_a_delivered(self):
+        self.pedido.payment_status = PaymentStatus.APPROVED
+        self.pedido.save(update_fields=['payment_status'])
+        self.assertIn(OrderStatus.DELIVERED, valid_next_statuses(self.pedido))
+
+    def test_delivered_solo_puede_pasar_a_devolucion(self):
         self.pedido.payment_status = PaymentStatus.APPROVED
         self.pedido.order_status = OrderStatus.DELIVERED
         self.pedido.save(update_fields=['payment_status', 'order_status'])
-        self.assertEqual(valid_next_statuses(self.pedido), [])
+        self.assertEqual(valid_next_statuses(self.pedido), [OrderStatus.RETURNED])
 
     def test_cancelado_no_tiene_transiciones_posteriores(self):
         self.pedido.order_status = OrderStatus.CANCELLED
@@ -105,6 +116,18 @@ class OrderTransitionServiceTests(TestCase):
         self.pedido.order_status = OrderStatus.SHIPPED
         self.pedido.save(update_fields=['payment_status', 'order_status'])
         self.assertNotIn(OrderStatus.CANCELLED, valid_next_statuses(self.pedido))
+
+    def test_solo_se_puede_devolver_desde_enviado_en_transito_o_entregado(self):
+        for estado in (OrderStatus.PENDING_PAYMENT, OrderStatus.CONFIRMED, OrderStatus.PREPARING):
+            self.pedido.order_status = estado
+            self.pedido.payment_status = PaymentStatus.APPROVED
+            self.pedido.save(update_fields=['order_status', 'payment_status'])
+            self.assertNotIn(OrderStatus.RETURNED, valid_next_statuses(self.pedido))
+
+        for estado in (OrderStatus.SHIPPED, OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED):
+            self.pedido.order_status = estado
+            self.pedido.save(update_fields=['order_status'])
+            self.assertIn(OrderStatus.RETURNED, valid_next_statuses(self.pedido))
 
     def test_transicion_valida_no_toca_payment_status(self):
         self.pedido.payment_status = PaymentStatus.APPROVED
@@ -139,7 +162,6 @@ class AdminOrdersAccessTestCase(TestCase):
         return [
             reverse('admin_orders'),
             reverse('admin_order_detail', args=[self.pedido.order_number]),
-            reverse('admin_payment_transactions'),
         ]
 
     def test_anonimo_no_accede_a_ninguna_vista(self):
@@ -153,7 +175,7 @@ class AdminOrdersAccessTestCase(TestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 302, url)
 
-    def test_staff_accede_a_las_tres_vistas(self):
+    def test_staff_accede_a_las_vistas_de_pedidos(self):
         self.client.force_login(self.staff)
         for url in self._urls():
             response = self.client.get(url)
@@ -213,8 +235,14 @@ class AdminCannotEditPaymentStatusTests(TestCase):
         self.assertNotContains(response, 'name="payment_status"')
 
 
-class PaymentTransactionsListTests(TestCase):
-    def test_lista_transacciones_de_distintos_pedidos(self):
+class PagosUnificadosEnPedidosTests(TestCase):
+    """La pantalla "Pagos" separada se retiro: mostraba la misma tabla de
+    transacciones que ya trae el detalle de cada pedido. Lo que si era una
+    capacidad real y no duplicada -- buscar un pedido por su referencia de
+    pago sin saber antes a cual pertenece -- se movio al buscador de
+    Pedidos."""
+
+    def setUp(self):
         categoria = ProductCategory.objects.create(name='Categoria pagos admin')
         marca = Brand.objects.create(name='Marca pagos admin')
         producto = Product.objects.create(
@@ -228,18 +256,26 @@ class PaymentTransactionsListTests(TestCase):
             email='cliente-lista-pagos@example.com', username='cliente-lista-pagos@example.com',
             password='secret123',
         )
-        staff = User.objects.create_user(
+        self.staff = User.objects.create_user(
             email='staff-lista-pagos@example.com', username='staff-lista-pagos@example.com',
             password='secret123', is_staff=True,
         )
-        pedido = create_order_from_cart(cliente, {str(variante.pk): 1}, DATOS)
+        self.pedido = create_order_from_cart(cliente, {str(variante.pk): 1}, DATOS)
         PaymentTransaction.objects.create(
-            order=pedido, provider='mock', preference_id='pref-test-1',
-            external_reference=pedido.order_number, status='pending',
-            amount=pedido.total, idempotency_key='idem-test-1',
+            order=self.pedido, provider='mock', preference_id='pref-test-1',
+            external_reference=self.pedido.order_number, status='pending',
+            amount=self.pedido.total, idempotency_key='idem-test-1',
         )
+        self.client.force_login(self.staff)
 
-        self.client.force_login(staff)
-        response = self.client.get(reverse('admin_payment_transactions'))
+    def test_el_detalle_del_pedido_muestra_su_transaccion(self):
+        response = self.client.get(reverse('admin_order_detail', args=[self.pedido.order_number]))
         self.assertContains(response, 'pref-test-1')
-        self.assertContains(response, pedido.order_number)
+
+    def test_pedidos_se_puede_buscar_por_referencia_de_pago(self):
+        response = self.client.get(reverse('admin_orders'), {'q': 'pref-test-1'})
+        self.assertContains(response, self.pedido.order_number)
+
+    def test_la_pantalla_de_pagos_separada_ya_no_existe(self):
+        with self.assertRaises(NoReverseMatch):
+            reverse('admin_payment_transactions')
