@@ -232,6 +232,7 @@
 .influencer-table-card {
   width: min(100%, 900px);
   padding: var(--space-5);
+  overflow-x: auto;
 }
 
 .influencer-table-card h2 {

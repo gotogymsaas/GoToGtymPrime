@@ -449,3 +449,11 @@ input, select, textarea {
   .hero, .page-head, .topbar { align-items: flex-start; flex-direction: column; }
   .search { grid-template-columns: 1fr; }
 }
+
+@media (max-width: 400px) {
+  .main { padding: 16px; }
+  h1 { font-size: 28px; }
+  .stock-form, .role-form { flex-wrap: wrap; }
+  .stock-form input { width: 100%; max-width: 100px; }
+  .role-form select { min-width: 0; flex: 1; }
+}
