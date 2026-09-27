@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static i18n tienda_filters %}
+{% load static i18n tienda_filters imagenes %}
 {% block title %}{% trans "Checkout" %}{% endblock %}
 
 {% block extra_head %}
@@ -8,7 +8,6 @@
 {% endblock %}
 
 {% block content %}
-{% get_static_prefix as STATIC_PREFIX %}
 <div class="editorial-page">
   <header class="editorial-hero">
     <div class="editorial-shell">
@@ -90,7 +89,7 @@
         <ul class="checkout-summary__items">
           {% for item in resumen.items %}
           <li>
-            <img src="{% if item.image %}{{ STATIC_PREFIX }}product_media/{{ item.image.name }}{% else %}{% static 'images/img/placeholder.webp' %}{% endif %}"
+            <img src="{% url_imagen_producto item.image.name %}"
                  alt="{{ item.producto.name }}">
             <div class="min-w-0">
               <p class="checkout-item-name">{{ item.producto.name }}</p>
