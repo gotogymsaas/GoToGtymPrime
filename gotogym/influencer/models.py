@@ -155,3 +155,6 @@ class ReferralClick(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Clic de {self.influencer.referral_code} ({self.created_at:%Y-%m-%d %H:%M})"

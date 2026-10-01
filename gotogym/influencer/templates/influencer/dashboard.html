@@ -4,7 +4,7 @@
 {% block title %}Panel de afiliados{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20260930-panel-quantum">
+<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20260930-panel-quantum-r2">
 {% endblock %}
 
 {% block content %}
@@ -56,7 +56,6 @@
 
     <section class="stats">
       <article class="is-violet"><span>{{ profile.total_referred }}</span><p>Personas referidas</p></article>
-      <article class="is-teal"><span>${{ profile.total_sales|cop }} COP</span><p>Ventas generadas</p></article>
       <article class="is-teal"><span>${{ profile.commission_balance|cop }} COP</span><p>Comision disponible</p></article>
       <article class="is-gold"><span>${{ pending_commission_total|cop }} COP</span><p>Comision pendiente</p></article>
       <article><span>{{ click_count }}</span><p>Clics en tu enlace</p></article>

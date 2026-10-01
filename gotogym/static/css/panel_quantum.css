@@ -166,7 +166,7 @@ body.panel-shell {
 .panel-shell .stats article.is-green::before, .panel-shell .pq-card.is-green::before { background: var(--pq-green); }
 .panel-shell .stats article.stat-warning::before { background: var(--pq-gold); }
 .panel-shell .stats article.stat-danger::before { background: var(--pq-red); }
-.panel-shell .stats span { display: block; font-size: clamp(1.6rem, 2.6vw, 2.1rem); font-weight: 600; letter-spacing: -.02em; color: var(--pq-text); }
+.panel-shell .stats span { display: block; font-size: clamp(1.3rem, 2vw, 1.65rem); font-weight: 600; letter-spacing: -.02em; color: var(--pq-text); }
 .panel-shell .stats p { margin-bottom: 0; color: var(--pq-muted); font-size: .72rem; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; }
 .panel-shell .stats-secondary { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
 .panel-shell .stats-compact { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }

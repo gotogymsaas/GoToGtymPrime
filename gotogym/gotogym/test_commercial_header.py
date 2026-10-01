@@ -133,7 +133,7 @@ class CommercialHeaderTests(TestCase):
 
         self.assertIn(reverse('influencer_suscribete'), html)
         self.assertIn('Hazte influencer', html)
-        self.assertNotIn('Panel influencer', html)
+        self.assertNotIn('Panel de afiliados', html)
 
     def test_quien_ya_es_influencer_ve_su_panel_y_no_la_invitacion(self):
         from influencer.models import InfluencerProfile
@@ -144,5 +144,5 @@ class CommercialHeaderTests(TestCase):
         html = self._html(reverse('logged_home'))
 
         self.assertIn(reverse('influencer_dashboard'), html)
-        self.assertIn('Panel influencer', html)
+        self.assertIn('Panel de afiliados', html)
         self.assertNotIn('Hazte influencer', html)

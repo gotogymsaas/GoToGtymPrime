@@ -94,9 +94,19 @@ def _ensure_personal_coupon(profile):
 
     existente = profile.coupons.first()
     if existente is not None:
+        update_fields = []
         if not existente.is_active:
             existente.is_active = True
-            existente.save(update_fields=['is_active'])
+            update_fields.append('is_active')
+        # El afiliado puede proponer un codigo distinto cada vez que vuelve
+        # a postularse (ver `influencer.views.suscribete`); si el cupon ya
+        # existia con el codigo anterior, queda desincronizado del panel y
+        # del listado de Cupones hasta que se actualiza aqui tambien.
+        if existente.code != profile.referral_code:
+            existente.code = profile.referral_code
+            update_fields.append('code')
+        if update_fields:
+            existente.save(update_fields=update_fields)
         return existente
 
     settings_obj = InfluencerProgramSettings.load()

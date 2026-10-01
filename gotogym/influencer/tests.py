@@ -102,13 +102,27 @@ class InfluencerTestBase(TestCase):
 class SolicitudDeAfiliacionTests(InfluencerTestBase):
     def test_suscribirse_crea_perfil_pendiente_sin_activar_rol(self):
         self.client.force_login(self.afiliado_user)
-        self.client.post(reverse('influencer_suscribete'), {'accept_terms': '1'})
+        self.client.post(reverse('influencer_suscribete'), {'accept_terms': '1', 'referral_code': 'MIMARCA2026'})
 
         perfil = InfluencerProfile.objects.get(user=self.afiliado_user)
         self.assertEqual(perfil.status, InfluencerStatus.PENDING)
+        self.assertEqual(perfil.referral_code, 'MIMARCA2026')
         self.assertIsNotNone(perfil.terms_accepted_at)
         self.afiliado_user.refresh_from_db()
         self.assertFalse(self.afiliado_user.es_influencer)
+
+    def test_el_codigo_propuesto_debe_ser_valido(self):
+        self.client.force_login(self.afiliado_user)
+        self.client.post(reverse('influencer_suscribete'), {'accept_terms': '1', 'referral_code': 'a b!'})
+
+        self.assertFalse(InfluencerProfile.objects.filter(user=self.afiliado_user).exists())
+
+    def test_el_codigo_propuesto_debe_estar_disponible(self):
+        InfluencerProfile.objects.create(user=self.comprador, referral_code='OCUPADO1')
+        self.client.force_login(self.afiliado_user)
+        self.client.post(reverse('influencer_suscribete'), {'accept_terms': '1', 'referral_code': 'ocupado1'})
+
+        self.assertFalse(InfluencerProfile.objects.filter(user=self.afiliado_user).exists())
 
     def test_no_se_puede_suscribir_sin_aceptar_terminos(self):
         self.client.force_login(self.afiliado_user)
@@ -135,6 +149,22 @@ class SolicitudDeAfiliacionTests(InfluencerTestBase):
         self.assertTrue(self.afiliado_user.es_influencer)
         cupon = Coupon.objects.get(influencer=perfil)
         self.assertEqual(cupon.code, perfil.referral_code)
+        self.assertTrue(cupon.is_active)
+
+    def test_reaprobar_con_codigo_nuevo_actualiza_el_cupon_existente(self):
+        perfil = InfluencerProfile.objects.create(
+            user=self.afiliado_user, status=InfluencerStatus.PENDING, referral_code='PRIMERCODIGO',
+        )
+        approve_influencer(perfil, self.admin)
+        deactivate_influencer(perfil)
+
+        perfil.referral_code = 'CODIGONUEVO'
+        perfil.status = InfluencerStatus.PENDING
+        perfil.save(update_fields=['referral_code', 'status'])
+        approve_influencer(perfil, self.admin)
+
+        cupon = Coupon.objects.get(influencer=perfil)
+        self.assertEqual(cupon.code, 'CODIGONUEVO')
         self.assertTrue(cupon.is_active)
 
     def test_rechazar_no_activa_el_rol_ni_genera_cupon(self):

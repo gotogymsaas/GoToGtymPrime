@@ -116,7 +116,7 @@
           <a href="{% url 'edit_profile' %}">{% trans "Editar perfil" %}</a>
           {% if user.influencer_profile.is_active %}
           <a href="{% url 'influencer_dashboard' %}">
-            {% if user.influencer_profile.status == 'approved' %}{% trans "Panel influencer" %}{% else %}{% trans "Solicitud de influencer" %}{% endif %}
+            {% if user.influencer_profile.status == 'approved' %}{% trans "Panel de afiliados" %}{% else %}{% trans "Solicitud de afiliado" %}{% endif %}
           </a>
           {% else %}
           {% comment %}

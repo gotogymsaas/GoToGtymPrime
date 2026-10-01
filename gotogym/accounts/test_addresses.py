@@ -12,6 +12,13 @@ DATOS_DIRECCION = {
     'address_line': 'Calle 100 # 15-20',
 }
 
+# Lo que realmente acepta el formulario hoy (`label`/`full_name`/`phone` se
+# completan a partir del perfil del usuario, ver `accounts.views.address_edit`).
+DATOS_DIRECCION_FORMULARIO = {
+    'country': 'Colombia', 'department': 'Bogotá D.C.', 'city': 'Bogotá',
+    'address_line': 'Calle 100 # 15-20',
+}
+
 
 class LibretaDeDireccionesTests(TestCase):
     def setUp(self):
@@ -25,8 +32,25 @@ class LibretaDeDireccionesTests(TestCase):
         self.client.force_login(self.usuario)
 
     def test_crear_direccion(self):
-        self.client.post(reverse('address_new'), DATOS_DIRECCION)
+        self.client.post(reverse('address_new'), DATOS_DIRECCION_FORMULARIO)
         self.assertEqual(CustomerAddress.objects.filter(user=self.usuario).count(), 1)
+
+    def test_la_primera_direccion_queda_predeterminada_automaticamente(self):
+        self.client.post(reverse('address_new'), DATOS_DIRECCION_FORMULARIO)
+        direccion = CustomerAddress.objects.get(user=self.usuario)
+        self.assertTrue(direccion.is_default)
+
+    def test_el_nombre_y_telefono_se_completan_desde_el_perfil_no_del_formulario(self):
+        self.usuario.first_name = 'Ana'
+        self.usuario.last_name = 'Marin'
+        self.usuario.phone = '3009998888'
+        self.usuario.save()
+
+        self.client.post(reverse('address_new'), DATOS_DIRECCION_FORMULARIO)
+
+        direccion = CustomerAddress.objects.get(user=self.usuario)
+        self.assertEqual(direccion.full_name, 'Ana Marin')
+        self.assertEqual(direccion.phone, '3009998888')
 
     def test_marcar_como_predeterminada_desmarca_las_demas(self):
         d1 = CustomerAddress.objects.create(user=self.usuario, is_default=True, **DATOS_DIRECCION)
@@ -39,14 +63,16 @@ class LibretaDeDireccionesTests(TestCase):
         self.assertFalse(d1.is_default)
         self.assertTrue(d2.is_default)
 
-    def test_guardar_como_predeterminada_desmarca_la_anterior(self):
+    def test_una_segunda_direccion_nueva_no_desplaza_la_predeterminada(self):
+        # La predeterminada ahora se elige solo desde la lista de
+        # direcciones (`address_set_default`); crear una direccion nueva ya
+        # no la cambia por si sola, ni siquiera si ya existe una por defecto.
         anterior = CustomerAddress.objects.create(user=self.usuario, is_default=True, **DATOS_DIRECCION)
 
-        datos = dict(DATOS_DIRECCION, is_default='on')
-        self.client.post(reverse('address_new'), datos)
+        self.client.post(reverse('address_new'), DATOS_DIRECCION_FORMULARIO)
 
         anterior.refresh_from_db()
-        self.assertFalse(anterior.is_default)
+        self.assertTrue(anterior.is_default)
         self.assertEqual(CustomerAddress.objects.filter(user=self.usuario, is_default=True).count(), 1)
 
     def test_no_se_puede_editar_la_direccion_de_otro_usuario(self):

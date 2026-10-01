@@ -5,6 +5,10 @@ from .models import CustomerAddress
 
 
 class CustomerAddressForm(forms.ModelForm):
+    # El catalogo de departamentos/ciudades es solo de Colombia (envios no
+    # cubren otros paises todavia), asi que el desplegable de pais tiene una
+    # sola opcion real en vez de dejarlo como texto libre.
+    country = forms.ChoiceField(label='Pais', choices=[('Colombia', 'Colombia')], initial='Colombia')
     department = forms.ChoiceField(
         label='Departamento',
         choices=[('', 'Selecciona un departamento')] + [(d, d) for d in DEPARTAMENTOS],
@@ -12,10 +16,24 @@ class CustomerAddressForm(forms.ModelForm):
 
     class Meta:
         model = CustomerAddress
+        # `label`, `full_name` y `phone` salieron del formulario: duplicaban
+        # lo que el usuario ya puso en "Datos personales" (nombre, telefono)
+        # y una direccion de entrega es solo el lugar, no un contacto
+        # distinto. El formulario completa esos tres a partir del perfil
+        # (ver `accounts.views.address_edit`). `is_default` tambien salio:
+        # se elige desde la lista de direcciones, no al editar una sola.
         fields = [
-            'label', 'full_name', 'phone', 'country', 'department', 'city',
-            'postal_code', 'address_line', 'address_complement', 'notes', 'is_default',
+            'country', 'department', 'city',
+            'postal_code', 'address_line', 'address_complement', 'notes',
         ]
+        labels = {
+            'country': 'Pais',
+            'city': 'Ciudad',
+            'postal_code': 'Codigo postal',
+            'address_line': 'Direccion',
+            'address_complement': 'Complemento (apto, torre, etc.)',
+            'notes': 'Notas de entrega',
+        }
 
     def clean(self):
         cleaned_data = super().clean()

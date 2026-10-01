@@ -1,3 +1,4 @@
+import re
 from decimal import Decimal
 
 from django.contrib import messages
@@ -9,6 +10,22 @@ from django.utils import timezone
 
 from .models import CommissionStatus, InfluencerProfile, InfluencerStatus, WithdrawalStatus
 from .services import deactivate_influencer, request_withdrawal
+
+CODIGO_REFERIDO_REGEX = re.compile(r'^[A-Z0-9]{4,20}$')
+
+
+def _codigo_referido_disponible(codigo, excluir_profile_pk=None):
+    """El codigo elegido por el afiliado tambien se vuelve `Coupon.code` al
+    aprobarse (ver `influencer.services._ensure_personal_coupon`), asi que
+    debe ser unico contra ambas tablas antes de aceptarlo."""
+    from orders.models import Coupon
+
+    perfiles = InfluencerProfile.objects.filter(referral_code=codigo)
+    if excluir_profile_pk:
+        perfiles = perfiles.exclude(pk=excluir_profile_pk)
+    if perfiles.exists():
+        return False
+    return not Coupon.objects.filter(code=codigo).exists()
 
 
 def get_referred_orders(profile):
@@ -44,6 +61,20 @@ def suscribete(request):
         messages.error(request, 'Debes aceptar los terminos del programa para continuar.')
         return redirect('influencer_suscribete')
 
+    necesita_codigo_nuevo = profile is None or not profile.is_active or profile.status == InfluencerStatus.REJECTED
+    codigo_propuesto = None
+    if necesita_codigo_nuevo:
+        codigo_propuesto = request.POST.get('referral_code', '').strip().upper()
+        if not CODIGO_REFERIDO_REGEX.fullmatch(codigo_propuesto):
+            messages.error(
+                request,
+                'Elige un codigo de 4 a 20 letras o numeros (sin espacios ni simbolos) que te represente a ti y a tu marca.',
+            )
+            return redirect('influencer_suscribete')
+        if not _codigo_referido_disponible(codigo_propuesto, excluir_profile_pk=profile.pk if profile else None):
+            messages.error(request, 'Ese codigo ya esta en uso. Elige otro.')
+            return redirect('influencer_suscribete')
+
     ahora = timezone.now()
 
     if profile is not None:
@@ -53,8 +84,9 @@ def suscribete(request):
             profile.reviewed_at = None
             profile.reviewed_by = None
             profile.terms_accepted_at = ahora
+            profile.referral_code = codigo_propuesto
             profile.save(update_fields=[
-                'is_active', 'status', 'reviewed_at', 'reviewed_by', 'terms_accepted_at',
+                'is_active', 'status', 'reviewed_at', 'reviewed_by', 'terms_accepted_at', 'referral_code',
             ])
             messages.success(request, 'Tu solicitud fue enviada de nuevo. Te avisaremos cuando sea revisada.')
         elif profile.status == InfluencerStatus.REJECTED:
@@ -62,7 +94,8 @@ def suscribete(request):
             profile.reviewed_at = None
             profile.reviewed_by = None
             profile.terms_accepted_at = ahora
-            profile.save(update_fields=['status', 'reviewed_at', 'reviewed_by', 'terms_accepted_at'])
+            profile.referral_code = codigo_propuesto
+            profile.save(update_fields=['status', 'reviewed_at', 'reviewed_by', 'terms_accepted_at', 'referral_code'])
             messages.success(request, 'Tu solicitud fue enviada de nuevo. Te avisaremos cuando sea revisada.')
         elif profile.status == InfluencerStatus.PENDING:
             messages.info(request, 'Tu solicitud ya esta en revision.')
@@ -73,6 +106,7 @@ def suscribete(request):
     try:
         InfluencerProfile.objects.create(
             user=user, status=InfluencerStatus.PENDING, terms_accepted_at=ahora,
+            referral_code=codigo_propuesto,
         )
         messages.success(request, 'Tu solicitud fue enviada. Te avisaremos cuando sea aprobada.')
     except IntegrityError:

@@ -4,7 +4,7 @@
 {% block title %}Unete al programa de afiliados{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20260930-panel-quantum">
+<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20260930-panel-quantum-r2">
 {% endblock %}
 
 {% block content %}
@@ -23,7 +23,7 @@
   <div class="editorial-shell">
     <div class="panel">
       <h2>Como funciona</h2>
-      <p>Tu solicitud sera revisada por un administrador. Una vez aprobada, recibiras un codigo propio para compartir: cada compra hecha con tu codigo genera una comision.</p>
+      <p>Tu solicitud sera revisada por un administrador. Tu propio codigo (el que elijas abajo) se activa como cupon al aprobarse: cada compra hecha con el genera una comision.</p>
     </div>
 
     <div class="panel">
@@ -32,6 +32,12 @@
 
       <form method="post" class="form-grid">
         {% csrf_token %}
+        <label class="field-full">
+          <span>Tu codigo de afiliado</span>
+          <input type="text" name="referral_code" maxlength="20" placeholder="Ej: TUMARCA2026" required
+                 pattern="[A-Za-z0-9]{4,20}" title="4 a 20 letras o numeros, sin espacios ni simbolos">
+        </label>
+        <p class="hint field-full">Elige un codigo de 4 a 20 letras o numeros que te represente a ti y a tu marca (sin espacios ni simbolos). Sera tu cupon de descuento una vez aprobado.</p>
         <label class="check field-full">
           <input type="checkbox" name="accept_terms" required>
           <span>Acepto los terminos del programa de afiliados y la obligacion de divulgacion publicitaria.</span>

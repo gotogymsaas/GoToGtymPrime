@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static i18n %}
 {% block title %}{% if direccion %}{% trans "Editar direccion" %}{% else %}{% trans "Nueva direccion" %}{% endif %} | GoToGym{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260926-token-h1">{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260930-account-select-fix">{% endblock %}
 {% block content %}
 <div class="editorial-page">
   <header class="editorial-hero editorial-hero--compact">
@@ -11,16 +11,25 @@
     </div>
   </header>
   <section class="editorial-section editorial-section--mist">
-    <form method="post" class="editorial-shell account-layout">
+    <form method="post" class="editorial-shell account-layout" data-address-form>
       {% csrf_token %}
       <div class="account-panel account-field--full">
         <div class="account-fields">
           {% for field in form %}
+          {% if field.name == 'city' %}
+          <div class="account-field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <select name="{{ field.html_name }}" id="{{ field.id_for_label }}" data-selected="{{ field.value|default:'' }}" data-city-select required>
+              <option value="">{% trans "Selecciona primero un departamento" %}</option>
+            </select>
+          </div>
+          {% else %}
           <div class="account-field {% if field.name == 'address_line' or field.name == 'notes' %}account-field--full{% endif %}">
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
             {{ field }}
             {{ field.errors }}
           </div>
+          {% endif %}
           {% endfor %}
         </div>
       </div>
@@ -31,4 +40,42 @@
     </form>
   </section>
 </div>
+{{ municipios_por_departamento|json_script:"municipios-data" }}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var datosEl = document.getElementById('municipios-data');
+    var form = document.querySelector('[data-address-form]');
+    if (!datosEl || !form) return;
+    var municipiosPorDepartamento = JSON.parse(datosEl.textContent);
+    var deptoSelect = form.querySelector('select[name="department"]');
+    var ciudadSelect = form.querySelector('[data-city-select]');
+    if (!deptoSelect || !ciudadSelect) return;
+
+    function llenarCiudades(departamento, ciudadAConservar) {
+      var municipios = municipiosPorDepartamento[departamento] || [];
+      ciudadSelect.innerHTML = '';
+      var placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = municipios.length ? '{% trans "Selecciona una ciudad" %}' : '{% trans "Selecciona primero un departamento" %}';
+      ciudadSelect.appendChild(placeholder);
+      municipios.forEach(function (municipio) {
+        var opcion = document.createElement('option');
+        opcion.value = municipio;
+        opcion.textContent = municipio;
+        if (municipio === ciudadAConservar) opcion.selected = true;
+        ciudadSelect.appendChild(opcion);
+      });
+    }
+
+    deptoSelect.addEventListener('change', function () {
+      llenarCiudades(deptoSelect.value, null);
+    });
+    if (deptoSelect.value) {
+      llenarCiudades(deptoSelect.value, ciudadSelect.dataset.selected);
+    }
+  });
+</script>
 {% endblock %}

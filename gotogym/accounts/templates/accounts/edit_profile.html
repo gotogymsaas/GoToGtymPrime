@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static i18n %}
 {% block title %}{% trans "Mi cuenta" %} | GoToGym{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260926-token-h1">{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260930-account-select-fix">{% endblock %}
 {% block content %}
 <div class="editorial-page">
   <header class="editorial-hero editorial-hero--compact"><div class="editorial-shell"><p class="editorial-kicker">Tu cuenta</p><h1 class="editorial-title">Tu información,<br><em>a tu manera.</em></h1></div></header>
@@ -13,6 +13,7 @@
         <div class="account-field"><label for="id_last_name">{% trans "Apellido" %}</label><input type="text" name="last_name" id="id_last_name" value="{{ user.last_name|default:'' }}" required></div>
         <div class="account-field account-field--full"><label for="id_email">Email</label><input type="email" name="email" id="id_email" value="{{ user.email }}" required></div>
         <div class="account-field"><label for="id_age">{% trans "Edad" %}</label><input type="number" name="age" id="id_age" value="{{ user.age|default:'' }}" min="10" max="120"></div>
+        <div class="account-field"><label for="id_phone">{% trans "Telefono" %}</label><input type="tel" name="phone" id="id_phone" value="{{ user.phone|default:'' }}"></div>
       </div></div>
       <aside class="account-panel"><p class="editorial-kicker">Protección</p><h2>Seguridad</h2><details class="account-security"><summary>Cambiar contraseña</summary><div class="account-fields">
         <div class="account-field account-field--full"><label for="id_current_password">{% trans "Contraseña actual" %}</label><input type="password" name="current_password" id="id_current_password" autocomplete="current-password"></div>
@@ -26,37 +27,128 @@
       <div class="account-panel account-field--full">
         <p class="editorial-kicker">Entrega</p>
         <h2>{% trans "Mis direcciones" %}</h2>
-        <div class="account-actions" style="margin-bottom:1rem;">
-          <a class="editorial-action" href="{% url 'address_new' %}">{% trans "Agregar direccion" %}</a>
-        </div>
-        {% for direccion in direcciones %}
-        <div class="account-field account-field--full" style="border-bottom:1px solid rgba(0,0,0,.08); padding-bottom:1rem; margin-bottom:1rem;">
-          <p>
-            <strong>{{ direccion.label|default:direccion.full_name }}</strong>
-            {% if direccion.is_default %}<span> &middot; {% trans "Predeterminada" %}</span>{% endif %}
-          </p>
-          <p>{{ direccion.full_name }} &middot; {{ direccion.phone }}</p>
-          <p>{{ direccion.address_line }}{% if direccion.address_complement %}, {{ direccion.address_complement }}{% endif %}</p>
-          <p>{{ direccion.city }}, {{ direccion.department }}</p>
-          <div class="account-actions">
-            <a class="editorial-text-link" href="{% url 'address_edit' direccion.pk %}">{% trans "Editar" %}</a>
-            {% if not direccion.is_default %}
-            <form method="post" action="{% url 'address_set_default' direccion.pk %}" style="display:inline;">
-              {% csrf_token %}
-              <button type="submit" class="editorial-text-link" style="background:none;border:none;cursor:pointer;">{% trans "Marcar como predeterminada" %}</button>
-            </form>
-            {% endif %}
-            <form method="post" action="{% url 'address_delete' direccion.pk %}" style="display:inline;" onsubmit="return confirm('{% trans "¿Eliminar esta direccion?" %}');">
-              {% csrf_token %}
-              <button type="submit" class="editorial-text-link" style="background:none;border:none;cursor:pointer;">{% trans "Eliminar" %}</button>
-            </form>
-          </div>
-        </div>
-        {% empty %}
+
+        {% if direcciones_formularios %}
+        <p class="account-address-hint">{% trans "Elige cual usar por defecto en tus pedidos:" %}</p>
+        <ul class="account-address-list">
+          {% for item in direcciones_formularios %}
+          <li>
+            <label>
+              <input type="radio" name="direccion_predeterminada" value="{{ item.direccion.pk }}"
+                     {% if item.direccion.is_default %}checked{% endif %}
+                     form="form-predeterminada-{{ item.direccion.pk }}"
+                     onchange="this.form.submit()">
+              <span>
+                <strong>{{ item.direccion.address_line }}</strong>{% if item.direccion.address_complement %}, {{ item.direccion.address_complement }}{% endif %}
+                <small>{{ item.direccion.city }}, {{ item.direccion.department }}{% if item.direccion.is_default %} &middot; {% trans "Predeterminada" %}{% endif %}</small>
+              </span>
+            </label>
+            <form id="form-predeterminada-{{ item.direccion.pk }}" method="post" action="{% url 'address_set_default' item.direccion.pk %}">{% csrf_token %}</form>
+
+            <details class="account-security">
+              <summary>{% trans "Editar direccion" %}</summary>
+              <form method="post" action="{% url 'address_edit' item.direccion.pk %}" class="account-fields" data-address-form>
+                {% csrf_token %}
+                {% for field in item.form %}
+                {% if field.name == 'city' %}
+                <div class="account-field">
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  <select name="{{ field.html_name }}" id="{{ field.id_for_label }}" data-selected="{{ field.value|default:'' }}" data-city-select required>
+                    <option value="">{% trans "Selecciona primero un departamento" %}</option>
+                  </select>
+                </div>
+                {% else %}
+                <div class="account-field {% if field.name == 'address_line' or field.name == 'notes' %}account-field--full{% endif %}">
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {{ field }}
+                  {{ field.errors }}
+                </div>
+                {% endif %}
+                {% endfor %}
+                <div class="account-actions account-field--full">
+                  <button type="submit" class="editorial-action">{% trans "Guardar direccion" %}</button>
+                </div>
+              </form>
+            </details>
+            <div class="account-actions">
+              <form method="post" action="{% url 'address_delete' item.direccion.pk %}" onsubmit="return confirm('{% trans "¿Eliminar esta direccion?" %}');">
+                {% csrf_token %}
+                <button type="submit" class="editorial-text-link" style="background:none;border:none;cursor:pointer;">{% trans "Eliminar" %}</button>
+              </form>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
         <p>{% trans "Todavia no tienes direcciones guardadas." %}</p>
-        {% endfor %}
+        {% endif %}
+
+        <details class="account-security">
+          <summary>{% trans "Agregar direccion" %}</summary>
+          <form method="post" action="{% url 'address_new' %}" class="account-fields" data-address-form>
+            {% csrf_token %}
+            {% for field in address_form %}
+            {% if field.name == 'city' %}
+            <div class="account-field">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              <select name="{{ field.html_name }}" id="{{ field.id_for_label }}" data-selected="{{ field.value|default:'' }}" data-city-select required>
+                <option value="">{% trans "Selecciona primero un departamento" %}</option>
+              </select>
+            </div>
+            {% else %}
+            <div class="account-field {% if field.name == 'address_line' or field.name == 'notes' %}account-field--full{% endif %}">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {{ field.errors }}
+            </div>
+            {% endif %}
+            {% endfor %}
+            <div class="account-actions account-field--full">
+              <button type="submit" class="editorial-action">{% trans "Guardar direccion" %}</button>
+            </div>
+          </form>
+        </details>
       </div>
     </div>
   </section>
 </div>
+{{ municipios_por_departamento|json_script:"municipios-data" }}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var datosEl = document.getElementById('municipios-data');
+    if (!datosEl) return;
+    var municipiosPorDepartamento = JSON.parse(datosEl.textContent);
+
+    function llenarCiudades(ciudadSelect, departamento, ciudadAConservar) {
+      var municipios = municipiosPorDepartamento[departamento] || [];
+      ciudadSelect.innerHTML = '';
+      var placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = municipios.length ? '{% trans "Selecciona una ciudad" %}' : '{% trans "Selecciona primero un departamento" %}';
+      ciudadSelect.appendChild(placeholder);
+      municipios.forEach(function (municipio) {
+        var opcion = document.createElement('option');
+        opcion.value = municipio;
+        opcion.textContent = municipio;
+        if (municipio === ciudadAConservar) opcion.selected = true;
+        ciudadSelect.appendChild(opcion);
+      });
+    }
+
+    document.querySelectorAll('[data-address-form]').forEach(function (form) {
+      var deptoSelect = form.querySelector('select[name="department"]');
+      var ciudadSelect = form.querySelector('[data-city-select]');
+      if (!deptoSelect || !ciudadSelect) return;
+      deptoSelect.addEventListener('change', function () {
+        llenarCiudades(ciudadSelect, deptoSelect.value, null);
+      });
+      if (deptoSelect.value) {
+        llenarCiudades(ciudadSelect, deptoSelect.value, ciudadSelect.dataset.selected);
+      }
+    });
+  });
+</script>
 {% endblock %}

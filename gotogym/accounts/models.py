@@ -52,6 +52,7 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
     age = models.PositiveIntegerField(null=True, blank=True)
+    phone = models.CharField(max_length=40, blank=True)
     accepted_terms = models.BooleanField(default=False)
     terms_accepted_at = models.DateTimeField(null=True, blank=True)
     terms_hash = models.CharField(max_length=128, blank=True)

@@ -76,10 +76,49 @@
 .account-field { display: grid; gap: 7px; }
 .account-field--full { grid-column: 1/-1; }
 .account-field label { color: var(--ed-muted); font-size: .75rem; font-weight: 800; text-transform: uppercase; }
-.account-field input { min-height: 50px; border: 1px solid #c8c8c5; border-radius: 0; background: #fff; color: var(--ed-ink); padding: 0 14px; }
+/* input/select/textarea con la misma metrica: sin esto el <select> se queda
+ * sin el borde/alto que si recibe el <input> (ver el mismo arreglo ya hecho
+ * para el dominio comercial en commerce_editorial.css) y dos campos
+ * contiguos -como Departamento y Ciudad- se ven distintos. */
+.account-field input,
+.account-field select,
+.account-field textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 50px;
+  border: 1px solid #c8c8c5;
+  border-radius: 0;
+  background: #fff;
+  color: var(--ed-ink);
+  padding: 0 14px;
+  font: inherit;
+}
+/* El borde/alto de arriba no basta para un <select>: el navegador le suma
+ * su propio chrome nativo (flecha, relieve) encima de cualquier CSS, asi
+ * que sigue viendose distinto a un <input> con el mismo borde. Se apaga ese
+ * chrome y se dibuja una flecha propia para que ambos queden iguales. */
+.account-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23101012' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 7.5l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px;
+  padding-right: 40px;
+}
 .account-security summary { cursor: pointer; font-weight: 700; }
 .account-security[open] summary { margin-bottom: var(--space-5); }
 .account-actions { display: flex; justify-content: space-between; gap: 14px; margin-top: 28px; }
+
+.account-address-hint { color: var(--ed-muted); font-size: .85rem; margin: 0 0 var(--space-3); }
+.account-address-list { list-style: none; margin: 0 0 var(--space-5); padding: 0; }
+.account-address-list > li { border-bottom: 1px solid rgba(0,0,0,.08); padding: var(--space-4) 0; }
+.account-address-list label { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.account-address-list input[type="radio"] { width: 16px; height: 16px; min-height: 0; margin-top: 3px; flex: 0 0 auto; }
+.account-address-list label small { display: block; color: var(--ed-muted); margin-top: 2px; }
+.account-address-list .account-security { margin: var(--space-3) 0 0 26px; }
+.account-address-list .account-actions { margin: var(--space-2) 0 0 26px; justify-content: flex-start; }
 
 .order-list { background: var(--ed-paper); }
 .order-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); padding: 24px; border-bottom: 1px solid #dededb; color: inherit; text-decoration: none; }

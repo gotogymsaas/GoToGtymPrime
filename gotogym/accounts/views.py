@@ -118,6 +118,7 @@ def edit_profile(request):
         first_name = request.POST.get('first_name', '').strip()
         last_name = request.POST.get('last_name', '').strip()
         age = request.POST.get('age', '').strip()
+        phone = request.POST.get('phone', '').strip()
         email = request.POST.get('email', '').strip()
         current_password = request.POST.get('current_password', '')
         password = request.POST.get('password', '')
@@ -130,6 +131,9 @@ def edit_profile(request):
             changed = True
         if last_name and last_name != user.last_name:
             user.last_name = last_name
+            changed = True
+        if phone != user.phone:
+            user.phone = phone
             changed = True
         if age:
             try:
@@ -175,8 +179,20 @@ def edit_profile(request):
                 return JsonResponse({'ok': True, 'message': 'No se realizaron cambios.'})
             messages.info(request, 'No se realizaron cambios.')
         return redirect('logged_home')
+    from orders.colombia_data import MUNICIPIOS_POR_DEPARTAMENTO
+
     direcciones = user.addresses.all()
-    return render(request, 'accounts/edit_profile.html', {'user': user, 'direcciones': direcciones})
+    direcciones_formularios = [
+        {'direccion': direccion, 'form': CustomerAddressForm(instance=direccion)}
+        for direccion in direcciones
+    ]
+    context = {
+        'user': user,
+        'direcciones_formularios': direcciones_formularios,
+        'address_form': CustomerAddressForm(),
+        'municipios_por_departamento': MUNICIPIOS_POR_DEPARTAMENTO,
+    }
+    return render(request, 'accounts/edit_profile.html', context)
 
 
 @login_required
@@ -190,16 +206,36 @@ def address_edit(request, pk=None):
     if request.method == 'POST':
         form = CustomerAddressForm(request.POST, instance=direccion)
         if form.is_valid():
+            es_nueva = direccion is None
             nueva = form.save(commit=False)
             nueva.user = request.user
+            # `full_name`/`phone` ya no se piden en este formulario (ver
+            # CustomerAddressForm): una direccion es el lugar de entrega, el
+            # contacto es el del perfil. Se completan aqui para no dejar
+            # esas columnas vacias (las usa el precargado del checkout).
+            if not nueva.full_name:
+                nueva.full_name = request.user.get_full_name() or request.user.email
+            if not nueva.phone:
+                nueva.phone = request.user.phone
+            # La predeterminada ahora se elige desde la lista de
+            # direcciones (un radio por direccion), no al crear/editar una
+            # sola -- salvo la primera direccion del usuario, que se marca
+            # predeterminada automaticamente para que nunca quede en cero.
+            if es_nueva and not request.user.addresses.exists():
+                nueva.is_default = True
             nueva.save()
-            if nueva.is_default:
-                request.user.addresses.exclude(pk=nueva.pk).update(is_default=False)
             messages.success(request, 'Direccion guardada.')
             return redirect('edit_profile')
     else:
         form = CustomerAddressForm(instance=direccion)
-    return render(request, 'accounts/address_form.html', {'form': form, 'direccion': direccion})
+    from orders.colombia_data import MUNICIPIOS_POR_DEPARTAMENTO
+
+    context = {
+        'form': form,
+        'direccion': direccion,
+        'municipios_por_departamento': MUNICIPIOS_POR_DEPARTAMENTO,
+    }
+    return render(request, 'accounts/address_form.html', context)
 
 
 @login_required
