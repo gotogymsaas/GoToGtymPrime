@@ -80,6 +80,7 @@
           {% else %}
             <span class="empty-img">Sin permiso</span>
           {% endif %}
+          <a class="ghost btn-sm" href="{% url 'admin_variant_inventory_history' variant.pk %}">Historial</a>
         </td>
       </tr>
       {% endwith %}

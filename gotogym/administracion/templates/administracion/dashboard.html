@@ -3,39 +3,133 @@
 {% block title %}Panel GoToGym Admin{% endblock %}
 {% block content %}
 <section class="hero">
-  <div>
-    <p class="eyebrow">Base conectada con tienda comercial</p>
-    <h1>Centro administrador GoToGym</h1>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <span class="quantum-emblem"><span class="quantum-emblem__core"></span></span>
+    <div>
+      <p class="eyebrow">Base conectada con tienda comercial</p>
+      <h1>Centro administrador GoToGym</h1>
+    </div>
   </div>
   <a class="button" href="{% url 'admin_product_new' %}">Nuevo producto</a>
 </section>
-<section class="stats">
+
+<section class="stats stats-compact">
   <article><span>{{ product_count }}</span><p>Productos</p></article>
-  <article><span>{{ user_count }}</span><p>Usuarios inscritos</p></article>
-  <article><span>{{ influencer_count }}</span><p>Influencers</p></article>
   <article><span>{{ category_count }}</span><p>Categorias</p></article>
-  <article><span>{{ stock_total }}</span><p>Unidades en stock</p></article>
+  <article><span>{{ active_coupon_count }}</span><p>Cupones activos</p></article>
+  <article><span>{{ user_count }}</span><p>Usuarios inscritos</p></article>
+  <article><span>{{ influencer_count }}</span><p>Influencers activos</p></article>
+</section>
+
+<section class="page-head">
+  <h2>Necesita tu atencion</h2>
 </section>
 <section class="stats stats-secondary">
-  <article class="{% if low_stock_count %}stat-warning{% endif %}"><span>{{ low_stock_count }}</span><p>Variantes con stock bajo</p></article>
-  <article class="{% if out_of_stock_count %}stat-danger{% endif %}"><span>{{ out_of_stock_count }}</span><p>Variantes agotadas</p></article>
-  <article><span>{{ active_coupon_count }}</span><p>Cupones activos</p></article>
+  <article class="{% if pending_influencer_count %}is-gold stat-warning{% else %}is-green{% endif %}">
+    <a href="{% url 'admin_influencers' %}?status=pending"><span>{{ pending_influencer_count }}</span><p>Solicitudes de afiliado</p></a>
+  </article>
+  <article class="{% if pending_withdrawal_count %}is-gold stat-warning{% else %}is-green{% endif %}">
+    <a href="{% url 'admin_withdrawals' %}"><span>{{ pending_withdrawal_count }}</span><p>Retiros pendientes</p></a>
+  </article>
+  <article class="{% if low_stock_count %}is-gold stat-warning{% else %}is-green{% endif %}"><span>{{ low_stock_count }}</span><p>Variantes con stock bajo</p></article>
+  <article class="{% if out_of_stock_count %}stat-danger{% else %}is-green{% endif %}"><span>{{ out_of_stock_count }}</span><p>Variantes agotadas</p></article>
 </section>
+
+{% if bajo_stock %}
+<div class="panel">
+  <h2>Stock bajo &mdash; reabastecer pronto</h2>
+  <table>
+    <thead><tr><th>Producto</th><th>SKU</th><th>Talla/Color</th><th>Disponible</th></tr></thead>
+    <tbody>
+      {% for inv in bajo_stock %}
+      <tr>
+        <td><a href="{% url 'admin_product_edit' inv.variant.product_id %}">{{ inv.variant.product.name }}</a></td>
+        <td>{{ inv.variant.sku }}</td>
+        <td>{{ inv.variant.size }}/{{ inv.variant.color }}</td>
+        <td>{% if inv.quantity_available == 0 %}<span class="pill pill-off">Agotado</span>{% else %}{{ inv.quantity_available }}{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<section class="page-head">
+  <div>
+    <h2>Ventas y comisiones</h2>
+  </div>
+  <form class="date-filter" method="get">
+    <label>Desde <input type="date" name="desde" value="{{ desde|date:'Y-m-d' }}"></label>
+    <label>Hasta <input type="date" name="hasta" value="{{ hasta|date:'Y-m-d' }}"></label>
+    <button type="submit">Filtrar</button>
+  </form>
+</section>
+<section class="stats">
+  <article><span>{{ resumen.pedidos|default:0 }}</span><p>Pedidos pagados</p></article>
+  <article><span>${{ resumen.ingresos|default:0|cop }} COP</span><p>Ingresos totales</p></article>
+  <article><span>${{ resumen.descuentos|default:0|cop }} COP</span><p>Descuentos otorgados</p></article>
+  <article><span>${{ resumen.envio|default:0|cop }} COP</span><p>Envio cobrado</p></article>
+</section>
+
+<div class="panel">
+  <h2>Meta de ventas del rango</h2>
+  {% if sales_goal %}
+  <div class="pq-progress" style="margin-bottom: var(--space-3);">
+    <div class="pq-progress__label"><span>${{ resumen.ingresos|default:0|cop }} COP</span><span>Meta: ${{ sales_goal|cop }} COP</span></div>
+    <div class="pq-progress__track"><div class="pq-progress__fill" style="width:{{ sales_goal_percent }}%;"></div></div>
+  </div>
+  {% else %}
+  <p class="hint">Define una meta para ver tu progreso de ventas en el rango seleccionado.</p>
+  {% endif %}
+  {% if perms.administracion.change_panelsettings %}
+  <form method="post" action="{% url 'admin_sales_goal_update' %}" style="display:flex; align-items:center; gap: var(--space-3); flex-wrap: wrap;">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <label class="check">
+      <span>Meta de ventas (COP)</span>
+      {{ sales_goal_form.monthly_sales_goal }}
+    </label>
+    <button class="ghost btn-sm" type="submit">Guardar</button>
+  </form>
+  {% endif %}
+</div>
+
+<section class="stats stats-secondary">
+  <article><span>${{ comisiones.pendiente|default:0|cop }} COP</span><p>Comisiones pendientes</p></article>
+  <article><span>${{ comisiones.aprobada|default:0|cop }} COP</span><p>Comisiones aprobadas</p></article>
+  <article><span>${{ comisiones.pagada|default:0|cop }} COP</span><p>Comisiones pagadas</p></article>
+</section>
+
 <section class="grid-two">
   <div class="panel">
-    <h2>Productos recientes</h2>
+    <h2>Ventas por dia</h2>
     <table>
-      {% for product in latest_products %}
-      <tr><td>{{ product.name }}</td><td>${{ product.base_price|cop }} COP</td><td>{{ product.stock }}</td></tr>
-      {% empty %}<tr><td>No hay productos.</td></tr>{% endfor %}
+      <thead><tr><th>Fecha</th><th>Pedidos</th><th>Total</th></tr></thead>
+      <tbody>
+        {% for fila in ventas_por_dia %}
+        <tr>
+          <td>{{ fila.dia|date:"d/m/Y" }}</td>
+          <td>{{ fila.pedidos }}</td>
+          <td>${{ fila.total|cop }} COP</td>
+        </tr>
+        {% empty %}<tr><td colspan="3">Sin ventas en este rango.</td></tr>{% endfor %}
+      </tbody>
     </table>
   </div>
   <div class="panel">
-    <h2>Usuarios recientes</h2>
+    <h2>Productos mas vendidos</h2>
     <table>
-      {% for user in latest_users %}
-      <tr><td>{{ user.email }}</td><td>{{ user.first_name }} {{ user.last_name }}</td><td>{{ user.age|default:"-" }} años</td></tr>
-      {% empty %}<tr><td>No hay usuarios.</td></tr>{% endfor %}
+      <thead><tr><th>Producto</th><th>SKU</th><th>Unidades</th><th>Ingresos</th></tr></thead>
+      <tbody>
+        {% for fila in productos_top %}
+        <tr>
+          <td>{{ fila.product_name_snapshot }}</td>
+          <td>{{ fila.sku_snapshot }}</td>
+          <td>{{ fila.unidades }}</td>
+          <td>${{ fila.ingresos|cop }} COP</td>
+        </tr>
+        {% empty %}<tr><td colspan="4">Sin ventas en este rango.</td></tr>{% endfor %}
+      </tbody>
     </table>
   </div>
 </section>

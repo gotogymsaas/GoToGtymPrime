@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Unete al programa de afiliados{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20260930-panel-quantum">
+{% endblock %}
+
+{% block content %}
+<div class="panel-shell">
+  <section class="panel-hero">
+    <div class="editorial-shell">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;">
+        <span class="quantum-emblem"><span class="quantum-emblem__core"></span></span>
+        <span class="quantum-signal-line"></span>
+      </div>
+      <p class="eyebrow">Programa de afiliados</p>
+      <h1>Unete al programa de afiliados</h1>
+    </div>
+  </section>
+
+  <div class="editorial-shell">
+    <div class="panel">
+      <h2>Como funciona</h2>
+      <p>Tu solicitud sera revisada por un administrador. Una vez aprobada, recibiras un codigo propio para compartir: cada compra hecha con tu codigo genera una comision.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Terminos del programa</h2>
+      <p>Al participar te comprometes a divulgar claramente a tu audiencia que usas un codigo o enlace de afiliado cuando lo promociones, conforme a la normativa de publicidad con influenciadores aplicable. El programa puede suspender el acceso de un afiliado que incumpla estas condiciones.</p>
+
+      <form method="post" class="form-grid">
+        {% csrf_token %}
+        <label class="check field-full">
+          <input type="checkbox" name="accept_terms" required>
+          <span>Acepto los terminos del programa de afiliados y la obligacion de divulgacion publicitaria.</span>
+        </label>
+        <div class="form-actions">
+          <a href="{% url 'logged_home' %}" class="ghost">Cancelar</a>
+          <button type="submit" class="button">Enviar solicitud</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

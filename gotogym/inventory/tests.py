@@ -6,12 +6,13 @@ from django.db import IntegrityError, connection, connections, transaction
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 from products.models import Brand, Product, ProductCategory, ProductVariant
 
-from .models import Inventory
+from .models import Inventory, InventoryAdjustment, InventoryAdjustmentReason
 from .services import (
     InsufficientStockError,
     check_availability,
     decrement_stock,
     get_available_quantity,
+    record_adjustment,
     restore_stock,
 )
 
@@ -207,3 +208,44 @@ class SelectForUpdateSupportTests(TransactionTestCase):
 
     def test_backend_supports_row_locking(self):
         self.assertTrue(connection.features.has_select_for_update)
+
+
+class InventoryAdjustmentHistoryTests(TestCase):
+    """Kardex (G2): cada descuento o reposicion de stock deja un registro
+    historico, no solo el valor final."""
+
+    def setUp(self):
+        self.variant = _build_variant('Kardex', 'INV-TEST-KARDEX', 10)
+
+    def test_decrement_stock_deja_un_registro_con_el_delta_negativo(self):
+        decrement_stock([(self.variant, 3)])
+
+        ajuste = InventoryAdjustment.objects.get(inventory__variant=self.variant)
+        self.assertEqual(ajuste.delta, -3)
+        self.assertEqual(ajuste.quantity_after, 7)
+        self.assertEqual(ajuste.reason, InventoryAdjustmentReason.SALE)
+        self.assertIsNone(ajuste.created_by)
+
+    def test_restore_stock_deja_un_registro_con_el_delta_positivo(self):
+        decrement_stock([(self.variant, 5)])
+        restore_stock([(self.variant, 5)])
+
+        ajustes = list(InventoryAdjustment.objects.filter(inventory__variant=self.variant).order_by('created_at'))
+        self.assertEqual(len(ajustes), 2)
+        self.assertEqual(ajustes[-1].delta, 5)
+        self.assertEqual(ajustes[-1].quantity_after, 10)
+        self.assertEqual(ajustes[-1].reason, InventoryAdjustmentReason.RESTOCK)
+
+    def test_un_descuento_fallido_no_deja_registro(self):
+        with self.assertRaises(InsufficientStockError):
+            decrement_stock([(self.variant, 999)])
+        self.assertFalse(InventoryAdjustment.objects.filter(inventory__variant=self.variant).exists())
+
+    def test_record_adjustment_relee_el_stock_actual_de_la_base(self):
+        inventario = Inventory.objects.get(variant=self.variant)
+        Inventory.objects.filter(pk=inventario.pk).update(quantity_available=42)
+
+        record_adjustment(inventario, delta=32, reason=InventoryAdjustmentReason.MANUAL)
+
+        ajuste = InventoryAdjustment.objects.get(inventory=inventario)
+        self.assertEqual(ajuste.quantity_after, 42)

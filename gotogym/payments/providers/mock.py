@@ -48,6 +48,13 @@ class MockPaymentProvider(PaymentProvider):
             'El proveedor mock no recibe webhooks reales; usa force_status.'
         )
 
+    def refund_payment(self, payment_transaction, amount=None):
+        """Simula un reembolso exitoso, sin mover dinero real."""
+        return {
+            'provider_refund_id': f"mock-refund-{uuid.uuid4().hex[:12]}",
+            'status': 'approved',
+        }
+
     def force_status(self, payment_transaction, status):
         """Fuerza un estado sin pasar por ningun webhook real.
 

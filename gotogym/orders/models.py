@@ -47,6 +47,16 @@ class Coupon(models.Model):
     max_uses = models.PositiveIntegerField(null=True, blank=True)
     times_used = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    influencer = models.ForeignKey(
+        'influencer.InfluencerProfile', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='coupons',
+        help_text='Si se asigna, las ventas hechas con este cupon se atribuyen a este afiliado.',
+    )
+    customer_segment = models.ForeignKey(
+        'accounts.CustomerSegment', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='coupons',
+        help_text='Si se asigna, solo los clientes de este segmento pueden usar el cupon (precio diferenciado por segmento).',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -114,6 +124,14 @@ class Order(models.Model):
     # Nota operativa para casos que exigen revision humana, como un pago
     # aprobado sin stock suficiente para cumplirlo. No es visible al cliente.
     internal_note = models.TextField(blank=True)
+
+    # Afiliado cuyo cupon se uso en este pedido, si aplica. Se fija una sola
+    # vez al crear el pedido (a partir de `Coupon.influencer`) y no cambia
+    # aunque el cupon se reasigne despues: es la atribucion de esa venta.
+    referred_by = models.ForeignKey(
+        'influencer.InfluencerProfile', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='referred_orders',
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -33,8 +33,7 @@ class PanelAdminBaseTestCase(TestCase):
 class ChromeDelPanelTests(PanelAdminBaseTestCase):
     """El "Salir" del panel no puede ser el mismo boton que cierra sesion
     (ver base.html): son dos acciones distintas, una vuelve a la tienda
-    sin tocar la sesion, la otra la cierra de verdad. "Grupos y permisos"
-    ya no tiene entrada en la navegacion (retirado temporalmente)."""
+    sin tocar la sesion, la otra la cierra de verdad."""
 
     def test_salir_del_panel_es_un_enlace_a_la_tienda_no_un_logout(self):
         respuesta = self.client.get(reverse('admin_dashboard'))
@@ -53,9 +52,9 @@ class ChromeDelPanelTests(PanelAdminBaseTestCase):
         respuesta_panel = self.client.get(reverse('admin_dashboard'))
         self.assertNotEqual(respuesta_panel.status_code, 200)
 
-    def test_grupos_y_permisos_no_aparece_en_la_navegacion(self):
+    def test_grupos_y_permisos_aparece_en_la_navegacion(self):
         respuesta = self.client.get(reverse('admin_dashboard'))
-        self.assertNotContains(respuesta, 'Grupos y permisos')
+        self.assertContains(respuesta, 'Grupos y permisos')
 
 
 class CuponesAdminTests(PanelAdminBaseTestCase):
@@ -155,6 +154,36 @@ class InventarioAdminTests(PanelAdminBaseTestCase):
         self.assertRedirects(respuesta, reverse('admin_variants'))
         self.inventario.refresh_from_db()
         self.assertEqual(self.inventario.quantity_available, 25)
+
+    def test_actualizar_stock_deja_un_registro_de_ajuste_manual(self):
+        from inventory.models import InventoryAdjustment, InventoryAdjustmentReason
+
+        self.client.post(
+            reverse('admin_variant_stock_update', args=[self.variante.pk]),
+            {'quantity_available': '25'},
+        )
+
+        ajuste = InventoryAdjustment.objects.get(inventory=self.inventario)
+        self.assertEqual(ajuste.delta, 22)
+        self.assertEqual(ajuste.reason, InventoryAdjustmentReason.MANUAL)
+        self.assertEqual(ajuste.created_by, self.staff)
+
+    def test_dejar_el_mismo_valor_no_crea_un_ajuste(self):
+        from inventory.models import InventoryAdjustment
+
+        self.client.post(
+            reverse('admin_variant_stock_update', args=[self.variante.pk]),
+            {'quantity_available': '3'},
+        )
+        self.assertFalse(InventoryAdjustment.objects.filter(inventory=self.inventario).exists())
+
+    def test_pantalla_de_historial_muestra_los_ajustes(self):
+        self.client.post(
+            reverse('admin_variant_stock_update', args=[self.variante.pk]),
+            {'quantity_available': '25'},
+        )
+        respuesta = self.client.get(reverse('admin_variant_inventory_history', args=[self.variante.pk]))
+        self.assertContains(respuesta, '+22')
 
     def test_rechaza_cantidad_negativa(self):
         self.client.post(

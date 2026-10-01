@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
-from inventory.models import Inventory
+from inventory.models import Inventory, InventoryAdjustment
 from orders.models import Order
 from orders.services import create_order_from_cart
 from PIL import Image
@@ -543,3 +543,51 @@ class EliminarVarianteReferenciadaTests(CatalogAdminTestCase):
         self.assertTrue(ProductVariant.objects.filter(pk=self.variante.pk).exists())
         pedido = Order.objects.get()
         self.assertEqual(pedido.items.get().variant_id, self.variante.pk)
+
+
+class KardexDesdeElFormularioDeProductoTests(CatalogAdminTestCase):
+    """Editar el stock desde "Editar producto" debe dejar el mismo rastro
+    en el kardex (`InventoryAdjustment`) que editarlo desde la pantalla de
+    inventario: son dos puertas al mismo dato, no dos historiales."""
+
+    def setUp(self):
+        super().setUp()
+        self.producto = Product.objects.create(
+            name='Producto kardex', category=self.categoria, brand=self.marca,
+            base_price=Decimal('90000'), stock=0,
+        )
+        self.variante = ProductVariant.objects.create(
+            product=self.producto, sku='KDX-001-S-NEG', size='S', color='negro',
+        )
+        Inventory.objects.create(variant=self.variante, quantity_available=10)
+
+    def _editar_stock(self, cantidad):
+        data = {
+            'name': self.producto.name, 'category': self.categoria.pk, 'brand': self.marca.pk,
+            'description': '', 'base_price': '90000', 'discount': '0', 'stock': '0', 'featured': '',
+            'variants-0-id': str(self.variante.pk),
+            'variants-0-size': 'S',
+            'variants-0-color': 'negro',
+            'variants-0-price_override': '',
+            'variants-0-is_active': 'on',
+            'variants-0-quantity_available': str(cantidad),
+            **self._formset_management(total=1, initial=1),
+        }
+        return self.client.post(reverse('admin_product_edit', args=[self.producto.pk]), data)
+
+    def test_editar_stock_desde_el_producto_registra_un_ajuste_en_el_kardex(self):
+        self._editar_stock(25)
+
+        ajuste = InventoryAdjustment.objects.get(inventory__variant=self.variante)
+        self.assertEqual(ajuste.delta, 15)
+        self.assertEqual(ajuste.quantity_after, 25)
+        self.assertEqual(ajuste.created_by, self.staff)
+
+    def test_dejar_el_mismo_stock_no_agrega_un_ajuste(self):
+        self._editar_stock(10)
+        self.assertFalse(InventoryAdjustment.objects.filter(inventory__variant=self.variante).exists())
+
+    def test_la_ficha_de_producto_muestra_el_estado_del_stock_y_el_link_al_historial(self):
+        response = self.client.get(reverse('admin_product_edit', args=[self.producto.pk]))
+        self.assertContains(response, 'Disponible')
+        self.assertContains(response, reverse('admin_variant_inventory_history', args=[self.variante.pk]))

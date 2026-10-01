@@ -4,7 +4,7 @@
 {% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260926-token-h1">{% endblock %}
 {% block content %}
 <div class="editorial-page">
-  <header class="editorial-hero"><div class="editorial-shell"><p class="editorial-kicker">Tu cuenta</p><h1 class="editorial-title">Tu información,<br><em>a tu manera.</em></h1><p class="editorial-lead">Actualiza tus datos y administra la seguridad de tu cuenta sin salir de tu universo GoToGym.</p></div></header>
+  <header class="editorial-hero editorial-hero--compact"><div class="editorial-shell"><p class="editorial-kicker">Tu cuenta</p><h1 class="editorial-title">Tu información,<br><em>a tu manera.</em></h1></div></header>
   <section class="editorial-section editorial-section--mist">
     <form method="post" enctype="multipart/form-data" class="editorial-shell account-layout">
       {% csrf_token %}
@@ -21,6 +21,42 @@
       </div></details></aside>
       <div class="account-actions account-field--full"><a class="editorial-text-link" href="{% url 'logged_home' %}">← Volver al Home</a><button type="submit" class="editorial-action">{% trans "Guardar cambios" %}</button></div>
     </form>
+
+    <div class="editorial-shell account-layout">
+      <div class="account-panel account-field--full">
+        <p class="editorial-kicker">Entrega</p>
+        <h2>{% trans "Mis direcciones" %}</h2>
+        <div class="account-actions" style="margin-bottom:1rem;">
+          <a class="editorial-action" href="{% url 'address_new' %}">{% trans "Agregar direccion" %}</a>
+        </div>
+        {% for direccion in direcciones %}
+        <div class="account-field account-field--full" style="border-bottom:1px solid rgba(0,0,0,.08); padding-bottom:1rem; margin-bottom:1rem;">
+          <p>
+            <strong>{{ direccion.label|default:direccion.full_name }}</strong>
+            {% if direccion.is_default %}<span> &middot; {% trans "Predeterminada" %}</span>{% endif %}
+          </p>
+          <p>{{ direccion.full_name }} &middot; {{ direccion.phone }}</p>
+          <p>{{ direccion.address_line }}{% if direccion.address_complement %}, {{ direccion.address_complement }}{% endif %}</p>
+          <p>{{ direccion.city }}, {{ direccion.department }}</p>
+          <div class="account-actions">
+            <a class="editorial-text-link" href="{% url 'address_edit' direccion.pk %}">{% trans "Editar" %}</a>
+            {% if not direccion.is_default %}
+            <form method="post" action="{% url 'address_set_default' direccion.pk %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="editorial-text-link" style="background:none;border:none;cursor:pointer;">{% trans "Marcar como predeterminada" %}</button>
+            </form>
+            {% endif %}
+            <form method="post" action="{% url 'address_delete' direccion.pk %}" style="display:inline;" onsubmit="return confirm('{% trans "¿Eliminar esta direccion?" %}');">
+              {% csrf_token %}
+              <button type="submit" class="editorial-text-link" style="background:none;border:none;cursor:pointer;">{% trans "Eliminar" %}</button>
+            </form>
+          </div>
+        </div>
+        {% empty %}
+        <p>{% trans "Todavia no tienes direcciones guardadas." %}</p>
+        {% endfor %}
+      </div>
+    </div>
   </section>
 </div>
 {% endblock %}

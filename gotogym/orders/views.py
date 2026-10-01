@@ -41,7 +41,7 @@ def checkout(request):
     resumen['coupon_discount'] = 0
 
     if request.method == 'POST':
-        form = CheckoutForm(request.POST)
+        form = CheckoutForm(request.POST, user=request.user)
         if form.is_valid():
             try:
                 pedido = create_order_from_cart(request.user, cart, form.cleaned_data)
@@ -52,11 +52,29 @@ def checkout(request):
                 write_cart(request.session, {})
                 return redirect('payments:pending', order_number=pedido.order_number)
     else:
-        form = CheckoutForm(initial={
+        initial = {
             'email': request.user.email,
             'first_name': request.user.first_name or '',
             'last_name': request.user.last_name or '',
-        })
+            # Enlace de referido capturado por ReferralTrackingMiddleware:
+            # precarga el codigo, pero el comprador sigue pudiendo cambiarlo.
+            'coupon_code': request.session.get('referral_code', ''),
+        }
+        # Libreta de direcciones (G4): solo precarga los campos de entrega,
+        # nunca crea ni modifica nada por si sola. El comprador puede
+        # cambiar cualquier campo antes de confirmar, igual que siempre.
+        direccion_default = request.user.addresses.filter(is_default=True).first()
+        if direccion_default:
+            initial.update({
+                'phone': direccion_default.phone,
+                'country': direccion_default.country,
+                'department': direccion_default.department,
+                'city': direccion_default.city,
+                'postal_code': direccion_default.postal_code,
+                'address_line': direccion_default.address_line,
+                'address_complement': direccion_default.address_complement,
+            })
+        form = CheckoutForm(user=request.user, initial=initial)
 
     return render(request, 'orders/checkout.html', {
         'form': form,
@@ -117,7 +135,7 @@ def validar_cupon(request):
         return JsonResponse({'error': 'El carrito esta vacio.'}, status=400)
 
     subtotal = Decimal(resumen['subtotal']).quantize(Decimal('0.01'))
-    cupon = get_usable_coupon(codigo)
+    cupon = get_usable_coupon(codigo, user=request.user)
     if cupon is None:
         return JsonResponse({'valid': False})
 

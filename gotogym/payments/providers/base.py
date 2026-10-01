@@ -22,3 +22,11 @@ class PaymentProvider(ABC):
     def handle_callback(self, payload):
         """Procesa una notificacion asincrona del proveedor (webhook) y
         devuelve el `PaymentTransaction` actualizado."""
+
+    @abstractmethod
+    def refund_payment(self, payment_transaction, amount=None):
+        """Reembolsa un pago ya aprobado, total o parcialmente.
+
+        Devuelve un dict con al menos `provider_refund_id` y `status`. No
+        cambia el estado logistico del pedido: eso lo decide quien llama
+        (ver `payments.services.refund_order_payment`)."""

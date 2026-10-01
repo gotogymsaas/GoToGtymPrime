@@ -43,13 +43,19 @@ def _crear_variante(producto, sku, size, color, stock):
 class FakeMercadoPagoClient:
     """Doble de MercadoPagoClient: no hace ninguna llamada de red."""
 
-    def __init__(self, response=None):
+    def __init__(self, response=None, refund_response=None):
         self.response = response or {'id': 'pref-fake-123'}
+        self.refund_response = refund_response or {'id': 'refund-fake-1', 'status': 'approved'}
         self.llamadas = []
+        self.llamadas_refund = []
 
     def create_preference(self, preference_data):
         self.llamadas.append(preference_data)
         return self.response
+
+    def refund_payment(self, payment_id, amount=None):
+        self.llamadas_refund.append({'payment_id': payment_id, 'amount': amount})
+        return self.refund_response
 
 
 class MercadoPagoProviderTestCase(TestCase):
@@ -356,3 +362,63 @@ class MercadoPagoWebhookViewTests(TestCase):
         }
         response = self._post_firmado(payload, payment_id='pay-webhook-2')
         self.assertEqual(response.status_code, 200)
+
+
+class MercadoPagoRefundTestCase(TestCase):
+    """`refund_payment`: preparado, no activo (mismo espiritu que el resto
+    del proveedor real)."""
+
+    @classmethod
+    def setUpTestData(cls):
+        categoria = ProductCategory.objects.create(name='Categoria MP reembolso')
+        marca = Brand.objects.create(name='Marca MP reembolso')
+        producto = Product.objects.create(
+            name='Producto MP reembolso', category=categoria, brand=marca,
+            base_price=Decimal('100000.0000'), stock=0,
+        )
+        variante = _crear_variante(producto, 'MP-REF-001-S-NEG', 'S', 'negro', 5)
+        User = get_user_model()
+        usuario = User.objects.create_user(
+            email='mp-reembolso@example.com', username='mp-reembolso@example.com', password='secret123',
+        )
+        cls.pedido = create_order_from_cart(usuario, {str(variante.pk): 1}, DATOS)
+
+    def _transaccion_aprobada(self, payment_id='pay-aprobado-1'):
+        return PaymentTransaction.objects.create(
+            order=self.pedido, provider='mercadopago', payment_id=payment_id,
+            external_reference=self.pedido.order_number,
+            status=PaymentTransaction.Status.APPROVED, amount=self.pedido.total,
+            idempotency_key='idem-refund-1',
+        )
+
+    def test_refund_payment_llama_al_cliente_con_el_payment_id(self):
+        transaccion = self._transaccion_aprobada()
+        cliente_falso = FakeMercadoPagoClient()
+        provider = MercadoPagoPaymentProvider(client=cliente_falso)
+
+        resultado = provider.refund_payment(transaccion)
+
+        self.assertEqual(cliente_falso.llamadas_refund[0]['payment_id'], 'pay-aprobado-1')
+        self.assertEqual(resultado['status'], 'approved')
+        self.assertEqual(resultado['provider_refund_id'], 'refund-fake-1')
+
+    def test_refund_parcial_envia_el_monto(self):
+        transaccion = self._transaccion_aprobada()
+        cliente_falso = FakeMercadoPagoClient()
+        provider = MercadoPagoPaymentProvider(client=cliente_falso)
+
+        provider.refund_payment(transaccion, amount=Decimal('5000.00'))
+
+        self.assertEqual(cliente_falso.llamadas_refund[0]['amount'], 5000.0)
+
+    def test_no_se_puede_reembolsar_un_pago_que_nunca_se_aprobo(self):
+        transaccion = PaymentTransaction.objects.create(
+            order=self.pedido, provider='mercadopago', payment_id='',
+            external_reference=self.pedido.order_number,
+            status=PaymentTransaction.Status.PENDING, amount=self.pedido.total,
+            idempotency_key='idem-refund-2',
+        )
+        provider = MercadoPagoPaymentProvider(client=FakeMercadoPagoClient())
+
+        with self.assertRaises(ValueError):
+            provider.refund_payment(transaccion)

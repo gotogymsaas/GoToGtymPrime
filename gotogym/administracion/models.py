@@ -13,6 +13,10 @@ class PanelSettings(models.Model):
     low_stock_threshold = models.PositiveIntegerField(
         default=5, help_text="A partir de cuantas unidades una variante se marca como 'stock bajo'.",
     )
+    monthly_sales_goal = models.PositiveIntegerField(
+        default=0,
+        help_text="Meta de ingresos (COP) para el rango de fechas consultado en el panel. 0 desactiva la barra de progreso.",
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

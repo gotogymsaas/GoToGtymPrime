@@ -20,7 +20,21 @@ from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
 
-from .models import Inventory
+from .models import Inventory, InventoryAdjustment, InventoryAdjustmentReason
+
+
+def record_adjustment(inventory, delta, reason, created_by=None):
+    """Dej a constancia de un cambio de stock ya aplicado.
+
+    Se llama despues de que el UPDATE ya se hizo (no calcula nada, solo
+    registra): `quantity_after` se relee de la base para reflejar el valor
+    real, no uno calculado a mano que podria desincronizarse.
+    """
+    inventory.refresh_from_db(fields=['quantity_available'])
+    InventoryAdjustment.objects.create(
+        inventory=inventory, delta=delta, quantity_after=inventory.quantity_available,
+        reason=reason, created_by=created_by,
+    )
 
 
 class InsufficientStockError(Exception):
@@ -119,6 +133,9 @@ def decrement_stock(items):
         )
         if not updated:
             raise InsufficientStockError(variant, quantity, get_available_quantity(variant))
+        record_adjustment(
+            variant.inventory, delta=-quantity, reason=InventoryAdjustmentReason.SALE,
+        )
 
 
 @transaction.atomic
@@ -139,4 +156,7 @@ def restore_stock(items):
         Inventory.objects.filter(variant_id=variant.id).update(
             quantity_available=F('quantity_available') + quantity,
             updated_at=now,
+        )
+        record_adjustment(
+            variant.inventory, delta=quantity, reason=InventoryAdjustmentReason.RESTOCK,
         )

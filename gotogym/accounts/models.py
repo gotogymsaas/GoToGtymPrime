@@ -31,6 +31,22 @@ class UserManager(BaseUserManager):
             raise ValueError('El superusuario debe tener is_superuser=True.')
         return self.create_user(email, password, username, first_name, last_name, age, **extra_fields)
 
+class CustomerSegment(models.Model):
+    """Segmento de clientes (p. ej. mayorista, entrenador, club) usado para
+    aplicar condiciones diferenciadas de precio o comunicacion. Es
+    deliberadamente generico: quien lo usa decide el criterio de precio, no
+    el modelo."""
+
+    name = models.CharField(max_length=80, unique=True)
+    description = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class User(AbstractUser):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=150, blank=True)
@@ -41,6 +57,9 @@ class User(AbstractUser):
     terms_hash = models.CharField(max_length=128, blank=True)
     show_influencer_modal = models.BooleanField(default=True)  # Nuevo campo
     es_influencer = models.BooleanField(default=False, verbose_name="Es influencer")
+    customer_segments = models.ManyToManyField(
+        CustomerSegment, blank=True, related_name='members', verbose_name="Segmentos de cliente",
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -56,3 +75,31 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class CustomerAddress(models.Model):
+    """Libreta de direcciones del cliente, reutilizable entre pedidos.
+
+    Independiente de `orders.Address` (que congela la direccion de un
+    pedido puntual): esta vive en la cuenta y se puede editar o borrar sin
+    afectar pedidos ya hechos."""
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
+    label = models.CharField(max_length=60, blank=True, help_text="Ej. Casa, Oficina")
+    full_name = models.CharField(max_length=200)
+    phone = models.CharField(max_length=40)
+    country = models.CharField(max_length=80, default='Colombia')
+    department = models.CharField(max_length=80)
+    city = models.CharField(max_length=80)
+    postal_code = models.CharField(max_length=20, blank=True)
+    address_line = models.CharField(max_length=255)
+    address_complement = models.CharField(max_length=255, blank=True)
+    notes = models.TextField(blank=True)
+    is_default = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-is_default', '-created_at']
+
+    def __str__(self):
+        return f"{self.label or self.full_name} - {self.city}"

@@ -12,12 +12,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.db.models import Q
 from django.http import JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect
+
+from .forms import CustomerAddressForm
+from .models import CustomerAddress
 
 TERMS_PATH = Path(__file__).resolve().parent / 'templates' / 'accounts' / 'terms_and_conditions.html'
 
@@ -172,4 +175,48 @@ def edit_profile(request):
                 return JsonResponse({'ok': True, 'message': 'No se realizaron cambios.'})
             messages.info(request, 'No se realizaron cambios.')
         return redirect('logged_home')
-    return render(request, 'accounts/edit_profile.html', {'user': user})
+    direcciones = user.addresses.all()
+    return render(request, 'accounts/edit_profile.html', {'user': user, 'direcciones': direcciones})
+
+
+@login_required
+def address_book(request):
+    return redirect('edit_profile')
+
+
+@login_required
+def address_edit(request, pk=None):
+    direccion = get_object_or_404(CustomerAddress, pk=pk, user=request.user) if pk else None
+    if request.method == 'POST':
+        form = CustomerAddressForm(request.POST, instance=direccion)
+        if form.is_valid():
+            nueva = form.save(commit=False)
+            nueva.user = request.user
+            nueva.save()
+            if nueva.is_default:
+                request.user.addresses.exclude(pk=nueva.pk).update(is_default=False)
+            messages.success(request, 'Direccion guardada.')
+            return redirect('edit_profile')
+    else:
+        form = CustomerAddressForm(instance=direccion)
+    return render(request, 'accounts/address_form.html', {'form': form, 'direccion': direccion})
+
+
+@login_required
+def address_delete(request, pk):
+    direccion = get_object_or_404(CustomerAddress, pk=pk, user=request.user)
+    if request.method == 'POST':
+        direccion.delete()
+        messages.success(request, 'Direccion eliminada.')
+    return redirect('edit_profile')
+
+
+@login_required
+def address_set_default(request, pk):
+    direccion = get_object_or_404(CustomerAddress, pk=pk, user=request.user)
+    if request.method == 'POST':
+        request.user.addresses.exclude(pk=direccion.pk).update(is_default=False)
+        direccion.is_default = True
+        direccion.save(update_fields=['is_default'])
+        messages.success(request, 'Direccion marcada como predeterminada.')
+    return redirect('edit_profile')

@@ -17,6 +17,9 @@
   </p>
   <p><strong>Cliente:</strong> {{ order.email }} &middot; {{ order.phone }}</p>
   <p><strong>Creado:</strong> {{ order.created_at|date:"d/m/Y H:i" }}</p>
+  {% if order.referred_by %}
+  <p><strong>Afiliado referido:</strong> {{ order.referred_by.user.email }}</p>
+  {% endif %}
 </div>
 
 {% if next_statuses %}
@@ -82,6 +85,28 @@
       {% empty %}<tr><td colspan="5">Sin transacciones todavia.</td></tr>{% endfor %}
     </tbody>
   </table>
+  {% if puede_reembolsar and perms.payments.add_refund %}
+  <form method="post" action="{% url 'admin_order_refund' order.order_number %}" onsubmit="return confirm('¿Reembolsar el pago de este pedido?');">
+    {% csrf_token %}
+    <button type="submit" class="button">Reembolsar pago</button>
+  </form>
+  {% endif %}
+  {% if refunds %}
+  <h3>Reembolsos</h3>
+  <table>
+    <thead><tr><th>Monto</th><th>Estado</th><th>Solicitado por</th><th>Fecha</th></tr></thead>
+    <tbody>
+      {% for refund in refunds %}
+      <tr>
+        <td>${{ refund.amount|cop }} COP</td>
+        <td>{{ refund.get_status_display }}</td>
+        <td>{{ refund.requested_by.email|default:"—" }}</td>
+        <td>{{ refund.created_at|date:"d/m/Y H:i" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
 </div>
 
 {% if order.internal_note %}

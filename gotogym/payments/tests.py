@@ -6,7 +6,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from orders.models import Order, OrderStatus, PaymentStatus
 
-from .models import PaymentTransaction
+from .models import PaymentTransaction, Refund
 from .providers.mock import MockPaymentProvider
 
 
@@ -209,3 +209,61 @@ class IntegracionOrdenPagoTests(TestCase):
         pedido.refresh_from_db()
         self.assertEqual(pedido.order_status, OrderStatus.CONFIRMED)
         self.assertEqual(pedido.payment_status, PaymentStatus.APPROVED)
+
+
+class RefundServiceTests(TestCase):
+    """`refund_order_payment`: reembolso real via el proveedor que proceso
+    el pago original."""
+
+    def setUp(self):
+        self.pedido = _crear_pedido()
+        User = get_user_model()
+        self.admin = User.objects.create_user(
+            email='admin-reembolso@example.com', username='admin-reembolso@example.com',
+            password='secret123', is_staff=True,
+        )
+
+    def _transaccion_aprobada(self):
+        return PaymentTransaction.objects.create(
+            order=self.pedido, provider='mock', payment_id='mock-pay-1',
+            external_reference=self.pedido.order_number,
+            status=PaymentTransaction.Status.APPROVED, amount=self.pedido.total,
+            idempotency_key='idem-refund-service-1',
+        )
+
+    def test_reembolso_exitoso_crea_registro_aprobado(self):
+        from .services import refund_order_payment
+
+        transaccion = self._transaccion_aprobada()
+        reembolso = refund_order_payment(self.pedido, self.admin)
+
+        self.assertEqual(reembolso.status, Refund.Status.APPROVED)
+        self.assertEqual(reembolso.amount, transaccion.amount)
+        self.assertEqual(reembolso.requested_by, self.admin)
+
+    def test_no_se_puede_reembolsar_sin_pago_aprobado(self):
+        from .services import RefundError, refund_order_payment
+
+        with self.assertRaises(RefundError):
+            refund_order_payment(self.pedido, self.admin)
+
+    def test_no_se_puede_reembolsar_dos_veces(self):
+        from .services import RefundError, refund_order_payment
+
+        self._transaccion_aprobada()
+        refund_order_payment(self.pedido, self.admin)
+
+        with self.assertRaises(RefundError):
+            refund_order_payment(self.pedido, self.admin)
+
+    def test_proveedor_desconocido_no_revienta_sino_que_levanta_refund_error(self):
+        from .services import RefundError, refund_order_payment
+
+        PaymentTransaction.objects.create(
+            order=self.pedido, provider='otro-proveedor', payment_id='x',
+            external_reference=self.pedido.order_number,
+            status=PaymentTransaction.Status.APPROVED, amount=self.pedido.total,
+            idempotency_key='idem-refund-service-2',
+        )
+        with self.assertRaises(RefundError):
+            refund_order_payment(self.pedido, self.admin)

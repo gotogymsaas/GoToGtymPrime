@@ -1,0 +1,88 @@
+{% extends "administracion/base.html" %}
+{% load tienda_filters %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Programa de afiliados</p>
+    <h1>Afiliados</h1>
+  </div>
+</section>
+
+{% if settings_form %}
+<div class="panel">
+  <h2>Configuracion del programa</h2>
+  <form class="form-grid" method="post" action="{% url 'admin_influencer_settings_update' %}">
+    {% csrf_token %}
+    {% for field in settings_form %}
+      <label>
+        <span>{{ field.label }}</span>
+        {{ field }}
+        {{ field.errors }}
+      </label>
+    {% endfor %}
+    <div class="form-actions">
+      <button class="button" type="submit">Guardar</button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<div class="filter-tabs">
+  <a href="?q={{ query }}" class="{% if not status %}active{% endif %}">Todos</a>
+  <a href="?q={{ query }}&status=pending" class="{% if status == 'pending' %}active{% endif %}">Pendientes</a>
+  <a href="?q={{ query }}&status=approved" class="{% if status == 'approved' %}active{% endif %}">Aprobados</a>
+  <a href="?q={{ query }}&status=rejected" class="{% if status == 'rejected' %}active{% endif %}">Rechazados</a>
+</div>
+<form class="search" method="get">
+  <input type="hidden" name="status" value="{{ status }}">
+  <input name="q" value="{{ query }}" placeholder="Buscar por email o codigo">
+  <button type="submit">Buscar</button>
+</form>
+<div class="panel">
+  <table>
+    <thead><tr><th>Afiliado</th><th>Codigo</th><th>Estado</th><th>Comision disponible</th><th>Solicitado</th><th></th></tr></thead>
+    <tbody>
+      {% for profile in page_obj %}
+      <tr>
+        <td><strong>{{ profile.user.email }}</strong></td>
+        <td>{{ profile.referral_code }}</td>
+        <td>
+          {% if profile.status == 'approved' and profile.is_active %}<span class="pill pill-ok">Aprobado</span>
+          {% elif profile.status == 'pending' %}<span class="badge badge-gold">Pendiente</span>
+          {% elif profile.status == 'rejected' %}<span class="pill pill-off">Rechazado</span>
+          {% else %}<span class="pill pill-off">Inactivo</span>{% endif %}
+        </td>
+        <td>${{ profile.commission_balance|cop }} COP</td>
+        <td><small>{{ profile.created_at|date:"d/m/Y" }}</small></td>
+        <td class="actions">
+          <a class="ghost btn-sm" href="{% url 'admin_influencer_detail' profile.pk %}">Ver</a>
+          {% if perms.influencer.change_influencerprofile %}
+            {% if profile.status == 'pending' %}
+            <form method="post" action="{% url 'admin_influencer_approve' profile.pk %}">
+              {% csrf_token %}
+              <button class="ghost btn-sm" type="submit">Aprobar</button>
+            </form>
+            <form method="post" action="{% url 'admin_influencer_reject' profile.pk %}">
+              {% csrf_token %}
+              <button class="button btn-sm product-delete-button" type="submit">Rechazar</button>
+            </form>
+            {% elif profile.status == 'approved' and profile.is_active %}
+            <form method="post" action="{% url 'admin_influencer_deactivate' profile.pk %}" onsubmit="return confirm('¿Desactivar a {{ profile.user.email|escapejs }} del programa de afiliados?');">
+              {% csrf_token %}
+              <button class="ghost btn-sm" type="submit">Desactivar</button>
+            </form>
+            {% elif not profile.is_active %}
+            <form method="post" action="{% url 'admin_influencer_approve' profile.pk %}">
+              {% csrf_token %}
+              <button class="ghost btn-sm" type="submit">Reactivar</button>
+            </form>
+            {% endif %}
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="6">No hay afiliados registrados.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "administracion/pagination.html" %}
+{% endblock %}

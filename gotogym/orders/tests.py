@@ -308,6 +308,21 @@ class VistaDeCheckoutTests(CheckoutBaseTestCase):
         response = self.client.get(self._url())
         self.assertRedirects(response, reverse('carrito:cart_detail'))
 
+    def test_precarga_la_direccion_predeterminada_de_la_libreta(self):
+        from accounts.models import CustomerAddress
+
+        CustomerAddress.objects.create(
+            user=self.usuario, is_default=True, full_name='Ana Marin', phone='3009876543',
+            country='Colombia', department='Antioquia', city='Medellín',
+            address_line='Carrera 50 # 10-20',
+        )
+        self._poner_en_carrito({str(self.variante.pk): 1})
+
+        response = self.client.get(self._url())
+
+        self.assertContains(response, '3009876543')
+        self.assertContains(response, 'Carrera 50 # 10-20')
+
     def test_post_valido_crea_el_pedido_y_vacia_el_carrito(self):
         self._poner_en_carrito({str(self.variante.pk): 2})
         response = self.client.post(self._url(), DATOS_VALIDOS)
@@ -460,6 +475,37 @@ class ValidacionDeCuponEnVivoTests(CheckoutBaseTestCase):
             self.usuario, {str(self.variante.pk): 1}, {**DATOS_VALIDOS, 'coupon_code': 'CUPON'},
         )
         self.assertEqual(Decimal(str(datos['discount'])), pedido.discount_total)
+
+
+class CuponPorSegmentoDeClienteTests(CheckoutBaseTestCase):
+    """RF-A07: un cupon puede restringirse a un segmento de cliente (p. ej.
+    entrenadores, clubes) en vez de estar abierto a cualquiera."""
+
+    def setUp(self):
+        super().setUp()
+        from accounts.models import CustomerSegment
+
+        self.segmento = CustomerSegment.objects.create(name='Entrenadores')
+        self.cupon = Coupon.objects.create(
+            code='ENTRENA10', discount_type='percentage', value=10, customer_segment=self.segmento,
+        )
+
+    def test_cliente_fuera_del_segmento_no_puede_usar_el_cupon(self):
+        self._poner_en_carrito({str(self.variante.pk): 1})
+        datos = self.client.get(reverse('orders:validar_cupon'), {'code': 'ENTRENA10'}).json()
+        self.assertFalse(datos['valid'])
+
+    def test_cliente_del_segmento_si_puede_usarlo(self):
+        self.usuario.customer_segments.add(self.segmento)
+        self._poner_en_carrito({str(self.variante.pk): 1})
+        datos = self.client.get(reverse('orders:validar_cupon'), {'code': 'ENTRENA10'}).json()
+        self.assertTrue(datos['valid'])
+
+    def test_el_pedido_no_aplica_el_descuento_si_no_pertenece_al_segmento(self):
+        pedido = create_order_from_cart(
+            self.usuario, {str(self.variante.pk): 1}, {**DATOS_VALIDOS, 'coupon_code': 'ENTRENA10'},
+        )
+        self.assertEqual(pedido.discount_total, Decimal('0.00'))
 
 
 class DetalleDePedidoTests(CheckoutBaseTestCase):

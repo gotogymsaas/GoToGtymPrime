@@ -33,6 +33,37 @@
       </button>
     </div>
 
+    {% if filtros_activos %}
+    <div class="shop-active-filters" role="group" aria-label="{% trans 'Filtros activos' %}">
+      {% if filtro %}
+      <a href="{% querystring filtro=None page=None %}" class="shop-chip-active">
+        {% trans "Buscar" %}: “{{ filtro }}”<span class="material-icons-outlined" aria-hidden="true">close</span>
+      </a>
+      {% endif %}
+      {% if selected_category_name %}
+      <a href="{% querystring categoria=None page=None %}" class="shop-chip-active">
+        {{ selected_category_name }}<span class="material-icons-outlined" aria-hidden="true">close</span>
+      </a>
+      {% endif %}
+      {% if selected_size %}
+      <a href="{% querystring talla=None page=None %}" class="shop-chip-active">
+        {% trans "Talla" %} {{ selected_size }}<span class="material-icons-outlined" aria-hidden="true">close</span>
+      </a>
+      {% endif %}
+      {% if selected_color %}
+      <a href="{% querystring color=None page=None %}" class="shop-chip-active">
+        {{ selected_color }}<span class="material-icons-outlined" aria-hidden="true">close</span>
+      </a>
+      {% endif %}
+      {% if precio_min or precio_max %}
+      <a href="{% querystring precio_min=None precio_max=None page=None %}" class="shop-chip-active">
+        {% if precio_min and precio_max %}${{ precio_min }}–${{ precio_max }}{% elif precio_min %}{% trans "desde" %} ${{ precio_min }}{% else %}{% trans "hasta" %} ${{ precio_max }}{% endif %}<span class="material-icons-outlined" aria-hidden="true">close</span>
+      </a>
+      {% endif %}
+      <a href="{% url 'tienda:producto_list' %}" class="shop-chip-active shop-chip-active--clear">{% trans "Limpiar todo" %}</a>
+    </div>
+    {% endif %}
+
     <div class="shop-layout">
       <aside data-filters-panel class="hidden lg:block">
         <form method="get" class="shop-filters">

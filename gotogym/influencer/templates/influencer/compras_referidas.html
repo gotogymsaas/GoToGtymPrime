@@ -2,62 +2,56 @@
 {% load static tienda_filters %}
 
 {% block title %}Compras referidas{% endblock %}
-{% block navbar %}{% endblock %}
-{% block footer %}{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/home_figma.css' %}?v=20260907-influencer-orbit">
-<link rel="stylesheet" href="{% static 'css/influencer_figma.css' %}?v=20260907-panel-final">
+<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20260930-panel-quantum">
 {% endblock %}
 
 {% block content %}
-<main class="figma-home influencer-page">
-  <section class="quantum-hero" aria-labelledby="influencer-purchases-title">
-    <div class="quantum-field" aria-hidden="true">
-      <span class="quantum-watermark"></span>
-      <span class="quantum-orbit quantum-orbit--outer"><i></i></span>
-      <span class="quantum-orbit quantum-orbit--one"><i></i></span>
-      <span class="quantum-orbit quantum-orbit--two"><i></i></span>
-      <span class="quantum-orbit quantum-orbit--three"><i></i></span>
-      <span class="quantum-core"></span>
-    </div>
-
-    <div class="influencer-shell">
-      <a href="{% url 'logged_home' %}" class="influencer-logo" aria-label="GoToGym inicio">
-        <img src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" aria-hidden="true">
-      </a>
-
-      <h1 id="influencer-purchases-title" class="influencer-title">Compras referidas</h1>
-
-      <section class="influencer-table-card">
-        {% if compras %}
-          <table class="influencer-table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Fecha</th>
-                <th>Monto</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for compra in compras %}
-              <tr>
-                <td>{{ compra.nombre }}</td>
-                <td>{{ compra.email }}</td>
-                <td>{{ compra.fecha|date:'d/m/Y' }}</td>
-                <td>${{ compra.monto|cop }} COP</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        {% else %}
-          <p class="influencer-empty">A&uacute;n no tienes compras referidas.</p>
-        {% endif %}
-      </section>
-
-      <a href="{% url 'influencer_dashboard' %}" class="influencer-link">Resumen</a>
+<div class="panel-shell">
+  <section class="panel-hero">
+    <div class="editorial-shell">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;">
+        <span class="quantum-emblem"><span class="quantum-emblem__core"></span></span>
+        <span class="quantum-signal-line"></span>
+      </div>
+      <p class="eyebrow">Programa de afiliados</p>
+      <h1>Compras referidas</h1>
     </div>
   </section>
-</main>
+
+  <div class="editorial-shell">
+    <div class="actions" style="margin-bottom: 24px;">
+      <a href="{% url 'influencer_dashboard' %}" class="ghost btn-sm">Resumen</a>
+    </div>
+    <div class="panel">
+      {% if compras %}
+      <table>
+        <thead>
+          <tr>
+            <th>Pedido</th>
+            <th>Fecha</th>
+            <th>Venta</th>
+            <th>Comisi&oacute;n</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in compras %}
+          <tr>
+            <td>{{ order.order_number }}</td>
+            <td>{{ order.created_at|date:'d/m/Y' }}</td>
+            <td>${{ order.subtotal|cop }} COP</td>
+            <td>{% if order.commission %}${{ order.commission.amount|cop }} COP{% else %}&mdash;{% endif %}</td>
+            <td>{% if order.commission %}{{ order.commission.get_status_display }}{% else %}&mdash;{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>A&uacute;n no tienes compras referidas.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
 {% endblock %}

@@ -1,0 +1,113 @@
+{% extends "administracion/base.html" %}
+{% load tienda_filters %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Afiliado</p>
+    <h1>{{ profile.user.email }}</h1>
+  </div>
+  <a class="button ghost" href="{% url 'admin_influencers' %}">Volver</a>
+</section>
+
+<div class="panel">
+  <p><strong>Codigo de referido:</strong> {{ profile.referral_code }}</p>
+  <p><strong>Estado:</strong>
+    {% if profile.status == 'approved' and profile.is_active %}<span class="pill pill-ok">Aprobado</span>
+    {% elif profile.status == 'pending' %}<span class="badge badge-gold">Pendiente</span>
+    {% elif profile.status == 'rejected' %}<span class="pill pill-off">Rechazado</span>
+    {% else %}<span class="pill pill-off">Inactivo</span>{% endif %}
+  </p>
+  {% if profile.reviewed_by %}<p><strong>Revisado por:</strong> {{ profile.reviewed_by.email }} el {{ profile.reviewed_at|date:"d/m/Y H:i" }}</p>{% endif %}
+  <p><strong>Terminos aceptados:</strong> {% if profile.terms_accepted_at %}{{ profile.terms_accepted_at|date:"d/m/Y H:i" }}{% else %}No registrado{% endif %}</p>
+  <p><strong>Personas referidas:</strong> {{ profile.total_referred }} &middot; <strong>Ventas generadas:</strong> ${{ profile.total_sales|cop }} COP &middot; <strong>Comision disponible:</strong> ${{ profile.commission_balance|cop }} COP</p>
+  <p><strong>Clics en el enlace:</strong> {{ click_count }} &middot; <strong>Tasa de conversion:</strong> {% if conversion_rate %}{{ conversion_rate }}%{% else %}&mdash;{% endif %}</p>
+  <p><strong>Tasa de comision:</strong> {% if profile.commission_rate %}{{ profile.commission_rate }}% (propia){% else %}Tasa global del programa{% endif %}</p>
+
+  {% if perms.influencer.change_influencerprofile %}
+  <form method="post" action="{% url 'admin_influencer_commission_rate_update' profile.pk %}" class="form-grid">
+    {% csrf_token %}
+    <label>
+      <span>Tasa propia de comision (%)</span>
+      <input type="number" step="0.01" min="0" max="100" name="commission_rate" value="{{ profile.commission_rate|default_if_none:'' }}" placeholder="Vacio = tasa global">
+    </label>
+    <div class="form-actions"><button class="button" type="submit">Guardar tasa</button></div>
+  </form>
+  {% endif %}
+
+  {% if perms.influencer.change_influencerprofile %}
+  <div class="form-actions">
+    {% if profile.status == 'pending' %}
+    <form method="post" action="{% url 'admin_influencer_approve' profile.pk %}">
+      {% csrf_token %}
+      <button class="button" type="submit">Aprobar</button>
+    </form>
+    <form method="post" action="{% url 'admin_influencer_reject' profile.pk %}">
+      {% csrf_token %}
+      <button class="button product-delete-button" type="submit">Rechazar</button>
+    </form>
+    {% elif profile.status == 'approved' and profile.is_active %}
+    <form method="post" action="{% url 'admin_influencer_deactivate' profile.pk %}" onsubmit="return confirm('¿Desactivar a este afiliado?');">
+      {% csrf_token %}
+      <button class="ghost" type="submit">Desactivar</button>
+    </form>
+    {% elif not profile.is_active %}
+    <form method="post" action="{% url 'admin_influencer_approve' profile.pk %}">
+      {% csrf_token %}
+      <button class="button" type="submit">Reactivar</button>
+    </form>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Cupones</h2>
+  <table>
+    <thead><tr><th>Codigo</th><th>Descuento</th><th>Usos</th><th>Estado</th></tr></thead>
+    <tbody>
+      {% for coupon in coupons %}
+      <tr>
+        <td><strong>{{ coupon.code }}</strong></td>
+        <td>{% if coupon.discount_type == 'percentage' %}{{ coupon.value }}%{% else %}${{ coupon.value }} COP{% endif %}</td>
+        <td>{{ coupon.times_used }}{% if coupon.max_uses %} / {{ coupon.max_uses }}{% endif %}</td>
+        <td>{% if coupon.is_usable %}<span class="pill pill-ok">Vigente</span>{% elif coupon.is_active %}<span class="badge badge-gold">Fuera de vigencia</span>{% else %}<span class="pill pill-off">Desactivado</span>{% endif %}</td>
+      </tr>
+      {% empty %}<tr><td colspan="4">Sin cupones todavia.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="panel">
+  <h2>Comisiones</h2>
+  <table>
+    <thead><tr><th>Pedido</th><th>Monto</th><th>Estado</th><th>Fecha</th></tr></thead>
+    <tbody>
+      {% for commission in commissions %}
+      <tr>
+        <td><a href="{% url 'admin_order_detail' commission.order.order_number %}">{{ commission.order.order_number }}</a></td>
+        <td>${{ commission.amount|cop }} COP</td>
+        <td>{{ commission.get_status_display }}</td>
+        <td><small>{{ commission.created_at|date:"d/m/Y" }}</small></td>
+      </tr>
+      {% empty %}<tr><td colspan="4">Sin comisiones todavia.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="panel">
+  <h2>Solicitudes de retiro</h2>
+  <table>
+    <thead><tr><th>Monto</th><th>Estado</th><th>Solicitada</th><th>Resuelta</th></tr></thead>
+    <tbody>
+      {% for withdrawal in withdrawal_requests %}
+      <tr>
+        <td>${{ withdrawal.amount|cop }} COP</td>
+        <td>{{ withdrawal.get_status_display }}</td>
+        <td><small>{{ withdrawal.requested_at|date:"d/m/Y" }}</small></td>
+        <td><small>{{ withdrawal.resolved_at|date:"d/m/Y"|default:"—" }}</small></td>
+      </tr>
+      {% empty %}<tr><td colspan="4">Sin solicitudes todavia.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -10,6 +10,11 @@ from carrito.services import build_cart_context
 from django.db import IntegrityError, transaction
 from django.db.models import F
 from django.utils import timezone
+from influencer.services import (
+    approve_order_commission,
+    register_order_commission,
+    revert_order_commission,
+)
 from inventory.services import InsufficientStockError, decrement_stock, get_available_quantity
 from shipping.models import ShippingQuote
 from shipping.services import get_mock_quote
@@ -20,25 +25,37 @@ from .models import Address, Coupon, Order, OrderItem, OrderStatus, PaymentStatu
 MAX_INTENTOS_NUMERO = 5
 
 
-def get_usable_coupon(coupon_code):
+def get_usable_coupon(coupon_code, user=None):
     """Busca un cupon utilizable por su codigo, o None si no aplica.
 
     Centraliza la busqueda para que el formulario (validacion) y el
     servicio de creacion del pedido (aplicacion real) usen exactamente el
-    mismo criterio de "utilizable".
+    mismo criterio de "utilizable". Si `user` es el propio afiliado dueño
+    del cupon, se trata como no utilizable: control de autorreferencia
+    (RF-F11), para que nadie se autoaplique el descuento ni se genere
+    comision sobre su propia compra.
     """
     codigo = (coupon_code or '').strip().upper()
     if not codigo:
         return None
-    cupon = Coupon.objects.filter(code=codigo).first()
+    cupon = Coupon.objects.filter(code=codigo).select_related('influencer').first()
     if cupon is None or not cupon.is_usable():
         return None
+    autenticado = user is not None and getattr(user, 'is_authenticated', False)
+    if cupon.influencer_id and autenticado and cupon.influencer.user_id == user.id:
+        return None
+    if cupon.customer_segment_id:
+        # Cupon restringido a un segmento de cliente (p. ej. entrenadores,
+        # clubes): sin sesion o fuera del segmento, se trata como no
+        # utilizable, igual que un cupon vencido.
+        if not autenticado or not user.customer_segments.filter(pk=cupon.customer_segment_id).exists():
+            return None
     return cupon
 
 
-def calculate_coupon_discount(subtotal, coupon_code=''):
+def calculate_coupon_discount(subtotal, coupon_code='', user=None):
     """Calcula el descuento del cupon indicado, si existe y es utilizable."""
-    cupon = get_usable_coupon(coupon_code)
+    cupon = get_usable_coupon(coupon_code, user=user)
     if cupon is None:
         return Decimal('0.00')
     return cupon.compute_discount(subtotal)
@@ -132,6 +149,7 @@ def valid_next_statuses(order):
     return siguientes
 
 
+@transaction.atomic
 def apply_order_status_transition(order, nuevo_estado):
     """Mueve `order_status` un paso valido hacia adelante (o a cancelado).
 
@@ -143,6 +161,16 @@ def apply_order_status_transition(order, nuevo_estado):
 
     order.order_status = nuevo_estado
     order.save(update_fields=['order_status', 'updated_at'])
+
+    # Efecto sobre la comision del afiliado, si el pedido tiene una: se
+    # aprueba al entregarse (ya paso la ventana de devolucion) y se
+    # revierte si se cancela o se devuelve. No hace nada si el pedido no
+    # esta referido o no tiene comision todavia.
+    if nuevo_estado == OrderStatus.DELIVERED:
+        approve_order_commission(order)
+    elif nuevo_estado in (OrderStatus.CANCELLED, OrderStatus.RETURNED):
+        revert_order_commission(order)
+
     return order
 
 
@@ -199,7 +227,7 @@ def create_order_from_cart(user, cart, datos):
     subtotal = Decimal(contexto['subtotal']).quantize(Decimal('0.01'))
     cotizacion = get_mock_quote(datos['city'], subtotal)
     envio = Decimal(cotizacion['cost']).quantize(Decimal('0.01'))
-    cupon = get_usable_coupon(datos.get('coupon_code', ''))
+    cupon = get_usable_coupon(datos.get('coupon_code', ''), user=user)
     descuento = cupon.compute_discount(subtotal) if cupon else Decimal('0.00')
     total = subtotal + envio - descuento
 
@@ -218,6 +246,7 @@ def create_order_from_cart(user, cart, datos):
                     total=total,
                     order_status=OrderStatus.PENDING_PAYMENT,
                     payment_status=PaymentStatus.PENDING,
+                    referred_by=cupon.influencer if cupon else None,
                 )
             break
         except IntegrityError:
@@ -319,4 +348,5 @@ def confirm_payment(order, payment_transaction):
 
     order.order_status = OrderStatus.CONFIRMED
     order.save(update_fields=['payment_status', 'order_status', 'updated_at'])
+    register_order_commission(order)
     return order

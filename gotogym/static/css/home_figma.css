@@ -1,6 +1,6 @@
 .figma-home {
-  --home-gold: #d5b667;
-  --home-mint: #0fc8bd;
+  --home-gold: var(--color-gold, #d4b46a);
+  --home-mint: var(--color-accent, #00d4c7);
   --home-muted: rgba(255, 255, 255, 0.64);
   position: relative;
   min-height: 100vh;
@@ -441,8 +441,8 @@
 }
 
 .quantum-privacy {
-  --home-gold: #d5b667;
-  --home-mint: #0fc8bd;
+  --home-gold: var(--color-gold, #d4b46a);
+  --home-mint: var(--color-accent, #00d4c7);
   --home-muted: rgba(255, 255, 255, 0.68);
   position: relative;
   min-height: 100vh;

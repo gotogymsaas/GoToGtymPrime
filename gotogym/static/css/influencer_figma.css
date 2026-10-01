@@ -139,6 +139,22 @@
   margin: 0;
 }
 
+.influencer-terms-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 18px;
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.influencer-terms-check input {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
 .influencer-action {
   width: 100%;
   min-height: 34px;

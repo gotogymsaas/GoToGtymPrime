@@ -1,22 +1,42 @@
+from datetime import datetime, timedelta
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Count, Max, Prefetch, Q, Sum
+from django.db.models.functions import TruncDate
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
-from influencer.models import InfluencerProfile
-from inventory.models import Inventory
-from orders.models import Coupon, Order, OrderStatus
+from influencer.models import (
+    Commission,
+    CommissionStatus,
+    InfluencerProfile,
+    InfluencerProgramSettings,
+    InfluencerStatus,
+    WithdrawalRequest,
+    WithdrawalStatus,
+)
+from influencer.services import (
+    approve_influencer,
+    deactivate_influencer,
+    reject_influencer,
+    resolve_withdrawal,
+)
+from inventory.models import Inventory, InventoryAdjustment, InventoryAdjustmentReason
+from inventory.services import record_adjustment
+from orders.models import Coupon, Order, OrderItem, OrderStatus, PaymentStatus
 from orders.services import (
     InvalidOrderTransitionError,
     apply_order_status_transition,
     valid_next_statuses,
 )
-from payments.models import PaymentTransaction
+from payments.models import PaymentTransaction, Refund
+from payments.services import RefundError, refund_order_payment
 from products.models import (
     Brand,
     Product,
@@ -33,10 +53,13 @@ from .forms import (
     CategoryForm,
     CouponForm,
     GroupForm,
+    InfluencerCommissionRateForm,
+    InfluencerProgramSettingsForm,
     PanelSettingsForm,
     ProductAdminForm,
     ProductTagForm,
     ProductVariantFormSet,
+    SalesGoalForm,
 )
 from .models import PanelSettings
 from .permissions import (
@@ -49,21 +72,96 @@ from .permissions import (
 
 @staff_required
 def dashboard(request):
+    """Panel unico de gestion: antes esta pantalla solo mostraba contadores
+    puntuales y los informes de ventas vivian en una pantalla aparte
+    (`/informes/`), que obligaba a saltar entre dos vistas para tener una
+    idea completa del negocio. Ahora todo vive aqui, con un solo rango de
+    fechas para la parte de ventas/comisiones."""
     User = get_user_model()
     panel_settings = PanelSettings.load()
+    threshold = panel_settings.low_stock_threshold
+    sales_goal = panel_settings.monthly_sales_goal
+
+    hoy = timezone.localdate()
+    hasta = _parse_fecha(request.GET.get("hasta", ""), hoy)
+    desde = _parse_fecha(request.GET.get("desde", ""), hoy - timedelta(days=30))
+    if desde > hasta:
+        desde, hasta = hasta, desde
+
+    pedidos_pagados = Order.objects.filter(
+        payment_status=PaymentStatus.APPROVED,
+        created_at__date__gte=desde,
+        created_at__date__lte=hasta,
+    )
+    resumen = pedidos_pagados.aggregate(
+        pedidos=Count("id"),
+        ingresos=Sum("total"),
+        descuentos=Sum("discount_total"),
+        envio=Sum("shipping_cost"),
+    )
+    ventas_por_dia = (
+        pedidos_pagados
+        .annotate(dia=TruncDate("created_at"))
+        .values("dia")
+        .annotate(total=Sum("total"), pedidos=Count("id"))
+        .order_by("-dia")
+    )
+    productos_top = (
+        OrderItem.objects
+        .filter(order__in=pedidos_pagados)
+        .values("product_name_snapshot", "sku_snapshot")
+        .annotate(unidades=Sum("quantity"), ingresos=Sum("line_total"))
+        .order_by("-unidades")[:10]
+    )
+    comisiones = Commission.objects.filter(
+        created_at__date__gte=desde, created_at__date__lte=hasta,
+    ).aggregate(
+        pendiente=Sum("amount", filter=Q(status=CommissionStatus.PENDING)),
+        aprobada=Sum("amount", filter=Q(status=CommissionStatus.APPROVED)),
+        pagada=Sum("amount", filter=Q(status=CommissionStatus.PAID)),
+    )
+
+    # Reemplaza a "Productos recientes"/"Usuarios recientes" (duplicaban lo
+    # que ya hacen /productos/ y /usuarios/ con busqueda real, sin ayudar a
+    # decidir nada): esto si es accionable, apunta directo a que producto
+    # reabastecer.
+    bajo_stock = (
+        Inventory.objects
+        .filter(quantity_available__lte=threshold)
+        .select_related("variant__product")
+        .order_by("quantity_available")[:10]
+    )
+
+    ingresos = resumen.get("ingresos") or 0
+    sales_goal_percent = None
+    if sales_goal:
+        sales_goal_percent = min(100, round((ingresos / sales_goal) * 100))
+
     context = {
+        "desde": desde,
+        "hasta": hasta,
+        "resumen": resumen,
+        "ventas_por_dia": ventas_por_dia,
+        "productos_top": productos_top,
+        "comisiones": comisiones,
+        "bajo_stock": bajo_stock,
+        "low_stock_threshold": threshold,
+        "sales_goal": sales_goal,
+        "sales_goal_percent": sales_goal_percent,
+        "sales_goal_form": SalesGoalForm(instance=panel_settings),
         "product_count": Product.objects.count(),
         "user_count": User.objects.count(),
-        "influencer_count": InfluencerProfile.objects.filter(is_active=True).count(),
+        "influencer_count": InfluencerProfile.objects.filter(
+            is_active=True, status=InfluencerStatus.APPROVED,
+        ).count(),
+        "pending_influencer_count": InfluencerProfile.objects.filter(status=InfluencerStatus.PENDING).count(),
+        "pending_withdrawal_count": WithdrawalRequest.objects.filter(status=WithdrawalStatus.PENDING).count(),
         "category_count": ProductCategory.objects.count(),
-        "stock_total": Product.objects.aggregate(total=Sum("stock")).get("total") or 0,
         "low_stock_count": Inventory.objects.filter(
-            quantity_available__gt=0, quantity_available__lte=panel_settings.low_stock_threshold,
+            quantity_available__gt=0, quantity_available__lte=threshold,
         ).count(),
         "out_of_stock_count": Inventory.objects.filter(quantity_available=0).count(),
         "active_coupon_count": Coupon.objects.filter(is_active=True).count(),
-        "latest_products": Product.objects.select_related("category", "brand").order_by("-id")[:10],
-        "latest_users": User.objects.order_by("-id")[:10],
     }
     return render(request, "administracion/dashboard.html", context)
 
@@ -90,7 +188,12 @@ def products_list(request):
         products = products.filter(name__icontains=query)
     paginator = Paginator(products, 8)
     page_obj = paginator.get_page(request.GET.get("page"))
-    return render(request, "administracion/products.html", {"page_obj": page_obj, "query": query})
+    context = {
+        "page_obj": page_obj,
+        "query": query,
+        "threshold_form": PanelSettingsForm(instance=PanelSettings.load()),
+    }
+    return render(request, "administracion/products.html", context)
 
 
 def _safe_redirect(request, fallback):
@@ -100,7 +203,7 @@ def _safe_redirect(request, fallback):
     return redirect(fallback)
 
 
-def _save_variant_formset(formset, product):
+def _save_variant_formset(formset, product, user=None):
     """Aplica el formset de variantes sobre `product`.
 
     Una variante marcada para eliminar solo se borra de verdad si nunca
@@ -120,7 +223,7 @@ def _save_variant_formset(formset, product):
             continue
         if not form.cleaned_data.get("size") or not (form.cleaned_data.get("color") or "").strip():
             continue
-        form.save_with_inventory(product)
+        form.save_with_inventory(product, user=user)
 
 
 def _ensure_default_variant(product):
@@ -180,7 +283,7 @@ def product_edit(request, pk=None):
 
                 variant_formset = ProductVariantFormSet(request.POST, instance=product)
                 if variant_formset.is_valid():
-                    _save_variant_formset(variant_formset, product)
+                    _save_variant_formset(variant_formset, product, user=request.user)
                     _ensure_default_variant(product)
                     messages.success(request, "Producto guardado. La tienda comercial ya lee este cambio.")
                     return redirect("admin_product_edit", pk=product.pk)
@@ -205,6 +308,7 @@ def product_edit(request, pk=None):
             "product": product,
             "variant_formset": variant_formset,
             "media_items": product.media.all() if product else None,
+            "low_stock_threshold": PanelSettings.load().low_stock_threshold,
         },
     )
 
@@ -375,9 +479,26 @@ def variant_stock_update(request, pk):
         messages.error(request, "La cantidad de stock debe ser un numero entero valido (0 o mas).")
         return _safe_redirect(request, "admin_variants")
 
-    Inventory.objects.update_or_create(variant=variant, defaults={"quantity_available": cantidad})
+    anterior = Inventory.objects.filter(variant=variant).values_list("quantity_available", flat=True).first() or 0
+    inventario, _ = Inventory.objects.update_or_create(variant=variant, defaults={"quantity_available": cantidad})
+    if cantidad != anterior:
+        record_adjustment(
+            inventario, delta=cantidad - anterior, reason=InventoryAdjustmentReason.MANUAL,
+            created_by=request.user,
+        )
     messages.success(request, f"Stock de {variant.sku} actualizado a {cantidad}.")
     return _safe_redirect(request, "admin_variants")
+
+
+@staff_required
+def variant_inventory_history(request, pk):
+    variant = get_object_or_404(ProductVariant.objects.select_related("product"), pk=pk)
+    ajustes = InventoryAdjustment.objects.filter(inventory__variant=variant).select_related("created_by")
+    return render(
+        request,
+        "administracion/variant_inventory_history.html",
+        {"variant": variant, "ajustes": ajustes},
+    )
 
 
 @require_perms("administracion.change_panelsettings")
@@ -392,7 +513,23 @@ def inventory_threshold_update(request):
     else:
         for error in form.errors.values():
             messages.error(request, error.as_text())
-    return _safe_redirect(request, "admin_variants")
+    return _safe_redirect(request, "admin_dashboard")
+
+
+@require_perms("administracion.change_panelsettings")
+@require_POST
+def sales_goal_update(request):
+    """Meta de ventas customizable: reusa el mismo patron de ajuste rapido
+    que el umbral de stock bajo, pero vive junto a los KPIs de ventas en el
+    dashboard en vez de en Productos."""
+    form = SalesGoalForm(request.POST, instance=PanelSettings.load())
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Meta de ventas actualizada.")
+    else:
+        for error in form.errors.values():
+            messages.error(request, error.as_text())
+    return _safe_redirect(request, "admin_dashboard")
 
 
 @staff_required
@@ -448,12 +585,22 @@ def orders_list(request):
 def order_detail(request, order_number):
     order = get_object_or_404(
         Order.objects
-        .select_related("address", "shipping_quote")
+        .select_related("address", "shipping_quote", "referred_by__user")
         .prefetch_related("items", "payment_transactions"),
         order_number=order_number,
     )
     etiquetas = dict(OrderStatus.choices)
     siguientes = [(estado, etiquetas.get(estado, estado)) for estado in valid_next_statuses(order)]
+
+    transaccion_aprobada = (
+        order.payment_transactions.filter(status=PaymentTransaction.Status.APPROVED)
+        .order_by("-created_at").first()
+    )
+    puede_reembolsar = (
+        transaccion_aprobada is not None
+        and order.order_status in (OrderStatus.CANCELLED, OrderStatus.RETURNED)
+        and not transaccion_aprobada.refunds.filter(status=Refund.Status.APPROVED).exists()
+    )
 
     return render(
         request,
@@ -461,6 +608,8 @@ def order_detail(request, order_number):
         {
             "order": order,
             "next_statuses": siguientes,
+            "puede_reembolsar": puede_reembolsar,
+            "refunds": Refund.objects.filter(payment_transaction__order=order).select_related("requested_by"),
         },
     )
 
@@ -481,6 +630,19 @@ def order_update_status(request, order_number):
         messages.error(request, str(error))
     else:
         messages.success(request, "Estado del pedido actualizado.")
+    return redirect("admin_order_detail", order_number=order_number)
+
+
+@require_perms("payments.add_refund")
+@require_POST
+def order_refund(request, order_number):
+    order = get_object_or_404(Order, order_number=order_number)
+    try:
+        refund_order_payment(order, request.user)
+    except RefundError as error:
+        messages.error(request, str(error))
+    else:
+        messages.success(request, "Reembolso procesado.")
     return redirect("admin_order_detail", order_number=order_number)
 
 
@@ -762,6 +924,127 @@ def coupon_delete(request, pk):
 
 
 @staff_required
+def influencers_list(request):
+    status = request.GET.get("status", "").strip()
+    query = request.GET.get("q", "").strip()
+    profiles = InfluencerProfile.objects.select_related("user").order_by("-created_at")
+    if status in dict(InfluencerStatus.choices):
+        profiles = profiles.filter(status=status)
+    if query:
+        profiles = profiles.filter(
+            Q(user__email__icontains=query) | Q(referral_code__icontains=query.upper())
+        )
+
+    paginator = Paginator(profiles, 20)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    settings_form = None
+    if request.user.has_perm("influencer.change_influencerprogramsettings"):
+        settings_form = InfluencerProgramSettingsForm(instance=InfluencerProgramSettings.load())
+
+    return render(
+        request,
+        "administracion/influencers.html",
+        {"page_obj": page_obj, "query": query, "status": status, "settings_form": settings_form},
+    )
+
+
+@require_perms("influencer.change_influencerprogramsettings")
+@require_POST
+def influencer_settings_update(request):
+    form = InfluencerProgramSettingsForm(request.POST, instance=InfluencerProgramSettings.load())
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Configuracion del programa de afiliados actualizada.")
+    else:
+        messages.error(request, "No se pudo guardar la configuracion.")
+    return redirect("admin_influencers")
+
+
+@staff_required
+def influencer_detail(request, pk):
+    profile = get_object_or_404(InfluencerProfile.objects.select_related("user", "reviewed_by"), pk=pk)
+    commissions = profile.commissions.select_related("order").order_by("-created_at")[:50]
+    click_count = profile.referral_clicks.count()
+    conversion_rate = f"{profile.total_referred / click_count * 100:.1f}" if click_count else None
+    return render(
+        request,
+        "administracion/influencer_detail.html",
+        {
+            "profile": profile,
+            "commissions": commissions,
+            "coupons": profile.coupons.order_by("-created_at"),
+            "withdrawal_requests": profile.withdrawal_requests.order_by("-requested_at"),
+            "click_count": click_count,
+            "conversion_rate": conversion_rate,
+        },
+    )
+
+
+@require_perms("influencer.change_influencerprofile")
+@require_POST
+def influencer_commission_rate_update(request, pk):
+    profile = get_object_or_404(InfluencerProfile, pk=pk)
+    form = InfluencerCommissionRateForm(request.POST, instance=profile)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Tasa de comision actualizada.")
+    else:
+        messages.error(request, "No se pudo guardar la tasa de comision.")
+    return redirect("admin_influencer_detail", pk=pk)
+
+
+@require_perms("influencer.change_influencerprofile")
+@require_POST
+def influencer_approve(request, pk):
+    profile = get_object_or_404(InfluencerProfile, pk=pk)
+    approve_influencer(profile, request.user)
+    messages.success(request, f"Afiliado {profile.user.email} aprobado.")
+    return _safe_redirect(request, "admin_influencers")
+
+
+@require_perms("influencer.change_influencerprofile")
+@require_POST
+def influencer_reject(request, pk):
+    profile = get_object_or_404(InfluencerProfile, pk=pk)
+    reject_influencer(profile, request.user)
+    messages.success(request, f"Solicitud de {profile.user.email} rechazada.")
+    return _safe_redirect(request, "admin_influencers")
+
+
+@require_perms("influencer.change_influencerprofile")
+@require_POST
+def influencer_deactivate(request, pk):
+    profile = get_object_or_404(InfluencerProfile, pk=pk)
+    deactivate_influencer(profile)
+    messages.success(request, f"Afiliado {profile.user.email} desactivado.")
+    return _safe_redirect(request, "admin_influencers")
+
+
+@staff_required
+def withdrawals_list(request):
+    status = request.GET.get("status", WithdrawalStatus.PENDING).strip()
+    requests_qs = WithdrawalRequest.objects.select_related("influencer__user").order_by("-requested_at")
+    if status in dict(WithdrawalStatus.choices):
+        requests_qs = requests_qs.filter(status=status)
+
+    paginator = Paginator(requests_qs, 20)
+    page_obj = paginator.get_page(request.GET.get("page"))
+    return render(request, "administracion/withdrawals.html", {"page_obj": page_obj, "status": status})
+
+
+@require_perms("influencer.change_withdrawalrequest")
+@require_POST
+def withdrawal_resolve(request, pk):
+    solicitud = get_object_or_404(WithdrawalRequest, pk=pk)
+    aprobar = request.POST.get("action") == "pay"
+    resolve_withdrawal(solicitud, aprobar, request.user)
+    estado = "pagada" if aprobar else "rechazada"
+    messages.success(request, f"Solicitud de retiro {estado}.")
+    return _safe_redirect(request, "admin_withdrawals")
+
+
+@staff_required
 def groups_list(request):
     """Roles intermedios: Grupos de Django con un subconjunto de permisos
     del panel. Aparte de Usuario/Influencer/Administrador, un Grupo permite
@@ -793,3 +1076,12 @@ def group_delete(request, pk):
     return redirect("admin_groups")
 
 
+
+
+def _parse_fecha(valor, por_defecto):
+    if not valor:
+        return por_defecto
+    try:
+        return datetime.strptime(valor, "%Y-%m-%d").date()
+    except ValueError:
+        return por_defecto

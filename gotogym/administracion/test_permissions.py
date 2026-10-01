@@ -211,7 +211,7 @@ class ConfiguracionDelPanelTests(TestCase):
 
     def test_actualiza_el_umbral_de_stock_bajo(self):
         respuesta = self.client.post(reverse('admin_inventory_threshold_update'), {'low_stock_threshold': '10'})
-        self.assertRedirects(respuesta, reverse('admin_variants'))
+        self.assertRedirects(respuesta, reverse('admin_dashboard'))
         self.assertEqual(PanelSettings.load().low_stock_threshold, 10)
 
     def test_dashboard_usa_el_umbral_configurado(self):

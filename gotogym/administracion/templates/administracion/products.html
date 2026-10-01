@@ -8,6 +8,19 @@
   </div>
   {% if perms.products.add_product %}<a class="button" href="{% url 'admin_product_new' %}">Crear producto</a>{% endif %}
 </section>
+{% if perms.administracion.change_panelsettings %}
+<div class="panel stat-form" style="margin-bottom: var(--space-4);">
+  <form method="post" action="{% url 'admin_inventory_threshold_update' %}" style="display:flex; align-items:center; gap: var(--space-3); flex-wrap: wrap;">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <label class="check">
+      <span>Umbral de stock bajo</span>
+      {{ threshold_form.low_stock_threshold }}
+    </label>
+    <button class="ghost btn-sm" type="submit">Guardar</button>
+  </form>
+</div>
+{% endif %}
 <form class="search" method="get">
   <input name="q" value="{{ query }}" placeholder="Buscar por nombre">
   <button type="submit">Buscar</button>

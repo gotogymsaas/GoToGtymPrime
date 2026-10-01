@@ -114,8 +114,10 @@
         <div id="userDropdown" class="gtg-dropdown" hidden>
           <a href="{% url 'orders:my_orders' %}">{% trans "Mis pedidos" %}</a>
           <a href="{% url 'edit_profile' %}">{% trans "Editar perfil" %}</a>
-          {% if user.influencer_profile %}
-          <a href="{% url 'influencer_dashboard' %}">{% trans "Panel influencer" %}</a>
+          {% if user.influencer_profile.is_active %}
+          <a href="{% url 'influencer_dashboard' %}">
+            {% if user.influencer_profile.status == 'approved' %}{% trans "Panel influencer" %}{% else %}{% trans "Solicitud de influencer" %}{% endif %}
+          </a>
           {% else %}
           {% comment %}
           Antes vivia como modal en la entrada publica (home.html), pero esa

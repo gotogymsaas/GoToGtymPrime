@@ -44,6 +44,10 @@ ADMIN_PERM_SPECS = [
     ('auth', 'change_group'),
     ('auth', 'delete_group'),
     ('administracion', 'change_panelsettings'),
+    ('influencer', 'change_influencerprofile'),
+    ('influencer', 'change_withdrawalrequest'),
+    ('influencer', 'change_influencerprogramsettings'),
+    ('payments', 'add_refund'),
 ]
 
 ADMIN_PERM_CODENAMES = [f'{app_label}.{codename}' for app_label, codename in ADMIN_PERM_SPECS]

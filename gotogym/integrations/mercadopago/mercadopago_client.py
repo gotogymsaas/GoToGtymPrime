@@ -19,3 +19,9 @@ class MercadoPagoClient:
         """Create a payment preference and return the API response."""
         result = self.sdk.preference().create(preference_data)
         return result.get("response", {})
+
+    def refund_payment(self, payment_id: str, amount: float | None = None) -> dict:
+        """Refund a payment, fully or partially, and return the API response."""
+        refund_object = {"amount": amount} if amount is not None else None
+        result = self.sdk.refund().create(payment_id, refund_object)
+        return result.get("response", {})

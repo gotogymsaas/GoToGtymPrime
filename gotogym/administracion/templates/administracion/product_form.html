@@ -80,9 +80,10 @@
     {{ variant_formset.management_form }}
     <div class="variants-table-wrap">
     <table class="variants-table" id="variants-table">
-      <thead><tr><th>SKU</th><th>Talla</th><th>Color</th><th>Precio propio</th><th>Stock</th><th>Activa</th><th></th></tr></thead>
+      <thead><tr><th>SKU</th><th>Talla</th><th>Color</th><th>Precio propio</th><th>Stock</th><th>Estado</th><th>Activa</th><th></th><th></th></tr></thead>
       <tbody id="variants-body">
         {% for vform in variant_formset.forms %}
+        {% with disponible=vform.instance.inventory.quantity_available %}
         <tr class="variant-row">
           <td data-label="SKU">
             {{ vform.id }}
@@ -92,7 +93,17 @@
           <td data-label="Color">{{ vform.color }}</td>
           <td data-label="Precio propio">{{ vform.price_override }}</td>
           <td data-label="Stock">{{ vform.quantity_available }}</td>
+          <td data-label="Estado">
+            {% if not vform.instance.pk %}<small>&mdash;</small>
+            {% elif not vform.instance.inventory %}<span class="pill pill-off">Sin inventario</span>
+            {% elif disponible == 0 %}<span class="pill pill-off">Agotado</span>
+            {% elif disponible <= low_stock_threshold %}<span class="badge badge-gold">Stock bajo</span>
+            {% else %}<span class="pill pill-ok">Disponible</span>{% endif %}
+          </td>
           <td data-label="Activa" class="cell-check">{{ vform.is_active }}</td>
+          <td data-label="Historial">
+            {% if vform.instance.pk %}<a class="ghost btn-sm" href="{% url 'admin_variant_inventory_history' vform.instance.pk %}">Historial</a>{% endif %}
+          </td>
           <td data-label="Quitar" class="cell-check">
             {% if vform.instance.pk %}
               {{ vform.DELETE }}
@@ -101,6 +112,7 @@
             {% endif %}
           </td>
         </tr>
+        {% endwith %}
         {% endfor %}
       </tbody>
     </table>
@@ -114,7 +126,9 @@
       <td data-label="Color">{{ variant_formset.empty_form.color }}</td>
       <td data-label="Precio propio">{{ variant_formset.empty_form.price_override }}</td>
       <td data-label="Stock">{{ variant_formset.empty_form.quantity_available }}</td>
+      <td data-label="Estado"><small>&mdash;</small></td>
       <td data-label="Activa" class="cell-check">{{ variant_formset.empty_form.is_active }}</td>
+      <td data-label="Historial"></td>
       <td data-label="Quitar" class="cell-check"><button type="button" class="ghost btn-sm remove-variant-row">Quitar</button></td>
     </tr>
   </template>

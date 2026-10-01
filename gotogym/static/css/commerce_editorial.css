@@ -95,6 +95,16 @@
 .shop-filters__reset { display: inline-flex; align-items: center; padding: 0 var(--space-4); border: 1px solid #c8c8c5; color: var(--shop-muted); font-size: .78rem; text-decoration: none; }
 .shop-filters__reset:hover { border-color: var(--shop-ink); color: var(--shop-ink); }
 
+/* Resumen de filtros activos como chips removibles: evita que el usuario
+ * tenga que reabrir el panel (colapsado por defecto en movil) para saber
+ * que esta filtrando. */
+.shop-active-filters { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: 16px 0; border-bottom: 1px solid #dcdcd9; }
+.shop-chip-active { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border: 1px solid var(--shop-ink); border-radius: 999px; background: var(--shop-mist); color: var(--shop-ink); font-size: .76rem; font-weight: 700; text-decoration: none; transition: background .18s ease, color .18s ease; }
+.shop-chip-active .material-icons-outlined { font-size: 16px; }
+.shop-chip-active:hover { background: var(--shop-ink); color: var(--shop-paper); }
+.shop-chip-active--clear { border-style: dashed; background: transparent; color: var(--shop-muted); }
+.shop-chip-active--clear:hover { border-style: solid; background: var(--shop-ink); color: var(--shop-paper); }
+
 .shop-empty { padding: clamp(48px, 8vw, 90px); border-left: 3px solid var(--shop-turquoise); background: var(--shop-mist); }
 .shop-empty p { margin: 0 0 20px; color: var(--shop-muted); font-size: 1.02rem; }
 

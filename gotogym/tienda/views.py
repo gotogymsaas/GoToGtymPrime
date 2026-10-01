@@ -85,14 +85,22 @@ def producto_list(request):
 
     filtros_activos = any([filtro, categoria_id, talla, color, precio_min, precio_max])
 
+    categorias = ProductCategory.objects.all().order_by('name')
+    selected_category_name = ''
+    if categoria_id:
+        selected_category_name = next(
+            (cat.name for cat in categorias if str(cat.id) == categoria_id), ''
+        )
+
     context = {
         'page_obj': page_obj,
         'cards': [build_product_card(producto) for producto in page_obj],
-        'categorias': ProductCategory.objects.all().order_by('name'),
+        'categorias': categorias,
         'sizes': sizes,
         'colors': colors,
         'filtro': filtro,
         'selected_category_id': categoria_id,
+        'selected_category_name': selected_category_name,
         'selected_size': talla,
         'selected_color': color,
         'precio_min': precio_min,

@@ -6,7 +6,9 @@ from django.contrib.auth.models import Group, Permission
 from django.db.models import Q
 from django.forms import BaseInlineFormSet, inlineformset_factory
 from django.utils.text import slugify
-from inventory.models import Inventory
+from influencer.models import InfluencerProfile, InfluencerProgramSettings
+from inventory.models import Inventory, InventoryAdjustmentReason
+from inventory.services import record_adjustment
 from orders.models import Coupon
 from products.models import (
     Brand,
@@ -81,6 +83,16 @@ class ProductAdminForm(forms.ModelForm):
             "description": forms.Textarea(attrs={"rows": 3}),
             "tags": forms.CheckboxSelectMultiple(),
         }
+        labels = {
+            "name": "Nombre",
+            "category": "Categoria",
+            "brand": "Marca",
+            "description": "Descripcion",
+            "discount": "Descuento (%)",
+            "stock": "Stock inicial (heredado)",
+            "featured": "Destacado",
+            "tags": "Etiquetas",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -124,7 +136,7 @@ class ProductVariantForm(forms.ModelForm):
             except Inventory.DoesNotExist:
                 self.fields["quantity_available"].initial = 0
 
-    def save_with_inventory(self, product):
+    def save_with_inventory(self, product, user=None):
         """Guarda la variante y su stock en la misma operacion.
 
         No se usa `save()` a secas porque el formset la llama con
@@ -133,6 +145,11 @@ class ProductVariantForm(forms.ModelForm):
         guardada conserva el suyo aunque se le edite talla o color, para
         no invalidar un codigo que ya pudo quedar referenciado afuera
         (una etiqueta impresa, un pedido ya despachado).
+
+        El cambio de stock queda en el kardex (`InventoryAdjustment`) igual
+        que si se hubiera hecho desde la pantalla de inventario: editar el
+        stock desde "Editar producto" no debe dejar un hueco en el
+        historial solo por haber entrado por esta puerta.
         """
         es_nueva = self.instance.pk is None
         variant = self.save(commit=False)
@@ -142,7 +159,17 @@ class ProductVariantForm(forms.ModelForm):
         variant.save()
         cantidad = self.cleaned_data.get("quantity_available")
         if cantidad is not None:
-            Inventory.objects.update_or_create(variant=variant, defaults={"quantity_available": cantidad})
+            anterior = Inventory.objects.filter(variant=variant).values_list(
+                "quantity_available", flat=True,
+            ).first() or 0
+            inventario, _ = Inventory.objects.update_or_create(
+                variant=variant, defaults={"quantity_available": cantidad},
+            )
+            if cantidad != anterior:
+                record_adjustment(
+                    inventario, delta=cantidad - anterior, reason=InventoryAdjustmentReason.MANUAL,
+                    created_by=user,
+                )
         return variant
 
 
@@ -235,17 +262,36 @@ class CouponForm(forms.ModelForm):
         model = Coupon
         fields = [
             "code", "discount_type", "value", "min_purchase",
-            "starts_at", "ends_at", "max_uses", "is_active",
+            "starts_at", "ends_at", "max_uses", "is_active", "influencer", "customer_segment",
         ]
         widgets = {
             "starts_at": forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"),
             "ends_at": forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"),
+        }
+        labels = {
+            "code": "Codigo",
+            "discount_type": "Tipo de descuento",
+            "value": "Valor",
+            "min_purchase": "Compra minima",
+            "starts_at": "Vigente desde",
+            "ends_at": "Vigente hasta",
+            "max_uses": "Usos maximos",
+            "is_active": "Activo",
+            "influencer": "Afiliado (opcional)",
+            "customer_segment": "Restringir a segmento de cliente (opcional)",
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["starts_at"].input_formats = ["%Y-%m-%dT%H:%M"]
         self.fields["ends_at"].input_formats = ["%Y-%m-%dT%H:%M"]
+        self.fields["influencer"].queryset = InfluencerProfile.objects.filter(
+            is_active=True,
+        ).select_related("user").order_by("user__email")
+        self.fields["influencer"].required = False
+        self.fields["influencer"].empty_label = "Ninguno (cupon general)"
+        self.fields["customer_segment"].required = False
+        self.fields["customer_segment"].empty_label = "Ninguno (cualquier cliente)"
 
     def clean_code(self):
         code = self.cleaned_data["code"].strip().upper()
@@ -280,6 +326,7 @@ class GroupForm(forms.ModelForm):
     class Meta:
         model = Group
         fields = ["name"]
+        labels = {"name": "Nombre"}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -297,3 +344,27 @@ class PanelSettingsForm(forms.ModelForm):
     class Meta:
         model = PanelSettings
         fields = ["low_stock_threshold"]
+
+
+class SalesGoalForm(forms.ModelForm):
+    class Meta:
+        model = PanelSettings
+        fields = ["monthly_sales_goal"]
+        labels = {"monthly_sales_goal": "Meta de ventas (COP)"}
+
+
+class InfluencerProgramSettingsForm(forms.ModelForm):
+    class Meta:
+        model = InfluencerProgramSettings
+        fields = ["default_commission_rate", "default_customer_discount"]
+        labels = {
+            "default_commission_rate": "Tasa de comision global (%)",
+            "default_customer_discount": "Descuento al cliente final (%)",
+        }
+
+
+class InfluencerCommissionRateForm(forms.ModelForm):
+    class Meta:
+        model = InfluencerProfile
+        fields = ["commission_rate"]
+        labels = {"commission_rate": "Tasa propia (vacio = usar la tasa global)"}

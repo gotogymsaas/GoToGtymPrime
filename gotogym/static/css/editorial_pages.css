@@ -3,8 +3,8 @@
   --ed-paper: #f8f9fa;
   --ed-mist: #e8e8e5;
   --ed-muted: #66666c;
-  --ed-turquoise: #0fbfb0;
-  --ed-gold: #d4b46a;
+  --ed-turquoise: var(--color-accent, #00d4c7);
+  --ed-gold: var(--color-gold, #d4b46a);
   --ed-sapphire: #17375c;
   min-height: 70vh;
   overflow: clip;

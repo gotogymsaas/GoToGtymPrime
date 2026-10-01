@@ -62,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'influencer.middleware.ReferralTrackingMiddleware',
 ]
 
 ROOT_URLCONF = 'gotogym.urls'
@@ -202,6 +203,22 @@ HUBSPOT_PRIVATE_TOKEN = os.environ.get('HUBSPOT_PRIVATE_TOKEN', '')
 # Compatibilidad: prioriza ALEGRA_API_TOKEN y usa ALEGRA_TOKEN como fallback.
 ALEGRA_API_TOKEN = os.environ.get('ALEGRA_API_TOKEN') or os.environ.get('ALEGRA_TOKEN', '')
 
+# Monitoreo de errores (Sentry). Sin SENTRY_DSN en el entorno queda
+# desactivado: no requiere la librería instalada para arrancar y no rompe
+# entornos (local, tests) que no lo configuren.
+SENTRY_DSN = os.environ.get('SENTRY_DSN', '')
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        environment=os.environ.get('SENTRY_ENVIRONMENT', 'production'),
+        traces_sample_rate=float(os.environ.get('SENTRY_TRACES_SAMPLE_RATE', '0.2')),
+        send_default_pii=False,
+    )
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -221,3 +238,18 @@ LOGIN_REDIRECT_URL = 'logged_home'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Envío de correo (recuperación de contraseña, notificaciones transaccionales).
+# Sin EMAIL_HOST en el entorno, cae a console backend para no romper en un
+# despliegue que aún no tenga el proveedor SMTP configurado.
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+if EMAIL_HOST:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+    EMAIL_USE_TLS = _as_bool(os.environ.get('EMAIL_USE_TLS'), True)
+    EMAIL_USE_SSL = _as_bool(os.environ.get('EMAIL_USE_SSL'), False)
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'GoToGym <no-reply@gotogym.store>')

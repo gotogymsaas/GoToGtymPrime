@@ -1,0 +1,45 @@
+{% extends "administracion/base.html" %}
+{% load tienda_filters %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Programa de afiliados</p>
+    <h1>Retiros de afiliados</h1>
+  </div>
+</section>
+<div class="filter-tabs">
+  <a href="?status=pending" class="{% if status == 'pending' %}active{% endif %}">Pendientes</a>
+  <a href="?status=paid" class="{% if status == 'paid' %}active{% endif %}">Pagadas</a>
+  <a href="?status=rejected" class="{% if status == 'rejected' %}active{% endif %}">Rechazadas</a>
+</div>
+<div class="panel">
+  <table>
+    <thead><tr><th>Afiliado</th><th>Monto</th><th>Solicitada</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+      {% for withdrawal in page_obj %}
+      <tr>
+        <td><a href="{% url 'admin_influencer_detail' withdrawal.influencer.pk %}">{{ withdrawal.influencer.user.email }}</a></td>
+        <td>${{ withdrawal.amount|cop }} COP</td>
+        <td><small>{{ withdrawal.requested_at|date:"d/m/Y H:i" }}</small></td>
+        <td>{{ withdrawal.get_status_display }}</td>
+        <td class="actions">
+          {% if withdrawal.status == 'pending' and perms.influencer.change_withdrawalrequest %}
+          <form method="post" action="{% url 'admin_withdrawal_resolve' withdrawal.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="pay">
+            <button class="ghost btn-sm" type="submit">Marcar pagada</button>
+          </form>
+          <form method="post" action="{% url 'admin_withdrawal_resolve' withdrawal.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reject">
+            <button class="button btn-sm product-delete-button" type="submit">Rechazar</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="5">No hay solicitudes en este estado.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "administracion/pagination.html" %}
+{% endblock %}

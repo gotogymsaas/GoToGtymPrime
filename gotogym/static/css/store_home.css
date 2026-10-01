@@ -3,7 +3,7 @@
   --home-carbon: #404045;
   --home-white: #f8f9fa;
   --home-turquoise: #0fbfb0;
-  --home-gold: #d4b46a;
+  --home-gold: var(--color-gold, #d4b46a);
   --home-sapphire: #17375c;
   overflow: clip;
   background: var(--home-white);

@@ -29,40 +29,37 @@
       <img src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" aria-hidden="true">
     </a>
 
-    {% if error_message %}
-    <div class="commercial-auth__error" role="alert">{{ error_message }}</div>
-    {% endif %}
-
-    <form method="post" class="commercial-auth__form" id="commercial-auth-form">
+    <form method="post" class="commercial-auth__form" id="commercial-auth-form" novalidate>
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ next }}">
 
-      <div class="commercial-auth__field">
-        <input type="text" name="username" id="id_username" placeholder="{% trans 'Usuario o Email' %}" autocomplete="username" required>
+      <div class="commercial-auth__field{% if error_message %} commercial-auth__field--invalid{% endif %}" data-field="username">
+        <input type="text" name="username" id="id_username" placeholder="{% trans 'Usuario o Email' %}" autocomplete="username" required aria-describedby="err-username">
         <label for="id_username">{% trans "Usuario o Email" %}</label>
       </div>
+      <p class="commercial-auth__field-error" id="err-username" role="alert" {% if not error_message %}hidden{% endif %}>
+        {% if error_message %}{{ error_message }}{% else %}{% trans "Ingresa tu usuario o email." %}{% endif %}
+      </p>
 
-      <div class="commercial-auth__field commercial-auth__password">
-        <input type="password" name="password" id="id_password" placeholder="{% trans 'Contraseña' %}" autocomplete="current-password" required>
+      <div class="commercial-auth__field commercial-auth__password{% if error_message %} commercial-auth__field--invalid{% endif %}" data-field="password">
+        <input type="password" name="password" id="id_password" placeholder="{% trans 'Contraseña' %}" autocomplete="current-password" required aria-describedby="err-password">
         <label for="id_password">{% trans "Contraseña" %}</label>
         <button type="button" aria-label="{% trans 'Mostrar contraseña' %}" data-password-toggle>
           <span class="material-icons-outlined">visibility</span>
         </button>
       </div>
+      <p class="commercial-auth__field-error" id="err-password" role="alert" hidden>
+        {% trans "Ingresa tu contraseña." %}
+      </p>
 
       <button type="submit" class="commercial-auth__button commercial-auth__button--gold">
         {% trans "Iniciar Sesión" %}
       </button>
     </form>
 
-    <button type="button" class="commercial-auth__forgot" data-forgot-password>
+    <a href="{% url 'password_reset_form' %}" class="commercial-auth__forgot">
       {% trans "¿Olvidaste tu contraseña?" %}
-    </button>
-
-    <div class="commercial-auth__recovery-message" data-recovery-message role="status" aria-live="polite" hidden>
-      <p>revise su correo al cual le acaba de llegar un enlace para recuperar su contraseña. Una vez la recupere, con gusto lo volvemos a atender. Muchas gracias.</p>
-      <a href="{% url 'home' %}" class="commercial-auth__exit">salir</a>
-    </div>
+    </a>
 
     <div class="commercial-auth__register">
       <span>{% trans "¿No tienes cuenta?" %}</span>
@@ -87,12 +84,46 @@
       });
     }
 
-    const forgot = document.querySelector('[data-forgot-password]');
-    const recoveryMessage = document.querySelector('[data-recovery-message]');
-    if (forgot && recoveryMessage) {
-      forgot.addEventListener('click', function () {
-        recoveryMessage.hidden = false;
-        recoveryMessage.classList.add('commercial-auth__recovery-message--visible');
+    var form = document.getElementById('commercial-auth-form');
+    var fields = [
+      { input: document.getElementById('id_username'), wrapper: document.querySelector('[data-field="username"]'), error: document.getElementById('err-username') },
+      { input: document.getElementById('id_password'), wrapper: document.querySelector('[data-field="password"]'), error: document.getElementById('err-password') },
+    ];
+
+    function clearFieldError(field) {
+      field.wrapper.classList.remove('commercial-auth__field--invalid');
+      field.error.hidden = true;
+    }
+
+    function showFieldError(field, message) {
+      field.wrapper.classList.add('commercial-auth__field--invalid');
+      if (message) field.error.textContent = message;
+      field.error.hidden = false;
+    }
+
+    fields.forEach(function (field) {
+      if (!field.input) return;
+      field.input.addEventListener('input', function () {
+        if (field.input.value.trim()) clearFieldError(field);
+      });
+    });
+
+    if (form) {
+      form.addEventListener('submit', function (event) {
+        var firstInvalid = null;
+        fields.forEach(function (field) {
+          if (!field.input) return;
+          if (!field.input.value.trim()) {
+            showFieldError(field, field.input === fields[0].input
+              ? "{% trans 'Ingresa tu usuario o email.' %}"
+              : "{% trans 'Ingresa tu contraseña.' %}");
+            if (!firstInvalid) firstInvalid = field.input;
+          }
+        });
+        if (firstInvalid) {
+          event.preventDefault();
+          firstInvalid.focus();
+        }
       });
     }
   });

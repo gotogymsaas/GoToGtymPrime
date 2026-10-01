@@ -104,6 +104,22 @@ class MercadoPagoPaymentProvider(PaymentProvider):
     def get_status(self, payment_transaction):
         return payment_transaction.status
 
+    def refund_payment(self, payment_transaction, amount=None):
+        """Reembolsa el pago real en Mercado Pago.
+
+        Requiere `payment_id` (el pago ya debe estar aprobado): no tiene
+        sentido reembolsar una preferencia que nunca se pago."""
+        if not payment_transaction.payment_id:
+            raise ValueError('No hay payment_id: este pago nunca fue aprobado por Mercado Pago.')
+        respuesta = self.client.refund_payment(
+            payment_transaction.payment_id,
+            amount=float(amount) if amount is not None else None,
+        )
+        return {
+            'provider_refund_id': str(respuesta.get('id', '')),
+            'status': respuesta.get('status', ''),
+        }
+
     def handle_callback(self, payload):
         """Procesa una notificacion de webhook y devuelve la transaccion
         actualizada.

@@ -279,3 +279,82 @@ class PagosUnificadosEnPedidosTests(TestCase):
     def test_la_pantalla_de_pagos_separada_ya_no_existe(self):
         with self.assertRaises(NoReverseMatch):
             reverse('admin_payment_transactions')
+
+
+class OrderRefundAdminTests(TestCase):
+    """Boton "Reembolsar pago": solo cuando hay un pago aprobado sobre un
+    pedido cancelado/devuelto, y solo con el permiso correspondiente."""
+
+    @classmethod
+    def setUpTestData(cls):
+        categoria = ProductCategory.objects.create(name='Categoria admin reembolso')
+        marca = Brand.objects.create(name='Marca admin reembolso')
+        producto = Product.objects.create(
+            name='Producto admin reembolso', category=categoria, brand=marca,
+            base_price=Decimal('80000.0000'), stock=0,
+        )
+        variante = _crear_variante(producto, 'ADM-REF-001-S-NEG', 'S', 'negro', 5)
+
+        User = get_user_model()
+        cls.cliente = User.objects.create_user(
+            email='cliente-reembolso@example.com', username='cliente-reembolso@example.com', password='secret123',
+        )
+        cls.staff = User.objects.create_user(
+            email='staff-reembolso@example.com', username='staff-reembolso@example.com', password='secret123',
+            is_staff=True,
+        )
+        cls.pedido = create_order_from_cart(cls.cliente, {str(variante.pk): 1}, DATOS)
+
+    def _url(self):
+        return reverse('admin_order_refund', args=[self.pedido.order_number])
+
+    def _marcar_pago_aprobado_y_cancelar(self):
+        PaymentTransaction.objects.create(
+            order=self.pedido, provider='mock', payment_id='mock-pay-refund-1',
+            external_reference=self.pedido.order_number,
+            status=PaymentTransaction.Status.APPROVED, amount=self.pedido.total,
+            idempotency_key='idem-admin-refund-1',
+        )
+        apply_order_status_transition(self.pedido, OrderStatus.CANCELLED)
+
+    def test_staff_puede_reembolsar_un_pedido_cancelado_con_pago_aprobado(self):
+        self._marcar_pago_aprobado_y_cancelar()
+        self.client.force_login(self.staff)
+
+        self.client.post(self._url())
+
+        from payments.models import Refund
+        self.assertTrue(Refund.objects.filter(payment_transaction__order=self.pedido).exists())
+
+    def test_no_se_puede_reembolsar_sin_pago_aprobado(self):
+        self.client.force_login(self.staff)
+
+        response = self.client.post(self._url(), follow=True)
+
+        self.assertContains(response, 'no tiene un pago aprobado')
+
+    def test_cliente_no_staff_no_puede_reembolsar(self):
+        self._marcar_pago_aprobado_y_cancelar()
+        self.client.force_login(self.cliente)
+
+        response = self.client.post(self._url())
+
+        self.assertEqual(response.status_code, 302)
+        from payments.models import Refund
+        self.assertFalse(Refund.objects.filter(payment_transaction__order=self.pedido).exists())
+
+    def test_staff_con_grupo_sin_el_permiso_no_puede_reembolsar(self):
+        from django.contrib.auth.models import Group
+
+        self._marcar_pago_aprobado_y_cancelar()
+        staff_sin_permiso = get_user_model().objects.create_user(
+            email='staff-reembolso-2@example.com', username='staff-reembolso-2@example.com',
+            password='secret123', is_staff=True,
+        )
+        staff_sin_permiso.groups.add(Group.objects.create(name='Grupo sin permiso de reembolso'))
+        self.client.force_login(staff_sin_permiso)
+
+        self.client.post(self._url())
+
+        from payments.models import Refund
+        self.assertFalse(Refund.objects.filter(payment_transaction__order=self.pedido).exists())
