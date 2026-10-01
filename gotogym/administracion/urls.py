@@ -43,6 +43,7 @@ urlpatterns = [
     path("afiliados/<int:pk>/aprobar/", views.influencer_approve, name="admin_influencer_approve"),
     path("afiliados/<int:pk>/rechazar/", views.influencer_reject, name="admin_influencer_reject"),
     path("afiliados/<int:pk>/desactivar/", views.influencer_deactivate, name="admin_influencer_deactivate"),
+    path("afiliados/<int:pk>/eliminar/", views.influencer_delete, name="admin_influencer_delete"),
     path("retiros/", views.withdrawals_list, name="admin_withdrawals"),
     path("retiros/<int:pk>/resolver/", views.withdrawal_resolve, name="admin_withdrawal_resolve"),
     path("grupos/", views.groups_list, name="admin_groups"),

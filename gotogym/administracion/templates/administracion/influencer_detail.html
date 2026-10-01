@@ -58,6 +58,14 @@
     {% endif %}
   </div>
   {% endif %}
+  {% if perms.influencer.delete_influencerprofile %}
+  <div class="form-actions">
+    <form method="post" action="{% url 'admin_influencer_delete' profile.pk %}" onsubmit="return confirm('¿Eliminar definitivamente a {{ profile.user.email|escapejs }} del programa de afiliados? Esta accion no se puede deshacer.');">
+      {% csrf_token %}
+      <button class="button product-delete-button" type="submit">Eliminar afiliado</button>
+    </form>
+  </div>
+  {% endif %}
 </div>
 
 <div class="panel">

@@ -925,6 +925,10 @@ def coupon_delete(request, pk):
 
 @staff_required
 def influencers_list(request):
+    """Pagina unica del programa de afiliados: antes "Afiliados" y "Retiros
+    de afiliados" vivian en pantallas separadas aunque un retiro no se
+    entiende sin ver primero al afiliado que lo pide. Ahora la info de
+    afiliados va arriba y los retiros abajo, en la misma pagina."""
     status = request.GET.get("status", "").strip()
     query = request.GET.get("q", "").strip()
     profiles = InfluencerProfile.objects.select_related("user").order_by("-created_at")
@@ -942,10 +946,24 @@ def influencers_list(request):
     if request.user.has_perm("influencer.change_influencerprogramsettings"):
         settings_form = InfluencerProgramSettingsForm(instance=InfluencerProgramSettings.load())
 
+    withdrawal_status = request.GET.get("wstatus", WithdrawalStatus.PENDING).strip()
+    withdrawals_qs = WithdrawalRequest.objects.select_related("influencer__user").order_by("-requested_at")
+    if withdrawal_status in dict(WithdrawalStatus.choices):
+        withdrawals_qs = withdrawals_qs.filter(status=withdrawal_status)
+    withdrawal_paginator = Paginator(withdrawals_qs, 20)
+    withdrawal_page_obj = withdrawal_paginator.get_page(request.GET.get("wpage"))
+
     return render(
         request,
         "administracion/influencers.html",
-        {"page_obj": page_obj, "query": query, "status": status, "settings_form": settings_form},
+        {
+            "page_obj": page_obj,
+            "query": query,
+            "status": status,
+            "settings_form": settings_form,
+            "withdrawal_page_obj": withdrawal_page_obj,
+            "withdrawal_status": withdrawal_status,
+        },
     )
 
 
@@ -1023,14 +1041,10 @@ def influencer_deactivate(request, pk):
 
 @staff_required
 def withdrawals_list(request):
-    status = request.GET.get("status", WithdrawalStatus.PENDING).strip()
-    requests_qs = WithdrawalRequest.objects.select_related("influencer__user").order_by("-requested_at")
-    if status in dict(WithdrawalStatus.choices):
-        requests_qs = requests_qs.filter(status=status)
-
-    paginator = Paginator(requests_qs, 20)
-    page_obj = paginator.get_page(request.GET.get("page"))
-    return render(request, "administracion/withdrawals.html", {"page_obj": page_obj, "status": status})
+    # "Retiros de afiliados" se unifico dentro de "Afiliados" (ver
+    # `influencers_list`); esta ruta se conserva solo para no romper
+    # enlaces viejos.
+    return redirect("admin_influencers")
 
 
 @require_perms("influencer.change_withdrawalrequest")
@@ -1041,7 +1055,17 @@ def withdrawal_resolve(request, pk):
     resolve_withdrawal(solicitud, aprobar, request.user)
     estado = "pagada" if aprobar else "rechazada"
     messages.success(request, f"Solicitud de retiro {estado}.")
-    return _safe_redirect(request, "admin_withdrawals")
+    return _safe_redirect(request, "admin_influencers")
+
+
+@require_perms("influencer.delete_influencerprofile")
+@require_POST
+def influencer_delete(request, pk):
+    profile = get_object_or_404(InfluencerProfile, pk=pk)
+    email = profile.user.email
+    profile.delete()
+    messages.success(request, f"Afiliado {email} eliminado.")
+    return redirect("admin_influencers")
 
 
 @staff_required

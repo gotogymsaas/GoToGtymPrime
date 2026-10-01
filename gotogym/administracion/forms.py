@@ -262,7 +262,7 @@ class CouponForm(forms.ModelForm):
         model = Coupon
         fields = [
             "code", "discount_type", "value", "min_purchase",
-            "starts_at", "ends_at", "max_uses", "is_active", "influencer", "customer_segment",
+            "starts_at", "ends_at", "max_uses", "is_active",
         ]
         widgets = {
             "starts_at": forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"),
@@ -277,21 +277,12 @@ class CouponForm(forms.ModelForm):
             "ends_at": "Vigente hasta",
             "max_uses": "Usos maximos",
             "is_active": "Activo",
-            "influencer": "Afiliado (opcional)",
-            "customer_segment": "Restringir a segmento de cliente (opcional)",
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["starts_at"].input_formats = ["%Y-%m-%dT%H:%M"]
         self.fields["ends_at"].input_formats = ["%Y-%m-%dT%H:%M"]
-        self.fields["influencer"].queryset = InfluencerProfile.objects.filter(
-            is_active=True,
-        ).select_related("user").order_by("user__email")
-        self.fields["influencer"].required = False
-        self.fields["influencer"].empty_label = "Ninguno (cupon general)"
-        self.fields["customer_segment"].required = False
-        self.fields["customer_segment"].empty_label = "Ninguno (cualquier cliente)"
 
     def clean_code(self):
         code = self.cleaned_data["code"].strip().upper()

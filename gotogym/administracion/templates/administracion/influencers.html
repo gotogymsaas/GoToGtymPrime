@@ -74,9 +74,15 @@
             {% elif not profile.is_active %}
             <form method="post" action="{% url 'admin_influencer_approve' profile.pk %}">
               {% csrf_token %}
-              <button class="ghost btn-sm" type="submit">Reactivar</button>
+              <button class="button btn-sm" type="submit">Reactivar</button>
             </form>
             {% endif %}
+          {% endif %}
+          {% if perms.influencer.delete_influencerprofile %}
+          <form method="post" action="{% url 'admin_influencer_delete' profile.pk %}" onsubmit="return confirm('¿Eliminar definitivamente a {{ profile.user.email|escapejs }} del programa de afiliados? Esta accion no se puede deshacer.');">
+            {% csrf_token %}
+            <button class="button btn-sm product-delete-button" type="submit">Eliminar</button>
+          </form>
           {% endif %}
         </td>
       </tr>
@@ -85,4 +91,52 @@
   </table>
 </div>
 {% include "administracion/pagination.html" %}
+
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Programa de afiliados</p>
+    <h2>Retiros de afiliados</h2>
+  </div>
+</section>
+<div class="filter-tabs">
+  <a href="?wstatus=pending" class="{% if withdrawal_status == 'pending' %}active{% endif %}">Pendientes</a>
+  <a href="?wstatus=paid" class="{% if withdrawal_status == 'paid' %}active{% endif %}">Pagadas</a>
+  <a href="?wstatus=rejected" class="{% if withdrawal_status == 'rejected' %}active{% endif %}">Rechazadas</a>
+</div>
+<div class="panel">
+  <table>
+    <thead><tr><th>Afiliado</th><th>Monto</th><th>Solicitada</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+      {% for withdrawal in withdrawal_page_obj %}
+      <tr>
+        <td><a href="{% url 'admin_influencer_detail' withdrawal.influencer.pk %}">{{ withdrawal.influencer.user.email }}</a></td>
+        <td>${{ withdrawal.amount|cop }} COP</td>
+        <td><small>{{ withdrawal.requested_at|date:"d/m/Y H:i" }}</small></td>
+        <td>{{ withdrawal.get_status_display }}</td>
+        <td class="actions">
+          {% if withdrawal.status == 'pending' and perms.influencer.change_withdrawalrequest %}
+          <form method="post" action="{% url 'admin_withdrawal_resolve' withdrawal.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="pay">
+            <button class="ghost btn-sm" type="submit">Marcar pagada</button>
+          </form>
+          <form method="post" action="{% url 'admin_withdrawal_resolve' withdrawal.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reject">
+            <button class="button btn-sm product-delete-button" type="submit">Rechazar</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="5">No hay solicitudes en este estado.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if withdrawal_page_obj.has_other_pages %}
+<nav class="pagination">
+  {% if withdrawal_page_obj.has_previous %}<a href="?wpage={{ withdrawal_page_obj.previous_page_number }}&wstatus={{ withdrawal_status }}">Anterior</a>{% endif %}
+  <span>Pagina {{ withdrawal_page_obj.number }} de {{ withdrawal_page_obj.paginator.num_pages }}</span>
+  {% if withdrawal_page_obj.has_next %}<a href="?wpage={{ withdrawal_page_obj.next_page_number }}&wstatus={{ withdrawal_status }}">Siguiente</a>{% endif %}
+</nav>
+{% endif %}
 {% endblock %}

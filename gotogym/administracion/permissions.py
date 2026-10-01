@@ -45,6 +45,7 @@ ADMIN_PERM_SPECS = [
     ('auth', 'delete_group'),
     ('administracion', 'change_panelsettings'),
     ('influencer', 'change_influencerprofile'),
+    ('influencer', 'delete_influencerprofile'),
     ('influencer', 'change_withdrawalrequest'),
     ('influencer', 'change_influencerprogramsettings'),
     ('payments', 'add_refund'),

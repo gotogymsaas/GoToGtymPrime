@@ -91,6 +91,15 @@ body.panel-shell {
   font-weight: 600;
 }
 .panel-shell .sidebar nav a:hover { color: var(--pq-text); background: rgba(255, 255, 255, .06); }
+/* Sub-enlace de un item del nav (ej. "Retiros de afiliados" bajo
+ * "Afiliados"): mismo trato visual, pero mas angosto y mas chico para que
+ * se lea como parte de esa seccion y no como otra seccion al mismo nivel. */
+.panel-shell .sidebar nav a.sidebar-sublink {
+  margin-left: 16px;
+  padding: 8px 12px;
+  font-size: .8rem;
+  color: rgba(243, 245, 244, .5);
+}
 .panel-shell .main { padding: var(--space-6); min-width: 0; }
 .panel-shell .topbar {
   min-height: 60px;
