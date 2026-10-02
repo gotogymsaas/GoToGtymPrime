@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static i18n %}
 {% block title %}GoToGym Journal{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260930-account-select-fix">{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">{% endblock %}
 {% block content %}
 <div class="editorial-page">
   <header class="editorial-hero editorial-hero--compact">
@@ -31,7 +31,7 @@
         {% for post in posts %}
         <article class="editorial-card">
           <a class="editorial-card__media" href="{% url 'blog:post_detail' post.slug %}" aria-label="Leer {{ post.title }}">
-            {% if post.featured %}<img src="{{ post.featured.url }}" alt="" loading="lazy">{% else %}<span aria-hidden="true">G</span>{% endif %}
+            {% if post.featured %}<img src="{{ post.featured.url }}" alt="" loading="lazy">{% else %}<span class="editorial-card__lattice" aria-hidden="true"></span>{% endif %}
           </a>
           <div class="editorial-card__copy">
             <span class="editorial-meta">{{ post.category.name|default:'GoToGym' }} · {{ post.reading_time }} min</span>

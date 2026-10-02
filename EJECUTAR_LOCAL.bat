@@ -53,6 +53,9 @@ if errorlevel 1 (
     exit /b 1
 )
 
+python manage.py seed_journal --solo-faltantes --settings=gotogym.settings_local
+if errorlevel 1 echo No se pudieron cargar las entradas del Journal. Continua sin ellas.
+
 python manage.py check --settings=gotogym.settings_local
 if errorlevel 1 (
     echo La validacion de Django encontro errores.

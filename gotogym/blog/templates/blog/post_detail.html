@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load static %}
+{% load blog_extras %}
 
 {% block title %}{{ post.title }}{% endblock %}
 
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260930-account-select-fix">{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">{% endblock %}
 
 {% block content %}
 <div class="editorial-page">
@@ -22,7 +23,17 @@
         {% if post.featured %}
         <img src="{{ post.featured.url }}" alt="" loading="lazy" class="editorial-article__cover">
         {% endif %}
-        {{ post.content|linebreaks }}
+        {{ post.content|post_body }}
+        {% if post.reference_items %}
+        <section class="editorial-references" aria-labelledby="referencias-titulo">
+          <h2 id="referencias-titulo">{% trans "Referencias" %}</h2>
+          <ol>
+            {% for ref in post.reference_items %}
+            <li id="ref-{{ forloop.counter }}">{{ ref.text }}{% if ref.url %} <a href="{{ ref.url }}" target="_blank" rel="noopener noreferrer">{% trans "Ver fuente" %}</a>{% endif %}</li>
+            {% endfor %}
+          </ol>
+        </section>
+        {% endif %}
       </article>
     </div>
   </section>

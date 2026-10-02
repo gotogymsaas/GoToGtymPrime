@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Antes de cada push: la misma validacion que el build del CI (lint, tipos,
+# django check, migraciones pendientes y pruebas). Evita que un build roto
+# quede en el historial de GitHub.
+set -euo pipefail
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+exec bash "${ROOT_DIR}/environments/backend/validate_local.sh"

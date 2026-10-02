@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Antes de cada commit: lint y gobernanza de diseno (rapido, ~1 s).
+# Las pruebas completas corren en pre-push.
+set -euo pipefail
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+exec bash "${ROOT_DIR}/environments/backend/validate_local.sh" --quick

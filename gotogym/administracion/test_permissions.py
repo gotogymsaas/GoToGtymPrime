@@ -10,7 +10,7 @@ from django.urls import reverse
 from products.models import Product, ProductCategory, ProductMedia
 
 from .models import PanelSettings
-from .permissions import ADMIN_PERM_CODENAMES, admin_permission_queryset
+from .permissions import ADMIN_PERM_CODENAMES
 
 
 class AutoSanadoDeAdminsLegadosTests(TestCase):

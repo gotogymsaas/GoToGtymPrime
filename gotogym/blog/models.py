@@ -22,6 +22,13 @@ class Post(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='posts')
     excerpt = models.TextField(blank=True)
     content = models.TextField()
+    references = models.TextField(
+        blank=True,
+        help_text=(
+            'Una referencia por linea, con el formato "Texto de la referencia | URL". '
+            'En el contenido se citan como [1], [2]... segun el orden de esta lista.'
+        ),
+    )
     featured = models.ImageField(upload_to='blog/featured/', blank=True, null=True)
     published = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -35,3 +42,15 @@ class Post(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
+
+    @property
+    def reference_items(self):
+        """Referencias ya separadas en texto y enlace, en el orden de la lista."""
+        items = []
+        for line in self.references.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            text, _, url = line.partition('|')
+            items.append({'text': text.strip(), 'url': url.strip()})
+        return items

@@ -85,3 +85,23 @@ Ejecucion real (solo cuando la suscripcion este Enabled):
 ```bash
 DRY_RUN=false bash environments/azure/apply_fase2_config.sh
 ```
+
+## Validacion antes de subir (hooks de git)
+
+Para que un build roto no llegue al historial de GitHub, el repositorio trae
+hooks versionados en `.githooks/` que corren la misma validacion que el job
+`build` del CI. Se activan una vez por clon:
+
+```bash
+bash environments/install_git_hooks.sh
+```
+
+- `pre-commit`: ruff y gobernanza de diseno (~1 s).
+- `pre-push`: ruff, mypy, `manage.py check`, migraciones pendientes y la suite
+  de pruebas con `settings_test` (~2 min).
+
+Tambien se puede correr a mano con
+`bash environments/backend/validate_local.sh` (o con `--quick`). Requiere
+`ruff` y `mypy` en el entorno (`pip install -r requirements-dev.txt`). Si
+hace falta saltarla de forma puntual: `git commit --no-verify` o
+`git push --no-verify`; el CI sigue siendo la barrera final.

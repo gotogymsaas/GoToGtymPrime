@@ -1,0 +1,5 @@
+# Los scripts de shell y los hooks deben conservar fin de linea LF aunque
+# core.autocrlf este activo en Windows; con CRLF, bash no encuentra el
+# interprete ("bash\r") y el hook falla.
+*.sh text eol=lf
+.githooks/* text eol=lf
