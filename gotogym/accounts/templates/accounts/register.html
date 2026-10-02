@@ -34,6 +34,7 @@
 
     <form method="post" class="commercial-auth__form commercial-auth__form--grid" id="register-form">
       {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
 
       <div class="commercial-auth__field">
         <input type="text" name="first_name" id="first_name" placeholder="{% trans 'Nombre' %}" required>

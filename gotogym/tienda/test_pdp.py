@@ -206,10 +206,27 @@ class SuperposicionYColapsoTests(TiendaAutenticadaMixin, TestCase):
         self.assertFalse(response.context['has_price_range'])
         self.assertContains(response, 'data-has-range="false"')
 
-    def test_el_precio_variable_si_se_marca_como_incierto(self):
+    def test_con_precios_distintos_deja_elegida_la_variante_mas_barata(self):
         response = self.client.get(self._url(self.precio_variable))
-        self.assertTrue(response.context['has_price_range'])
-        self.assertContains(response, 'data-has-range="true"')
+        self.assertEqual(response.context['default_variant']['sku'], 'SUP-002-S-NEG')
+        self.assertEqual(response.context['price_min'], Decimal('90000.0000'))
+        self.assertFalse(response.context['has_price_range'])
+        self.assertContains(response, 'data-has-range="false"')
+
+    def test_la_variante_mas_barata_llega_marcada_en_los_selectores(self):
+        html = self.client.get(self._url(self.precio_variable)).content.decode()
+        boton_s = html[html.index('data-size="S"'):]
+        boton_s = boton_s[:boton_s.index('</button>')]
+        self.assertIn('aria-pressed="true"', boton_s)
+        boton_m = html[html.index('data-size="M"'):]
+        boton_m = boton_m[:boton_m.index('</button>')]
+        self.assertIn('aria-pressed="false"', boton_m)
+
+    def test_la_preseleccion_salta_la_variante_agotada(self):
+        Inventory.objects.filter(variant__sku='SUP-002-S-NEG').update(quantity_available=0)
+        response = self.client.get(self._url(self.precio_variable))
+        self.assertEqual(response.context['default_variant']['sku'], 'SUP-002-M-NEG')
+        self.assertEqual(response.context['price_min'], Decimal('120000.0000'))
 
     def test_la_variante_unica_muestra_su_talla_resuelta(self):
         response = self.client.get(self._url(self.unico))

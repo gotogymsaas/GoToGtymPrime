@@ -52,7 +52,7 @@
           {% elif profile.status == 'rejected' %}<span class="pill pill-off">Rechazado</span>
           {% else %}<span class="pill pill-off">Inactivo</span>{% endif %}
         </td>
-        <td>${{ profile.commission_balance|cop }} COP</td>
+        <td class="nowrap">${{ profile.commission_balance|cop }} COP</td>
         <td><small>{{ profile.created_at|date:"d/m/Y" }}</small></td>
         <td class="actions">
           <a class="ghost btn-sm" href="{% url 'admin_influencer_detail' profile.pk %}">Ver</a>
@@ -110,7 +110,7 @@
       {% for withdrawal in withdrawal_page_obj %}
       <tr>
         <td><a href="{% url 'admin_influencer_detail' withdrawal.influencer.pk %}">{{ withdrawal.influencer.user.email }}</a></td>
-        <td>${{ withdrawal.amount|cop }} COP</td>
+        <td class="nowrap">${{ withdrawal.amount|cop }} COP</td>
         <td><small>{{ withdrawal.requested_at|date:"d/m/Y H:i" }}</small></td>
         <td>{{ withdrawal.get_status_display }}</td>
         <td class="actions">

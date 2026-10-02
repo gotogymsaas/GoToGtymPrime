@@ -234,7 +234,7 @@ SIMPLE_JWT = {
 
 AUTH_USER_MODEL = 'accounts.User'
 LOGIN_URL = 'commercial_login'
-LOGIN_REDIRECT_URL = 'logged_home'
+LOGIN_REDIRECT_URL = 'home'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

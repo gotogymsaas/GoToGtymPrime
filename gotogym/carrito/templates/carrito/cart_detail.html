@@ -4,7 +4,7 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20260930-account-select-fix">
-<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260926-token-h1">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20261002-importes">
 {% endblock %}
 
 {% block content %}
@@ -44,7 +44,7 @@
                 <div><dt>{% trans "Color" %}:</dt> <dd>{{ item.variant.color }}</dd></div>
                 <div><dt>SKU:</dt> <dd class="font-mono">{{ item.variant.sku }}</dd></div>
               </dl>
-              <p class="cart-row__price-each">${{ item.precio|cop }} COP {% trans "c/u" %}</p>
+              <p class="cart-row__price-each">{% if item.precio_lista %}<s class="price-compare">${{ item.precio_lista|cop }}</s> {% endif %}${{ item.precio|cop }} COP {% trans "c/u" %}{% if item.precio_lista %} <span class="price-badge">-{{ item.descuento_pct }}%</span>{% endif %}</p>
             </div>
 
             <form method="post" action="{% url 'carrito:update_cart' item.variant.id %}" class="cart-row__qty">

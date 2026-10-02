@@ -79,6 +79,8 @@ def build_cart_context(cart):
         precio = variante.effective_price
         item_subtotal = precio * cantidad
         items.append({
+            'precio_lista': variante.list_price if variante.has_discount else None,
+            'descuento_pct': variante.discount_percent,
             'variant': variante,
             'producto': variante.product,
             'image': variante.product.primary_image,

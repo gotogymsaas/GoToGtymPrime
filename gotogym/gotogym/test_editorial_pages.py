@@ -49,7 +49,7 @@ class EditorialPagesTests(TestCase):
 
         self.assertContains(response, 'Datos personales')
         self.assertContains(response, '<details class="account-security">', html=False)
-        self.assertContains(response, reverse('logged_home'))
+        self.assertContains(response, reverse('home'))
 
     def test_pedidos_vacios_reciben_recomendaciones_comprables(self):
         category = ProductCategory.objects.create(name='Editorial recommendation')
@@ -71,12 +71,6 @@ class EditorialPagesTests(TestCase):
         self.assertEqual(len(recommendations), 3)
         self.assertTrue(all(card['in_stock'] for card in recommendations))
         self.assertContains(response, '/static/product_media/')
-
-    def test_entrada_publica_conserva_experiencia_quantum(self):
-        response = self.client.get(reverse('home'))
-
-        self.assertContains(response, 'class="figma-home"', html=False)
-        self.assertContains(response, 'class="quantum-field"', html=False)
 
     def test_contacto_conserva_fondo_quantum_con_shell_editorial(self):
         response = self.client.get(reverse('contacto'))

@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Prefetch
 from django.http import JsonResponse
@@ -39,7 +38,6 @@ def _catalog_queryset():
     )
 
 
-@login_required
 def producto_list(request):
     productos = _catalog_queryset()
 
@@ -120,13 +118,17 @@ def _unique_preserving_order(values):
     return vistos
 
 
-@login_required
 def producto_detail(request, pk):
     producto = get_object_or_404(_catalog_queryset(), pk=pk)
 
     variantes = build_variant_matrix(producto)
     disponibles = [v for v in variantes if v['available']]
-    precios = [v['price'] for v in variantes] or [producto.base_price]
+    # Variante que la ficha deja elegida al entrar: la de menor precio entre
+    # las disponibles (o entre todas, si ninguna lo esta). A igual precio
+    # gana la primera en el orden talla/color.
+    candidatas = disponibles or variantes
+    por_defecto = min(candidatas, key=lambda v: v['price']) if candidatas else None
+    precio_inicial = por_defecto['price'] if por_defecto else producto.base_price
 
     colores = _unique_preserving_order([v['color'] for v in variantes])
     reviews = list(producto.reviews.select_related('user').order_by('-created_at'))
@@ -149,6 +151,9 @@ def producto_detail(request, pk):
                 'size': v['size'],
                 'color': v['color'],
                 'price': float(v['price']),
+                'list_price': float(v['list_price']),
+                'has_discount': v['has_discount'],
+                'discount_percent': v['discount_percent'],
                 'available': v['available'],
                 'stock': v['stock'],
             }
@@ -157,9 +162,12 @@ def producto_detail(request, pk):
         'sizes': _unique_preserving_order([v['size'] for v in variantes]),
         'colors': [{'name': c, 'swatch': color_swatch(c)} for c in colores],
         'in_stock': bool(disponibles),
-        'price_min': min(precios),
-        'price_max': max(precios),
-        'has_price_range': min(precios) != max(precios),
+        'default_variant': por_defecto,
+        'price_min': precio_inicial,
+        'price_max': precio_inicial,
+        'has_price_range': False,
+        'compare_price': por_defecto['list_price'] if por_defecto and por_defecto['has_discount'] else None,
+        'discount_percent': por_defecto['discount_percent'] if por_defecto and por_defecto['has_discount'] else 0,
         # Con una sola variante no tiene sentido pedirle al usuario que elija:
         # se preselecciona y los selectores no se muestran.
         'single_variant': variantes[0] if len(variantes) == 1 else None,
@@ -174,7 +182,6 @@ def producto_detail(request, pk):
     return render(request, 'tienda/producto_detail.html', context)
 
 
-@login_required
 def producto_variante(request, pk):
     """Consulta de una combinacion talla/color concreta.
 
@@ -196,6 +203,9 @@ def producto_variante(request, pk):
         'size': variante.size,
         'color': variante.color,
         'price': float(variante.effective_price),
+        'list_price': float(variante.list_price),
+        'has_discount': variante.has_discount,
+        'discount_percent': variante.discount_percent,
         'available': stock > 0,
         'stock': stock,
     })

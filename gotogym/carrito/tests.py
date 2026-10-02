@@ -228,19 +228,44 @@ class CarritoHeredadoTests(CarritoAutenticadoMixin, TestCase):
 
 
 class AccesoAlCarritoTests(TestCase):
-    """Store y carrito exigen sesion iniciada."""
+    """Tienda y carrito se pueden usar sin sesion; el login se exige al
+    pasar a checkout."""
 
-    def test_carrito_anonimo_redirige_a_login_con_next(self):
+    def test_carrito_anonimo_se_puede_ver(self):
         response = self.client.get(reverse('carrito:cart_detail'))
-        self.assertEqual(response.status_code, 302)
-        self.assertIn('next=', response.url)
+        self.assertEqual(response.status_code, 200)
 
-    def test_tienda_anonima_redirige_a_login_con_next(self):
-        url = reverse('tienda:producto_list')
+    def test_tienda_anonima_se_puede_ver(self):
+        response = self.client.get(reverse('tienda:producto_list'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_checkout_anonimo_redirige_a_login_con_next(self):
+        url = reverse('orders:checkout')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('commercial_login'), response.url)
         self.assertIn('next=', response.url)
-        self.assertIn(url, response.url)
+
+    def test_carrito_anonimo_sobrevive_al_login(self):
+        User = get_user_model()
+        User.objects.create_user(
+            email='comprador@example.com', username='comprador@example.com', password='secret123',
+        )
+        producto = Product.objects.create(
+            name='Producto acceso anonimo',
+            category=ProductCategory.objects.create(name='Categoria acceso anonimo'),
+            brand=Brand.objects.create(name='Marca acceso anonimo'),
+            base_price=Decimal('100000.0000'), stock=10,
+        )
+        variante = _crear_variante(producto, 'ANON-TEST-U-UNI', 'UNICA', 'UNICO', 10)
+        self.client.post(reverse('carrito:add_to_cart', args=[variante.pk]))
+        self.assertEqual(self.client.session['cart'], {str(variante.pk): 1})
+
+        self.client.post(reverse('commercial_login'), {
+            'username': 'comprador@example.com', 'password': 'secret123',
+        })
+
+        self.assertEqual(self.client.session['cart'], {str(variante.pk): 1})
 
 
 class CommerceRegressionTests(TestCase):

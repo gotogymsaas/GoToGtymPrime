@@ -55,7 +55,7 @@ ancho de pantalla, incluido el movil.
         <a class="intent-card intent-card--daily" data-track="intent_daily" href="{% url 'tienda:producto_list' %}">
           <span class="intent-card__number">02</span><span><strong>Movimiento diario</strong><small>Comodidad técnica para todo tu día.</small></span><b aria-hidden="true">↗</b>
         </a>
-        <a class="intent-card intent-card--custom" data-track="intent_custom" href="{% url 'contacto' %}?next=logged_home">
+        <a class="intent-card intent-card--custom" data-track="intent_custom" href="{% url 'contacto' %}">
           <span class="intent-card__number">03</span><span><strong>Ediciones personalizadas</strong><small>Diseño y detalles verdaderamente propios.</small></span><b aria-hidden="true">↗</b>
         </a>
       </div>
@@ -85,7 +85,7 @@ ancho de pantalla, incluido el movil.
             <p>{{ card.product.category.name }}</p>
             <h3><a href="{% url 'tienda:producto_detail' card.product.pk %}">{{ card.product.name }}</a></h3>
             <div class="home-product-card__meta">
-              <strong>{% include "tienda/partials/_price.html" with price_min=card.price_min price_max=card.price_max has_range=card.has_price_range %}</strong>
+              <strong>{% include "tienda/partials/_price.html" with price_min=card.price_min price_max=card.price_max has_range=card.has_price_range compare_price=card.compare_price discount_percent=card.discount_percent %}</strong>
               {% if card.sizes %}<small>{{ card.sizes|join:" · " }}</small>{% endif %}
             </div>
           </div>
@@ -123,7 +123,7 @@ ancho de pantalla, incluido el movil.
         <p class="store-eyebrow">Bienestar en movimiento</p>
         <h2 id="wellness-title">Equipos que se mueven mejor, conectan mejor.</h2>
         <p>Experiencias y prendas para organizaciones que entienden el bienestar como parte de su cultura.</p>
-        <a class="store-button store-button--dark" href="{% url 'contacto' %}?next=logged_home">Hablar con GoToGym</a>
+        <a class="store-button store-button--dark" href="{% url 'contacto' %}">Hablar con GoToGym</a>
       </div>
       {% imagen_editorial "bienestar_empresarial_3.jpeg" alt="Equipo usando prendas GoToGym en una experiencia de bienestar empresarial" sizes="(max-width: 980px) 100vw, 60vw" %}
     </div>

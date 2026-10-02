@@ -75,12 +75,12 @@
   {% if variant_formset %}
   <div class="panel field-full variants-panel">
     <h2>Variantes</h2>
-    <p class="hint">Cada fila es una presentacion vendible del producto (talla + color), con su propio stock. El SKU lo genera el sistema solo, a partir del producto, la talla y el color.</p>
+    <p class="hint">Cada fila es una presentacion vendible del producto (talla + color), con su propio stock. Para un descuento, escribe el precio final a pagar o el porcentaje (no ambos): el precio normal se mostrara tachado en la tienda. El SKU lo genera el sistema solo, a partir del producto, la talla y el color.</p>
     {{ variant_formset.non_form_errors }}
     {{ variant_formset.management_form }}
     <div class="variants-table-wrap">
     <table class="variants-table" id="variants-table">
-      <thead><tr><th>SKU</th><th>Talla</th><th>Color</th><th>Precio propio</th><th>Stock</th><th>Estado</th><th>Activa</th><th></th><th></th></tr></thead>
+      <thead><tr><th>SKU</th><th>Talla</th><th>Color</th><th>Precio propio</th><th>Precio con descuento</th><th>% desc.</th><th>Stock</th><th>Estado</th><th>Activa</th><th></th><th>Eliminar</th></tr></thead>
       <tbody id="variants-body">
         {% for vform in variant_formset.forms %}
         {% with disponible=vform.instance.inventory.quantity_available %}
@@ -92,6 +92,11 @@
           <td data-label="Talla">{{ vform.size }}</td>
           <td data-label="Color">{{ vform.color }}</td>
           <td data-label="Precio propio">{{ vform.price_override }}</td>
+          <td data-label="Precio con descuento">{{ vform.discount_price }}{{ vform.discount_price.errors }}{{ vform.non_field_errors }}</td>
+          <td data-label="% desc.">
+            {{ vform.discount_percent }}{{ vform.discount_percent.errors }}
+            {% if vform.instance.has_discount %}<small class="discount-current">Vigente: -{{ vform.instance.discount_percent }}%</small>{% endif %}
+          </td>
           <td data-label="Stock">{{ vform.quantity_available }}</td>
           <td data-label="Estado">
             {% if not vform.instance.pk %}<small>&mdash;</small>
@@ -104,7 +109,7 @@
           <td data-label="Historial">
             {% if vform.instance.pk %}<a class="ghost btn-sm" href="{% url 'admin_variant_inventory_history' vform.instance.pk %}">Historial</a>{% endif %}
           </td>
-          <td data-label="Quitar" class="cell-check">
+          <td data-label="Eliminar" class="cell-check">
             {% if vform.instance.pk %}
               {{ vform.DELETE }}
             {% else %}
@@ -125,11 +130,13 @@
       <td data-label="Talla">{{ variant_formset.empty_form.size }}</td>
       <td data-label="Color">{{ variant_formset.empty_form.color }}</td>
       <td data-label="Precio propio">{{ variant_formset.empty_form.price_override }}</td>
+      <td data-label="Precio con descuento">{{ variant_formset.empty_form.discount_price }}</td>
+      <td data-label="% desc.">{{ variant_formset.empty_form.discount_percent }}</td>
       <td data-label="Stock">{{ variant_formset.empty_form.quantity_available }}</td>
       <td data-label="Estado"><small>&mdash;</small></td>
       <td data-label="Activa" class="cell-check">{{ variant_formset.empty_form.is_active }}</td>
       <td data-label="Historial"></td>
-      <td data-label="Quitar" class="cell-check"><button type="button" class="ghost btn-sm remove-variant-row">Quitar</button></td>
+      <td data-label="Eliminar" class="cell-check"><button type="button" class="ghost btn-sm remove-variant-row">Quitar</button></td>
     </tr>
   </template>
   <script>

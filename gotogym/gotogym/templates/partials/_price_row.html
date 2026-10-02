@@ -14,5 +14,5 @@ Parametros:
                envio y el total se recalculan al elegir ciudad).
 {% endcomment %}<div class="{{ row_class }}"{% if row_id %} id="{{ row_id }}"{% endif %}>
   <span>{% trans label %}</span>
-  <span>{% if value_text %}{% trans value_text %}{% else %}${{ amount|cop }} {{ suffix|default:"COP" }}{% endif %}</span>
+  <span class="price-amount">{% if value_text %}{% trans value_text %}{% else %}${{ amount|cop }} {{ suffix|default:"COP" }}{% endif %}</span>
 </div>

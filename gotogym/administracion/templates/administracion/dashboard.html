@@ -110,7 +110,7 @@
         <tr>
           <td>{{ fila.dia|date:"d/m/Y" }}</td>
           <td>{{ fila.pedidos }}</td>
-          <td>${{ fila.total|cop }} COP</td>
+          <td class="nowrap">${{ fila.total|cop }} COP</td>
         </tr>
         {% empty %}<tr><td colspan="3">Sin ventas en este rango.</td></tr>{% endfor %}
       </tbody>
@@ -126,7 +126,7 @@
           <td>{{ fila.product_name_snapshot }}</td>
           <td>{{ fila.sku_snapshot }}</td>
           <td>{{ fila.unidades }}</td>
-          <td>${{ fila.ingresos|cop }} COP</td>
+          <td class="nowrap">${{ fila.ingresos|cop }} COP</td>
         </tr>
         {% empty %}<tr><td colspan="4">Sin ventas en este rango.</td></tr>{% endfor %}
       </tbody>

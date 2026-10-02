@@ -1,3 +1,5 @@
+from decimal import ROUND_HALF_UP
+
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -82,6 +84,13 @@ class ProductVariant(models.Model):
         max_digits=12, decimal_places=4, null=True, blank=True,
         help_text="Si se define, reemplaza el precio base del producto.",
     )
+    discount_price = models.DecimalField(
+        max_digits=12, decimal_places=4, null=True, blank=True,
+        help_text=(
+            "Precio vigente con descuento, en valor a pagar. Si es menor que el "
+            "precio normal, es el que se cobra y el normal se muestra tachado."
+        ),
+    )
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -98,10 +107,31 @@ class ProductVariant(models.Model):
         return f"{self.sku} - {self.product.name} ({self.size}/{self.color})"
 
     @property
-    def effective_price(self):
+    def list_price(self):
+        """Precio normal, antes de cualquier descuento."""
         if self.price_override is not None:
             return self.price_override
         return self.product.base_price
+
+    @property
+    def has_discount(self):
+        # Un descuento mayor o igual al precio normal no es un descuento:
+        # se ignora en vez de cobrar de mas o regalar el producto.
+        descuento = self.discount_price
+        return descuento is not None and 0 < descuento < self.list_price
+
+    @property
+    def effective_price(self):
+        """Lo que realmente paga el comprador: el precio con descuento si
+        hay uno vigente, o el precio normal."""
+        return self.discount_price if self.has_discount else self.list_price
+
+    @property
+    def discount_percent(self):
+        if not self.has_discount:
+            return 0
+        ahorro = (self.list_price - self.discount_price) / self.list_price * 100
+        return max(1, int(ahorro.to_integral_value(rounding=ROUND_HALF_UP)))
 
 
 class ProductMedia(models.Model):

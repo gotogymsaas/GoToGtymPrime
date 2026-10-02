@@ -4,7 +4,7 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260923-fringe-fix">
-<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20260926-token-h1">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20261002-importes">
 {% endblock %}
 
 {% block content %}
@@ -50,7 +50,7 @@
         tenga varias tallas o colores.
         {% endcomment %}
         <span id="pdp-price" class="shop-pdp__price" data-has-range="{% if has_price_range %}true{% else %}false{% endif %}">
-          {% include "tienda/partials/_price.html" with price_min=price_min price_max=price_max has_range=has_price_range %}
+          {% include "tienda/partials/_price.html" with price_min=price_min price_max=price_max has_range=has_price_range compare_price=compare_price discount_percent=discount_percent %}
         </span>
 
         <p class="shop-pdp__description">{{ producto.description }}</p>
@@ -81,9 +81,9 @@
           <input type="hidden" name="variant_id" id="pdp-variant-id"
                  value="{% if single_variant %}{{ single_variant.id }}{% endif %}">
 
-          {% include "tienda/partials/_size_selector.html" with sizes=sizes selected_size=single_variant.size %}
+          {% include "tienda/partials/_size_selector.html" with sizes=sizes selected_size=default_variant.size %}
           {% if not single_variant %}
-            {% include "tienda/partials/_color_selector.html" with colors=colors %}
+            {% include "tienda/partials/_color_selector.html" with colors=colors selected_color=default_variant.color %}
           {% endif %}
 
           {% comment %}
@@ -258,11 +258,39 @@ document.addEventListener('DOMContentLoaded', function () {
     return b.getAttribute('aria-pressed') === 'true';
   })[0];
   if (tallaMarcada) tallaElegida = tallaMarcada.dataset.size;
+  var colorMarcado = botonesColor.filter(function (b) {
+    return b.getAttribute('aria-pressed') === 'true';
+  })[0];
+  if (colorMarcado) colorElegido = colorMarcado.dataset.color;
   if (!botonesTalla.length && tallasUnicas.length === 1) tallaElegida = tallasUnicas[0];
   if (!botonesColor.length && coloresUnicos.length === 1) colorElegido = coloresUnicos[0];
 
   function formatearPrecio(valor) {
     return '$' + Math.round(valor).toLocaleString('es-CO') + ' COP';
+  }
+
+  // Con descuento, el precio normal va tachado y el vigente es el que se
+  // cobra; mismo marcado que tienda/partials/_price.html.
+  function pintarPrecio(variante) {
+    precio.textContent = '';
+    if (!variante.has_discount) {
+      precio.textContent = formatearPrecio(variante.price);
+      return;
+    }
+    var anterior = document.createElement('s');
+    anterior.className = 'price-compare';
+    anterior.textContent = '$' + Math.round(variante.list_price).toLocaleString('es-CO');
+    var vigente = document.createElement('span');
+    vigente.className = 'price-current';
+    vigente.textContent = formatearPrecio(variante.price);
+    var etiqueta = document.createElement('span');
+    etiqueta.className = 'price-badge';
+    etiqueta.textContent = '-' + variante.discount_percent + '%';
+    precio.appendChild(anterior);
+    precio.appendChild(document.createTextNode(' '));
+    precio.appendChild(vigente);
+    precio.appendChild(document.createTextNode(' '));
+    precio.appendChild(etiqueta);
   }
 
   function marcarSeleccion(botones, activo, atributo) {
@@ -304,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    precio.textContent = formatearPrecio(encontrada.price);
+    pintarPrecio(encontrada);
 
     if (!encontrada.available) {
       campoVariante.value = '';

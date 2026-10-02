@@ -52,9 +52,9 @@ class ChromeDelPanelTests(PanelAdminBaseTestCase):
         respuesta_panel = self.client.get(reverse('admin_dashboard'))
         self.assertNotEqual(respuesta_panel.status_code, 200)
 
-    def test_grupos_y_permisos_aparece_en_la_navegacion(self):
+    def test_grupos_y_permisos_no_aparece_en_la_navegacion(self):
         respuesta = self.client.get(reverse('admin_dashboard'))
-        self.assertContains(respuesta, 'Grupos y permisos')
+        self.assertNotContains(respuesta, 'Grupos y permisos')
 
 
 class CuponesAdminTests(PanelAdminBaseTestCase):

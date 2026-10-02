@@ -46,7 +46,7 @@ class CommercialHeaderTests(TestCase):
     def test_la_tienda_esta_en_la_barra_y_no_solo_en_el_panel_movil(self):
         self.client.force_login(self.user)
 
-        for url in [reverse('logged_home'), reverse('tienda:producto_list'),
+        for url in [reverse('home'), reverse('tienda:producto_list'),
                     reverse('carrito:cart_detail')]:
             with self.subTest(url=url):
                 navegacion = self._navegacion(self._html(url))
@@ -63,7 +63,7 @@ class CommercialHeaderTests(TestCase):
 
     def test_el_buscador_apunta_a_la_tienda_con_el_parametro_de_la_plp(self):
         self.client.force_login(self.user)
-        html = self._html(reverse('logged_home'))
+        html = self._html(reverse('home'))
 
         self.assertIn('class="gtg-nav-search"', html)
         url_tienda = reverse('tienda:producto_list')
@@ -104,7 +104,7 @@ class CommercialHeaderTests(TestCase):
     def test_el_salto_al_contenido_es_el_primer_enlace_de_la_pagina(self):
         self.client.force_login(self.user)
 
-        html = self._html(reverse('logged_home'))
+        html = self._html(reverse('home'))
 
         self.assertIn('class="gtg-skip-link" href="#main-content"', html)
         self.assertLess(html.index('gtg-skip-link'), html.index('gtg-navbar'))
@@ -112,7 +112,7 @@ class CommercialHeaderTests(TestCase):
     def test_el_comportamiento_del_header_viaja_en_un_archivo_cacheable(self):
         self.client.force_login(self.user)
 
-        html = self._html(reverse('logged_home'))
+        html = self._html(reverse('home'))
 
         self.assertIn('js/commerce_header.js', html)
         # El panel movil y el menu de cuenta se ocultan con el atributo
@@ -129,7 +129,7 @@ class CommercialHeaderTests(TestCase):
         # PROPUESTA_HOME_STORE_QUANTUM.md, seccion 2).
         self.client.force_login(self.user)
 
-        html = self._html(reverse('logged_home'))
+        html = self._html(reverse('home'))
 
         self.assertIn(reverse('influencer_suscribete'), html)
         self.assertIn('Programa de afiliados', html)
@@ -141,7 +141,7 @@ class CommercialHeaderTests(TestCase):
         InfluencerProfile.objects.create(user=self.user)
         self.client.force_login(self.user)
 
-        html = self._html(reverse('logged_home'))
+        html = self._html(reverse('home'))
 
         self.assertIn(reverse('influencer_dashboard'), html)
         self.assertIn('Panel de afiliados', html)

@@ -37,6 +37,14 @@ def logout_view(request):
         return redirect(next_url)
     return redirect('home')
 
+def _safe_next_url(request, fallback):
+    """`next` recibido por POST o GET si apunta a este mismo sitio."""
+    next_url = request.POST.get('next') or request.GET.get('next') or ''
+    if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+        return next_url
+    return fallback
+
+
 @csrf_protect
 def register_view(request):
     if request.method == 'POST':
@@ -57,12 +65,7 @@ def register_view(request):
             messages.error(request, 'El correo ya está registrado.')
         else:
             terms_text = TERMS_PATH.read_text(encoding='utf-8')
-            # `login` ya esta importado arriba pero nunca se llama con este
-            # usuario: hoy quien se registra queda sin sesion y tiene que
-            # loguearse aparte en la pantalla siguiente. Puede ser
-            # deliberado o un paso que falto -- no se decide aqui, se deja
-            # visible en vez de silenciar el aviso.
-            user = User.objects.create_user(  # noqa: F841
+            user = User.objects.create_user(
                 email=email,
                 username=username,
                 first_name=first_name,
@@ -73,9 +76,12 @@ def register_view(request):
                 terms_accepted_at=timezone.now(),
                 terms_hash=hashlib.sha512(terms_text.encode()).hexdigest(),
             )
-            messages.success(request, 'Registro exitoso. Ahora puedes iniciar sesión.')
-            return redirect('commercial_login')
-    return render(request, 'accounts/register.html')
+            # Quien se registra durante una compra no debe volver a escribir
+            # sus datos en el login: queda con sesion y sigue a donde iba.
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            messages.success(request, 'Registro exitoso. Ya iniciaste sesión.')
+            return redirect(_safe_next_url(request, reverse('home')))
+    return render(request, 'accounts/register.html', {'next': _safe_next_url(request, '')})
 
 @csrf_protect
 def login_view(request):
@@ -90,7 +96,7 @@ def commercial_login_view(request):
 def _login_response(request, template_name):
     show_logo = request.session.pop('show_logo', True)
     error_message = None
-    redirect_to = request.POST.get('next') or request.GET.get('next') or reverse('logged_home')
+    redirect_to = request.POST.get('next') or request.GET.get('next') or reverse('home')
     if request.method == 'POST':
         username_or_email = request.POST.get('username', '').strip()
         password = request.POST.get('password')
@@ -109,7 +115,14 @@ def _login_response(request, template_name):
             return redirect(redirect_to)
         else:
             error_message = _('Credenciales incorrectas')
-    return render(request, template_name, {'error_message': error_message, 'show_logo': show_logo, 'next': redirect_to})
+    # Aviso solo cuando el login viene de intentar pagar.
+    checkout_notice = redirect_to.startswith(reverse('orders:checkout'))
+    return render(request, template_name, {
+        'error_message': error_message,
+        'show_logo': show_logo,
+        'next': redirect_to,
+        'checkout_notice': checkout_notice,
+    })
 
 @login_required
 def edit_profile(request):
@@ -178,7 +191,7 @@ def edit_profile(request):
             if is_ajax:
                 return JsonResponse({'ok': True, 'message': 'No se realizaron cambios.'})
             messages.info(request, 'No se realizaron cambios.')
-        return redirect('logged_home')
+        return redirect('home')
     from orders.colombia_data import MUNICIPIOS_POR_DEPARTAMENTO
 
     direcciones = user.addresses.all()

@@ -1,5 +1,5 @@
 import re
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 from django import forms
 from django.contrib.auth.models import Group, Permission
@@ -123,10 +123,21 @@ class ProductVariantForm(forms.ModelForm):
     price_override = COPPriceField(
         label="Precio propio", required=False,
     )
+    # El descuento se puede dar como valor a pagar o como porcentaje. Solo
+    # el valor se guarda (`discount_price`): el porcentaje es una forma de
+    # calcularlo sobre el precio normal, no un segundo dato que pudiera
+    # quedar desincronizado.
+    discount_price = COPPriceField(
+        label="Precio con descuento", required=False,
+    )
+    discount_percent = forms.IntegerField(
+        label="% desc.", min_value=1, max_value=99, required=False,
+        widget=forms.NumberInput(attrs={"inputmode": "numeric", "min": 1, "max": 99}),
+    )
 
     class Meta:
         model = ProductVariant
-        fields = ["size", "color", "price_override", "is_active"]
+        fields = ["size", "color", "price_override", "discount_price", "is_active"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -135,6 +146,43 @@ class ProductVariantForm(forms.ModelForm):
                 self.fields["quantity_available"].initial = self.instance.inventory.quantity_available
             except Inventory.DoesNotExist:
                 self.fields["quantity_available"].initial = 0
+
+    def _list_price(self, override):
+        """Precio normal contra el que se calcula o valida el descuento."""
+        if override is not None:
+            return override
+        producto = self.instance.product if self.instance.product_id else None
+        return producto.base_price if producto else None
+
+    def clean(self):
+        cleaned = super().clean()
+        precio = cleaned.get("discount_price")
+        porcentaje = cleaned.get("discount_percent")
+        if "discount_price" in self.errors or "discount_percent" in self.errors:
+            return cleaned
+
+        lista = self._list_price(cleaned.get("price_override"))
+
+        # Un porcentaje escrito gana sobre un precio que no se toco (el que
+        # la fila ya traia guardado); si se tocaron los dos, no se sabe cual
+        # quiere el admin y se le pide elegir.
+        precio_editado = "discount_price" in self.changed_data
+        if porcentaje and precio and precio_editado:
+            raise forms.ValidationError(
+                "Indica el precio con descuento o el porcentaje, no los dos."
+            )
+        if porcentaje:
+            if lista is None:
+                raise forms.ValidationError("No se pudo calcular el descuento sin un precio base.")
+            precio = (lista * (100 - porcentaje) / 100).to_integral_value(rounding=ROUND_HALF_UP)
+            cleaned["discount_price"] = precio
+
+        if precio is not None and lista is not None and precio >= lista:
+            self.add_error(
+                "discount_price",
+                "El precio con descuento debe ser menor al precio normal.",
+            )
+        return cleaned
 
     def save_with_inventory(self, product, user=None):
         """Guarda la variante y su stock en la misma operacion.

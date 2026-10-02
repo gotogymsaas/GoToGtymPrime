@@ -608,6 +608,43 @@ picture source {
   gap: var(--space-1);
 }
 
+.gtg-auth-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: var(--space-1);
+}
+
+.gtg-auth-links a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.gtg-auth-links__login {
+  color: var(--color-text-primary);
+}
+
+.gtg-auth-links__login:hover {
+  color: var(--color-accent);
+}
+
+.gtg-auth-links__signup {
+  color: var(--color-zafiro);
+  background: var(--color-gold, #d4b46a);
+}
+
+.gtg-auth-links__signup:hover {
+  filter: brightness(1.08);
+}
+
 .gtg-icon-button,
 .gtg-menu-toggle {
   position: relative;
@@ -1337,6 +1374,12 @@ picture source {
   }
 }
 
+@media (max-width: 900px) {
+  .gtg-auth-links {
+    display: none;
+  }
+}
+
 @media (max-width: 560px) {
   .gtg-brand {
     font-size: 18px;
@@ -1360,4 +1403,39 @@ picture source {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Precio con descuento: el normal tachado y atenuado, el vigente es el que
+ * se cobra. Hereda el color del contexto (tarjetas claras, ficha oscura). */
+.price-compare {
+  margin-right: 0.15em;
+  font-size: 0.82em;
+  font-weight: 400;
+  opacity: 0.6;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.price-current {
+  font-weight: inherit;
+}
+
+.price-badge {
+  display: inline-block;
+  padding: 0.12em 0.5em;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--color-gold, #d4b46a);
+  color: #101012;
+  font-size: 0.68em;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Un importe ("$1.372.000 COP") no se parte en dos lineas. */
+.price-amount,
+.price-compare,
+.price-current {
+  white-space: nowrap;
 }

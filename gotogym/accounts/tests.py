@@ -109,3 +109,29 @@ class LogoutRedirectTests(TestCase):
 	def test_logout_ignora_un_next_hacia_otro_dominio(self):
 		response = self.client.post(reverse('logout'), {'next': 'https://evil.example.com/'})
 		self.assertRedirects(response, reverse('home'), fetch_redirect_response=False)
+
+
+class RegistroDuranteLaCompraTests(TestCase):
+	DATOS = {
+		'first_name': 'Ana', 'last_name': 'Prueba', 'age': '30',
+		'email': 'nueva@example.com', 'password1': 'secret12345', 'password2': 'secret12345',
+		'accepted_terms': 'on',
+	}
+
+	def test_registro_inicia_sesion_y_sigue_al_destino(self):
+		destino = reverse('orders:checkout')
+		response = self.client.post(reverse('register'), {**self.DATOS, 'next': destino})
+		self.assertRedirects(response, destino, fetch_redirect_response=False)
+		self.assertIn('_auth_user_id', self.client.session)
+
+	def test_registro_sin_next_va_a_la_home(self):
+		response = self.client.post(reverse('register'), self.DATOS)
+		self.assertRedirects(response, reverse('home'), fetch_redirect_response=False)
+
+	def test_registro_ignora_un_next_hacia_otro_dominio(self):
+		response = self.client.post(reverse('register'), {**self.DATOS, 'next': 'https://evil.example.com/'})
+		self.assertRedirects(response, reverse('home'), fetch_redirect_response=False)
+
+	def test_login_desde_checkout_muestra_aviso(self):
+		response = self.client.get(reverse('commercial_login'), {'next': reverse('orders:checkout')})
+		self.assertContains(response, 'Tu carrito se conserva')

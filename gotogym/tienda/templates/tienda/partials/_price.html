@@ -3,4 +3,8 @@ Formatea un precio o rango de precios en pesos colombianos. Parametros:
   price_min - monto minimo (obligatorio)
   price_max - monto maximo (opcional, junto con has_range)
   has_range - si es verdadero, muestra "price_min - price_max"
-{% endcomment %}${{ price_min|cop }}{% if has_range %} – ${{ price_max|cop }}{% endif %} COP
+  compare_price    - precio normal (opcional). Si viene, se muestra tachado y
+                     price_min/price_max pasan a ser el precio vigente con
+                     descuento.
+  discount_percent - porcentaje de descuento (opcional, junto con compare_price)
+{% endcomment %}{% if compare_price %}<s class="price-compare">${{ compare_price|cop }}</s> <span class="price-current">${{ price_min|cop }}{% if has_range %} – ${{ price_max|cop }}{% endif %} COP</span>{% if discount_percent %} <span class="price-badge">-{{ discount_percent }}%</span>{% endif %}{% else %}${{ price_min|cop }}{% if has_range %} – ${{ price_max|cop }}{% endif %} COP{% endif %}

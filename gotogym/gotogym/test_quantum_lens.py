@@ -37,7 +37,7 @@ class QuantumLensTests(TestCase):
 
     def _paginas_comerciales(self):
         return [
-            reverse('logged_home'),
+            reverse('home'),
             reverse('tienda:producto_list'),
             reverse('tienda:producto_detail', args=[self.product.pk]),
         ]
@@ -72,22 +72,20 @@ class QuantumLensTests(TestCase):
         self.assertNotIn('data-quantum-lens', html)
         self.assertNotIn('quantum_lens.css', html)
 
-    def test_la_entrada_publica_conserva_sus_orbitas_y_no_carga_la_lente(self):
-        # .quantum-field (orbitas, home_figma.css) y .quantum-lens son dos
-        # componentes distintos. Si la entrada llegara a cargar la hoja de
-        # la lente, sus orbitas heredarian position/transform y se romperia.
+    def test_la_pantalla_de_bienvenida_anterior_ya_no_se_sirve(self):
+        # La entrada publica con orbitas (home.html) quedo fuera de servicio:
+        # `/` es la portada con catalogo, tambien para visitantes.
         html = self.client.get(reverse('home')).content.decode()
 
-        self.assertIn('class="quantum-field"', html)
-        self.assertNotIn('quantum_lens.css', html)
-        self.assertNotIn('quantum-lens', html)
+        self.assertNotIn('figma-home', html)
+        self.assertNotIn('class="quantum-field"', html)
 
     def test_la_franja_de_interferencia_ya_no_se_muestra_en_el_home(self):
         # La franja decorativa (.quantum-fringe--story) se probo y se
         # retiro del Home: quedaba como una banda de color ajena al resto
         # de la pagina en vez de leerse como transicion editorial.
         self.client.force_login(self.user)
-        html = self.client.get(reverse('logged_home')).content.decode()
+        html = self.client.get(reverse('home')).content.decode()
 
         self.assertNotIn('quantum-fringe', html)
 

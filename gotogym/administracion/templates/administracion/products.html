@@ -41,7 +41,7 @@
             {% for tag in product.tags.all %}<span class="badge badge-{{ tag.color_token }}">{{ tag.name }}</span>{% endfor %}
           </div>
         </td>
-        <td>${{ product.base_price|cop }} COP</td>
+        <td class="nowrap">${{ product.base_price|cop }} COP</td>
         <td class="{% if not product.real_stock %}stock-out{% elif product.real_stock <= 5 %}stock-low{% endif %} stock-value">{{ product.real_stock|default:0 }}</td>
         <td>
           {% if not product.variant_count %}

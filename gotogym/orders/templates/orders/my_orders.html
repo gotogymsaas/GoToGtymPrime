@@ -26,7 +26,7 @@
   {% if not orders and recommended_cards %}
   <section class="editorial-section">
     <div class="editorial-shell"><p class="editorial-kicker">Selección GoToGym</p><h2>Un buen lugar para empezar.</h2><div class="recommendation-grid">
-      {% for card in recommended_cards %}<article class="recommendation-card"><a href="{% url 'tienda:producto_detail' card.product.pk %}"><img src="{% url_imagen_producto card.image.name %}" alt="{{ card.product.name }}" loading="lazy"></a><div><h3><a href="{% url 'tienda:producto_detail' card.product.pk %}">{{ card.product.name }}</a></h3><strong>{% include 'tienda/partials/_price.html' with price_min=card.price_min price_max=card.price_max has_range=card.has_price_range %}</strong></div></article>{% endfor %}
+      {% for card in recommended_cards %}<article class="recommendation-card"><a href="{% url 'tienda:producto_detail' card.product.pk %}"><img src="{% url_imagen_producto card.image.name %}" alt="{{ card.product.name }}" loading="lazy"></a><div><h3><a href="{% url 'tienda:producto_detail' card.product.pk %}">{{ card.product.name }}</a></h3><strong>{% include 'tienda/partials/_price.html' with price_min=card.price_min price_max=card.price_max has_range=card.has_price_range compare_price=card.compare_price discount_percent=card.discount_percent %}</strong></div></article>{% endfor %}
     </div></div>
   </section>
   {% endif %}

@@ -93,7 +93,7 @@
       {% for commission in commissions %}
       <tr>
         <td><a href="{% url 'admin_order_detail' commission.order.order_number %}">{{ commission.order.order_number }}</a></td>
-        <td>${{ commission.amount|cop }} COP</td>
+        <td class="nowrap">${{ commission.amount|cop }} COP</td>
         <td>{{ commission.get_status_display }}</td>
         <td><small>{{ commission.created_at|date:"d/m/Y" }}</small></td>
       </tr>
@@ -109,7 +109,7 @@
     <tbody>
       {% for withdrawal in withdrawal_requests %}
       <tr>
-        <td>${{ withdrawal.amount|cop }} COP</td>
+        <td class="nowrap">${{ withdrawal.amount|cop }} COP</td>
         <td>{{ withdrawal.get_status_display }}</td>
         <td><small>{{ withdrawal.requested_at|date:"d/m/Y" }}</small></td>
         <td><small>{{ withdrawal.resolved_at|date:"d/m/Y"|default:"—" }}</small></td>

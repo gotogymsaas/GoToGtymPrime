@@ -140,14 +140,23 @@ def build_product_card(product):
     variants = [v for v in product.variants.all() if v.is_active]
     disponibles = [v for v in variants if variant_stock(v) > 0]
 
-    precios = [v.effective_price for v in variants] or [product.base_price]
+    # La tarjeta muestra un solo precio: el menor entre las variantes que se
+    # pueden comprar (o entre todas, si ninguna tiene stock). Es la misma
+    # variante que la ficha deja preseleccionada, y el precio tachado es el
+    # normal de esa variante.
+    candidatas = disponibles or variants
+    mas_barata = min(candidatas, key=lambda v: v.effective_price) if candidatas else None
+    precio = mas_barata.effective_price if mas_barata else product.base_price
+    con_descuento = mas_barata is not None and mas_barata.has_discount
 
     return {
         'product': product,
         'image': primary_image(product),
-        'price_min': min(precios),
-        'price_max': max(precios),
-        'has_price_range': min(precios) != max(precios),
+        'price_min': precio,
+        'price_max': precio,
+        'has_price_range': False,
+        'compare_price': mas_barata.list_price if con_descuento else None,
+        'discount_percent': mas_barata.discount_percent if con_descuento else 0,
         'sizes': sorted({v.size for v in disponibles}, key=size_sort_key),
         'colors': sorted({v.color for v in disponibles}),
         'in_stock': bool(disponibles),
@@ -207,6 +216,9 @@ def build_variant_matrix(product):
             'size': variant.size,
             'color': variant.color,
             'price': variant.effective_price,
+            'list_price': variant.list_price,
+            'has_discount': variant.has_discount,
+            'discount_percent': variant.discount_percent,
             'available': stock > 0,
             'stock': stock,
         })

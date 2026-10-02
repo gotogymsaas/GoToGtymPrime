@@ -7,20 +7,12 @@ from tienda.catalog import curated_product_cards
 
 
 def home(request):
-    # La home publica es la puerta de entrada para visitantes. Con sesion
-    # activa no aporta nada (sus unicas acciones son iniciar sesion y crear
-    # cuenta), asi que se redirige a la home de sesion. Resolverlo aqui y no
-    # en cada plantilla cubre tambien el logo, el menu movil y una URL
-    # escrita a mano.
-    if request.user.is_authenticated:
-        return redirect('logged_home')
-    return render(request, 'home.html')
-
-@login_required
-def logged_home(request):
-    # El Home utiliza la misma fuente de verdad del catalogo que la PLP. De
-    # este modo precio, variantes, imagen y disponibilidad no divergen entre
-    # la portada y la tienda, y las relaciones se resuelven sin consultas N+1.
+    # Portada unica para visitantes y compradores: el catalogo y el blog se
+    # pueden explorar sin cuenta, y el login se pide solo al comprar o al
+    # entrar a un panel. Usa la misma fuente de verdad del catalogo que la
+    # PLP, de modo que precio, variantes, imagen y disponibilidad no divergen
+    # entre la portada y la tienda, y las relaciones se resuelven sin
+    # consultas N+1.
     context = {
         'featured_cards': curated_product_cards(limit=4),
         'latest_posts': (
@@ -57,10 +49,7 @@ def acerca_de(request):
 
 
 def contacto(request):
-    back_url = reverse('home')
-    if request.GET.get('next') == 'logged_home' and request.user.is_authenticated:
-        back_url = reverse('logged_home')
-    return render(request, 'static_pages/contacto.html', {'back_url': back_url})
+    return render(request, 'static_pages/contacto.html', {'back_url': reverse('home')})
 
 
 @login_required
@@ -87,7 +76,7 @@ def politica_privacidad(request):
 def terminos(request):
     return render(request, 'static_pages/terms_page.html', {
         'policy_key': 'terms',
-        'back_url': reverse('logged_home') if request.user.is_authenticated else reverse('home'),
+        'back_url': reverse('home'),
     })
 
 
@@ -100,7 +89,7 @@ def _policy_page(request, title, paragraphs, *, policy_key='', summary='', provi
         'summary': summary,
         'provisional': provisional,
         'sections': [{'title': 'Lo que debes saber', 'paragraphs': paragraphs}],
-        'back_url': reverse('logged_home') if request.user.is_authenticated else reverse('home'),
+        'back_url': reverse('home'),
     })
 
 

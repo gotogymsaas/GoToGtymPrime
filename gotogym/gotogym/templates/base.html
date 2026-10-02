@@ -25,7 +25,7 @@
   hay: al editar style.css o tokens.css hay que subirlo o el navegador
   seguira sirviendo la copia vieja.
   {% endcomment %}
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260926-token-h1">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261002-importes">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
   {% block extra_head %}{% endblock %}
   {% comment %}
@@ -142,6 +142,11 @@
           </form>
         </div>
       </div>
+      {% else %}
+      <div class="gtg-auth-links">
+        <a class="gtg-auth-links__login" href="{% url 'commercial_login' %}?next={{ request.get_full_path|urlencode }}">{% trans "Iniciar sesión" %}</a>
+        <a class="gtg-auth-links__signup" href="{% url 'register' %}?next={{ request.get_full_path|urlencode }}">{% trans "Crear cuenta" %}</a>
+      </div>
       {% endif %}
     </div>
   </div>
@@ -186,6 +191,10 @@
       {% csrf_token %}
       <button type="submit">{% trans "Cerrar sesion" %}</button>
     </form>
+    {% else %}
+    <span class="gtg-mobile-menu__divider"></span>
+    <a href="{% url 'commercial_login' %}?next={{ request.get_full_path|urlencode }}">{% trans "Iniciar sesión" %}</a>
+    <a href="{% url 'register' %}?next={{ request.get_full_path|urlencode }}">{% trans "Crear cuenta" %}</a>
     {% endif %}
   </div>
 </nav>

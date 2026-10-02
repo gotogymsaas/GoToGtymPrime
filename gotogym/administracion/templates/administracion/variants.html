@@ -55,7 +55,10 @@
         <td>{{ variant.product.name }}</td>
         <td>{{ variant.size }}</td>
         <td>{{ variant.color }}</td>
-        <td>${{ variant.effective_price|cop }} COP{% if variant.price_override %} <small>propio</small>{% endif %}</td>
+        <td class="nowrap">
+          {% if variant.has_discount %}<s>${{ variant.list_price|cop }}</s> {% endif %}${{ variant.effective_price|cop }} COP{% if variant.price_override %} <small>propio</small>{% endif %}
+          {% if variant.has_discount %}<small>-{{ variant.discount_percent }}%</small>{% endif %}
+        </td>
         <td class="stock-value {% if not variant.inventory %}empty-img{% elif disponible == 0 %}stock-out{% elif disponible <= low_stock_threshold %}stock-low{% endif %}">
           {% if variant.inventory %}{{ disponible }}{% else %}sin inventario{% endif %}
         </td>

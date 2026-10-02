@@ -33,7 +33,7 @@ seccion 4.4).
     <p class="gtg-product-card__category">{{ card.product.category.name }}</p>
     <h3 class="gtg-product-card__name"><a href="{{ detail_url }}">{{ card.product.name }}</a></h3>
     <div class="gtg-product-card__meta">
-      <strong class="gtg-product-card__price">{% include "tienda/partials/_price.html" with price_min=card.price_min price_max=card.price_max has_range=card.has_price_range %}</strong>
+      <strong class="gtg-product-card__price">{% include "tienda/partials/_price.html" with price_min=card.price_min price_max=card.price_max has_range=card.has_price_range compare_price=card.compare_price discount_percent=card.discount_percent %}</strong>
       {% if card.sizes %}<small class="gtg-product-card__sizes">{{ card.sizes|join:" · " }}</small>{% endif %}
     </div>
   </div>

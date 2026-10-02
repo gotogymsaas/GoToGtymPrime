@@ -59,7 +59,7 @@ class LoggedHomeTests(TestCase):
         self.client.force_login(self.user)
 
     def test_home_renderiza_experiencia_comercial_y_journal(self):
-        response = self.client.get(reverse('logged_home'))
+        response = self.client.get(reverse('home'))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Diseñada para tu')
@@ -80,7 +80,7 @@ class LoggedHomeTests(TestCase):
         self.assertNotContains(response, 'Vincularse como')
 
     def test_home_limita_productos_y_prioriza_destacados(self):
-        response = self.client.get(reverse('logged_home'))
+        response = self.client.get(reverse('home'))
         cards = response.context['featured_cards']
 
         self.assertEqual(len(cards), 4)
@@ -93,19 +93,27 @@ class LoggedHomeTests(TestCase):
         Product.objects.all().delete()
         Post.objects.all().delete()
 
-        response = self.client.get(reverse('logged_home'))
+        response = self.client.get(reverse('home'))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Estamos preparando una selección extraordinaria')
         self.assertContains(response, 'Estamos preparando historias para avanzar')
 
-    def test_home_exige_autenticacion(self):
+    def test_home_es_publica(self):
         self.client.logout()
 
-        response = self.client.get(reverse('logged_home'))
+        response = self.client.get(reverse('home'))
 
-        self.assertEqual(response.status_code, 302)
-        self.assertIn(reverse('commercial_login'), response.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Diseñada para tu')
+        self.assertContains(response, self.post.title)
+        self.assertContains(response, reverse('commercial_login'))
+        self.assertContains(response, reverse('register'))
+
+    def test_welcome_redirige_a_la_home(self):
+        response = self.client.get('/es/welcome/')
+
+        self.assertRedirects(response, reverse('home'), status_code=301, fetch_redirect_response=False)
 
     def test_imagenes_editoriales_reutilizan_archivos_media_existentes(self):
         image_names = [

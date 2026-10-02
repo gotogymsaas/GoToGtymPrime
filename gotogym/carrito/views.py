@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
@@ -36,7 +35,6 @@ def _responder(request, error=None, cart=None):
     return redirect('carrito:cart_detail')
 
 
-@login_required
 @require_POST
 @rate_limit('add_to_cart', limit=30, period_seconds=60)
 def add_to_cart(request, variant_id):
@@ -59,7 +57,6 @@ def add_to_cart(request, variant_id):
     return _responder(request, cart=cart)
 
 
-@login_required
 @require_POST
 def remove_from_cart(request, variant_id):
     cart = _get_cart(request)
@@ -68,7 +65,6 @@ def remove_from_cart(request, variant_id):
     return _responder(request, cart=cart)
 
 
-@login_required
 @require_POST
 def update_cart(request, variant_id):
     variante = get_object_or_404(ProductVariant, pk=variant_id, is_active=True)
@@ -93,7 +89,6 @@ def update_cart(request, variant_id):
     return _responder(request, cart=cart)
 
 
-@login_required
 def cart_detail(request):
     cart = _get_cart(request)
     return render(request, 'carrito/cart_detail.html', build_cart_context(cart))

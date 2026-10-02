@@ -173,7 +173,7 @@ class PrecioDeTarjetaTests(TiendaAutenticadaMixin, TestCase):
         self.assertFalse(card['has_price_range'])
         self.assertEqual(card['price_min'], Decimal('90000.0000'))
 
-    def test_rango_de_precio_cuando_una_variante_tiene_precio_propio(self):
+    def test_con_precios_distintos_la_tarjeta_muestra_solo_el_menor(self):
         producto = _crear_producto('Precio variable', self.categoria, self.marca, '90000.0000')
         _crear_variante(producto, 'PRE-002-S-NEG', 'S', 'negro', 1)
         variante = _crear_variante(producto, 'PRE-002-L-NEG', 'L', 'negro', 1)
@@ -182,9 +182,22 @@ class PrecioDeTarjetaTests(TiendaAutenticadaMixin, TestCase):
 
         response = self.client.get(reverse('tienda:producto_list'))
         card = next(c for c in response.context['cards'] if c['product'].pk == producto.pk)
-        self.assertTrue(card['has_price_range'])
+        self.assertFalse(card['has_price_range'])
         self.assertEqual(card['price_min'], Decimal('90000.0000'))
-        self.assertEqual(card['price_max'], Decimal('130000.0000'))
+        self.assertNotContains(response, '130.000')
+
+    def test_el_menor_precio_ignora_variantes_agotadas(self):
+        producto = _crear_producto('Precio con agotada', self.categoria, self.marca, '90000.0000')
+        barata = _crear_variante(producto, 'PRE-003-S-NEG', 'S', 'negro', 0)
+        cara = _crear_variante(producto, 'PRE-003-L-NEG', 'L', 'negro', 2)
+        barata.price_override = Decimal('70000.0000')
+        barata.save(update_fields=['price_override'])
+        cara.price_override = Decimal('110000.0000')
+        cara.save(update_fields=['price_override'])
+
+        response = self.client.get(reverse('tienda:producto_list'))
+        card = next(c for c in response.context['cards'] if c['product'].pk == producto.pk)
+        self.assertEqual(card['price_min'], Decimal('110000.0000'))
 
 
 class ImagenDeTarjetaTests(TiendaAutenticadaMixin, TestCase):

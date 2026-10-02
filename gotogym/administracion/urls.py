@@ -46,8 +46,12 @@ urlpatterns = [
     path("afiliados/<int:pk>/eliminar/", views.influencer_delete, name="admin_influencer_delete"),
     path("retiros/", views.withdrawals_list, name="admin_withdrawals"),
     path("retiros/<int:pk>/resolver/", views.withdrawal_resolve, name="admin_withdrawal_resolve"),
-    path("grupos/", views.groups_list, name="admin_groups"),
-    path("grupos/nuevo/", views.group_edit, name="admin_group_new"),
-    path("grupos/<int:pk>/editar/", views.group_edit, name="admin_group_edit"),
-    path("grupos/<int:pk>/eliminar/", views.group_delete, name="admin_group_delete"),
+    # "Grupos y permisos" esta deshabilitado: sin rutas ni enlace. Las vistas
+    # y plantillas (groups_list, group_edit, group_delete) siguen en el
+    # codigo; para reactivarlo basta con restaurar estas cuatro rutas y el
+    # enlace del menu.
+    # path("grupos/", views.groups_list, name="admin_groups"),
+    # path("grupos/nuevo/", views.group_edit, name="admin_group_new"),
+    # path("grupos/<int:pk>/editar/", views.group_edit, name="admin_group_edit"),
+    # path("grupos/<int:pk>/eliminar/", views.group_delete, name="admin_group_delete"),
 ]

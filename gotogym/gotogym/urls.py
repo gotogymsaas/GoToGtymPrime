@@ -22,6 +22,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.shortcuts import redirect
 from django.urls import include, path
+from django.views.generic import RedirectView
 from django.views.i18n import set_language
 from django.views.static import serve
 from payments import views as payments_views
@@ -44,7 +45,8 @@ urlpatterns = [
 
 urlpatterns += i18n_patterns(
     path('', views.home, name='home'),
-    path('welcome/', views.logged_home, name='logged_home'),
+    # Alias de la antigua portada con sesion: ahora es la misma de '/'.
+    path('welcome/', RedirectView.as_view(pattern_name='home', permanent=True), name='logged_home'),
     path('tecnologia/', views.tecnologia, name='tecnologia'),
     path('pedidos/', views.pedidos, name='pedidos'),
     path('bienestar/', views.bienestar, name='bienestar'),

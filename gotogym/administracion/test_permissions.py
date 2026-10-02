@@ -132,66 +132,25 @@ class RolIntermedioViaGrupoTests(TestCase):
         self.assertIn(self.grupo, objetivo.groups.all())
 
 
-class GruposYPermisosAdminTests(TestCase):
+class GruposYPermisosDeshabilitadoTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         User = get_user_model()
         cls.admin = User.objects.create_user(
             email='admin-grupos2@example.com', username='admin-grupos2@example.com',
-            password='secret123', is_staff=True,
+            password='secret123', is_staff=True, is_superuser=True,
         )
 
     def setUp(self):
         self.client.force_login(self.admin)
 
-    # "Grupos y permisos" ya no tiene enlace en la navegacion del panel
-    # (retirado temporalmente de la interfaz), pero sus rutas y vistas
-    # siguen activas -- por eso estas pruebas todavia pasan por
-    # `reverse()` normal, no por acceso directo a la vista.
+    def test_las_rutas_de_grupos_ya_no_existen(self):
+        for ruta in ('/es/admin-panel/grupos/', '/es/admin-panel/grupos/nuevo/'):
+            self.assertEqual(self.client.get(ruta).status_code, 404, ruta)
 
-    def test_crea_grupo_con_permisos(self):
-        permiso = Permission.objects.get(content_type__app_label='orders', codename='add_coupon')
-        respuesta = self.client.post(reverse('admin_group_new'), {
-            'name': 'Marketing', 'permissions': [permiso.pk],
-        })
-        self.assertRedirects(respuesta, reverse('admin_groups'))
-        grupo = Group.objects.get(name='Marketing')
-        self.assertIn(permiso, grupo.permissions.all())
-
-    def test_solo_ofrece_el_catalogo_curado_de_permisos(self):
-        respuesta = self.client.get(reverse('admin_group_new'))
-        opciones = respuesta.context['form'].fields['permissions'].queryset
-        self.assertEqual(set(opciones), set(admin_permission_queryset()))
-
-    def test_elimina_grupo(self):
-        grupo = Group.objects.create(name='Temporal')
-        self.client.post(reverse('admin_group_delete', args=[grupo.pk]))
-        self.assertFalse(Group.objects.filter(pk=grupo.pk).exists())
-
-    def test_staff_con_rol_intermedio_no_puede_crear_grupos(self):
-        # Un staff con un Grupo acotado (rol intermedio) no se auto-sana a
-        # permisos completos: si su grupo no incluye auth.add_group, no
-        # puede crear otros grupos.
-        User = get_user_model()
-        staff_acotado = User.objects.create_user(
-            email='staff-acotado@example.com', username='staff-acotado@example.com',
-            password='secret123', is_staff=True,
-        )
-        grupo_limitado = Group.objects.create(name='Solo cupones')
-        grupo_limitado.permissions.add(
-            Permission.objects.get(content_type__app_label='orders', codename='add_coupon'),
-        )
-        staff_acotado.groups.add(grupo_limitado)
-        self.client.force_login(staff_acotado)
-
-        respuesta = self.client.post(reverse('admin_group_new'), {'name': 'Hackeo', 'permissions': []})
-        self.assertEqual(respuesta.status_code, 302)
-        self.assertFalse(Group.objects.filter(name='Hackeo').exists())
-        # Pero si puede seguir usando lo que su grupo si cubre.
-        respuesta_cupon = self.client.post(reverse('admin_coupon_new'), {
-            'code': 'ACOTADO', 'discount_type': 'percentage', 'value': '5',
-        })
-        self.assertRedirects(respuesta_cupon, reverse('admin_coupons'))
+    def test_el_menu_del_panel_no_ofrece_grupos_y_permisos(self):
+        respuesta = self.client.get(reverse('admin_dashboard'))
+        self.assertNotContains(respuesta, 'Grupos y permisos')
 
 
 class ConfiguracionDelPanelTests(TestCase):
