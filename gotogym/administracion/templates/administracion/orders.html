@@ -9,13 +9,13 @@
 </section>
 <form class="search" method="get">
   <input name="q" value="{{ query }}" placeholder="Buscar por numero, correo o referencia de pago">
-  <select name="order_status">
+  <select name="order_status" aria-label="Estado del pedido">
     <option value="">Todos los estados</option>
     {% for value, label in order_status_choices %}
     <option value="{{ value }}" {% if order_status == value %}selected{% endif %}>{{ label }}</option>
     {% endfor %}
   </select>
-  <select name="payment_status">
+  <select name="payment_status" aria-label="Estado del pago">
     <option value="">Todos los pagos</option>
     {% for value, label in payment_status_choices %}
     <option value="{{ value }}" {% if payment_status == value %}selected{% endif %}>{{ label }}</option>
@@ -25,7 +25,7 @@
 </form>
 <div class="panel">
   <table>
-    <thead><tr><th>Pedido</th><th>Fecha</th><th>Cliente</th><th>Estado</th><th>Pago</th><th>Referencia de pago</th><th>Total</th><th></th></tr></thead>
+    <thead><tr><th>Pedido</th><th>Fecha</th><th>Cliente</th><th>Estado</th><th>Pago</th><th>Referencia de pago</th><th>Total</th><th><span class="sr-only">Acciones</span></th></tr></thead>
     <tbody>
       {% for order in page_obj %}
       <tr>

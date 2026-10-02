@@ -25,6 +25,10 @@
   <h2>Necesita tu atencion</h2>
 </section>
 <section class="stats stats-secondary">
+  <article class="{% if anuladas.por_devolver_pedidos %}stat-danger{% else %}is-green{% endif %}">
+    <span>{{ anuladas.por_devolver_pedidos }}</span>
+    <p>Pedidos pagados y anulados sin reembolso{% if anuladas.por_devolver_monto %} (${{ anuladas.por_devolver_monto|cop }} COP){% endif %}</p>
+  </article>
   <article class="{% if pending_influencer_count %}is-gold stat-warning{% else %}is-green{% endif %}">
     <a href="{% url 'admin_influencers' %}?status=pending"><span>{{ pending_influencer_count }}</span><p>Solicitudes de afiliado</p></a>
   </article>
@@ -38,6 +42,7 @@
 {% if bajo_stock %}
 <div class="panel">
   <h2>Stock bajo &mdash; reabastecer pronto</h2>
+  <p class="hint">Umbral actual: {{ low_stock_threshold }} unidades. Para saber cuanto dura el stock segun lo que se vende, mira la <a href="{% url 'admin_analytics' %}#inventario">cobertura de inventario</a>.</p>
   <table>
     <thead><tr><th>Producto</th><th>SKU</th><th>Talla/Color</th><th>Disponible</th></tr></thead>
     <tbody>
@@ -56,37 +61,62 @@
 
 <section class="page-head">
   <div>
-    <h2>Ventas y comisiones</h2>
+    <h2>Ventas</h2>
+    <p class="hint">Venta valida: pago aprobado y pedido no cancelado ni devuelto. Comparado con el periodo anterior ({{ desde_anterior|date:"d/m/Y" }} a {{ hasta_anterior|date:"d/m/Y" }}).</p>
   </div>
   <form class="date-filter" method="get">
     <label>Desde <input type="date" name="desde" value="{{ desde|date:'Y-m-d' }}"></label>
     <label>Hasta <input type="date" name="hasta" value="{{ hasta|date:'Y-m-d' }}"></label>
     <button type="submit">Filtrar</button>
+    <a class="ghost btn-sm" href="{% url 'admin_export_orders' %}?desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">Exportar CSV</a>
   </form>
 </section>
 <section class="stats">
-  <article><span>{{ resumen.pedidos|default:0 }}</span><p>Pedidos pagados</p></article>
-  <article><span>${{ resumen.ingresos|default:0|cop }} COP</span><p>Ingresos totales</p></article>
-  <article><span>${{ resumen.descuentos|default:0|cop }} COP</span><p>Descuentos otorgados</p></article>
-  <article><span>${{ resumen.envio|default:0|cop }} COP</span><p>Envio cobrado</p></article>
+  <article>
+    <span>${{ resumen.neto|cop }} COP</span><p>Ingreso neto</p>
+    {% include "administracion/partials/_delta.html" with valor=comparacion.neto %}
+  </article>
+  <article>
+    <span>{{ resumen.pedidos }}</span><p>Pedidos validos</p>
+    {% include "administracion/partials/_delta.html" with valor=comparacion.pedidos %}
+  </article>
+  <article>
+    <span>${{ resumen.ticket_promedio|cop }} COP</span><p>Ticket promedio</p>
+    {% include "administracion/partials/_delta.html" with valor=comparacion.ticket_promedio %}
+  </article>
+  <article>
+    <span>{{ resumen.unidades_por_pedido }}</span><p>Unidades por pedido ({{ resumen.unidades }} en total)</p>
+    {% include "administracion/partials/_delta.html" with valor=comparacion.unidades %}
+  </article>
+</section>
+<section class="stats stats-secondary">
+  <article><span>${{ resumen.descuentos|cop }} COP</span><p>Descuentos{% if resumen.tasa_descuento is not None %} ({{ resumen.tasa_descuento }} % de la venta bruta){% endif %}</p></article>
+  <article><span>${{ resumen.envio|cop }} COP</span><p>Envio cobrado</p></article>
+  <article><span>${{ resumen.reembolsos|cop }} COP</span><p>Reembolsos parciales</p></article>
+  <article class="{% if anuladas.pedidos %}is-gold{% endif %}"><span>${{ anuladas.monto|cop }} COP</span><p>Ventas anuladas ({{ anuladas.pedidos }} pedidos), no incluidas arriba</p></article>
 </section>
 
 <div class="panel">
-  <h2>Meta de ventas del rango</h2>
-  {% if sales_goal %}
+  <h2>Meta de ventas del mes</h2>
+  {% if meta_mes %}
   <div class="pq-progress" style="margin-bottom: var(--space-3);">
-    <div class="pq-progress__label"><span>${{ resumen.ingresos|default:0|cop }} COP</span><span>Meta: ${{ sales_goal|cop }} COP</span></div>
-    <div class="pq-progress__track"><div class="pq-progress__fill" style="width:{{ sales_goal_percent }}%;"></div></div>
+    <div class="pq-progress__label"><span>${{ meta_mes.acumulado|cop }} COP en el mes</span><span>Meta: ${{ meta_mes.meta|cop }} COP</span></div>
+    <div class="pq-progress__track"><div class="pq-progress__fill" style="width:{{ meta_mes.avance_pct }}%;"></div></div>
   </div>
+  <p class="hint">
+    A hoy deberias llevar ${{ meta_mes.esperado_a_hoy|cop }} COP{% if meta_mes.ritmo_pct is not None %} (vas al {{ meta_mes.ritmo_pct }} % del ritmo){% endif %}.
+    Al ritmo actual cerrarias el mes en ${{ meta_mes.proyeccion|cop }} COP.
+    {% if meta_mes.diario_necesario is not None and meta_mes.diario_necesario > 0 %}Para llegar a la meta necesitas ${{ meta_mes.diario_necesario|cop }} COP por dia durante los {{ meta_mes.dias_restantes }} dias que quedan.{% endif %}
+  </p>
   {% else %}
-  <p class="hint">Define una meta para ver tu progreso de ventas en el rango seleccionado.</p>
+  <p class="hint">Define una meta mensual para ver tu avance, el ritmo esperado y la proyeccion del mes. Se mide siempre sobre el mes en curso, sin importar el rango filtrado arriba.</p>
   {% endif %}
   {% if perms.administracion.change_panelsettings %}
   <form method="post" action="{% url 'admin_sales_goal_update' %}" style="display:flex; align-items:center; gap: var(--space-3); flex-wrap: wrap;">
     {% csrf_token %}
     <input type="hidden" name="next" value="{{ request.get_full_path }}">
-    <label class="check">
-      <span>Meta de ventas (COP)</span>
+    <label class="goal-field">
+      <span>Meta mensual de ventas (COP)</span>
       {{ sales_goal_form.monthly_sales_goal }}
     </label>
     <button class="ghost btn-sm" type="submit">Guardar</button>
@@ -98,39 +128,78 @@
   <article><span>${{ comisiones.pendiente|default:0|cop }} COP</span><p>Comisiones pendientes</p></article>
   <article><span>${{ comisiones.aprobada|default:0|cop }} COP</span><p>Comisiones aprobadas</p></article>
   <article><span>${{ comisiones.pagada|default:0|cop }} COP</span><p>Comisiones pagadas</p></article>
+  <article><span>{% if comision_sobre_ventas_afiliados is not None %}{{ comision_sobre_ventas_afiliados }} %{% else %}&mdash;{% endif %}</span><p>Comision sobre ventas de afiliados</p></article>
 </section>
 
 <section class="grid-two">
   <div class="panel">
     <h2>Ventas por dia</h2>
     <table>
-      <thead><tr><th>Fecha</th><th>Pedidos</th><th>Total</th></tr></thead>
+      <thead><tr><th>Fecha</th><th>Pedidos</th><th>Total</th><th><span class="sr-only">Proporcion respecto al mejor dia</span></th></tr></thead>
       <tbody>
-        {% for fila in ventas_por_dia %}
+        {% for fila in serie_diaria %}
         <tr>
           <td>{{ fila.dia|date:"d/m/Y" }}</td>
           <td>{{ fila.pedidos }}</td>
-          <td class="nowrap">${{ fila.total|cop }} COP</td>
+          <td class="nowrap">${{ fila.ventas|cop }} COP</td>
+          <td style="min-width:90px;"><div class="pq-progress__track"><div class="pq-progress__fill" style="width:{{ fila.relativo }}%;"></div></div></td>
         </tr>
-        {% empty %}<tr><td colspan="3">Sin ventas en este rango.</td></tr>{% endfor %}
+        {% endfor %}
+        {% if not resumen.pedidos %}<tr><td colspan="4">Sin ventas en este rango.</td></tr>{% endif %}
       </tbody>
     </table>
   </div>
   <div class="panel">
-    <h2>Productos mas vendidos</h2>
+    <h2>Productos con mas ingresos</h2>
     <table>
-      <thead><tr><th>Producto</th><th>SKU</th><th>Unidades</th><th>Ingresos</th></tr></thead>
+      <thead><tr><th>Producto</th><th>Unid.</th><th>Ingresos</th><th>% del total</th></tr></thead>
       <tbody>
         {% for fila in productos_top %}
         <tr>
-          <td>{{ fila.product_name_snapshot }}</td>
-          <td>{{ fila.sku_snapshot }}</td>
+          <td>{{ fila.producto }}</td>
           <td>{{ fila.unidades }}</td>
           <td class="nowrap">${{ fila.ingresos|cop }} COP</td>
+          <td>{{ fila.participacion|default_if_none:"-" }}{% if fila.participacion is not None %} %{% endif %}</td>
         </tr>
         {% empty %}<tr><td colspan="4">Sin ventas en este rango.</td></tr>{% endfor %}
       </tbody>
     </table>
+  </div>
+</section>
+
+<section class="grid-two">
+  <div class="panel">
+    <h2>Ventas por categoria</h2>
+    <table>
+      <thead><tr><th>Categoria</th><th>Unid.</th><th>Ingresos</th><th>% del total</th></tr></thead>
+      <tbody>
+        {% for fila in categorias %}
+        <tr>
+          <td>{{ fila.categoria }}</td>
+          <td>{{ fila.unidades }}</td>
+          <td class="nowrap">${{ fila.ingresos|cop }} COP</td>
+          <td>{{ fila.participacion|default_if_none:"-" }}{% if fila.participacion is not None %} %{% endif %}</td>
+        </tr>
+        {% empty %}<tr><td colspan="4">Sin ventas en este rango.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="panel">
+    <h2>De donde viene la venta</h2>
+    <table>
+      <thead><tr><th>Origen</th><th>Pedidos</th><th>Ventas</th><th>%</th></tr></thead>
+      <tbody>
+        {% for fila in canales %}
+        <tr>
+          <td>{{ fila.canal }}</td>
+          <td>{{ fila.pedidos }}</td>
+          <td class="nowrap">${{ fila.ventas|cop }} COP</td>
+          <td>{{ fila.participacion|default_if_none:"-" }}{% if fila.participacion is not None %} %{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="hint">Mas detalle del comportamiento (embudo, busquedas, clientes y cupones) en <a href="{% url 'admin_analytics' %}">Analitica</a>.</p>
   </div>
 </section>
 {% endblock %}

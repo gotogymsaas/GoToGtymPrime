@@ -323,6 +323,36 @@ class VistaDeCheckoutTests(CheckoutBaseTestCase):
         self.assertContains(response, '3009876543')
         self.assertContains(response, 'Carrera 50 # 10-20')
 
+    def test_precarga_el_telefono_del_perfil(self):
+        get_user_model().objects.filter(pk=self.usuario.pk).update(phone='3151112233')
+        self._poner_en_carrito({str(self.variante.pk): 1})
+
+        response = self.client.get(self._url())
+
+        self.assertEqual(response.context['form'].initial['phone'], '3151112233')
+        self.assertContains(response, '3151112233')
+
+    def test_el_telefono_del_perfil_gana_sobre_el_de_la_direccion(self):
+        from accounts.models import CustomerAddress
+
+        get_user_model().objects.filter(pk=self.usuario.pk).update(phone='3151112233')
+        CustomerAddress.objects.create(
+            user=self.usuario, is_default=True, full_name='Ana Marin', phone='3009876543',
+            country='Colombia', department='Antioquia', city='Medellín',
+            address_line='Carrera 50 # 10-20',
+        )
+        self._poner_en_carrito({str(self.variante.pk): 1})
+
+        response = self.client.get(self._url())
+
+        self.assertEqual(response.context['form'].initial['phone'], '3151112233')
+        self.assertContains(response, 'Carrera 50 # 10-20')
+
+    def test_sin_telefono_en_el_perfil_el_campo_queda_vacio(self):
+        self._poner_en_carrito({str(self.variante.pk): 1})
+        response = self.client.get(self._url())
+        self.assertEqual(response.context['form'].initial['phone'], '')
+
     def test_post_valido_crea_el_pedido_y_vacia_el_carrito(self):
         self._poner_en_carrito({str(self.variante.pk): 2})
         response = self.client.post(self._url(), DATOS_VALIDOS)
@@ -617,3 +647,34 @@ class TotalUnicoDePuntaAPuntaTests(CheckoutBaseTestCase):
         #    mismo numero, no uno recalculado aparte.
         response = self.client.get(reverse('payments:pending', args=[pedido.order_number]))
         self.assertContains(response, f"${cop(pedido.total)}")
+
+
+class MedicionDelCheckoutTests(CheckoutBaseTestCase):
+    """El pedido guarda el cupon y el servidor mide que se creo."""
+
+    def test_el_pedido_guarda_el_cupon_usado(self):
+        cupon = Coupon.objects.create(code='MIDE10', discount_type='percentage', value=10)
+        self._poner_en_carrito({str(self.variante.pk): 1})
+        self.client.post(reverse('orders:checkout'), {**DATOS_VALIDOS, 'coupon_code': 'mide10'})
+        self.assertEqual(Order.objects.get().coupon, cupon)
+
+    def test_crear_el_pedido_registra_el_evento_de_embudo(self):
+        from analitica.models import EventoAnalitica
+        self._poner_en_carrito({str(self.variante.pk): 2})
+        self.client.post(reverse('orders:checkout'), DATOS_VALIDOS)
+
+        evento = EventoAnalitica.objects.get(nombre='order_created')
+        pedido = Order.objects.get()
+        self.assertEqual(evento.propiedades['valor'], float(pedido.total))
+        self.assertEqual(evento.propiedades['articulos'], 2)
+        self.assertEqual(evento.propiedades['cupon'], 0)
+        self.assertTrue(evento.autenticado)
+
+    def test_si_medir_falla_la_compra_sigue_adelante(self):
+        from unittest.mock import patch
+        self._poner_en_carrito({str(self.variante.pk): 1})
+        with patch('analitica.services.EventoAnalitica.objects.create', side_effect=RuntimeError('db')):
+            with self.assertLogs('analitica.services', level='ERROR'):
+                respuesta = self.client.post(reverse('orders:checkout'), DATOS_VALIDOS)
+        self.assertEqual(respuesta.status_code, 302)
+        self.assertEqual(Order.objects.count(), 1)

@@ -247,6 +247,7 @@ def create_order_from_cart(user, cart, datos):
                     order_status=OrderStatus.PENDING_PAYMENT,
                     payment_status=PaymentStatus.PENDING,
                     referred_by=cupon.influencer if cupon else None,
+                    coupon=cupon,
                 )
             break
         except IntegrityError:

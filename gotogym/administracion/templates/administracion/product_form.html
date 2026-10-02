@@ -80,7 +80,7 @@
     {{ variant_formset.management_form }}
     <div class="variants-table-wrap">
     <table class="variants-table" id="variants-table">
-      <thead><tr><th>SKU</th><th>Talla</th><th>Color</th><th>Precio propio</th><th>Precio con descuento</th><th>% desc.</th><th>Stock</th><th>Estado</th><th>Activa</th><th></th><th>Eliminar</th></tr></thead>
+      <thead><tr><th>SKU</th><th>Talla</th><th>Color</th><th>Precio propio</th><th>Precio con descuento</th><th>% desc.</th><th>Stock</th><th>Estado</th><th>Activa</th><th><span class="sr-only">Acciones</span></th><th>Eliminar</th></tr></thead>
       <tbody id="variants-body">
         {% for vform in variant_formset.forms %}
         {% with disponible=vform.instance.inventory.quantity_available %}

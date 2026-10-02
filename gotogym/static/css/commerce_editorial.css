@@ -14,7 +14,7 @@
   --shop-ink: #101012;
   --shop-paper: #f8f9fa;
   --shop-mist: #ececeb;
-  --shop-muted: #66666c;
+  --shop-muted: #5f6066;
   --shop-turquoise: #0fbfb0;
   --shop-gold: #d4b46a;
   --shop-sapphire: #17375c;
@@ -27,7 +27,7 @@
 /* --- Hero / cabecera de la tienda --- */
 .shop-hero { position: relative; isolation: isolate; overflow: clip; padding: clamp(32px, 4vw, 56px) 0 clamp(26px, 3vw, 40px); background: var(--shop-ink); color: var(--shop-paper); }
 .shop-hero__background { position: absolute; inset: 0; z-index: -1; background: radial-gradient(circle at 82% 20%, rgba(15,191,176,.16), transparent 30%), radial-gradient(circle at 15% 85%, rgba(40,79,126,.22), transparent 34%), #090a0c; }
-.shop-eyebrow { margin: 0 0 18px; color: var(--shop-turquoise); font-size: .72rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+.shop-eyebrow { margin: 0 0 18px; color: var(--shop-turquoise); font-size: .75rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
 /* El tracking y el interlineado replican los del Home (store_home.css); el
  * cuerpo es menor a proposito: aqui el header es rotulo, no portada.
  * El lead lleva clase propia: como `.shop-hero p` le ganaba en
@@ -79,7 +79,7 @@
 .shop-layout > * { min-width: 0; }
 .shop-filters { display: grid; gap: 26px; align-content: start; min-width: 0; }
 .shop-field { display: grid; gap: var(--space-2); min-width: 0; }
-.shop-field label, .shop-field legend { margin: 0; padding: 0; color: var(--shop-muted); font-size: .68rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.shop-field label, .shop-field legend { margin: 0; padding: 0; color: var(--shop-muted); font-size: .75rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 .shop-field input, .shop-field select { width: 100%; min-width: 0; max-width: 100%; min-height: 46px; border: 1px solid #c8c8c5; border-radius: 0; background: #fff; color: var(--shop-ink); padding: 0 14px; font: inherit; text-overflow: ellipsis; }
 .shop-field .shop-price-row { display: flex; gap: var(--space-2); }
 /* Cuadros iguales para todas las tallas: una grilla de columnas parejas
@@ -121,16 +121,16 @@
 .gtg-product-card__image img { width: 100%; height: 100%; object-fit: cover; transition: transform .55s cubic-bezier(.22,1,.36,1); }
 .gtg-product-card:hover .gtg-product-card__image img,
 .gtg-product-card:focus-within .gtg-product-card__image img { transform: scale(1.035); }
-.gtg-product-card__badge { position: absolute; top: 12px; left: 12px; padding: 6px 9px; background: #101012; color: #f8f9fa; font-size: .64rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.gtg-product-card__badge { position: absolute; top: 12px; left: 12px; padding: 6px 9px; background: #101012; color: #f8f9fa; font-size: .75rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
 .gtg-product-card__body { padding-top: var(--space-4); }
 /* Valores calcados de .home-product-card (store_home.css) para que la
  * tarjeta se lea igual en Home y en la tienda. */
-.gtg-product-card__category { margin: 0 0 5px; color: #77777c; font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; }
+.gtg-product-card__category { margin: 0 0 5px; color: #5f6066; font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; }
 .gtg-product-card__name { margin: 0 0 13px; font-size: 1.02rem; font-weight: 600; line-height: 1.35; }
 .gtg-product-card__name a { color: inherit; text-decoration: none; }
 .gtg-product-card__meta { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .gtg-product-card__price { font-size: .92rem; font-weight: 700; color: var(--color-zafiro, #17375c); }
-.gtg-product-card__sizes { margin: 0; color: #77777c; font-size: .72rem; }
+.gtg-product-card__sizes { margin: 0; color: #5f6066; font-size: .75rem; }
 .gtg-product-card--compact .gtg-product-card__name { font-size: .86rem; }
 .gtg-product-card--compact .gtg-product-card__body { padding-top: var(--space-3); }
 
@@ -166,7 +166,7 @@
   .shop-pdp__layout { grid-template-columns: 1fr; }
 }
 .shop-pdp__info { align-self: start; padding-top: clamp(4px, 2vw, 20px); }
-.shop-pdp__category { margin: 0 0 14px; color: var(--shop-turquoise); font-size: .72rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.shop-pdp__category { margin: 0 0 14px; color: var(--shop-turquoise); font-size: .75rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
 .shop-pdp__title { margin: 0 0 20px; font-size: clamp(2.1rem, 4vw, 3.4rem); font-weight: 500; letter-spacing: -.045em; line-height: .98; overflow-wrap: anywhere; }
 .shop-pdp__review-note { margin: 0 0 var(--space-5); color: rgba(248,249,250,.5); font-size: .85rem; }
 .shop-pdp__price { display: block; margin-bottom: 26px; font-size: 1.5rem; font-weight: 600; color: var(--shop-gold); }
@@ -233,7 +233,7 @@
 .shop-pdp__size-guide-note { margin: 14px 0 var(--space-3); color: rgba(248,249,250,.55); font-size: .78rem; line-height: 1.5; }
 .shop-pdp__size-guide table { width: 100%; border-collapse: collapse; font-size: .82rem; }
 .shop-pdp__size-guide th, .shop-pdp__size-guide td { padding: var(--space-2) 10px; text-align: left; border-bottom: 1px solid rgba(248,249,250,.12); }
-.shop-pdp__size-guide thead th { color: rgba(248,249,250,.5); font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.shop-pdp__size-guide thead th { color: rgba(248,249,250,.5); font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .shop-pdp__size-guide tbody th { color: var(--shop-paper); font-weight: 700; }
 .shop-pdp__size-guide td { color: rgba(248,249,250,.75); }
 
@@ -318,7 +318,7 @@
  * de la cuenta; en uppercase y ExtraBold eso se lee apretado y distinto al
  * resto del flujo de compra. */
 .account-field label {
-  font-size: .68rem;
+  font-size: .75rem;
   font-weight: 800;
   letter-spacing: .1em;
   text-transform: uppercase;
@@ -355,8 +355,8 @@
 .checkout-summary__items li > div { min-width: 0; }
 .checkout-summary__items .checkout-item-sku { overflow-wrap: anywhere; }
 .checkout-summary__items .checkout-item-name { margin: 0 0 3px; font-weight: 600; font-size: .9rem; color: var(--ed-ink, #101012); }
-.checkout-summary__items .checkout-item-meta { margin: 0; color: var(--ed-muted, #66666c); font-size: .8rem; }
-.checkout-summary__items .checkout-item-sku { margin: 2px 0 0; color: #9a9a9e; font-size: .7rem; font-family: monospace; }
+.checkout-summary__items .checkout-item-meta { margin: 0; color: var(--ed-muted, #5f6066); font-size: .8rem; }
+.checkout-summary__items .checkout-item-sku { margin: 2px 0 0; color: #686870; font-size: .75rem; font-family: monospace; }
 .checkout-summary__items .checkout-item-price { grid-column: 2; font-weight: 700; font-size: .88rem; color: var(--ed-ink, #101012); white-space: nowrap; }
 .checkout-coupon { margin: 0 0 24px; padding: 16px 0; border-bottom: 1px solid #dededb; }
 .checkout-coupon h3 { margin: 0 0 10px; color: var(--ed-ink, #101012); font-size: .9rem; }
@@ -374,10 +374,10 @@
 .cart-row__info { flex: 1; min-width: 200px; }
 .cart-row__info a { color: var(--ed-ink, #101012); font-weight: 600; text-decoration: none; }
 .cart-row__info a:hover { color: var(--ed-turquoise, #0fbfb0); }
-.cart-row__meta { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); margin: 6px 0 0; color: var(--ed-muted, #66666c); font-size: .8rem; }
+.cart-row__meta { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); margin: 6px 0 0; color: var(--ed-muted, #5f6066); font-size: .8rem; }
 .cart-row__meta dt { display: inline; font-weight: 600; }
 .cart-row__meta dd { display: inline; margin: 0; }
-.cart-row__price-each { margin: 6px 0 0; color: #9a9a9e; font-size: .78rem; white-space: nowrap; }
+.cart-row__price-each { margin: 6px 0 0; color: #686870; font-size: .78rem; white-space: nowrap; }
 .cart-row__qty { display: inline-flex; align-items: center; gap: 0; }
 .cart-row__qty input { box-sizing: border-box; width: 52px; min-height: 42px; padding: 0; border: 1px solid #c8c8c5; border-radius: 0; text-align: center; color: var(--ed-ink, #101012); }
 .cart-row__stepper { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 42px; padding: 0; border: 1px solid #c8c8c5; background: transparent; color: var(--ed-ink, #101012); cursor: pointer; }
@@ -387,7 +387,7 @@
 .cart-row__stepper .material-icons-outlined { font-size: 18px; }
 .cart-row__subtotal { min-width: 120px; white-space: nowrap; text-align: right; font-weight: 700; color: var(--ed-ink, #101012); }
 .cart-row > form:last-child { display: flex; justify-content: center; }
-.cart-row__remove { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 42px; border: 0; background: transparent; color: #9a9a9e; cursor: pointer; }
+.cart-row__remove { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 42px; border: 0; background: transparent; color: #686870; cursor: pointer; }
 .cart-row__remove .material-icons-outlined { font-size: 21px; line-height: 1; }
 .cart-row__remove:hover { color: #b91c1c; }
 
@@ -455,4 +455,7 @@
     animation: none !important;
   }
 }
-.cart-empty { padding: clamp(56px, 8vw, 100px) var(--space-5); text-align: center; color: var(--ed-muted, #66666c); }
+.cart-empty { padding: clamp(56px, 8vw, 100px) var(--space-5); text-align: center; color: var(--ed-muted, #5f6066); }
+
+/* Areas de clic de enlaces sueltos (tarjetas, migas de pan, politicas). */
+.gtg-product-card__name a, .shop-pdp__breadcrumb a, .shop-pdp__policies a { display: inline-block; padding-block: 4px; }

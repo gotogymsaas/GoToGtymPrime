@@ -132,6 +132,13 @@ class Order(models.Model):
         'influencer.InfluencerProfile', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='referred_orders',
     )
+    # Cupon aplicado. Sin este vinculo solo se sabia cuanto se descontaba, no
+    # cual campana lo origino, y no habia forma de medir el rendimiento de un
+    # cupon. Los pedidos anteriores a este campo quedan sin dato (null).
+    coupon = models.ForeignKey(
+        'orders.Coupon', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='orders',
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -1,0 +1,4 @@
+{% comment %}
+Variacion frente al periodo anterior. Parametro: valor (porcentaje, o None
+si el periodo anterior no tiene base de comparacion).
+{% endcomment %}{% if valor is None %}<small class="delta delta--none">Sin periodo anterior para comparar</small>{% elif valor > 0 %}<small class="delta delta--up">&uarr; {{ valor }} % frente al periodo anterior</small>{% elif valor < 0 %}<small class="delta delta--down">&darr; {{ valor }} % frente al periodo anterior</small>{% else %}<small class="delta delta--none">Igual que el periodo anterior</small>{% endif %}

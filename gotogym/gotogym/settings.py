@@ -1,4 +1,5 @@
 import os
+import sys
 import urllib.parse
 from datetime import timedelta
 from pathlib import Path
@@ -166,6 +167,16 @@ STORAGES = {
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
 }
+
+# Con `manage.py test` los estaticos no pasan por `collectstatic`: el backend
+# con manifiesto fallaria al resolver cualquier {% static %} (o resolveria
+# contra un manifiesto viejo). Para pruebas se usa el backend sin hash, el
+# mismo que usa settings_test.
+if sys.argv[1:2] == ['test']:
+    STORAGES = {
+        **STORAGES,
+        'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage'},
+    }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

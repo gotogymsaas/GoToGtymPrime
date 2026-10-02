@@ -73,10 +73,12 @@
               data-add-url-template="{% url 'carrito:add_to_cart' 0 %}"
               data-add-to-cart
               data-product-name="{{ producto.name }}"
+              data-product-id="{{ producto.pk }}"
               data-label-exito="{% trans 'Añadido al carrito' %}"
               data-label-error="{% trans 'No se pudo agregar' %}"
               {% if single_variant %}action="{% url 'carrito:add_to_cart' single_variant.id %}"
-              data-variant-label="{{ single_variant.size }} / {{ single_variant.color }}"{% endif %}>
+              data-variant-label="{{ single_variant.size }} / {{ single_variant.color }}"
+              data-variant-price="{{ single_variant.price|stringformat:'.0f' }}"{% endif %}>
           {% csrf_token %}
           <input type="hidden" name="variant_id" id="pdp-variant-id"
                  value="{% if single_variant %}{{ single_variant.id }}{% endif %}">
@@ -346,6 +348,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     campoVariante.value = encontrada.id;
     form.dataset.variantLabel = encontrada.size + ' / ' + encontrada.color;
+    form.dataset.variantPrice = encontrada.price;
     form.action = form.dataset.addUrlTemplate.replace(/0\/$/, encontrada.id + '/');
     boton.disabled = false;
 

@@ -37,7 +37,8 @@ referencia versionada en el repo.
 ## 📋 Documentación
 
 - **[docs/DESPLIEGUE_LOCAL.md](docs/DESPLIEGUE_LOCAL.md)** - Instrucciones detalladas de instalación local
-- **[docs/GUIA_ACCESO.md](docs/GUIA_ACCESO.md)** - Guía de acceso y bases de datos
+- **[docs/GUIA_ACCESO.md](docs/GUIA_ACCESO.md)** - Cómo ejecutar el proyecto y entrar a cada panel
+- **[docs/ANALISIS_ESTRUCTURA.md](docs/ANALISIS_ESTRUCTURA.md)** - Estructura, rutas, flujo de compra y configuración
 
 ---
 
@@ -72,26 +73,32 @@ referencia versionada en el repo.
 
 ### HubSpot
 
-Para que la señal de usuarios cree contactos automáticamente en HubSpot:
+`HUBSPOT_PRIVATE_TOKEN` se lee de la configuración, pero la integración con HubSpot
+es todavía un esqueleto (`integrations/hubspot/`): no crea contactos ni hace llamadas
+reales.
 
-```bash
-export HUBSPOT_PRIVATE_TOKEN="tu_token_privado"
-```
+### Correo, pagos y monitoreo
+
+`EMAIL_HOST` (con sus variables `EMAIL_*`), `PAYMENT_PROVIDER` (`mock` por defecto),
+`MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_WEBHOOK_SECRET` y `SENTRY_DSN` activan,
+respectivamente, el envío real de correo, el proveedor de pago real y el monitoreo de
+errores. La lista completa está en `docs/ANALISIS_ESTRUCTURA.md`.
 
 ## 💳 Pagos con Mercado Pago
 
-La tienda utiliza [Mercado Pago](https://www.mercadopago.com/) para procesar
-los pagos. Configura las siguientes variables de entorno:
+Por defecto la tienda usa un proveedor de pago **simulado**. El proveedor real de
+[Mercado Pago](https://www.mercadopago.com/) está construido (preferencias, webhook con
+verificación de firma y reembolsos), pero **todavía no se probó con credenciales reales**.
+Para activarlo en un entorno:
 
 ```bash
-export MERCADOPAGO_PUBLIC_KEY="<PUBLIC_KEY>"
+export PAYMENT_PROVIDER="mercadopago"
 export MERCADOPAGO_ACCESS_TOKEN="<ACCESS_TOKEN>"
-export MERCADOPAGO_CLIENT_ID="<CLIENT_ID>"
-export MERCADOPAGO_CLIENT_SECRET="<CLIENT_SECRET>"
+export MERCADOPAGO_WEBHOOK_SECRET="<SECRETO_DEL_WEBHOOK>"
 ```
 
-Al finalizar la compra se creará una *preference* y el usuario será
-redireccionado al flujo de pago de Mercado Pago.
+Registra `/pagos/webhook/mercadopago/` como URL de notificaciones en Mercado Pago y
+asegúrate de que `PAYMENTS_MOCK_UI_ENABLED` quede apagado fuera de desarrollo.
 
 ## 📊 Contabilidad con Alegra
 
@@ -105,19 +112,26 @@ export ALEGRA_TOKEN="<TOKEN_DE_API>"
 
 ---
 
-## 🧪 Tests
+## 🧪 Pruebas y validación
 
 ```bash
 cd gotogym
 
-# Todos los tests (esta es la suite que corre CI, ver
-# environments/backend/run_backend_checks.sh)
-python manage.py test . administracion --settings=gotogym.settings_test
+python manage.py test                       # suite completa
 
-# Test específico de integración (ya en gotogym/, integrations/ vive ahi)
-DJANGO_SETTINGS_MODULE=gotogym.settings_test \
-python -m unittest integrations.alegra.tests.test_client -v
+# Igual que el pipeline (ver environments/backend/run_backend_checks.sh)
+python manage.py test . administracion --settings=gotogym.settings_test
 ```
+
+Antes de subir cambios, activa la validación local una sola vez por clon:
+
+```bash
+bash environments/install_git_hooks.sh
+```
+
+Cada commit pasa por el lint y cada push por la misma validación del pipeline (lint,
+tipos, migraciones pendientes y pruebas). Detalles en
+[environments/README.md](environments/README.md).
 
 ---
 
@@ -136,9 +150,9 @@ El proyecto soporta 3 idiomas:
 - **Base de datos:** PostgreSQL (producción, Azure) / SQLite (desarrollo y tests)
 - **Frontend:** Django Templates + Tailwind (CSS compilado y versionado, sin build de Node en el despliegue)
 - **Autenticación:** Sesiones de Django (sitio) + JWT vía `djangorestframework-simplejwt` (`accounts/api_views.py`)
-- **Pagos:** Mercado Pago
+- **Pagos:** Mercado Pago (proveedor real construido, apagado por defecto)
 - **Contabilidad:** Alegra API
-- **CRM:** HubSpot
+- **CRM:** HubSpot (solo un esqueleto)
 
 ---
 

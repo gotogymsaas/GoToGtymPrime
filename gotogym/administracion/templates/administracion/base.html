@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}GoToGym Admin{% endblock %}</title>
+  <link rel="icon" type="image/png" href="{% static 'images/logo-gotogym-symbol-transparent.png' %}">
   <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
   <link href="{% static 'fonts/@fontsource/playfair-display/700.css' %}" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261002-importes">
@@ -19,6 +20,7 @@
     </a>
     <nav>
       <a href="{% url 'admin_dashboard' %}">Panel</a>
+      <a href="{% url 'admin_analytics' %}">Analitica</a>
       <a href="{% url 'admin_products' %}">Productos</a>
       <a href="{% url 'admin_coupons' %}">Cupones y descuentos</a>
       <a href="{% url 'admin_orders' %}">Pedidos y pagos</a>
@@ -56,5 +58,16 @@
       </div>
     {% endif %}
   </main>
+  <script>
+    // Un panel con tabla ancha desplaza su contenido: sin foco no se puede
+    // recorrer con el teclado.
+    document.querySelectorAll('.panel').forEach(function (panel) {
+      if (panel.scrollWidth <= panel.clientWidth + 1) return;
+      var titulo = panel.querySelector('h2');
+      panel.tabIndex = 0;
+      panel.setAttribute('role', 'region');
+      panel.setAttribute('aria-label', titulo ? titulo.textContent.trim() : 'Tabla');
+    });
+  </script>
 </body>
 </html>

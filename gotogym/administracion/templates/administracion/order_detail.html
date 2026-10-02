@@ -27,7 +27,7 @@
   <h2>Actualizar estado</h2>
   <form method="post" action="{% url 'admin_order_update_status' order.order_number %}">
     {% csrf_token %}
-    <select name="order_status">
+    <select name="order_status" aria-label="Nuevo estado del pedido">
       {% for value, label in next_statuses %}
       <option value="{{ value }}">{{ label }}</option>
       {% endfor %}

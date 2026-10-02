@@ -94,10 +94,10 @@
             {% else %}{% trans "Gratis" %}{% endif %}
           </span>
         </div>
-        <p class="text-xs text-gray-400 mb-4">{% trans "El costo exacto se confirma con tu dirección en el siguiente paso." %}</p>
+        <p class="text-xs text-gray-600 mb-4">{% trans "El costo exacto se confirma con tu dirección en el siguiente paso." %}</p>
 
         {% include "partials/_price_row.html" with row_class="flex justify-between font-bold text-lg border-t pt-4 mb-1" label="Total sin envío" amount=total %}
-        <p class="text-xs text-gray-400 mb-6">{% trans "El envío se suma en el checkout y ahí verás el total final a pagar." %}</p>
+        <p class="text-xs text-gray-600 mb-6">{% trans "El envío se suma en el checkout y ahí verás el total final a pagar." %}</p>
 
         {% url 'orders:checkout' as checkout_url %}
         {% include "partials/_cta_button.html" with tag="a" href=checkout_url variant="primary" label="Continuar" %}

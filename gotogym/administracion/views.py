@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime, timedelta
 
 from django.contrib import messages
@@ -6,8 +7,7 @@ from django.contrib.auth.models import Group
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Count, Max, Prefetch, Q, Sum
-from django.db.models.functions import TruncDate
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -29,7 +29,7 @@ from influencer.services import (
 )
 from inventory.models import Inventory, InventoryAdjustment, InventoryAdjustmentReason
 from inventory.services import record_adjustment
-from orders.models import Coupon, Order, OrderItem, OrderStatus, PaymentStatus
+from orders.models import Coupon, Order, OrderStatus
 from orders.services import (
     InvalidOrderTransitionError,
     apply_order_status_transition,
@@ -48,6 +48,7 @@ from products.models import (
 from products.variant_parsing import COLOR_UNKNOWN, SIZE_UNKNOWN, build_sku
 from tienda.catalog import SIZE_ORDER
 
+from . import metrics
 from .forms import (
     BrandForm,
     CategoryForm,
@@ -70,49 +71,42 @@ from .permissions import (
 )
 
 
+def _rango_de_fechas(request, dias_por_defecto=30, maximo=366):
+    """Rango `desde`/`hasta` del filtro, acotado para no calcular series de
+    varios anos por un parametro mal escrito."""
+    hoy = timezone.localdate()
+    hasta = _parse_fecha(request.GET.get("hasta", ""), hoy)
+    desde = _parse_fecha(request.GET.get("desde", ""), hoy - timedelta(days=dias_por_defecto))
+    if desde > hasta:
+        desde, hasta = hasta, desde
+    if (hasta - desde).days >= maximo:
+        desde = hasta - timedelta(days=maximo - 1)
+    return desde, hasta
+
+
 @staff_required
 def dashboard(request):
-    """Panel unico de gestion: antes esta pantalla solo mostraba contadores
-    puntuales y los informes de ventas vivian en una pantalla aparte
-    (`/informes/`), que obligaba a saltar entre dos vistas para tener una
-    idea completa del negocio. Ahora todo vive aqui, con un solo rango de
-    fechas para la parte de ventas/comisiones."""
+    """Panel unico de gestion.
+
+    Las cifras de ventas salen de `administracion.metrics`, donde estan
+    escritas sus definiciones: una venta valida excluye pedidos cancelados o
+    devueltos, el ingreso es neto de reembolsos, y cada indicador se compara
+    con el periodo anterior de igual duracion."""
     User = get_user_model()
     panel_settings = PanelSettings.load()
     threshold = panel_settings.low_stock_threshold
-    sales_goal = panel_settings.monthly_sales_goal
 
-    hoy = timezone.localdate()
-    hasta = _parse_fecha(request.GET.get("hasta", ""), hoy)
-    desde = _parse_fecha(request.GET.get("desde", ""), hoy - timedelta(days=30))
-    if desde > hasta:
-        desde, hasta = hasta, desde
+    desde, hasta = _rango_de_fechas(request)
+    desde_anterior, hasta_anterior = metrics.periodo_anterior(desde, hasta)
 
-    pedidos_pagados = Order.objects.filter(
-        payment_status=PaymentStatus.APPROVED,
-        created_at__date__gte=desde,
-        created_at__date__lte=hasta,
-    )
-    resumen = pedidos_pagados.aggregate(
-        pedidos=Count("id"),
-        ingresos=Sum("total"),
-        descuentos=Sum("discount_total"),
-        envio=Sum("shipping_cost"),
-    )
-    ventas_por_dia = (
-        pedidos_pagados
-        .annotate(dia=TruncDate("created_at"))
-        .values("dia")
-        .annotate(total=Sum("total"), pedidos=Count("id"))
-        .order_by("-dia")
-    )
-    productos_top = (
-        OrderItem.objects
-        .filter(order__in=pedidos_pagados)
-        .values("product_name_snapshot", "sku_snapshot")
-        .annotate(unidades=Sum("quantity"), ingresos=Sum("line_total"))
-        .order_by("-unidades")[:10]
-    )
+    resumen = metrics.resumen_ventas(desde, hasta)
+    anterior = metrics.resumen_ventas(desde_anterior, hasta_anterior)
+    comparacion = {
+        clave: metrics.variacion(resumen[clave], anterior[clave])
+        for clave in ("pedidos", "neto", "ticket_promedio", "unidades")
+    }
+    canales = metrics.canales_de_venta(desde, hasta)
+
     comisiones = Commission.objects.filter(
         created_at__date__gte=desde, created_at__date__lte=hasta,
     ).aggregate(
@@ -120,6 +114,8 @@ def dashboard(request):
         aprobada=Sum("amount", filter=Q(status=CommissionStatus.APPROVED)),
         pagada=Sum("amount", filter=Q(status=CommissionStatus.PAID)),
     )
+    comisionado = sum((comisiones[k] or 0) for k in ("pendiente", "aprobada", "pagada"))
+    ventas_afiliados = next((c["ventas"] for c in canales if c["canal"] == "Con cupon de afiliado"), 0)
 
     # Reemplaza a "Productos recientes"/"Usuarios recientes" (duplicaban lo
     # que ya hacen /productos/ y /usuarios/ con busqueda real, sin ayudar a
@@ -132,23 +128,27 @@ def dashboard(request):
         .order_by("quantity_available")[:10]
     )
 
-    ingresos = resumen.get("ingresos") or 0
-    sales_goal_percent = None
-    if sales_goal:
-        sales_goal_percent = min(100, round((ingresos / sales_goal) * 100))
-
     context = {
         "desde": desde,
         "hasta": hasta,
+        "desde_anterior": desde_anterior,
+        "hasta_anterior": hasta_anterior,
         "resumen": resumen,
-        "ventas_por_dia": ventas_por_dia,
-        "productos_top": productos_top,
+        "anterior": anterior,
+        "comparacion": comparacion,
+        "anuladas": metrics.ventas_anuladas(desde, hasta),
+        "serie_diaria": metrics.serie_diaria(desde, hasta),
+        "productos_top": metrics.top_productos(desde, hasta),
+        "categorias": metrics.ventas_por_categoria(desde, hasta),
+        "canales": canales,
         "comisiones": comisiones,
+        "comision_sobre_ventas_afiliados": (
+            round(float(comisionado) / float(ventas_afiliados) * 100, 1) if ventas_afiliados else None
+        ),
+        "meta_mes": metrics.meta_del_mes(panel_settings.monthly_sales_goal),
+        "sales_goal_form": SalesGoalForm(instance=panel_settings),
         "bajo_stock": bajo_stock,
         "low_stock_threshold": threshold,
-        "sales_goal": sales_goal,
-        "sales_goal_percent": sales_goal_percent,
-        "sales_goal_form": SalesGoalForm(instance=panel_settings),
         "product_count": Product.objects.count(),
         "user_count": User.objects.count(),
         "influencer_count": InfluencerProfile.objects.filter(
@@ -164,6 +164,50 @@ def dashboard(request):
         "active_coupon_count": Coupon.objects.filter(is_active=True).count(),
     }
     return render(request, "administracion/dashboard.html", context)
+
+
+@staff_required
+def analytics(request):
+    """Comportamiento de la tienda: embudo, canales, busquedas, clientes,
+    cupones, operacion e inventario. Complementa al dashboard (que responde
+    "cuanto vendimos") con "por que" y "que hacer"."""
+    desde, hasta = _rango_de_fechas(request)
+    context = {
+        "desde": desde,
+        "hasta": hasta,
+        "embudo": metrics.embudo(desde, hasta),
+        "canales_trafico": metrics.canales_de_trafico(desde, hasta),
+        "busquedas": metrics.busquedas(desde, hasta),
+        "clientes": metrics.clientes(desde, hasta),
+        "canales_venta": metrics.canales_de_venta(desde, hasta),
+        "cupones": metrics.rendimiento_de_cupones(desde, hasta),
+        "pipeline": metrics.pipeline_de_pedidos(desde, hasta),
+        "inventario": metrics.salud_de_inventario(),
+        "resumen": metrics.resumen_ventas(desde, hasta),
+    }
+    return render(request, "administracion/analytics.html", context)
+
+
+def _celda_segura(valor):
+    """Evita que una hoja de calculo interprete un texto como formula."""
+    if isinstance(valor, str) and valor[:1] in ("=", "+", "-", "@"):
+        return "'" + valor
+    return valor
+
+
+@staff_required
+def export_orders_csv(request):
+    """Pedidos del rango en CSV, para analizarlos fuera del panel. No incluye
+    correo ni telefono: el cliente va como identificador interno."""
+    desde, hasta = _rango_de_fechas(request)
+    respuesta = HttpResponse(content_type="text/csv; charset=utf-8")
+    respuesta["Content-Disposition"] = f'attachment; filename="pedidos_{desde}_{hasta}.csv"'
+    respuesta.write("﻿")  # BOM: Excel abre bien los acentos
+    escritor = csv.DictWriter(respuesta, fieldnames=metrics.COLUMNAS_EXPORTACION)
+    escritor.writeheader()
+    for fila in metrics.filas_exportacion(desde, hasta):
+        escritor.writerow({clave: _celda_segura(valor) for clave, valor in fila.items()})
+    return respuesta
 
 
 @staff_required

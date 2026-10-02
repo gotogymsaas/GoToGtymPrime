@@ -15,7 +15,6 @@ Tres defensas, en este orden:
    dentro de un evento.
 3. Limite de tasa y de tamano del lote.
 """
-import hashlib
 import json
 
 from django.db import transaction
@@ -24,6 +23,7 @@ from django.views.decorators.http import require_POST
 from gotogym.ratelimit import rate_limit
 
 from .models import EventoAnalitica
+from .services import hash_visitante, no_medir
 
 # Taxonomia cerrada. Al anadir un evento nuevo en una plantilla hay que
 # declararlo aqui tambien, o la vista lo descarta en silencio.
@@ -44,20 +44,6 @@ EVENTOS_PERMITIDOS = frozenset({
 MAX_EVENTOS_POR_LOTE = 40
 MAX_PROPIEDADES = 8
 MAX_LARGO_VALOR = 120
-
-
-def _hash_sesion(request):
-    """Identificador estable por sesion que no permite recuperar la clave.
-
-    Se siembra con SECRET_KEY para que el hash no sea reversible por fuerza
-    bruta sobre el espacio de claves de sesion.
-    """
-    clave = request.session.session_key
-    if not clave:
-        return ''
-    from django.conf import settings
-    semilla = f'{settings.SECRET_KEY}:{clave}'.encode()
-    return hashlib.sha256(semilla).hexdigest()[:32]
 
 
 def _limpiar_propiedades(crudas):
@@ -89,6 +75,11 @@ def registrar_eventos(request):
     cabeceras propias: mandar un FormData es lo que permite incluir el
     token CSRF y que la proteccion siga activa.
     """
+    if no_medir(request):
+        # Respetar la preferencia tambien aqui: el script del navegador ya
+        # no envia, pero la peticion puede venir de otro cliente.
+        return JsonResponse({'ok': True, 'guardados': 0})
+
     try:
         lote = json.loads(request.POST.get('eventos', '[]'))
     except (TypeError, ValueError):
@@ -98,7 +89,7 @@ def registrar_eventos(request):
         return JsonResponse({'ok': False, 'error': 'se esperaba una lista'}, status=400)
 
     autenticado = request.user.is_authenticated
-    sesion = _hash_sesion(request)
+    sesion = hash_visitante(request)
 
     filas = []
     for crudo in lote[:MAX_EVENTOS_POR_LOTE]:

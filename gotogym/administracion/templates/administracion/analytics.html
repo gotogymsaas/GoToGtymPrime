@@ -1,0 +1,205 @@
+{% extends "administracion/base.html" %}
+{% load tienda_filters %}
+{% block title %}Analitica &middot; GoToGym Admin{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <h1>Analitica de comportamiento</h1>
+    <p class="hint">Responde por que se vende o no se vende y que hacer al respecto. Las ventas y su comparacion con el periodo anterior estan en el <a href="{% url 'admin_dashboard' %}">Panel</a>.</p>
+  </div>
+  <form class="date-filter" method="get">
+    <label>Desde <input type="date" name="desde" value="{{ desde|date:'Y-m-d' }}"></label>
+    <label>Hasta <input type="date" name="hasta" value="{{ hasta|date:'Y-m-d' }}"></label>
+    <button type="submit">Filtrar</button>
+    <a class="ghost btn-sm" href="{% url 'admin_export_orders' %}?desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">Exportar pedidos (CSV)</a>
+  </form>
+</section>
+
+{# ---------------------------------------------------------------- Embudo #}
+<div class="panel" id="embudo">
+  <h2>Embudo de compra</h2>
+  {% if embudo.hay_datos %}
+  <table>
+    <thead><tr><th>Etapa</th><th class="num">Sesiones</th><th class="num">Del inicio</th><th class="num">Del paso anterior</th><th><span class="sr-only">Proporcion respecto al inicio</span></th></tr></thead>
+    <tbody>
+      {% for fila in embudo.etapas %}
+      <tr>
+        <td>{{ fila.etapa }}</td>
+        <td class="num">{{ fila.sesiones }}</td>
+        <td class="num">{% if fila.del_inicio is not None %}{{ fila.del_inicio }} %{% else %}&mdash;{% endif %}</td>
+        <td class="num">{% if fila.del_paso_anterior is not None %}{{ fila.del_paso_anterior }} %{% else %}&mdash;{% endif %}</td>
+        <td style="min-width:120px;"><div class="pq-progress__track"><div class="pq-progress__fill" style="width:{{ fila.ancho }}%;"></div></div></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="metric-note">
+    <strong>Como leerlo:</strong> la caida mayor entre dos etapas es donde mas gente se pierde. Pedidos pagados en el rango (de la base de datos, no del embudo): <strong>{{ embudo.pedidos_pagados }}</strong>{% if embudo.conversion_pagada is not None %} &middot; {{ embudo.conversion_pagada }} % de las sesiones medidas{% endif %}.
+  </p>
+
+  <h3 style="margin-top:var(--space-5);">Movil frente a escritorio</h3>
+  <table>
+    <thead>
+      <tr><th>Etapa</th><th class="num">Movil</th><th class="num">% del inicio</th><th class="num">Escritorio</th><th class="num">% del inicio</th></tr>
+    </thead>
+    <tbody>
+      {% for fila in embudo.comparativo_dispositivos %}
+      <tr>
+        <td>{{ fila.etapa }}</td>
+        <td class="num">{{ fila.movil.sesiones }}</td>
+        <td class="num">{% if fila.movil.del_inicio is not None %}{{ fila.movil.del_inicio }} %{% else %}&mdash;{% endif %}</td>
+        <td class="num">{{ fila.escritorio.sesiones }}</td>
+        <td class="num">{% if fila.escritorio.del_inicio is not None %}{{ fila.escritorio.del_inicio }} %{% else %}&mdash;{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="metric-note">Una brecha grande entre movil y escritorio en la misma etapa indica un problema de experiencia en ese dispositivo, no de oferta.</p>
+  {% else %}
+  <p class="hint">Todavia no hay sesiones medidas en este rango. El embudo se llena a medida que la gente navega la tienda.</p>
+  {% endif %}
+  <p class="metric-note"><strong>Calidad del dato:</strong> solo se mide a quien acepta ser medido; quedan fuera las personas con Do Not Track y quienes usan bloqueadores. Las cifras absolutas son un piso; lo util son las proporciones entre etapas. Cada visitante se cuenta una sola vez aunque inicie sesion a mitad de camino.</p>
+</div>
+
+{# -------------------------------------------------------- Canales #}
+<div class="panel">
+    <h2>Canales de entrada</h2>
+    <table>
+      <thead><tr><th>Canal</th><th class="num">Sesiones</th><th class="num">Carritos</th><th class="num">Pedidos</th><th class="num">Conversion</th></tr></thead>
+      <tbody>
+        {% for fila in canales_trafico %}
+        <tr>
+          <td>{{ fila.canal }}</td>
+          <td class="num">{{ fila.sesiones }}</td>
+          <td class="num">{{ fila.carritos }}</td>
+          <td class="num">{{ fila.pedidos }}</td>
+          <td class="num">{% if fila.conversion is not None %}{{ fila.conversion }} %{% else %}&mdash;{% endif %}</td>
+        </tr>
+        {% empty %}<tr><td colspan="5">Sin sesiones medidas en este rango.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    <p class="metric-note">Se toma de los parametros <strong>utm_*</strong>, del codigo <strong>?ref=</strong> de afiliados y del sitio de origen. Para medir una campana, enlazala con <strong>utm_source</strong> y <strong>utm_medium</strong>; sin ellos queda en "Directo / sin dato".</p>
+</div>
+
+<div class="panel">
+    <h2>Busquedas internas</h2>
+    <p class="hint">{{ busquedas.total }} busquedas en el rango{% if busquedas.sin_termino %}, {{ busquedas.sin_termino }} sin texto{% endif %}.</p>
+    <table>
+      <thead><tr><th>Termino</th><th class="num">Veces</th><th class="num">Productos que coinciden</th></tr></thead>
+      <tbody>
+        {% for fila in busquedas.terminos %}
+        <tr>
+          <td>{{ fila.termino }}</td>
+          <td class="num">{{ fila.veces }}</td>
+          <td class="num">{% if fila.resultados == 0 %}<span class="pill pill-off">Sin resultados</span>{% else %}{{ fila.resultados }}{% endif %}</td>
+        </tr>
+        {% empty %}<tr><td colspan="3">Sin busquedas en este rango.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    {% if busquedas.sin_resultados %}
+    <p class="metric-note"><strong>Demanda sin atender:</strong> {{ busquedas.sin_resultados|length }} termino{{ busquedas.sin_resultados|length|pluralize }} que la gente busca y el catalogo no tiene. Candidatos a nuevos productos, a sinonimos en el nombre o a una nueva categoria.</p>
+    {% endif %}
+  </div>
+
+{# ------------------------------------------------------ Clientes #}
+<div class="panel">
+  <h2>Clientes</h2>
+  <section class="stats stats-secondary" style="margin-bottom:var(--space-3);">
+    <article><span>{{ clientes.compradores }}</span><p>Compradores en el rango</p></article>
+    <article><span>{{ clientes.nuevos }}</span><p>Nuevos (primera compra)</p></article>
+    <article><span>{{ clientes.recurrentes }}</span><p>Recurrentes{% if clientes.tasa_recurrentes is not None %} ({{ clientes.tasa_recurrentes }} %){% endif %}</p></article>
+    <article><span>{{ clientes.repiten_en_el_rango }}</span><p>Compraron mas de una vez en el rango</p></article>
+  </section>
+  <table>
+    <thead><tr><th>Segmento</th><th class="num">Ingreso</th></tr></thead>
+    <tbody>
+      <tr><td>Clientes nuevos</td><td class="num">${{ clientes.ingreso_nuevos|cop }} COP</td></tr>
+      <tr><td>Clientes recurrentes</td><td class="num">${{ clientes.ingreso_recurrentes|cop }} COP</td></tr>
+    </tbody>
+  </table>
+  <p class="metric-note">Adquirir un cliente nuevo cuesta mas que venderle a uno que ya compro. Si los recurrentes aportan poco, el negocio depende de captar siempre gente nueva.</p>
+</div>
+
+{# ------------------------------------------ Cupones y canales de venta #}
+<section class="grid-two">
+  <div class="panel">
+    <h2>Rendimiento de cupones</h2>
+    <table>
+      <thead><tr><th>Cupon</th><th class="num">Pedidos</th><th class="num">Ventas</th><th class="num">Descuento</th><th class="num">Desc. / ventas</th></tr></thead>
+      <tbody>
+        {% for fila in cupones %}
+        <tr>
+          <td>{{ fila.codigo }}</td>
+          <td class="num">{{ fila.pedidos }}</td>
+          <td class="num">${{ fila.ventas|cop }} COP</td>
+          <td class="num">${{ fila.descuento|cop }} COP</td>
+          <td class="num">{% if fila.descuento_sobre_ventas is not None %}{{ fila.descuento_sobre_ventas }} %{% else %}&mdash;{% endif %}</td>
+        </tr>
+        {% empty %}<tr><td colspan="5">Sin pedidos con cupon registrado en este rango.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    <p class="metric-note">Solo cuenta pedidos hechos desde que el pedido guarda el cupon usado; los anteriores no se pueden atribuir a una campana.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Operacion de pedidos</h2>
+    <table>
+      <thead><tr><th>Estado</th><th class="num">Pedidos</th><th class="num">Valor</th><th class="num">%</th></tr></thead>
+      <tbody>
+        {% for fila in pipeline.estados %}
+        <tr>
+          <td>{{ fila.estado }}</td>
+          <td class="num">{{ fila.pedidos }}</td>
+          <td class="num">${{ fila.valor|cop }} COP</td>
+          <td class="num">{{ fila.participacion|default_if_none:"-" }}</td>
+        </tr>
+        {% empty %}<tr><td colspan="4">Sin pedidos creados en este rango.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    <p class="metric-note">
+      Cancelacion: <strong>{{ pipeline.tasa_cancelacion|default_if_none:"-" }}{% if pipeline.tasa_cancelacion is not None %} %{% endif %}</strong>
+      &middot; Devolucion: <strong>{{ pipeline.tasa_devolucion|default_if_none:"-" }}{% if pipeline.tasa_devolucion is not None %} %{% endif %}</strong>
+      &middot; Pagos rechazados: <strong>{{ pipeline.pago_rechazado }}</strong>.
+      {% if pipeline.sin_pagar_24h %}<br>Hay <strong>{{ pipeline.sin_pagar_24h }}</strong> pedido{{ pipeline.sin_pagar_24h|pluralize }} sin pagar con mas de 24 horas (${{ pipeline.sin_pagar_24h_valor|cop }} COP): clientes que llegaron al pago y no lo completaron.{% endif %}
+    </p>
+  </div>
+</section>
+
+{# ------------------------------------------------------ Inventario #}
+<div class="panel" id="inventario">
+  <h2>Cobertura de inventario</h2>
+  <p class="hint">Calculada con la venta de los ultimos {{ inventario.dias }} dias. Un producto en riesgo es el que se agota en {{ inventario.cobertura_critica }} dias o menos al ritmo actual, o ya esta agotado y todavia se vendia.</p>
+  <table>
+    <thead><tr><th>Producto</th><th>Variante</th><th class="num">Disponible</th><th class="num">Vendidas ({{ inventario.dias }} d)</th><th class="num">Alcanza para</th></tr></thead>
+    <tbody>
+      {% for fila in inventario.en_riesgo %}
+      <tr>
+        <td><a href="{% url 'admin_product_edit' fila.product_id %}">{{ fila.producto }}</a></td>
+        <td>{{ fila.variante }}</td>
+        <td class="num">{% if fila.disponible == 0 %}<span class="pill pill-off">Agotado</span>{% else %}{{ fila.disponible }}{% endif %}</td>
+        <td class="num">{{ fila.vendidas_30 }}</td>
+        <td class="num">{% if fila.cobertura_dias is None %}&mdash;{% else %}{{ fila.cobertura_dias }} dia{{ fila.cobertura_dias|pluralize }}{% endif %}</td>
+      </tr>
+      {% empty %}<tr><td colspan="5">Ninguna variante con venta reciente esta en riesgo de agotarse.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  {% if inventario.en_riesgo_total > inventario.en_riesgo|length %}<p class="metric-note">Se muestran {{ inventario.en_riesgo|length }} de {{ inventario.en_riesgo_total }} en riesgo.</p>{% endif %}
+
+  <h3 style="margin-top:var(--space-5);">Stock que no rota</h3>
+  <p class="hint">Inventario con unidades y ninguna venta en {{ inventario.dias }} dias. Capital inmovilizado: <strong>${{ inventario.valor_sin_rotacion|cop }} COP</strong>{% if inventario.pct_sin_rotacion is not None %} ({{ inventario.pct_sin_rotacion }} % de los ${{ inventario.valor_inventario|cop }} COP en inventario){% endif %}.</p>
+  <table>
+    <thead><tr><th>Producto</th><th>Variante</th><th class="num">Disponible</th><th class="num">Valor</th></tr></thead>
+    <tbody>
+      {% for fila in inventario.sin_rotacion %}
+      <tr>
+        <td><a href="{% url 'admin_product_edit' fila.product_id %}">{{ fila.producto }}</a></td>
+        <td>{{ fila.variante }}</td>
+        <td class="num">{{ fila.disponible }}</td>
+        <td class="num">${{ fila.valor|cop }} COP</td>
+      </tr>
+      {% empty %}<tr><td colspan="4">Todo el inventario con unidades tuvo ventas recientes.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  {% if inventario.sin_rotacion_total > inventario.sin_rotacion|length %}<p class="metric-note">Se muestran {{ inventario.sin_rotacion|length }} de {{ inventario.sin_rotacion_total }}. Candidatos a promocion o a no reponer.</p>{% endif %}
+</div>
+{% endblock %}

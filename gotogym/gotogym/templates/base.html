@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load static %}
+{% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
@@ -7,6 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="GoToGym - Ropa deportiva, tecnologia textil y bienestar.">
   <title>{% block title %}GoToGym{% endblock %}</title>
+  <link rel="icon" type="image/png" href="{% static 'images/logo-gotogym-symbol-transparent.png' %}">
   <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
   {% comment %}
   Playfair Display, peso 700 (unico peso con archivo real descargado, ver
@@ -54,7 +56,7 @@
 <body class="gtg-theme{% if user.is_authenticated %} gtg-autenticado{% endif %}">
   <a class="gtg-skip-link" href="#main-content">{% trans "Saltar al contenido" %}</a>
   {% block navbar %}
-<nav class="gtg-navbar">
+<nav class="gtg-navbar" aria-label="{% trans 'Navegación principal' %}">
   <div class="gtg-nav-wrap">
     <div class="gtg-nav-lead">
       <button class="gtg-menu-toggle" type="button" aria-label="{% trans 'Abrir menu' %}"

@@ -638,3 +638,7 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Aceptar terminos: casilla y enlace con area tactil suficiente. */
+.commercial-auth__checkbox input[type="checkbox"] { width: 24px; height: 24px; flex-shrink: 0; }
+.commercial-auth__checkbox #show-terms { min-height: 24px; padding-block: 4px; }

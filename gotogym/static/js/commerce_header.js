@@ -138,7 +138,9 @@
           detail: {
             producto: formularioCarrito.dataset.productName || '',
             variante: formularioCarrito.dataset.variantLabel || '',
-            unidades: resultado.cuerpo.cart_count
+            unidades: resultado.cuerpo.cart_count,
+            producto_id: formularioCarrito.dataset.productId || '',
+            valor: parseFloat(formularioCarrito.dataset.variantPrice) || 0
           }
         }));
 

@@ -1,94 +1,91 @@
 #!/bin/bash
-# Script para verificar estado de bases de datos
-# GoToGymPrime
+# Verifica el estado de la base de datos local y del servidor de desarrollo.
+#
+#   bash verificar_db.sh
+#
+# Es de solo lectura: no modifica datos. La base de produccion (PostgreSQL)
+# se consulta con la configuracion por defecto, que lee DATABASE_URL del
+# entorno; si no esta definida, usa SQLite y el resultado no dice nada sobre
+# produccion.
 
-echo "═══════════════════════════════════════════════════════"
-echo "  🔍 VERIFICACIÓN DE BASES DE DATOS - GoToGymPrime"
-echo "═══════════════════════════════════════════════════════"
-echo ""
+# Directorio del proyecto: relativo a este script.
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/gotogym" && pwd)"
+cd "$PROJECT_DIR" || exit 1
 
-cd /workspaces/GoToGtymPrime/gotogym
+# Windows (Git Bash) usa cp1252 por defecto y algunos mensajes llevan emojis.
+export PYTHONUTF8=1
 
-# Colores
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo -e "${BLUE}📊 1. BASE DE DATOS LOCAL (SQLite)${NC}"
+echo "═══════════════════════════════════════════════════════"
+echo "  Verificación de bases de datos y servidor - GoToGymPrime"
+echo "═══════════════════════════════════════════════════════"
+echo ""
+
+echo -e "${BLUE}1. Base de datos local (SQLite)${NC}"
 echo "───────────────────────────────────────────────────────"
 if [ -f "db_local.sqlite3" ]; then
-    echo -e "${GREEN}✅ Archivo existe${NC}"
+    echo -e "${GREEN}Archivo existe${NC}"
     ls -lh db_local.sqlite3 | awk '{print "   Tamaño: " $5}'
-    
     echo ""
-    echo "📋 Contenido de la base de datos:"
     python manage.py shell --settings=gotogym.settings_local << 'EOF'
 from accounts.models import User
-from products.models import Product, ProductCategory, Brand
+from blog.models import Post
+from orders.models import Order
+from products.models import Brand, Product, ProductCategory
 
-print(f"   👥 Usuarios: {User.objects.count()}")
-print(f"   🛍️  Productos: {Product.objects.count()}")
-print(f"   📦 Categorías: {ProductCategory.objects.count()}")
-print(f"   🏷️  Marcas: {Brand.objects.count()}")
-
-if User.objects.filter(is_superuser=True).exists():
-    print(f"   ✅ Hay superusuarios")
-else:
-    print(f"   ⚠️  NO hay superusuarios")
+print(f"   Usuarios:    {User.objects.count()}")
+print(f"   Productos:   {Product.objects.count()}")
+print(f"   Categorías:  {ProductCategory.objects.count()}")
+print(f"   Marcas:      {Brand.objects.count()}")
+print(f"   Pedidos:     {Order.objects.count()}")
+print(f"   Entradas del Journal: {Post.objects.filter(is_published=True).count()}")
+print("   Hay superusuarios" if User.objects.filter(is_superuser=True).exists() else "   NO hay superusuarios (createsuperuser)")
 EOF
+    echo ""
+    echo "   Para una auditoría de integridad del catálogo:"
+    echo "   python manage.py audit_catalog --settings=gotogym.settings_local"
 else
-    echo -e "${YELLOW}❌ No existe db_local.sqlite3${NC}"
+    echo -e "${YELLOW}No existe db_local.sqlite3${NC}"
     echo "   Ejecuta: python manage.py migrate --settings=gotogym.settings_local"
 fi
 
 echo ""
-echo -e "${BLUE}📊 2. BASE DE DATOS PRODUCCIÓN (MySQL Azure)${NC}"
+echo -e "${BLUE}2. Base de datos de producción (PostgreSQL)${NC}"
 echo "───────────────────────────────────────────────────────"
-echo "   Host: servergotogym.mysql.database.azure.com"
-echo "   Base de datos: gotogym_bd"
-echo "   Usuario: gotogym_user"
-echo ""
-echo "   Probando conexión..."
-timeout 5 python manage.py check --database default --settings=gotogym.settings 2>&1 | head -5
+if [ -n "$DATABASE_URL" ]; then
+    echo "   DATABASE_URL definida; probando conexión..."
+    timeout 10 python manage.py check --database default 2>&1 | head -5
+else
+    echo -e "${YELLOW}   DATABASE_URL no está definida en este entorno.${NC}"
+    echo "   Sin ella la configuración por defecto usa SQLite, así que esta revisión"
+    echo "   no habla de producción. Defínela para probar la conexión real."
+fi
 
 echo ""
-echo -e "${BLUE}🌐 3. SERVIDOR WEB${NC}"
+echo -e "${BLUE}3. Servidor de desarrollo${NC}"
 echo "───────────────────────────────────────────────────────"
-if pgrep -f "runserver" > /dev/null; then
-    echo -e "${GREEN}✅ Servidor Django está corriendo${NC}"
-    PID=$(pgrep -f "runserver" | head -1)
-    echo "   PID: $PID"
-    echo "   Puerto: 8000"
-    
-    # Verificar respuesta
-    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/ 2>/dev/null)
-    if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "302" ]; then
-        echo -e "   ${GREEN}✅ Respondiendo correctamente (HTTP $HTTP_CODE)${NC}"
-    else
-        echo -e "   ${YELLOW}⚠️  HTTP Status: $HTTP_CODE${NC}"
+ENCONTRADO=0
+for PUERTO in 8000 8001; do
+    CODIGO=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:${PUERTO}/healthz" 2>/dev/null)
+    if [ "$CODIGO" = "200" ]; then
+        echo -e "${GREEN}Servidor respondiendo en http://localhost:${PUERTO}/ (HTTP ${CODIGO})${NC}"
+        ENCONTRADO=1
     fi
-else
-    echo -e "${YELLOW}❌ Servidor no está corriendo${NC}"
-    echo "   Inicia con: python manage.py runserver 0.0.0.0:8000 --settings=gotogym.settings_local"
+done
+if [ "$ENCONTRADO" = "0" ]; then
+    echo -e "${YELLOW}No hay un servidor respondiendo en los puertos 8000 ni 8001.${NC}"
+    echo "   Inicia con: EJECUTAR_LOCAL.bat (Windows) o ./start.sh"
 fi
 
 echo ""
-echo -e "${BLUE}🔗 4. URL DE ACCESO${NC}"
+echo -e "${BLUE}4. Dónde entrar${NC}"
 echo "───────────────────────────────────────────────────────"
-if [ -n "$CODESPACE_NAME" ]; then
-    CODESPACE_URL="https://${CODESPACE_NAME}-8000.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
-    echo -e "${GREEN}📱 URL Codespace:${NC}"
-    echo "   $CODESPACE_URL"
-    echo ""
-    echo "   Panel Admin: $CODESPACE_URL/admin/"
-    echo "   Login: admin@gotogym.com / admin123"
-else
-    echo "   http://localhost:8000/"
-    echo "   Panel Admin: http://localhost:8000/es/admin/"
-fi
-
+echo "   Tienda:          http://localhost:8000/es/"
+echo "   Panel interno:   http://localhost:8000/es/admin-panel/"
+echo "   Admin de Django: http://localhost:8000/es/admin/"
 echo ""
-echo "═══════════════════════════════════════════════════════"
-echo "  ✅ Verificación completa"
-echo "═══════════════════════════════════════════════════════"
+echo "Guía completa: docs/GUIA_ACCESO.md"

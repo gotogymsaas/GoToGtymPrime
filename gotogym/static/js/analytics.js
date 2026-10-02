@@ -103,10 +103,35 @@
   }
 
   // --- Vista de pagina ---------------------------------------------------
-  encolar('page_view', {
-    ancho: window.innerWidth,
-    autenticado: document.body.classList.contains('gtg-autenticado') ? 1 : 0
-  });
+  /* De donde llega la persona, solo en la primera pagina de la sesion: el
+   * dominio de origen (nunca la URL completa) y los parametros de campana.
+   * Sin esto no se puede saber que canal trae las visitas que compran. */
+  function atribucion() {
+    var datos = {};
+    try {
+      if (sessionStorage.getItem('gtg_atribucion')) return datos;
+      sessionStorage.setItem('gtg_atribucion', '1');
+    } catch (error) {
+      return datos;
+    }
+    try {
+      if (document.referrer) {
+        var origen = new URL(document.referrer).hostname;
+        if (origen && origen !== window.location.hostname) datos.referrer = origen;
+      }
+    } catch (error) { /* referrer ilegible: se omite */ }
+    var parametros = new URLSearchParams(window.location.search);
+    ['utm_source', 'utm_medium', 'utm_campaign', 'ref'].forEach(function (clave) {
+      var valor = parametros.get(clave);
+      if (valor) datos[clave] = valor;
+    });
+    return datos;
+  }
+
+  var vista = atribucion();
+  vista.ancho = window.innerWidth;
+  vista.autenticado = document.body.classList.contains('gtg-autenticado') ? 1 : 0;
+  encolar('page_view', vista);
 
   // --- Clics -------------------------------------------------------------
   document.addEventListener('click', function (evento) {

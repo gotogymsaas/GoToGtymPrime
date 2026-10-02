@@ -1,7 +1,9 @@
 #!/bin/bash
-# Script de inicio rápido para GoToGymPrime
-# Autor: Análisis automatizado
-# Fecha: 2026-02-14
+# Inicio rápido de GoToGymPrime en desarrollo (SQLite, settings_local).
+#
+#   ./start.sh
+#
+# En Windows, EJECUTAR_LOCAL.bat hace lo mismo sin preguntas.
 
 set -e
 
@@ -19,6 +21,13 @@ NC='\033[0m' # No Color
 # devcontainer especifico (la ruta absoluta anterior solo existia en un
 # Codespace concreto y rompia el script en cualquier otro lugar).
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/gotogym" && pwd)"
+
+# Usa el entorno virtual del proyecto si existe
+if [ -f "$(dirname "${BASH_SOURCE[0]}")/.venv/bin/activate" ]; then
+    source "$(dirname "${BASH_SOURCE[0]}")/.venv/bin/activate"
+elif [ -f "$(dirname "${BASH_SOURCE[0]}")/.venv/Scripts/activate" ]; then
+    source "$(dirname "${BASH_SOURCE[0]}")/.venv/Scripts/activate"
+fi
 
 # Verificar dependencias
 echo "📦 Verificando dependencias..."
@@ -64,6 +73,10 @@ else
 fi
 echo ""
 
+# Entradas del Journal (no pisa las que ya existan)
+python manage.py seed_journal --solo-faltantes --settings=gotogym.settings_local ||     echo -e "${YELLOW}⚠️  No se pudieron cargar las entradas del Journal; continúa sin ellas${NC}"
+echo ""
+
 # Verificar superusuario
 echo "👤 Verificando superusuario..."
 HAS_SUPER=$(python manage.py shell --settings=gotogym.settings_local -c "from accounts.models import User; print(User.objects.filter(is_superuser=True).exists())")
@@ -79,8 +92,9 @@ echo ""
 
 # Mostrar información de URLs
 echo "📍 URLs importantes:"
-echo "   - Frontend: http://localhost:8000/"
-echo "   - Admin: http://localhost:8000/admin/"
+echo "   - Tienda: http://localhost:8000/es/"
+echo "   - Panel interno: http://localhost:8000/es/admin-panel/"
+echo "   - Admin de Django: http://localhost:8000/es/admin/"
 echo ""
 
 # Iniciar servidor
