@@ -103,18 +103,23 @@
 </div>
 
 <div class="panel">
-  <h2>Solicitudes de retiro</h2>
+  <h2>Solicitudes de comision</h2>
   <table>
-    <thead><tr><th>Monto</th><th>Estado</th><th>Solicitada</th><th>Resuelta</th></tr></thead>
+    <thead><tr><th>Monto</th><th>Estado</th><th>Datos de pago</th><th>Solicitada</th><th>Resuelta</th></tr></thead>
     <tbody>
       {% for withdrawal in withdrawal_requests %}
       <tr>
         <td class="nowrap">${{ withdrawal.amount|cop }} COP</td>
         <td>{{ withdrawal.get_status_display }}</td>
+        <td>
+          {% if withdrawal.payment_details %}
+          <details class="payment-details"><summary>Ver mensaje</summary><p>{{ withdrawal.payment_details|linebreaksbr }}</p></details>
+          {% else %}&mdash;{% endif %}
+        </td>
         <td><small>{{ withdrawal.requested_at|date:"d/m/Y" }}</small></td>
         <td><small>{{ withdrawal.resolved_at|date:"d/m/Y"|default:"—" }}</small></td>
       </tr>
-      {% empty %}<tr><td colspan="4">Sin solicitudes todavia.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="5">Sin solicitudes todavia.</td></tr>{% endfor %}
     </tbody>
   </table>
 </div>

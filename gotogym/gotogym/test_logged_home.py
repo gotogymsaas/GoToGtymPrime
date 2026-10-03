@@ -63,7 +63,9 @@ class LoggedHomeTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Diseñada para tu')
-        self.assertContains(response, 'Hola, Ana')
+        # La portada es la misma con y sin sesion: no saluda por el nombre.
+        self.assertNotContains(response, 'Hola, Ana')
+        self.assertContains(response, 'Ropa deportiva con tecnología textil')
         # El hero precarga un derivado AVIF, no el JPEG original: el pipeline
         # de imagenes (tienda.imagenes) genera derivados versionados por
         # nombre, asi que aqui solo se comprueba que exista la precarga con

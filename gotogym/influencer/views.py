@@ -147,22 +147,38 @@ def compras_referidas(request):
     return render(request, 'influencer/compras_referidas.html', {'compras': compras})
 
 
+MAX_DATOS_DE_PAGO = 1000
+
+
 @login_required
 def solicitar_retiro(request):
+    """Solicitud de comision: el afiliado indica su cuenta e indicaciones de
+    pago en texto libre y el equipo le responde. Es POST: el panel muestra el
+    formulario desplegable."""
     profile = getattr(request.user, 'influencer_profile', None)
     if not profile or profile.status != InfluencerStatus.APPROVED or not profile.is_active:
         return redirect('influencer_dashboard')
+    if request.method != 'POST':
+        return redirect('influencer_dashboard')
     if profile.withdrawal_requests.filter(status=WithdrawalStatus.PENDING).exists():
-        messages.info(request, 'Ya tienes una solicitud de retiro pendiente.')
+        messages.info(request, 'Ya tienes una solicitud de comision pendiente.')
         return redirect('influencer_dashboard')
 
-    solicitud = request_withdrawal(profile)
+    datos_de_pago = request.POST.get('payment_details', '').strip()
+    if not datos_de_pago:
+        messages.error(request, 'Indica tu numero de cuenta e indicaciones para poder pagarte.')
+        return redirect('influencer_dashboard')
+    if len(datos_de_pago) > MAX_DATOS_DE_PAGO:
+        messages.error(request, f'El mensaje es muy largo (maximo {MAX_DATOS_DE_PAGO} caracteres).')
+        return redirect('influencer_dashboard')
+
+    solicitud = request_withdrawal(profile, datos_de_pago)
     if solicitud is None:
-        messages.error(request, 'No tienes comisiones disponibles para retirar todavia.')
+        messages.error(request, 'No tienes comisiones disponibles para solicitar todavia.')
     else:
         messages.success(
             request,
-            f'Solicitud de retiro por ${solicitud.amount} enviada. Te avisaremos cuando se procese.',
+            f'Solicitud de comision por ${solicitud.amount} enviada. Te responderemos con la mayor brevedad posible.',
         )
     return redirect('influencer_dashboard')
 

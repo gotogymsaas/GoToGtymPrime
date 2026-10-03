@@ -43,10 +43,16 @@
       <a href="{% url 'influencer_dashboard' %}" class="ghost btn-sm">Resumen</a>
       <a href="{% url 'influencer_compras_referidas' %}" class="ghost btn-sm">Compras referidas</a>
       {% if not pending_withdrawal %}
-      <form method="post" action="{% url 'influencer_solicitar_retiro' %}">
-        {% csrf_token %}
-        <button type="submit" class="button btn-sm">Solicitar retiro</button>
-      </form>
+      <details class="request-commission">
+        <summary class="button btn-sm">Solicitar comision</summary>
+        <form method="post" action="{% url 'influencer_solicitar_retiro' %}" class="request-commission__form">
+          {% csrf_token %}
+          <label for="payment_details">Indique el numero de cuenta e indicaciones. Le responderemos con la mayor brevedad posible.</label>
+          <textarea id="payment_details" name="payment_details" rows="5" maxlength="1000" required
+                    placeholder="Ej.: banco, tipo y numero de cuenta, nombre del titular y documento."></textarea>
+          <button type="submit" class="button btn-sm">Enviar solicitud</button>
+        </form>
+      </details>
       {% endif %}
       <form method="post" action="{% url 'influencer_quitar_suscripcion' %}">
         {% csrf_token %}
@@ -72,8 +78,8 @@
 
     {% if pending_withdrawal %}
     <div class="panel">
-      <h2>Solicitud de retiro en curso</h2>
-      <p>Pediste retirar ${{ pending_withdrawal.amount|cop }} COP el {{ pending_withdrawal.requested_at|date:"d/m/Y" }}. Te avisaremos cuando se procese.</p>
+      <h2>Solicitud de comision en curso</h2>
+      <p>Solicitaste ${{ pending_withdrawal.amount|cop }} COP el {{ pending_withdrawal.requested_at|date:"d/m/Y" }}. Te responderemos con la mayor brevedad posible y te avisaremos por correo cuando se pague.</p>
     </div>
     {% endif %}
 

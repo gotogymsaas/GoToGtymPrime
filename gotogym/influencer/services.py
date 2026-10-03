@@ -5,8 +5,10 @@ retiros. Los servicios de `orders` llaman a las funciones de comision
 nunca importa nada de `orders` a nivel de modulo para evitar un ciclo,
 salvo dentro de las funciones que lo necesitan (import diferido).
 """
+import logging
 from decimal import Decimal
 
+from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
@@ -19,6 +21,8 @@ from .models import (
     WithdrawalRequest,
     WithdrawalStatus,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def get_commission_rate(profile):
@@ -158,8 +162,11 @@ def deactivate_influencer(profile):
 
 
 @transaction.atomic
-def request_withdrawal(profile):
-    """Crea una solicitud de retiro por el total actualmente disponible.
+def request_withdrawal(profile, payment_details=''):
+    """Crea una solicitud de comision por el total actualmente disponible.
+
+    `payment_details` es lo que el afiliado escribio: numero de cuenta e
+    indicaciones para el pago.
 
     "Reserva" las comisiones aprobadas y sueltas ligandolas a la solicitud,
     para que una venta que se apruebe despues no infle un monto ya
@@ -171,7 +178,9 @@ def request_withdrawal(profile):
     total = comisiones.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
     if total <= 0:
         return None
-    solicitud = WithdrawalRequest.objects.create(influencer=profile, amount=total)
+    solicitud = WithdrawalRequest.objects.create(
+        influencer=profile, amount=total, payment_details=payment_details,
+    )
     comisiones.update(withdrawal_request=solicitud)
     recompute_profile_totals(profile)
     return solicitud
@@ -199,4 +208,37 @@ def resolve_withdrawal(solicitud, aprobar, resolver):
     solicitud.resolved_by = resolver
     solicitud.save(update_fields=['status', 'resolved_at', 'resolved_by'])
     recompute_profile_totals(solicitud.influencer)
+    if aprobar:
+        # Despues de confirmar la transaccion: si algo la revierte, el
+        # afiliado no recibe un aviso de un pago que no quedo registrado.
+        transaction.on_commit(lambda: notify_commission_paid(solicitud))
     return solicitud
+
+
+def notify_commission_paid(solicitud):
+    """Avisa por correo al afiliado que su solicitud de comision fue pagada.
+
+    Un fallo de correo nunca debe deshacer ni ocultar el pago ya registrado:
+    se deja en el log y el administrador sigue su flujo.
+    """
+    from tienda.templatetags.tienda_filters import cop
+
+    usuario = solicitud.influencer.user
+    nombre = usuario.first_name or usuario.email
+    cuerpo = (
+        f'Hola {nombre},\n\n'
+        f'Te confirmamos que pagamos tu solicitud de comision por ${cop(solicitud.amount)} COP, '
+        f'solicitada el {timezone.localtime(solicitud.requested_at):%d/%m/%Y}.\n\n'
+        'Si tienes alguna duda sobre el pago, escribenos a support@gotogym.store.\n\n'
+        'Gracias por hacer parte del programa de afiliados de GoToGym.\n'
+        'Equipo GoToGym\n'
+    )
+    try:
+        send_mail(
+            subject='Tu comision de GoToGym fue pagada',
+            message=cuerpo,
+            from_email=None,
+            recipient_list=[usuario.email],
+        )
+    except Exception:
+        logger.exception('No se pudo enviar el aviso de pago de comision (solicitud %s)', solicitud.pk)

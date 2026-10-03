@@ -97,6 +97,9 @@ class WithdrawalRequest(models.Model):
     influencer = models.ForeignKey(InfluencerProfile, on_delete=models.CASCADE, related_name='withdrawal_requests')
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     status = models.CharField(max_length=12, choices=WithdrawalStatus.choices, default=WithdrawalStatus.PENDING)
+    # Texto libre que escribe el afiliado al solicitar: numero de cuenta e
+    # indicaciones de pago. Es un dato financiero: solo lo ve el personal.
+    payment_details = models.TextField(blank=True)
     requested_at = models.DateTimeField(auto_now_add=True)
     resolved_at = models.DateTimeField(null=True, blank=True)
     resolved_by = models.ForeignKey(

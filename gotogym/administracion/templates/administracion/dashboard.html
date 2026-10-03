@@ -33,7 +33,7 @@
     <a href="{% url 'admin_influencers' %}?status=pending"><span>{{ pending_influencer_count }}</span><p>Solicitudes de afiliado</p></a>
   </article>
   <article class="{% if pending_withdrawal_count %}is-gold stat-warning{% else %}is-green{% endif %}">
-    <a href="{% url 'admin_withdrawals' %}"><span>{{ pending_withdrawal_count }}</span><p>Retiros pendientes</p></a>
+    <a href="{% url 'admin_withdrawals' %}"><span>{{ pending_withdrawal_count }}</span><p>Solicitudes de comision</p></a>
   </article>
   <article class="{% if low_stock_count %}is-gold stat-warning{% else %}is-green{% endif %}"><span>{{ low_stock_count }}</span><p>Variantes con stock bajo</p></article>
   <article class="{% if out_of_stock_count %}stat-danger{% else %}is-green{% endif %}"><span>{{ out_of_stock_count }}</span><p>Variantes agotadas</p></article>

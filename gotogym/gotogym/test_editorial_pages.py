@@ -98,3 +98,23 @@ class EditorialPagesTests(TestCase):
         response = self.client.get(reverse('politica_envios'))
 
         self.assertContains(response, 'href="{}" aria-current="page"'.format(reverse('politica_envios')))
+
+
+class PieDePaginaConFondoFijoTests(TestCase):
+    """Contacto tiene un fondo decorativo `position: fixed`, que forma una
+    capa posicionada. Un pie sin posicionar se pintaba debajo de ese fondo y
+    desaparecia al llegar al final de la pagina."""
+
+    def test_el_pie_tiene_su_propia_capa_por_encima_del_fondo(self):
+        from pathlib import Path
+
+        css = (Path(__file__).resolve().parents[1] / 'static' / 'css' / 'style.css').read_text(encoding='utf-8')
+        bloque = css[css.index('\n.gtg-footer {'):]
+        bloque = bloque[:bloque.index('}')]
+        self.assertIn('position: relative', bloque)
+        self.assertIn('z-index: 1', bloque)
+
+    def test_contacto_incluye_el_pie_de_pagina(self):
+        html = self.client.get(reverse('contacto')).content.decode()
+        self.assertIn('class="gtg-footer"', html)
+        self.assertIn('editorial-quantum__background', html)

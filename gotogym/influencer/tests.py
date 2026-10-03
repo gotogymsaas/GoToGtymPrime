@@ -7,9 +7,11 @@ propio codigo (ver historial) y no habia ninguna prueba sobre el flujo
 real.
 """
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from inventory.models import Inventory
@@ -21,6 +23,7 @@ from orders.services import (
     get_usable_coupon,
 )
 from products.models import Brand, Product, ProductCategory, ProductVariant
+from tienda.templatetags.tienda_filters import cop
 
 from .models import (
     Commission,
@@ -295,10 +298,116 @@ class RetiroDeComisionesTests(InfluencerTestBase):
         self._pedido_entregado(perfil)
         self.client.force_login(self.afiliado_user)
 
-        self.client.post(reverse('influencer_solicitar_retiro'))
-        self.client.post(reverse('influencer_solicitar_retiro'))
+        self.client.post(reverse('influencer_solicitar_retiro'), {'payment_details': 'Cuenta 123'})
+        self.client.post(reverse('influencer_solicitar_retiro'), {'payment_details': 'Cuenta 123'})
 
         self.assertEqual(WithdrawalRequest.objects.filter(influencer=perfil).count(), 1)
+
+
+class SolicitudDeComisionTests(InfluencerTestBase):
+    """El afiliado escribe su cuenta e indicaciones; el equipo le responde."""
+
+    def _solicitar(self, **datos):
+        return self.client.post(reverse('influencer_solicitar_retiro'), datos)
+
+    def setUp(self):
+        super().setUp()
+        self.perfil = self._crear_perfil_aprobado()
+        self._pedido_entregado(self.perfil)
+        self.client.force_login(self.afiliado_user)
+
+    def test_el_panel_ofrece_el_desplegable_con_el_mensaje_abierto(self):
+        respuesta = self.client.get(reverse('influencer_dashboard'))
+        self.assertContains(respuesta, 'Solicitar comision')
+        self.assertNotContains(respuesta, 'Solicitar retiro')
+        self.assertContains(respuesta, 'Indique el numero de cuenta e indicaciones')
+        self.assertContains(respuesta, 'Le responderemos con la mayor brevedad posible')
+        self.assertContains(respuesta, 'name="payment_details"')
+
+    def test_guarda_el_mensaje_con_la_solicitud(self):
+        self._solicitar(payment_details='  Bancolombia ahorros 000-111  \nTitular: Ana  ')
+        solicitud = WithdrawalRequest.objects.get(influencer=self.perfil)
+        self.assertEqual(solicitud.payment_details, 'Bancolombia ahorros 000-111  \nTitular: Ana')
+        self.assertGreater(solicitud.amount, 0)
+
+    def test_sin_mensaje_no_se_crea_la_solicitud_ni_se_reservan_comisiones(self):
+        respuesta = self._solicitar(payment_details='   ', follow=False)
+        self.assertEqual(respuesta.status_code, 302)
+        self.assertFalse(WithdrawalRequest.objects.exists())
+        self.perfil.refresh_from_db()
+        self.assertGreater(self.perfil.commission_balance, 0)
+
+    def test_un_mensaje_demasiado_largo_se_rechaza(self):
+        self._solicitar(payment_details='x' * 1001)
+        self.assertFalse(WithdrawalRequest.objects.exists())
+
+    def test_una_solicitud_se_hace_solo_por_post(self):
+        self.client.get(reverse('influencer_solicitar_retiro'))
+        self.assertFalse(WithdrawalRequest.objects.exists())
+
+    def test_con_una_solicitud_en_curso_el_panel_la_muestra_y_no_ofrece_otra(self):
+        self._solicitar(payment_details='Cuenta 1')
+        respuesta = self.client.get(reverse('influencer_dashboard'))
+        self.assertContains(respuesta, 'Solicitud de comision en curso')
+        self.assertNotContains(respuesta, 'name="payment_details"')
+
+
+class AvisoDePagoPorCorreoTests(InfluencerTestBase):
+    def setUp(self):
+        super().setUp()
+        from administracion.permissions import grant_full_admin_permissions
+        grant_full_admin_permissions(self.admin)
+        self.perfil = self._crear_perfil_aprobado()
+        self._pedido_entregado(self.perfil)
+        self.solicitud = request_withdrawal(self.perfil, 'Cuenta 123')
+        self.client.force_login(self.admin)
+
+    def _resolver(self, accion):
+        with self.captureOnCommitCallbacks(execute=True):
+            return self.client.post(
+                reverse('admin_withdrawal_resolve', args=[self.solicitud.pk]), {'action': accion},
+            )
+
+    def test_al_marcar_pagada_el_afiliado_recibe_un_correo(self):
+        self._resolver('pay')
+        self.assertEqual(len(mail.outbox), 1)
+        correo = mail.outbox[0]
+        self.assertEqual(correo.to, [self.afiliado_user.email])
+        self.assertIn('pagada', correo.subject)
+        self.assertIn(cop(self.solicitud.amount), correo.body)
+        self.assertNotIn('Cuenta 123', correo.body)  # nunca repite datos de pago
+
+    def test_al_rechazar_no_se_envia_correo(self):
+        self._resolver('reject')
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_resolver_dos_veces_no_envia_dos_correos(self):
+        self._resolver('pay')
+        self._resolver('pay')
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_si_el_correo_falla_el_pago_queda_registrado(self):
+        with patch('influencer.services.send_mail', side_effect=OSError('smtp caido')):
+            with self.assertLogs('influencer.services', level='ERROR'):
+                self._resolver('pay')
+        self.solicitud.refresh_from_db()
+        self.assertEqual(self.solicitud.status, WithdrawalStatus.PAID)
+
+    def test_el_administrador_ve_el_mensaje_y_los_nuevos_textos(self):
+        respuesta = self.client.get(reverse('admin_influencers'))
+        self.assertContains(respuesta, 'Comisiones de afiliados')
+        self.assertContains(respuesta, 'Datos de pago')
+        self.assertContains(respuesta, 'Cuenta 123')
+        self.assertNotContains(respuesta, 'Retiros de afiliados')
+        panel = self.client.get(reverse('admin_dashboard'))
+        self.assertContains(panel, 'Solicitudes de comision')
+        self.assertNotContains(panel, 'Retiros pendientes')
+
+    def test_el_menu_lateral_tiene_boton_para_plegarse_en_celular(self):
+        html = self.client.get(reverse('admin_dashboard')).content.decode()
+        self.assertIn('class="sidebar-toggle"', html)
+        self.assertIn('aria-controls="panel-nav"', html)
+        self.assertIn('id="panel-nav"', html)
 
 
 class PanelDeAfiliadoViewTests(InfluencerTestBase):

@@ -25,4 +25,4 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LANGUAGE_CODE = 'es'
 
 print("✅ Usando configuración LOCAL (SQLite)")
-print(f"📁 Base de datos: {DATABASES['default']['NAME']}")
+print(f"Base de datos: {DATABASES['default']['NAME']}")

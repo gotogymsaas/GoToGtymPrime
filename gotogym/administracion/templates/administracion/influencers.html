@@ -95,7 +95,7 @@
 <section class="page-head">
   <div>
     <p class="eyebrow">Programa de afiliados</p>
-    <h2>Retiros de afiliados</h2>
+    <h2>Comisiones de afiliados</h2>
   </div>
 </section>
 <div class="filter-tabs">
@@ -105,12 +105,17 @@
 </div>
 <div class="panel">
   <table>
-    <thead><tr><th>Afiliado</th><th>Monto</th><th>Solicitada</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
+    <thead><tr><th>Afiliado</th><th>Monto</th><th>Datos de pago</th><th>Solicitada</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
     <tbody>
       {% for withdrawal in withdrawal_page_obj %}
       <tr>
         <td><a href="{% url 'admin_influencer_detail' withdrawal.influencer.pk %}">{{ withdrawal.influencer.user.email }}</a></td>
         <td class="nowrap">${{ withdrawal.amount|cop }} COP</td>
+        <td>
+          {% if withdrawal.payment_details %}
+          <details class="payment-details"><summary>Ver mensaje</summary><p>{{ withdrawal.payment_details|linebreaksbr }}</p></details>
+          {% else %}&mdash;{% endif %}
+        </td>
         <td><small>{{ withdrawal.requested_at|date:"d/m/Y H:i" }}</small></td>
         <td>{{ withdrawal.get_status_display }}</td>
         <td class="actions">
@@ -128,7 +133,7 @@
           {% endif %}
         </td>
       </tr>
-      {% empty %}<tr><td colspan="5">No hay solicitudes en este estado.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="6">No hay solicitudes en este estado.</td></tr>{% endfor %}
     </tbody>
   </table>
 </div>

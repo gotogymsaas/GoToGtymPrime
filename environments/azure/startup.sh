@@ -21,6 +21,13 @@ echo "[startup] Aplicando migraciones..."
 echo "[startup] Recolectando estaticos..."
 "${PYTHON_BIN}" gotogym/manage.py collectstatic --noinput
 
+# Entradas del Journal: son datos, no codigo, asi que no llegan con el
+# despliegue. --solo-faltantes crea las que no existen y nunca pisa las que
+# ya estan (ni sus ediciones). Un fallo aqui no debe impedir que el sitio
+# arranque.
+echo "[startup] Cargando entradas del Journal (solo las que faltan)..."
+"${PYTHON_BIN}" gotogym/manage.py seed_journal --solo-faltantes   || echo "[startup] AVISO: no se pudieron cargar las entradas del Journal; el sitio arranca igual."
+
 # Este script quedo desincronizado de lo que el App Service corria de
 # verdad (el Startup Command configurado a mano en el Portal, invisible
 # para git) el tiempo suficiente para provocar una caida: revertir este

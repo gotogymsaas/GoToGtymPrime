@@ -1085,7 +1085,7 @@ def influencer_deactivate(request, pk):
 
 @staff_required
 def withdrawals_list(request):
-    # "Retiros de afiliados" se unifico dentro de "Afiliados" (ver
+    # "Comisiones de afiliados" se unifico dentro de "Afiliados" (ver
     # `influencers_list`); esta ruta se conserva solo para no romper
     # enlaces viejos.
     return redirect("admin_influencers")
@@ -1097,8 +1097,10 @@ def withdrawal_resolve(request, pk):
     solicitud = get_object_or_404(WithdrawalRequest, pk=pk)
     aprobar = request.POST.get("action") == "pay"
     resolve_withdrawal(solicitud, aprobar, request.user)
-    estado = "pagada" if aprobar else "rechazada"
-    messages.success(request, f"Solicitud de retiro {estado}.")
+    messages.success(
+        request,
+        "Solicitud de comision pagada. Se le aviso al afiliado por correo." if aprobar else "Solicitud de comision rechazada.",
+    )
     return _safe_redirect(request, "admin_influencers")
 
 

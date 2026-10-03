@@ -520,9 +520,31 @@ body.panel-shell {
   background: linear-gradient(90deg, rgba(0, 212, 199, .55), transparent);
 }
 
+/* Menu lateral: en celular se pliega tras un boton. */
+.panel-shell .sidebar-head { display: block; }
+.panel-shell .sidebar-toggle { display: none; }
+
 @media (max-width: 860px) {
   body.panel-shell { grid-template-columns: 1fr; }
-  .panel-shell .sidebar { position: static; height: auto; }
+  .panel-shell .sidebar { position: static; height: auto; padding: var(--space-3) var(--space-4); }
+  .panel-shell .sidebar-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+  .panel-shell .brand { margin-bottom: 0; }
+  .panel-shell .sidebar-toggle {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px;
+    border: 1px solid var(--pq-border-strong); border-radius: 8px; background: transparent;
+    color: var(--pq-text); font-size: .85rem; font-weight: 700; cursor: pointer;
+  }
+  .panel-shell .sidebar-toggle:hover { background: rgba(255, 255, 255, .06); }
+  .panel-shell .sidebar-toggle__bars,
+  .panel-shell .sidebar-toggle__bars::before,
+  .panel-shell .sidebar-toggle__bars::after {
+    display: block; width: 18px; height: 2px; border-radius: 2px; background: currentColor; content: "";
+  }
+  .panel-shell .sidebar-toggle__bars { position: relative; }
+  .panel-shell .sidebar-toggle__bars::before { position: absolute; top: -6px; }
+  .panel-shell .sidebar-toggle__bars::after { position: absolute; top: 6px; }
+  .panel-shell.js-nav .sidebar nav { display: none; margin-top: var(--space-3); }
+  .panel-shell.js-nav .sidebar nav.is-open { display: grid; }
   .panel-shell .stats, .panel-shell .stats-secondary, .panel-shell .stats-compact,
   .panel-shell .grid-two, .panel-shell .form-grid { grid-template-columns: 1fr; }
   .panel-shell .hero, .panel-shell .page-head, .panel-shell .topbar { align-items: flex-start; flex-direction: column; }
@@ -549,3 +571,25 @@ body.panel-shell {
 .panel-shell .check input:not([type="checkbox"]):not([type="radio"]) { width: auto; min-height: 44px; }
 .panel-shell .goal-field { display: grid; gap: var(--space-2); color: var(--pq-muted); font-size: .75rem; font-weight: 700; }
 .panel-shell .goal-field input { width: 220px; max-width: 100%; }
+
+/* Solicitar comision (panel de afiliados): desplegable con mensaje abierto. */
+.panel-shell .request-commission { position: relative; }
+.panel-shell .request-commission > summary { list-style: none; cursor: pointer; }
+.panel-shell .request-commission > summary::-webkit-details-marker { display: none; }
+.panel-shell .request-commission__form {
+  position: absolute; z-index: 20; top: calc(100% + 8px); left: 0; display: grid; gap: var(--space-3);
+  width: min(420px, 86vw); padding: var(--space-4); border: 1px solid var(--pq-border-strong);
+  border-radius: 10px; background: #0b0e12; box-shadow: 0 18px 42px rgba(0, 0, 0, .45);
+}
+.panel-shell .request-commission__form label { color: var(--pq-text); font-size: .85rem; line-height: 1.5; }
+.panel-shell .request-commission__form textarea { min-height: 120px; padding: var(--space-3); resize: vertical; }
+@media (max-width: 860px) {
+  .panel-shell div.actions { flex-wrap: wrap; }
+  .panel-shell .request-commission { flex: 1 1 100%; }
+  .panel-shell .request-commission > summary { display: inline-flex; }
+  .panel-shell .request-commission__form { position: static; width: 100%; margin-top: var(--space-2); }
+}
+
+/* Mensaje de pago que escribe el afiliado, visible solo en el administrador. */
+.panel-shell .payment-details summary { cursor: pointer; color: var(--pq-teal); font-size: .8rem; font-weight: 700; }
+.panel-shell .payment-details p { max-width: 320px; margin: var(--space-2) 0 0; color: var(--pq-text); font-size: .82rem; line-height: 1.5; overflow-wrap: anywhere; }

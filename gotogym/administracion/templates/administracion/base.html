@@ -8,17 +8,23 @@
   <link rel="icon" type="image/png" href="{% static 'images/logo-gotogym-symbol-transparent.png' %}">
   <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
   <link href="{% static 'fonts/@fontsource/playfair-display/700.css' %}" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261002-importes">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261003-footer">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
   <link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261002-importes">
 </head>
 <body class="panel-shell">
   <aside class="sidebar">
-    <a class="brand" href="{% url 'admin_dashboard' %}">
-      <span class="quantum-emblem quantum-emblem--sm"><span class="quantum-emblem__core"></span></span>
-      <span class="brand-text">GoToGym<span>Admin</span></span>
-    </a>
-    <nav>
+    <div class="sidebar-head">
+      <a class="brand" href="{% url 'admin_dashboard' %}">
+        <span class="quantum-emblem quantum-emblem--sm"><span class="quantum-emblem__core"></span></span>
+        <span class="brand-text">GoToGym<span>Admin</span></span>
+      </a>
+      <button class="sidebar-toggle" type="button" aria-expanded="false" aria-controls="panel-nav">
+        <span class="sidebar-toggle__bars" aria-hidden="true"></span>
+        <span class="sidebar-toggle__label">Menu</span>
+      </button>
+    </div>
+    <nav id="panel-nav" aria-label="Secciones del panel">
       <a href="{% url 'admin_dashboard' %}">Panel</a>
       <a href="{% url 'admin_analytics' %}">Analitica</a>
       <a href="{% url 'admin_products' %}">Productos</a>
@@ -59,6 +65,18 @@
     {% endif %}
   </main>
   <script>
+    // En celular el menu lateral queda cerrado y se abre con el boton; sin
+    // JavaScript se queda visible, como en escritorio.
+    (function () {
+      var boton = document.querySelector('.sidebar-toggle');
+      var menu = document.getElementById('panel-nav');
+      if (!boton || !menu) return;
+      document.body.classList.add('js-nav');
+      boton.addEventListener('click', function () {
+        var abierto = menu.classList.toggle('is-open');
+        boton.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+      });
+    })();
     // Un panel con tabla ancha desplaza su contenido: sin foco no se puede
     // recorrer con el teclado.
     document.querySelectorAll('.panel').forEach(function (panel) {

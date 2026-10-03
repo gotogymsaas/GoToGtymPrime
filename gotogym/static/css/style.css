@@ -901,6 +901,11 @@ picture source {
 }
 
 .gtg-footer {
+  /* Capa propia: algunas paginas (Contacto) tienen un fondo decorativo
+     `position: fixed` que forma una capa posicionada y se pintaba encima de
+     un pie sin posicionar, tapandolo al llegar al final. */
+  position: relative;
+  z-index: 1;
   background: var(--color-bg-base);
   color: var(--color-text-primary);
   padding: var(--space-6) 0 var(--space-5);
