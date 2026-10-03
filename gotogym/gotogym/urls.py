@@ -20,6 +20,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.contrib.sitemaps.views import sitemap
 from django.shortcuts import redirect
 from django.urls import include, path
 from django.views.generic import RedirectView
@@ -28,11 +29,14 @@ from django.views.static import serve
 from payments import views as payments_views
 
 from . import views
+from .sitemaps import SITEMAPS
 
 urlpatterns = [
     path('accounts', lambda request: redirect('commercial_login', permanent=False)),
     path('setlang/', set_language, name='set_language'),
     path('healthz', views.healthz, name='healthz'),
+    path('robots.txt', views.robots_txt, name='robots_txt'),
+    path('sitemap.xml', sitemap, {'sitemaps': SITEMAPS}, name='sitemap'),
     path('crm/healthz', views.healthz, name='legacy_crm_healthz'),
     path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
     path('api/v1/auth/login', accounts_api_views.developer_login, name='developer_auth_login'),
@@ -47,10 +51,6 @@ urlpatterns += i18n_patterns(
     path('', views.home, name='home'),
     # Alias de la antigua portada con sesion: ahora es la misma de '/'.
     path('welcome/', RedirectView.as_view(pattern_name='home', permanent=True), name='logged_home'),
-    path('tecnologia/', views.tecnologia, name='tecnologia'),
-    path('pedidos/', views.pedidos, name='pedidos'),
-    path('bienestar/', views.bienestar, name='bienestar'),
-    path('gestion/', views.gestion, name='gestion'),
     path('acerca-de/', views.acerca_de, name='acerca_de'),
     path('contacto/', views.contacto, name='contacto'),
     path('politicas-privacidad-usuario/', views.politicas_privacidad_usuario, name='politicas_privacidad_usuario'),
@@ -72,9 +72,6 @@ urlpatterns += i18n_patterns(
     path('accounts/reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='accounts/password_reset_complete.html'), name='password_reset_complete'),
     path('blog/', include('blog.urls', namespace='blog')),
     path('admin-panel/', include('administracion.urls')),
-    path('configuracion-marca/', lambda request: redirect('admin_catalogs', permanent=False)),
-    path('metricas/', lambda request: redirect('admin_dashboard', permanent=False)),
-    path('products/', include('products.urls', namespace='products')),
     path('contabilidad/', include('contabilidad.urls', namespace='contabilidad')),
     path('analitica/', include('analitica.urls', namespace='analitica')),
     path('tienda/', include('tienda.urls', namespace='tienda')),

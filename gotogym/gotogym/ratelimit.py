@@ -17,19 +17,29 @@ def _client_key(request):
 
 
 def rate_limit(key_prefix, limit, period_seconds):
-    """Permite como maximo `limit` peticiones cada `period_seconds`, por
-    usuario autenticado o por IP si es anonimo. Al superarse, responde 429
-    sin ejecutar la vista."""
+    """Permite como maximo `limit` peticiones por ventana de `period_seconds`,
+    por usuario autenticado o por IP si es anonimo. Al superarse, responde 429
+    sin ejecutar la vista.
+
+    El contador es atomico (`add` + `incr`): con una cache compartida entre
+    procesos, leer y luego escribir dejaria pasar peticiones simultaneas de
+    mas. La ventana es fija: empieza con la primera peticion y no se prolonga
+    con las siguientes."""
     def decorator(view_func):
         def wrapped(request, *args, **kwargs):
             cache_key = f'ratelimit:{key_prefix}:{_client_key(request)}'
-            intentos = cache.get(cache_key, 0)
-            if intentos >= limit:
+            cache.add(cache_key, 0, timeout=period_seconds)
+            try:
+                intentos = cache.incr(cache_key)
+            except ValueError:
+                # La clave caduco entre `add` e `incr`: empieza otra ventana.
+                cache.set(cache_key, 1, timeout=period_seconds)
+                intentos = 1
+            if intentos > limit:
                 return HttpResponse(
                     'Demasiadas solicitudes. Intenta de nuevo en unos segundos.',
                     status=429,
                 )
-            cache.set(cache_key, intentos + 1, timeout=period_seconds)
             return view_func(request, *args, **kwargs)
         wrapped.__name__ = getattr(view_func, '__name__', 'wrapped')
         wrapped.__doc__ = view_func.__doc__

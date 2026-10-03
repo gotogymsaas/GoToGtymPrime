@@ -11,7 +11,12 @@ def bootstrap_admin(apps, schema_editor):
 
     email = os.environ.get("GOTOGYM_ADMIN_EMAIL", "admin@gotogym.com").strip().lower()
     username = os.environ.get("GOTOGYM_ADMIN_USERNAME", "ericviana").strip()
-    password = os.environ.get("GOTOGYM_ADMIN_PASSWORD", "EricViana@2026")
+    password = os.environ.get("GOTOGYM_ADMIN_PASSWORD", "")
+    if not password:
+        # Antes habia una contrasena por defecto escrita aqui, publica para
+        # cualquiera que leyera el repositorio. Sin la variable no se crea ni se
+        # toca ningun administrador: se crea con `createsuperuser`.
+        return
 
     user, _ = User.objects.get_or_create(
         email=email,

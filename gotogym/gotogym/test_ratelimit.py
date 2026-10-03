@@ -74,3 +74,22 @@ class RateLimitTests(SimpleTestCase):
         self.assertEqual(vista_a(request).status_code, 200)
         # Un endpoint distinto no deberia consumir el mismo contador.
         self.assertEqual(vista_b(request).status_code, 200)
+
+    def test_la_ventana_es_fija_y_no_se_prolonga_con_cada_peticion(self):
+        # Con la versión anterior cada petición renovaba el vencimiento: quien
+        # insistía cada pocos segundos nunca recuperaba el acceso.
+        from unittest.mock import patch
+
+        vista = rate_limit('test-ventana', limit=1, period_seconds=60)(lambda r: HttpResponse('ok'))
+        with patch.object(cache, 'set', wraps=cache.set) as set_cache:
+            vista(self._request())
+            vista(self._request())
+            vista(self._request())
+        set_cache.assert_not_called()  # el vencimiento lo fija solo el primer `add`
+
+    def test_si_la_clave_caduca_entre_dos_pasos_empieza_otra_ventana(self):
+        from unittest.mock import patch
+
+        vista = rate_limit('test-caduca', limit=1, period_seconds=60)(lambda r: HttpResponse('ok'))
+        with patch.object(cache, 'incr', side_effect=ValueError('Key not found')):
+            self.assertEqual(vista(self._request()).status_code, 200)

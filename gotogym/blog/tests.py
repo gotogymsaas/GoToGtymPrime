@@ -100,6 +100,11 @@ class SeedJournalTests(TestCase):
             email='root@example.com', username='root@example.com', password='secret123',
         )
 
+    def _admin_posterior(self):
+        return get_user_model().objects.create_superuser(
+            email='otro-root@example.com', username='otro-root@example.com', password='secret123',
+        )
+
     def _correr(self, *args):
         salida = StringIO()
         call_command('seed_journal', *args, stdout=salida)
@@ -113,9 +118,8 @@ class SeedJournalTests(TestCase):
         self.assertTrue(Category.objects.filter(name='Materiales').exists())
 
     def test_por_defecto_el_autor_es_el_primer_superusuario(self):
-        # La migracion inicial ya crea un administrador, asi que existe aunque
-        # la prueba no cree ninguno.
-        primero = get_user_model().objects.filter(is_superuser=True).order_by('pk').first()
+        primero = self._admin()
+        self._admin_posterior()
         self._correr()
         self.assertEqual(set(Post.objects.values_list('author_id', flat=True)), {primero.pk})
 

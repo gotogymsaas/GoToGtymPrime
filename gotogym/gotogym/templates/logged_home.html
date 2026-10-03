@@ -14,7 +14,7 @@ ancho de pantalla, incluido el movil.
 {% if preload_movil %}<link rel="preload" as="image" type="image/avif" media="(max-width: 720px)" href="{{ preload_movil }}" fetchpriority="high">{% endif %}
 {% if preload_escritorio %}<link rel="preload" as="image" type="image/avif" media="(min-width: 721px)" href="{{ preload_escritorio }}" fetchpriority="high">{% endif %}
 <link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260923-fringe-fix">
-<link rel="stylesheet" href="{% static 'css/store_home.css' %}?v=20260930-token-unify">
+<link rel="stylesheet" href="{% static 'css/store_home.css' %}?v=20261004-sin-journal">
 {% endblock %}
 
 {% block content %}
@@ -126,43 +126,6 @@ ancho de pantalla, incluido el movil.
         <a class="store-button store-button--dark" href="{% url 'contacto' %}">Hablar con GoToGym</a>
       </div>
       {% imagen_editorial "bienestar_empresarial_3.jpeg" alt="Equipo usando prendas GoToGym en una experiencia de bienestar empresarial" sizes="(max-width: 980px) 100vw, 60vw" %}
-    </div>
-  </section>
-
-  <section class="store-section store-journal" aria-labelledby="journal-title">
-    <div class="store-shell">
-      <p class="store-eyebrow">GoToGym Journal</p>
-      {% if latest_posts %}
-      <div class="store-heading-row">
-        <h2 id="journal-title">Historias para avanzar</h2>
-        <a class="store-link" href="{% url 'blog:post_list' %}">Ver Journal <span aria-hidden="true">→</span></a>
-      </div>
-      <div class="journal-grid">
-        {% for post in latest_posts %}
-        <article class="{% if forloop.first %}journal-card--lead{% endif %}">
-          <a class="journal-card__media" href="{% url 'blog:post_detail' post.slug %}" aria-label="Leer {{ post.title }}">
-            {% if post.featured %}
-            <img src="{{ post.featured.url }}" alt="" loading="lazy">
-            {% else %}
-            <span aria-hidden="true">G</span>
-            {% endif %}
-          </a>
-          <div class="journal-card__copy">
-            <p>{{ post.category.name|default:"GoToGym" }} · {{ post.reading_time }} min</p>
-            <h3><a href="{% url 'blog:post_detail' post.slug %}">{{ post.title }}</a></h3>
-            <span>{{ post.excerpt|default:post.content|striptags|truncatewords:22 }}</span>
-            <a class="journal-card__read" href="{% url 'blog:post_detail' post.slug %}">Leer historia <span aria-hidden="true">→</span></a>
-          </div>
-        </article>
-        {% endfor %}
-      </div>
-      {% else %}
-      <div class="journal-empty">
-        <h2 id="journal-title">Estamos preparando historias para avanzar.</h2>
-        <p>Muy pronto encontrarás nuevas miradas sobre diseño, rendimiento, tecnología y bienestar.</p>
-        <a class="store-link" href="{% url 'tienda:producto_list' %}">Mientras tanto, descubre la colección <span aria-hidden="true">→</span></a>
-      </div>
-      {% endif %}
     </div>
   </section>
 

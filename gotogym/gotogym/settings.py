@@ -4,6 +4,8 @@ import urllib.parse
 from datetime import timedelta
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 
 def _split_csv(value: str) -> list[str]:
     return [item.strip() for item in value.split(',') if item.strip()]
@@ -16,8 +18,28 @@ def _as_bool(value: str | None, default: bool = False) -> bool:
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me')
 DEBUG = _as_bool(os.environ.get('DEBUG'), False)
+
+# Contexto de ejecucion. `--settings=` fija DJANGO_SETTINGS_MODULE antes de
+# importar este modulo, asi que se puede saber aqui si es desarrollo o
+# pruebas sin esperar a que settings_local/settings_test lo sobreescriban.
+_MODULO_DE_CONFIGURACION = os.environ.get('DJANGO_SETTINGS_MODULE', '')
+_EN_PRUEBAS = sys.argv[1:2] == ['test'] or _MODULO_DE_CONFIGURACION.endswith('settings_test')
+_EN_DESARROLLO = DEBUG or _MODULO_DE_CONFIGURACION.endswith('settings_local')
+# "Produccion" es todo lo que no es desarrollo ni pruebas: ahi los valores
+# seguros son el predeterminado y inseguro hay que pedirlo expresamente.
+PRODUCCION = not (_EN_PRUEBAS or _EN_DESARROLLO)
+
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
+if not SECRET_KEY:
+    if PRODUCCION:
+        # Arrancar con una clave publica y conocida deja firmas de sesion,
+        # tokens y enlaces de recuperacion falsificables por cualquiera.
+        raise ImproperlyConfigured(
+            'Falta DJANGO_SECRET_KEY. En produccion es obligatoria: genera una con '
+            '`python -c "import secrets; print(secrets.token_urlsafe(64))"`.'
+        )
+    SECRET_KEY = 'clave-solo-para-desarrollo-y-pruebas-no-usar-nunca-en-produccion-0123456789'
 DEFAULT_ALLOWED_HOSTS = (
     'localhost,127.0.0.1,'
     'gotogym.store,www.gotogym.store,developers.gotogym.store,'
@@ -33,9 +55,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
+    'widget_tweaks',
     'accounts',
     'blog',
     'products',
@@ -191,12 +215,50 @@ CORS_ALLOWED_ORIGINS = _split_csv(os.environ.get('CORS_ALLOWED_ORIGINS', DEFAULT
 
 CSRF_TRUSTED_ORIGINS = _split_csv(os.environ.get('CSRF_TRUSTED_ORIGINS', ''))
 
-# Requerido para que Django confíe en HTTPS detrás del proxy de Azure App Service
-if _as_bool(os.environ.get('SECURE_PROXY_SSL_HEADER'), False):
+# HTTPS. En produccion todo esto esta ACTIVO por defecto; en desarrollo y
+# pruebas, apagado (no hay certificado). Cada variable puede forzar el valor
+# contrario. `SECURE_PROXY_SSL_HEADER` es lo que permite a Django saber que
+# la peticion llego por HTTPS detras del proxy de Azure App Service; sin
+# el, activar la redireccion produciria un bucle infinito, por eso las dos
+# banderas comparten el mismo valor por defecto.
+if _as_bool(os.environ.get('SECURE_PROXY_SSL_HEADER'), PRODUCCION):
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = _as_bool(os.environ.get('SECURE_SSL_REDIRECT'), False)
-SESSION_COOKIE_SECURE = _as_bool(os.environ.get('SESSION_COOKIE_SECURE'), False)
-CSRF_COOKIE_SECURE = _as_bool(os.environ.get('CSRF_COOKIE_SECURE'), False)
+SECURE_SSL_REDIRECT = _as_bool(os.environ.get('SECURE_SSL_REDIRECT'), PRODUCCION)
+# Las comprobaciones de salud llegan por HTTP desde la propia plataforma: no
+# deben recibir una redireccion.
+SECURE_REDIRECT_EXEMPT = [r'^healthz$', r'^crm/healthz$']
+SESSION_COOKIE_SECURE = _as_bool(os.environ.get('SESSION_COOKIE_SECURE'), PRODUCCION)
+CSRF_COOKIE_SECURE = _as_bool(os.environ.get('CSRF_COOKIE_SECURE'), PRODUCCION)
+# HSTS le ordena al navegador no volver a usar HTTP con este dominio. Es
+# dificil de deshacer, asi que NO se activa solo: se declara por variable y se
+# sube por etapas (ver environments/azure/.env.release.example).
+SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '0'))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = _as_bool(os.environ.get('SECURE_HSTS_INCLUDE_SUBDOMAINS'), False)
+SECURE_HSTS_PRELOAD = _as_bool(os.environ.get('SECURE_HSTS_PRELOAD'), False)
+
+# Cache. Con REDIS_URL es compartida entre procesos (el limite de tasa solo es
+# fiable asi); sin ella, memoria local de cada proceso, suficiente en
+# desarrollo y con un solo proceso.
+REDIS_URL = os.environ.get('REDIS_URL', '')
+if REDIS_URL:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': REDIS_URL,
+            'KEY_PREFIX': 'gotogym',
+        },
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'gotogym-local',
+        },
+    }
+
+# Tareas en segundo plano (ver gotogym/tasks.py). "sync" ejecuta en el mismo
+# proceso; cuando exista una cola, se cambia aqui sin tocar quien encola.
+TASK_BACKEND = os.environ.get('TASK_BACKEND', 'sync')
 
 # Panel de simulacion de pagos: visible en desarrollo (DEBUG) o si se activa
 # explicitamente. Nunca debe quedar accesible en produccion real.
@@ -213,6 +275,7 @@ MERCADOPAGO_WEBHOOK_SECRET = os.environ.get('MERCADOPAGO_WEBHOOK_SECRET', '')
 HUBSPOT_PRIVATE_TOKEN = os.environ.get('HUBSPOT_PRIVATE_TOKEN', '')
 # Compatibilidad: prioriza ALEGRA_API_TOKEN y usa ALEGRA_TOKEN como fallback.
 ALEGRA_API_TOKEN = os.environ.get('ALEGRA_API_TOKEN') or os.environ.get('ALEGRA_TOKEN', '')
+ALEGRA_EMAIL = os.environ.get('ALEGRA_EMAIL', '')
 
 # Monitoreo de errores (Sentry). Sin SENTRY_DSN en el entorno queda
 # desactivado: no requiere la librería instalada para arrancar y no rompe

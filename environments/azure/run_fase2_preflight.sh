@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID:-c6015f72-55d5-4282-ba0b-f02152d798f7}"
+SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID:?Define AZURE_SUBSCRIPTION_ID (ver environments/azure/.env.release.example)}"
 RESOURCE_GROUP="${AZURE_RELEASE_RESOURCE_GROUP:-rg-gotogym-prime}"
 WEBAPP_NAME="${AZURE_RELEASE_WEBAPP:-gotogym-prime}"
 STAGING_SLOT="${AZURE_RELEASE_SLOT:-staging}"
@@ -15,6 +15,18 @@ required_settings=(
   "CSRF_TRUSTED_ORIGINS"
   "MERCADOPAGO_ACCESS_TOKEN"
   "ALEGRA_API_TOKEN"
+  "ALEGRA_EMAIL"
+)
+
+# Recomendadas: la aplicacion arranca sin ellas, pero faltan funciones o
+# garantias (correo real, monitoreo, limite de tasa fiable, HTTPS completo).
+recommended_settings=(
+  "EMAIL_HOST"
+  "SENTRY_DSN"
+  "REDIS_URL"
+  "PAYMENT_PROVIDER"
+  "SECURE_SSL_REDIRECT"
+  "SECURE_HSTS_SECONDS"
 )
 
 run_or_warn() {
@@ -68,6 +80,13 @@ if az webapp config appsettings list -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" 
   if [[ "${missing}" -eq 1 ]]; then
     echo "[azure-preflight] WARNING: hay app settings faltantes."
   fi
+  for key in "${recommended_settings[@]}"; do
+    if grep -qx "${key}" "${tmp_file}"; then
+      echo "[azure-preflight] OK recomendada: ${key}"
+    else
+      echo "[azure-preflight] RECOMENDADA sin definir: ${key}"
+    fi
+  done
 else
   echo "[azure-preflight] WARNING: no fue posible listar app settings (posible restriccion por estado de suscripcion o permisos)."
 fi

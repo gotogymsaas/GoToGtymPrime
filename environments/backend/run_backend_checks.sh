@@ -25,6 +25,9 @@ fi
 echo "[backend] Ejecutando ruff (lint)..."
 ruff check "${ROOT_DIR}/gotogym"
 
+echo "[backend] Ejecutando import-linter (dependencias entre apps)..."
+(cd "${ROOT_DIR}/gotogym" && PYTHONPATH=. lint-imports --config ../pyproject.toml)
+
 echo "[backend] Ejecutando mypy (tipos)..."
 # El backlog inicial (17 errores reales, ver historial de pyproject.toml)
 # ya se corrigio: esto bloquea el build igual que ruff.

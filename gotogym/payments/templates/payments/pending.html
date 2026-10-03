@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% block title %}{% trans "Pago" %} {{ order.order_number }}{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 {% block content %}
 <div class="container mx-auto py-8 px-4 max-w-xl">
   <div class="bg-[var(--color-premium-white)] rounded-xl shadow p-6">

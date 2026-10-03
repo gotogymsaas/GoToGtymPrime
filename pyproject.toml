@@ -66,3 +66,68 @@ omit = [
 [tool.coverage.report]
 skip_empty = true
 precision = 1
+
+[tool.importlinter]
+root_packages = [
+    "accounts", "administracion", "analitica", "blog", "carrito", "contabilidad",
+    "gotogym", "influencer", "inventory", "orders", "payments", "products",
+    "shipping", "tienda",
+]
+include_external_packages = false
+
+# Las pruebas y las migraciones cruzan apps con libertad: no son codigo de la
+# aplicacion, y una migracion apunta a otra app por su estado historico.
+exclude_type_checking_imports = true
+
+[[tool.importlinter.contracts]]
+name = "Las apps dependen hacia abajo y sin ciclos"
+type = "layers"
+layers = [
+    # Composicion: enruta y arma las paginas del sitio.
+    "gotogym.urls",
+    "gotogym.views | gotogym.sitemaps",
+    # Paneles internos: leen de casi todo, nadie depende de ellos.
+    "administracion | contabilidad",
+    "accounts | payments | influencer",
+    "orders",
+    "carrito",
+    "shipping",
+    "tienda | inventory | analitica | blog",
+    "products",
+    # Utilidades compartidas: no pueden conocer ninguna app.
+    "gotogym.seo | gotogym.ratelimit | gotogym.tasks",
+]
+ignore_imports = [
+    # Pruebas que preparan datos de otra app. Son lecturas de apoyo, no una
+    # dependencia del codigo de la aplicacion.
+    "products.test_commands -> administracion.management.commands.seed_initial_data",
+    "products.test_commands -> inventory.models",
+    "tienda.tests -> inventory.models",
+    "tienda.test_pdp -> inventory.models",
+    "tienda.test_imagen_producto -> inventory.models",
+    "orders.tests -> payments.models",
+    "orders.tests -> payments.providers.mock",
+    "orders.tests -> accounts.models",
+    "orders.test_security_hardening -> payments.models",
+    "influencer.tests -> administracion.permissions",
+    # Ciclos que ya existian al introducir la regla. Cada uno es deuda
+    # conocida: la regla impide que aparezcan nuevos, y estos se quitan al
+    # resolverlos (no se agregan otros sin discutirlo).
+    #
+    # Al crear un pedido se registra la comision del afiliado, pero el
+    # afiliado lee pedidos. Se resuelve con una senal que el pedido emita.
+    "orders.services -> influencer.services",
+    # Un envio apunta a su pedido, y el pedido calcula su envio.
+    "shipping.models -> orders.models",
+    # El comando de auditoria lee el inventario de cada producto.
+    "products.management.commands.audit_catalog -> inventory.models",
+]
+
+[[tool.importlinter.contracts]]
+name = "Las utilidades compartidas de gotogym no conocen ninguna app"
+type = "forbidden"
+source_modules = ["gotogym.seo", "gotogym.ratelimit", "gotogym.tasks"]
+forbidden_modules = [
+    "accounts", "administracion", "analitica", "blog", "carrito", "contabilidad",
+    "influencer", "inventory", "orders", "payments", "products", "shipping", "tienda",
+]

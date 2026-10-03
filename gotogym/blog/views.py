@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
+from gotogym.seo import contexto_seo, url_absoluta
 
 from .models import Category, Post
 
@@ -41,6 +42,11 @@ def post_list(request):
         'has_published_posts': has_published_posts,
         'has_active_filters': any([search, category, author]),
     }
+    context.update(contexto_seo(
+        'GoToGym Journal: historias para avanzar',
+        'Diseño, rendimiento, tecnología textil y bienestar: ciencia de materiales y ropa deportiva '
+        'explicadas con sus fuentes.',
+    ))
     return render(request, 'blog/post_list.html', context)
 
 
@@ -54,7 +60,21 @@ def post_detail(request, slug):
         .exclude(id=post.id)
         .order_by('-published')[:3]
     )
-    return render(request, 'blog/post_detail.html', {
-        'post': post,
-        'related_posts': related_posts,
-    })
+    imagen = url_absoluta(request, post.featured.url) if post.featured else None
+    datos = {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        'headline': post.title,
+        'datePublished': post.published.isoformat(),
+        'dateModified': post.updated.isoformat(),
+        'author': {'@type': 'Person', 'name': post.author.get_full_name() or 'GoToGym'},
+        'publisher': {'@type': 'Organization', 'name': 'GoToGym'},
+        'mainEntityOfPage': request.build_absolute_uri(request.path),
+    }
+    if imagen:
+        datos['image'] = imagen
+    context = {'post': post, 'related_posts': related_posts}
+    context.update(contexto_seo(
+        f'{post.title} | GoToGym Journal', post.excerpt or post.content, tipo='article', imagen=imagen, datos=datos,
+    ))
+    return render(request, 'blog/post_detail.html', context)

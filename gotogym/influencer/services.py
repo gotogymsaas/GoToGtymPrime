@@ -12,6 +12,7 @@ from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
+from gotogym.tasks import enqueue
 
 from .models import (
     Commission,
@@ -209,13 +210,15 @@ def resolve_withdrawal(solicitud, aprobar, resolver):
     solicitud.save(update_fields=['status', 'resolved_at', 'resolved_by'])
     recompute_profile_totals(solicitud.influencer)
     if aprobar:
-        # Despues de confirmar la transaccion: si algo la revierte, el
-        # afiliado no recibe un aviso de un pago que no quedo registrado.
-        transaction.on_commit(lambda: notify_commission_paid(solicitud))
+        # Se encola despues de confirmar la transaccion: si algo la revierte,
+        # el afiliado no recibe un aviso de un pago que no quedo registrado.
+        # Se pasa el id (no el objeto) para que la tarea pueda viajar por una
+        # cola de verdad.
+        enqueue(notify_commission_paid, solicitud.pk)
     return solicitud
 
 
-def notify_commission_paid(solicitud):
+def notify_commission_paid(solicitud_id):
     """Avisa por correo al afiliado que su solicitud de comision fue pagada.
 
     Un fallo de correo nunca debe deshacer ni ocultar el pago ya registrado:
@@ -223,6 +226,7 @@ def notify_commission_paid(solicitud):
     """
     from tienda.templatetags.tienda_filters import cop
 
+    solicitud = WithdrawalRequest.objects.select_related('influencer__user').get(pk=solicitud_id)
     usuario = solicitud.influencer.user
     nombre = usuario.first_name or usuario.email
     cuerpo = (

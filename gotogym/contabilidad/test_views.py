@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
+from contabilidad.views import MENSAJE_ERROR, MENSAJE_SIN_CREDENCIALES
+
 CLIENTES = [
     {'id': 1, 'name': 'Ana Marin', 'email': 'ana@example.com'},
     {'id': 2, 'name': 'Luis Soto', 'email': 'luis@example.com'},
@@ -68,7 +70,7 @@ class ContabilidadTests(TestCase):
         respuesta = self.client.get(reverse('contabilidad:clientes'))
         self.assertEqual(respuesta.status_code, 200)
         self.assertEqual(respuesta.context['clientes'], [])
-        self.assertIn('credentials', respuesta.context['error'])
+        self.assertEqual(respuesta.context['error'], MENSAJE_SIN_CREDENCIALES)
 
     def test_facturas_de_un_cliente(self, alegra):
         self._api(alegra)
@@ -96,8 +98,12 @@ class ContabilidadTests(TestCase):
         self.assertEqual(respuesta.context['facturas'], [])
 
     def test_facturas_con_la_api_caida(self, alegra):
-        alegra.return_value.get_clients.side_effect = RuntimeError('500')
+        alegra.return_value.get_clients.side_effect = RuntimeError('500 https://api.alegra.com/token=abc')
         self.client.force_login(self.staff)
-        respuesta = self.client.get(reverse('contabilidad:facturas_cliente', args=[1]))
+        with self.assertLogs('contabilidad.views', level='ERROR'):
+            respuesta = self.client.get(reverse('contabilidad:facturas_cliente', args=[1]))
         self.assertEqual(respuesta.status_code, 200)
-        self.assertEqual(respuesta.context['error'], '500')
+        # Se muestra un mensaje generico: el detalle del fallo no sale a pantalla.
+        self.assertEqual(respuesta.context['error'], MENSAJE_ERROR)
+        self.assertNotContains(respuesta, 'api.alegra.com')
+        self.assertNotContains(respuesta, 'token=abc')

@@ -2,6 +2,7 @@ from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Prefetch
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
+from gotogym.seo import contexto_seo, recortar, url_absoluta
 from products.models import Product, ProductCategory, ProductMedia, ProductVariant
 
 from .catalog import (
@@ -107,6 +108,10 @@ def producto_list(request):
         'filtros_activos': filtros_activos,
         'total_resultados': paginator.count,
     }
+    context.update(contexto_seo(
+        'Tienda GoToGym: ropa deportiva',
+        'Explora la colección de ropa deportiva GoToGym con tecnología textil: tallas, colores y precios.',
+    ))
     return render(request, 'tienda/producto_list.html', context)
 
 
@@ -179,6 +184,7 @@ def producto_detail(request, pk):
         'review_average': review_summary['average'],
         'review_count': review_summary['count'],
     }
+    context.update(_seo_de_producto(request, producto, variantes, context))
     return render(request, 'tienda/producto_detail.html', context)
 
 
@@ -209,3 +215,51 @@ def producto_variante(request, pk):
         'available': stock > 0,
         'stock': stock,
     })
+
+
+def _pesos(valor):
+    """Pesos colombianos sin decimales: "100000", no "100000.0000"."""
+    return str(int(round(valor)))
+
+
+def _seo_de_producto(request, producto, variantes, context):
+    """Metadatos y datos estructurados (schema.org/Product) de la ficha."""
+    galeria = context['gallery']
+    imagenes = [url_absoluta(request, foto.image.url) for foto in galeria if getattr(foto, 'image', None)]
+    precios = [v['price'] for v in variantes] or [producto.base_price]
+    disponibilidad = 'InStock' if context['in_stock'] else 'OutOfStock'
+    base_oferta = {
+        'priceCurrency': 'COP',
+        'availability': f'https://schema.org/{disponibilidad}',
+        'url': request.build_absolute_uri(request.path),
+    }
+    if min(precios) == max(precios):
+        oferta = {'@type': 'Offer', 'price': _pesos(min(precios)), **base_oferta}
+    else:
+        oferta = {
+            '@type': 'AggregateOffer', 'lowPrice': _pesos(min(precios)), 'highPrice': _pesos(max(precios)),
+            'offerCount': len(variantes), **base_oferta,
+        }
+    datos = {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        'name': producto.name,
+        'description': recortar(producto.description, 500) or producto.name,
+        'sku': (context.get('default_variant') or {}).get('sku') or str(producto.pk),
+        'brand': {'@type': 'Brand', 'name': producto.brand.name},
+        'category': producto.category.name,
+        'offers': oferta,
+    }
+    if imagenes:
+        datos['image'] = imagenes
+    if context['review_count']:
+        datos['aggregateRating'] = {
+            '@type': 'AggregateRating',
+            'ratingValue': round(float(context['review_average']), 1),
+            'reviewCount': context['review_count'],
+        }
+    descripcion = producto.description or f'{producto.name}, de la colección GoToGym.'
+    return contexto_seo(
+        f'{producto.name} | GoToGym', descripcion, tipo='product', imagen=imagenes[0] if imagenes else None,
+        datos=datos,
+    )

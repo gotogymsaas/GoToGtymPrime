@@ -1,8 +1,24 @@
+import logging
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from integrations.alegra.alegra_client import AlegraClient
+
+logger = logging.getLogger(__name__)
+
+MENSAJE_SIN_CREDENCIALES = 'Alegra no esta configurado: faltan las credenciales de la integracion.'
+MENSAJE_ERROR = 'No se pudo consultar Alegra. Intenta de nuevo en unos minutos; si persiste, revisa la integracion.'
+
+
+def _mensaje_de_error(error):
+    """Texto seguro para mostrar. El detalle de una excepcion (urls, cabeceras,
+    respuestas del proveedor) no se enseña: queda en el log."""
+    if isinstance(error, ValueError):
+        return MENSAJE_SIN_CREDENCIALES
+    logger.exception('Fallo la consulta a Alegra', exc_info=error)
+    return MENSAJE_ERROR
 
 
 def staff_required(view_func):
@@ -24,7 +40,7 @@ def clientes(request):
         if filtro:
             clientes = [c for c in clientes if filtro in c.get('name', '').lower() or filtro in c.get('email', '').lower()]
     except Exception as e:
-        error = str(e)
+        error = _mensaje_de_error(e)
     return render(request, 'contabilidad/clientes.html', {
         'clientes': clientes,
         'error': error,
@@ -49,7 +65,7 @@ def facturas_cliente(request, cliente_id):
         if filtro_factura:
             facturas = [f for f in facturas if filtro_factura in str(f.get('number', '')).lower() or filtro_factura in str(f.get('status', '')).lower()]
     except Exception as e:
-        error = str(e)
+        error = _mensaje_de_error(e)
     return render(request, 'contabilidad/facturas_cliente.html', {
         'cliente': cliente,
         'facturas': facturas,

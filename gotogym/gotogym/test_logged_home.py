@@ -58,7 +58,7 @@ class LoggedHomeTests(TestCase):
     def setUp(self):
         self.client.force_login(self.user)
 
-    def test_home_renderiza_experiencia_comercial_y_journal(self):
+    def test_home_renderiza_experiencia_comercial_sin_journal(self):
         response = self.client.get(reverse('home'))
 
         self.assertEqual(response.status_code, 200)
@@ -77,7 +77,9 @@ class LoggedHomeTests(TestCase):
         # pipeline degrada a servir el JPEG tal cual.
         self.assertContains(response, 'Imagenes%20Home/WhatsApp%20Image%202026-07-21')
         self.assertContains(response, 'Campo', count=0)
-        self.assertContains(response, self.post.title)
+        self.assertNotContains(response, self.post.title)
+        self.assertNotContains(response, 'Historias para avanzar')
+        self.assertContains(response, reverse('blog:post_list'))  # acceso desde el menu
         self.assertContains(response, 'GoToGym Technology')
         self.assertNotContains(response, 'Vincularse como')
 
@@ -99,7 +101,6 @@ class LoggedHomeTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Estamos preparando una selección extraordinaria')
-        self.assertContains(response, 'Estamos preparando historias para avanzar')
 
     def test_home_es_publica(self):
         self.client.logout()
@@ -108,7 +109,6 @@ class LoggedHomeTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Diseñada para tu')
-        self.assertContains(response, self.post.title)
         self.assertContains(response, reverse('commercial_login'))
         self.assertContains(response, reverse('register'))
 

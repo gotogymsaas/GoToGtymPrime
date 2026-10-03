@@ -12,7 +12,7 @@ if [[ -f "${ENV_FILE}" ]]; then
   set +a
 fi
 
-SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID:-c6015f72-55d5-4282-ba0b-f02152d798f7}"
+SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID:?Define AZURE_SUBSCRIPTION_ID (ver environments/azure/.env.release.example)}"
 RESOURCE_GROUP="${AZURE_RELEASE_RESOURCE_GROUP:-rg-gotogym-prime}"
 WEBAPP_NAME="${AZURE_RELEASE_WEBAPP:-gotogym-prime}"
 STAGING_SLOT="${AZURE_RELEASE_SLOT:-staging}"
@@ -59,7 +59,20 @@ fi
 startup_cmd="bash environments/azure/startup.sh"
 run_cmd webapp config set -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" --startup-file "${startup_cmd}"
 
+# Opcionales: solo se envian las que esten definidas (no pisan lo que Azure ya tenga).
+opcionales=()
+for var in CSRF_TRUSTED_ORIGINS PAYMENT_PROVIDER MERCADOPAGO_WEBHOOK_SECRET PAYMENTS_MOCK_UI_ENABLED \
+           ALEGRA_EMAIL EMAIL_HOST EMAIL_PORT EMAIL_HOST_USER EMAIL_HOST_PASSWORD EMAIL_USE_TLS \
+           DEFAULT_FROM_EMAIL SENTRY_DSN SENTRY_ENVIRONMENT REDIS_URL TASK_BACKEND \
+           SECURE_SSL_REDIRECT SECURE_PROXY_SSL_HEADER SESSION_COOKIE_SECURE CSRF_COOKIE_SECURE \
+           SECURE_HSTS_SECONDS SECURE_HSTS_INCLUDE_SUBDOMAINS SECURE_HSTS_PRELOAD; do
+  if [[ -n "${!var:-}" ]]; then
+    opcionales+=("${var}=${!var}")
+  fi
+done
+
 run_cmd webapp config appsettings set -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" --settings \
+  "${opcionales[@]}" \
   DJANGO_SECRET_KEY="${DJANGO_SECRET_KEY}" \
   DEBUG="${DEBUG}" \
   ALLOWED_HOSTS="${ALLOWED_HOSTS}" \

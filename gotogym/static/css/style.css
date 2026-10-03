@@ -1447,3 +1447,35 @@ picture source {
 
 /* Sobre fondo oscuro (ficha de producto) el gris no se lee: se aclara. */
 .shop-pdp__price .price-compare { color: rgba(248, 249, 250, 0.62); }
+
+/* Pantallas tactiles: los controles llegan a 44 px (el dedo es menos preciso
+ * que el puntero). Los enlaces dentro de un parrafo quedan fuera a proposito:
+ * crecerles la altura rompe el interlineado del texto. */
+@media (pointer: coarse) {
+  button,
+  select,
+  input:not([type="hidden"], [type="checkbox"], [type="radio"]),
+  .gtg-brand,
+  .brand,
+  .editorial-text-link,
+  .store-link,
+  .commercial-auth__forgot,
+  .contact-card__address,
+  #show-terms,
+  nav a,
+  footer a {
+    min-height: 44px;
+  }
+  .gtg-brand,
+  .brand,
+  .editorial-text-link,
+  .store-link,
+  .commercial-auth__forgot,
+  .contact-card__address,
+  #show-terms,
+  nav a,
+  footer a {
+    display: inline-flex;
+    align-items: center;
+  }
+}

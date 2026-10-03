@@ -1,7 +1,9 @@
+#
 msgid ""
 msgstr ""
-"Content-Type: text/plain; charset=UTF-8\n"
 "Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Has cerrado sesión correctamente."
 msgstr "You have successfully logged out."
@@ -39,7 +41,8 @@ msgstr "Your password has been successfully reset!"
 msgid "Ingresa tu nueva contraseña"
 msgstr "Enter your new password"
 
-msgid "Se ha enviado un correo con instrucciones para restablecer tu contraseña."
+msgid ""
+"Se ha enviado un correo con instrucciones para restablecer tu contraseña."
 msgstr "An email has been sent with instructions to reset your password."
 
 msgid "Cerrar sesión"
@@ -54,8 +57,10 @@ msgstr "This is the main page."
 msgid "Innovación Cuántica y Bienestar Personalizado"
 msgstr "Quantum Innovation and Personalized Wellness"
 
-msgid "Descubre la elegancia del lujo deportivo combinado con tecnología avanzada."
-msgstr "Discover the elegance of sports luxury combined with advanced technology."
+msgid ""
+"Descubre la elegancia del lujo deportivo combinado con tecnología avanzada."
+msgstr ""
+"Discover the elegance of sports luxury combined with advanced technology."
 
 msgid "Ya tengo cuenta"
 msgstr "I already have an account"
@@ -69,14 +74,22 @@ msgstr "Featured Collection"
 msgid "Alianza exclusiva con John Frank Alza"
 msgstr "Exclusive partnership with John Frank Alza"
 
-msgid "Presentamos una colección que redefine la moda deportiva fusionando la alta costura con la más avanzada tecnología textil."
-msgstr "We present a collection that redefines sports fashion by merging haute couture with the most advanced textile technology."
+msgid ""
+"Presentamos una colección que redefine la moda deportiva fusionando la alta "
+"costura con la más avanzada tecnología textil."
+msgstr ""
+"We present a collection that redefines sports fashion by merging haute "
+"couture with the most advanced textile technology."
 
 msgid "Nuestra esencia"
 msgstr "Our essence"
 
-msgid "Fusionamos lujo deportivo con nanotecnología avanzada y bienestar integral, creando una experiencia de usuario única y emocionalmente gratificante."
-msgstr "We merge sports luxury with advanced nanotechnology and holistic wellness, creating a unique and emotionally rewarding user experience."
+msgid ""
+"Fusionamos lujo deportivo con nanotecnología avanzada y bienestar integral, "
+"creando una experiencia de usuario única y emocionalmente gratificante."
+msgstr ""
+"We merge sports luxury with advanced nanotechnology and holistic wellness, "
+"creating a unique and emotionally rewarding user experience."
 
 msgid "Beneficios Clave"
 msgstr "Key Benefits"
@@ -84,14 +97,20 @@ msgstr "Key Benefits"
 msgid "Rendimiento Mejorado"
 msgstr "Enhanced Performance"
 
-msgid "Optimiza tu desempeño con textiles avanzados que se adaptan a tu ritmo."
-msgstr "Optimize your performance with advanced textiles that adapt to your pace."
+msgid ""
+"Optimiza tu desempeño con textiles avanzados que se adaptan a tu ritmo."
+msgstr ""
+"Optimize your performance with advanced textiles that adapt to your pace."
 
 msgid "Protección UV"
 msgstr "UV Protection"
 
-msgid "Cuida tu piel con nuestra tecnología antimicrobiana y protección solar integrada."
-msgstr "Take care of your skin with our antimicrobial technology and integrated sun protection."
+msgid ""
+"Cuida tu piel con nuestra tecnología antimicrobiana y protección solar "
+"integrada."
+msgstr ""
+"Take care of your skin with our antimicrobial technology and integrated sun "
+"protection."
 
 msgid "Control Térmico"
 msgstr "Thermal Control"
@@ -108,8 +127,14 @@ msgstr "Unique textures that provide an unparalleled sensory experience."
 msgid "Nuestros clientes opinan"
 msgstr "Our clients say"
 
-msgid "“Las prendas de GoToGym se convirtieron en mis favoritas. Al principio parecían normales, pero con el tiempo noté la diferencia positiva en rendimiento y comodidad. Ahora no puedo hacer ejercicio sin ellas.”"
-msgstr "GoToGym garments became my favorites. At first they seemed normal, but over time I noticed the positive difference in performance and comfort. Now I can't work out without them."
+msgid ""
+"“Las prendas de GoToGym se convirtieron en mis favoritas. Al principio "
+"parecían normales, pero con el tiempo noté la diferencia positiva en "
+"rendimiento y comodidad. Ahora no puedo hacer ejercicio sin ellas.”"
+msgstr ""
+"GoToGym garments became my favorites. At first they seemed normal, but over "
+"time I noticed the positive difference in performance and comfort. Now I "
+"can't work out without them."
 
 msgid "— Juan Manuel Goenaga"
 msgstr "— Juan Manuel Goenaga"
@@ -117,8 +142,13 @@ msgstr "— Juan Manuel Goenaga"
 msgid "Tecnología innovadora"
 msgstr "Innovative technology"
 
-msgid "Utilizamos grafeno y nanotecnología en nuestras prendas, garantizando resistencia, flexibilidad y un compromiso continuo con la sostenibilidad ambiental."
-msgstr "We use graphene and nanotechnology in our garments, ensuring strength, flexibility, and a continuous commitment to environmental sustainability."
+msgid ""
+"Utilizamos grafeno y nanotecnología en nuestras prendas, garantizando "
+"resistencia, flexibilidad y un compromiso continuo con la sostenibilidad "
+"ambiental."
+msgstr ""
+"We use graphene and nanotechnology in our garments, ensuring strength, "
+"flexibility, and a continuous commitment to environmental sustainability."
 
 msgid "Conocer más"
 msgstr "Learn more"
@@ -428,3 +458,467 @@ msgstr "Total"
 
 msgid "Sin costo por ahora"
 msgstr "No cost for now"
+
+msgid "Abrir menu"
+msgstr "Open menu"
+
+msgid "Acepto los"
+msgstr "I accept the"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Agregar direccion"
+msgstr "Add address"
+
+msgid "Artículos"
+msgstr "Items"
+
+msgid "Aumentar cantidad"
+msgstr "Increase quantity"
+
+msgid "Añadido al carrito"
+msgstr "Added to cart"
+
+msgid "Buscar productos"
+msgstr "Search products"
+
+msgid "Busto"
+msgstr "Bust"
+
+msgid "Cadera"
+msgstr "Hips"
+
+msgid "Calculando…"
+msgstr "Calculating…"
+
+msgid "Calificación"
+msgstr "Rating"
+
+msgid "Calificar producto"
+msgstr "Rate product"
+
+msgid "Cambios"
+msgstr "Exchanges"
+
+msgid "Cancelar"
+msgstr "Cancel"
+
+msgid "Cerrar"
+msgstr "Close"
+
+msgid "Cerrar sesion"
+msgstr "Log out"
+
+msgid "Cintura"
+msgstr "Waist"
+
+msgid "Comentario (opcional)"
+msgstr "Comment (optional)"
+
+msgid "Compra verificada"
+msgstr "Verified purchase"
+
+msgid "Confirmar contraseña"
+msgstr "Confirm password"
+
+msgid "Confirmar nueva contraseña"
+msgstr "Confirm new password"
+
+msgid "Contraseña actual"
+msgstr "Current password"
+
+msgid "Contraseña restablecida"
+msgstr "Password reset"
+
+msgid "Correo enviado"
+msgstr "Email sent"
+
+msgid "Crea tu cuenta"
+msgstr "Create your account"
+
+msgid "Crear cuenta"
+msgstr "Create account"
+
+msgid "Credenciales incorrectas"
+msgstr "Incorrect credentials"
+
+msgid "Cupón"
+msgstr "Coupon"
+
+msgid "Cupón aplicado."
+msgstr "Coupon applied."
+
+msgid "Cupón de descuento"
+msgstr "Discount coupon"
+
+msgid "Cupón no válido."
+msgstr "Invalid coupon."
+
+msgid "Código del cupón"
+msgstr "Coupon code"
+
+msgid "Devoluciones"
+msgstr "Returns"
+
+msgid "Disminuir cantidad"
+msgstr "Decrease quantity"
+
+msgid "Edad"
+msgstr "Age"
+
+msgid "Editar direccion"
+msgstr "Edit address"
+
+msgid "Editar perfil"
+msgstr "Edit profile"
+
+msgid ""
+"El enlace para restablecer la contraseña venció o ya se usó. Pide uno nuevo."
+msgstr ""
+"The password reset link has expired or was already used. Request a new one."
+
+msgid "El envío se suma en el checkout y ahí verás el total final a pagar."
+msgstr ""
+"Shipping is added at checkout, where you will see the final total to pay."
+
+msgid "Elige cual usar por defecto en tus pedidos:"
+msgstr "Choose which one to use by default for your orders:"
+
+msgid "Elige una contraseña segura para tu cuenta."
+msgstr "Choose a strong password for your account."
+
+msgid "Eliminar"
+msgstr "Delete"
+
+msgid "English"
+msgstr "English"
+
+msgid "Enviar instrucciones"
+msgstr "Send instructions"
+
+msgid "Envíos"
+msgstr "Shipping"
+
+msgid "Español"
+msgstr "Español"
+
+msgid "Establece tu nueva contraseña"
+msgstr "Set your new password"
+
+msgid "Estado"
+msgstr "Status"
+
+msgid "Estado del pago"
+msgstr "Payment status"
+
+msgid "Este enlace ya no sirve"
+msgstr "This link no longer works"
+
+msgid "Filtros activos"
+msgstr "Active filters"
+
+msgid "Garantía"
+msgstr "Warranty"
+
+msgid "Guardar"
+msgstr "Save"
+
+msgid "Guardar cambios"
+msgstr "Save changes"
+
+msgid "Guardar direccion"
+msgstr "Save address"
+
+msgid "Herramienta de pruebas — no visible en producción real"
+msgstr "Testing tool — not visible in real production"
+
+msgid "Historias relacionadas"
+msgstr "Related stories"
+
+msgid "Imprimir recibo"
+msgstr "Print receipt"
+
+msgid "Ingresa tu contraseña."
+msgstr "Enter your password."
+
+msgid ""
+"Ingresa tu correo y te enviaremos instrucciones para restablecer tu "
+"contraseña."
+msgstr ""
+"Enter your email and we'll send you instructions to reset your password."
+
+msgid "Ingresa tu cupón"
+msgstr "Enter your coupon"
+
+msgid "Ingresa tu email"
+msgstr "Enter your email"
+
+msgid "Ingresa tu usuario o email."
+msgstr "Enter your username or email."
+
+msgid "Inicia sesión"
+msgstr "Log in"
+
+msgid "Inicia sesión para completar tu compra. Tu carrito se conserva."
+msgstr "Log in to complete your purchase. Your cart is saved."
+
+msgid "Iniciar Sesión"
+msgstr "Log in"
+
+msgid "Ir a pagar"
+msgstr "Go to payment"
+
+msgid "Limpiar todo"
+msgstr "Clear all"
+
+msgid "Mantenerme informado"
+msgstr "Keep me informed"
+
+msgid ""
+"Medidas del cuerpo, en centímetros. Es una referencia general, no una medida"
+" verificada de esta prenda: cada corte puede variar."
+msgstr ""
+"Body measurements, in centimeters. This is a general reference, not a "
+"verified measurement of this garment: each cut may vary."
+
+msgid "Menu de usuario"
+msgstr "User menu"
+
+msgid "Mi cuenta"
+msgstr "My account"
+
+msgid "Mis direcciones"
+msgstr "My addresses"
+
+msgid "Mis pedidos"
+msgstr "My orders"
+
+msgid "Mostrar contraseña"
+msgstr "Show password"
+
+msgid "Navegación principal"
+msgstr "Main navigation"
+
+msgid "No se pudo agregar"
+msgstr "Could not add"
+
+msgid "Nueva contraseña"
+msgstr "New password"
+
+msgid "Nueva direccion"
+msgstr "New address"
+
+msgid "Ocultar contraseña"
+msgstr "Hide password"
+
+msgid "Opiniones de clientes"
+msgstr "Customer reviews"
+
+msgid "Pago"
+msgstr "Payment"
+
+msgid "Pago aprobado. Tu pedido continuará su proceso."
+msgstr "Payment approved. Your order will continue its process."
+
+msgid "Pago aprobado. Tu pedido quedó confirmado."
+msgstr "Payment approved. Your order is confirmed."
+
+msgid "Panel administrador"
+msgstr "Admin panel"
+
+msgid "Panel de afiliados"
+msgstr "Affiliate panel"
+
+msgid "Pedido"
+msgstr "Order"
+
+msgid "Pedir un enlace nuevo"
+msgstr "Request a new link"
+
+msgid "Políticas y condiciones"
+msgstr "Policies and conditions"
+
+msgid "Por"
+msgstr "By"
+
+msgid "Predeterminada"
+msgstr "Default"
+
+msgid "Producto calificado"
+msgstr "Product rated"
+
+msgid "Productos"
+msgstr "Products"
+
+msgid "Programa de afiliados"
+msgstr "Affiliate program"
+
+msgid "Publicar reseña"
+msgstr "Post review"
+
+msgid "Recibo"
+msgstr "Receipt"
+
+msgid "Recupera tu acceso"
+msgstr "Recover your access"
+
+msgid "Recuperar contraseña"
+msgstr "Recover password"
+
+msgid "Redes sociales"
+msgstr "Social media"
+
+msgid "Referencia"
+msgstr "Reference"
+
+msgid "Referencias"
+msgstr "References"
+
+msgid "Registrarse"
+msgstr "Sign up"
+
+msgid "Reseñas del producto"
+msgstr "Product reviews"
+
+msgid "Revisa tu correo"
+msgstr "Check your email"
+
+msgid "Saltar al contenido"
+msgstr "Skip to content"
+
+msgid "Se calcula con tu ciudad"
+msgstr "Calculated with your city"
+
+msgid "Selecciona una calificación de 1 a 5 estrellas"
+msgstr "Select a rating from 1 to 5 stars"
+
+msgid ""
+"Si el correo está registrado, recibirás un email con instrucciones para "
+"restablecer tu contraseña. Revisa también tu bandeja de spam o promociones."
+msgstr ""
+"If the email is registered, you will receive a message with instructions to "
+"reset your password. Also check your spam or promotions folder."
+
+msgid "Simular"
+msgstr "Simulate"
+
+msgid "Solicitud de afiliado"
+msgstr "Affiliate application"
+
+msgid "Suscribirme"
+msgstr "Subscribe"
+
+msgid "Telefono"
+msgstr "Phone"
+
+msgid "Terminos"
+msgstr "Terms"
+
+msgid "Todavia no tienes direcciones guardadas."
+msgstr "You don't have any saved addresses yet."
+
+msgid "Tratamiento de datos"
+msgstr "Data processing"
+
+msgid ""
+"Tu contraseña ha sido cambiada correctamente. Ya puedes acceder a tu cuenta."
+msgstr ""
+"Your password has been changed successfully. You can now access your "
+"account."
+
+msgid "Tu cuenta"
+msgstr "Your account"
+
+msgid ""
+"Tu pago fue aprobado, pero hubo un problema para completar el pedido. "
+"Nuestro equipo se pondrá en contacto contigo."
+msgstr ""
+"Your payment was approved, but there was a problem completing the order. Our"
+" team will contact you."
+
+msgid "Tu pedido quedó registrado y está pendiente de pago."
+msgstr "Your order is registered and awaiting payment."
+
+msgid "Términos y Condiciones de GoToGym para Usuarios (Clientes)"
+msgstr "GoToGym Terms and Conditions for Users (Customers)"
+
+msgid "Ver carrito"
+msgstr "View cart"
+
+msgid "Ver detalle del pedido"
+msgstr "View order details"
+
+msgid "Ver fuente"
+msgstr "View source"
+
+msgid "Ver guía de tallas"
+msgstr "View size guide"
+
+msgid "Volver a iniciar sesión"
+msgstr "Back to log in"
+
+msgid "Volver a la tienda"
+msgstr "Back to store"
+
+msgid "de 5 estrellas"
+msgstr "out of 5 stars"
+
+msgid "hasta"
+msgstr "up to"
+
+msgid "min de lectura"
+msgstr "min read"
+
+msgid "reseñas"
+msgstr "reviews"
+
+msgid "términos y condiciones"
+msgstr "terms and conditions"
+
+msgid "¡Contraseña restablecida!"
+msgstr "Password reset!"
+
+msgid "¡Quedan pocas unidades!"
+msgstr "Only a few left!"
+
+msgid "¿Eliminar esta direccion?"
+msgstr "Delete this address?"
+
+msgid "¿No tienes cuenta?"
+msgstr "Don't have an account?"
+
+msgid "¿Olvidaste tu contraseña?"
+msgstr "Forgot your password?"
+
+msgid "¿Ya tienes cuenta?"
+msgstr "Already have an account?"
+
+msgid "Únete a la comunidad GoToGym."
+msgstr "Join the GoToGym community."
+
+msgid "Página %(num)s de %(total)s"
+msgstr "Page %(num)s of %(total)s"
+
+msgid "%(counter)s artículo"
+msgid_plural "%(counter)s artículos"
+msgstr[0] "%(counter)s item"
+msgstr[1] "%(counter)s items"
+
+msgid "%(counter)s producto disponible"
+msgid_plural "%(counter)s productos disponibles"
+msgstr[0] "%(counter)s product available"
+msgstr[1] "%(counter)s products available"
+
+msgid "%(counter)s producto"
+msgid_plural "%(counter)s productos"
+msgstr[0] "%(counter)s product"
+msgstr[1] "%(counter)s products"
+
+msgid "%(dias)s día hábil"
+msgid_plural "%(dias)s días hábiles"
+msgstr[0] "%(dias)s business day"
+msgstr[1] "%(dias)s business days"
+
+msgid "Português"
+msgstr "Português"

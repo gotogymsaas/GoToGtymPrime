@@ -1,3 +1,10 @@
+#
+msgid ""
+msgstr ""
+"Language: pt\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
 msgid "Has cerrado sesión correctamente."
 msgstr "Sessão encerrada com sucesso."
 
@@ -34,7 +41,8 @@ msgstr "Sua senha foi redefinida com sucesso!"
 msgid "Ingresa tu nueva contraseña"
 msgstr "Digite sua nova senha"
 
-msgid "Se ha enviado un correo con instrucciones para restablecer tu contraseña."
+msgid ""
+"Se ha enviado un correo con instrucciones para restablecer tu contraseña."
 msgstr "Um e-mail foi enviado com instruções para redefinir sua senha."
 
 msgid "Cerrar sesión"
@@ -49,8 +57,10 @@ msgstr "Esta é a página principal."
 msgid "Innovación Cuántica y Bienestar Personalizado"
 msgstr "Inovação Quântica e Bem-Estar Personalizado"
 
-msgid "Descubre la elegancia del lujo deportivo combinado con tecnología avanzada."
-msgstr "Descubra a elegância do luxo esportivo combinado com tecnologia avançada."
+msgid ""
+"Descubre la elegancia del lujo deportivo combinado con tecnología avanzada."
+msgstr ""
+"Descubra a elegância do luxo esportivo combinado com tecnologia avançada."
 
 msgid "Ya tengo cuenta"
 msgstr "Já tenho conta"
@@ -64,14 +74,22 @@ msgstr "Coleção em destaque"
 msgid "Alianza exclusiva con John Frank Alza"
 msgstr "Parceria exclusiva com John Frank Alza"
 
-msgid "Presentamos una colección que redefine la moda deportiva fusionando la alta costura con la más avanzada tecnología textil."
-msgstr "Apresentamos uma coleção que redefine a moda esportiva ao unir alta costura com a mais avançada tecnologia têxtil."
+msgid ""
+"Presentamos una colección que redefine la moda deportiva fusionando la alta "
+"costura con la más avanzada tecnología textil."
+msgstr ""
+"Apresentamos uma coleção que redefine a moda esportiva ao unir alta costura "
+"com a mais avançada tecnologia têxtil."
 
 msgid "Nuestra esencia"
 msgstr "Nossa essência"
 
-msgid "Fusionamos lujo deportivo con nanotecnología avanzada y bienestar integral, creando una experiencia de usuario única y emocionalmente gratificante."
-msgstr "Fundimos luxo esportivo com nanotecnologia avançada e bem-estar integral, criando uma experiência única e emocionalmente gratificante para o usuário."
+msgid ""
+"Fusionamos lujo deportivo con nanotecnología avanzada y bienestar integral, "
+"creando una experiencia de usuario única y emocionalmente gratificante."
+msgstr ""
+"Fundimos luxo esportivo com nanotecnologia avançada e bem-estar integral, "
+"criando uma experiência única e emocionalmente gratificante para o usuário."
 
 msgid "Beneficios Clave"
 msgstr "Benefícios Chave"
@@ -79,14 +97,20 @@ msgstr "Benefícios Chave"
 msgid "Rendimiento Mejorado"
 msgstr "Desempenho Aprimorado"
 
-msgid "Optimiza tu desempeño con textiles avanzados que se adaptan a tu ritmo."
-msgstr "Otimize seu desempenho com tecidos avançados que se adaptam ao seu ritmo."
+msgid ""
+"Optimiza tu desempeño con textiles avanzados que se adaptan a tu ritmo."
+msgstr ""
+"Otimize seu desempenho com tecidos avançados que se adaptam ao seu ritmo."
 
 msgid "Protección UV"
 msgstr "Proteção UV"
 
-msgid "Cuida tu piel con nuestra tecnología antimicrobiana y protección solar integrada."
-msgstr "Cuide da sua pele com nossa tecnologia antimicrobiana e proteção solar integrada."
+msgid ""
+"Cuida tu piel con nuestra tecnología antimicrobiana y protección solar "
+"integrada."
+msgstr ""
+"Cuide da sua pele com nossa tecnologia antimicrobiana e proteção solar "
+"integrada."
 
 msgid "Control Térmico"
 msgstr "Controle Térmico"
@@ -98,13 +122,20 @@ msgid "Confort Personalizado "
 msgstr "Conforto Personalizado"
 
 msgid "Texturas únicas que brindan una experiencia sensorial inigualable."
-msgstr "Texturas únicas que proporcionam uma experiência sensorial incomparável."
+msgstr ""
+"Texturas únicas que proporcionam uma experiência sensorial incomparável."
 
 msgid "Nuestros clientes opinan"
 msgstr "Nossos clientes opinam"
 
-msgid "“Las prendas de GoToGym se convirtieron en mis favoritas. Al principio parecían normales, pero con el tiempo noté la diferencia positiva en rendimiento y comodidad. Ahora no puedo hacer ejercicio sin ellas.”"
-msgstr "As roupas da GoToGym se tornaram minhas favoritas. No começo pareciam normais, mas com o tempo notei a diferença positiva em desempenho e conforto. Agora não consigo treinar sem elas."
+msgid ""
+"“Las prendas de GoToGym se convirtieron en mis favoritas. Al principio "
+"parecían normales, pero con el tiempo noté la diferencia positiva en "
+"rendimiento y comodidad. Ahora no puedo hacer ejercicio sin ellas.”"
+msgstr ""
+"As roupas da GoToGym se tornaram minhas favoritas. No começo pareciam "
+"normais, mas com o tempo notei a diferença positiva em desempenho e "
+"conforto. Agora não consigo treinar sem elas."
 
 msgid "— Juan Manuel Goenaga"
 msgstr "— Juan Manuel Goenaga"
@@ -112,8 +143,13 @@ msgstr "— Juan Manuel Goenaga"
 msgid "Tecnología innovadora"
 msgstr "Tecnologia inovadora"
 
-msgid "Utilizamos grafeno y nanotecnología en nuestras prendas, garantizando resistencia, flexibilidad y un compromiso continuo con la sostenibilidad ambiental."
-msgstr "Utilizamos grafeno e nanotecnologia em nossas peças, garantindo resistência, flexibilidade e um compromisso contínuo com a sustentabilidade ambiental."
+msgid ""
+"Utilizamos grafeno y nanotecnología en nuestras prendas, garantizando "
+"resistencia, flexibilidad y un compromiso continuo con la sostenibilidad "
+"ambiental."
+msgstr ""
+"Utilizamos grafeno e nanotecnologia em nossas peças, garantindo resistência,"
+" flexibilidade e um compromisso contínuo com a sustentabilidade ambiental."
 
 msgid "Conocer más"
 msgstr "Saiba mais"
@@ -172,7 +208,690 @@ msgstr "Descobrir coleção"
 msgid "Política de privacidad"
 msgstr "Política de Privacidade"
 
+msgid "Abrir menu"
+msgstr "Abrir menu"
+
+msgid "Acepto los"
+msgstr "Aceito os"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Agregar direccion"
+msgstr "Adicionar endereço"
+
+msgid "Artículos"
+msgstr "Itens"
+
+msgid "Aumentar cantidad"
+msgstr "Aumentar quantidade"
+
+msgid "Añadido al carrito"
+msgstr "Adicionado ao carrinho"
+
+msgid "Buscar productos"
+msgstr "Buscar produtos"
+
+msgid "Busto"
+msgstr "Busto"
+
+msgid "Cadera"
+msgstr "Quadril"
+
+msgid "Calculando…"
+msgstr "Calculando…"
+
+msgid "Calificación"
+msgstr "Avaliação"
+
+msgid "Calificar producto"
+msgstr "Avaliar produto"
+
+msgid "Cambios"
+msgstr "Trocas"
+
+msgid "Cancelar"
+msgstr "Cancelar"
+
+msgid "Cerrar"
+msgstr "Fechar"
+
+msgid "Cerrar sesion"
+msgstr "Sair"
+
+msgid "Cintura"
+msgstr "Cintura"
+
+msgid "Comentario (opcional)"
+msgstr "Comentário (opcional)"
+
+msgid "Compra verificada"
+msgstr "Compra verificada"
+
+msgid "Confirmar contraseña"
+msgstr "Confirmar senha"
+
+msgid "Confirmar nueva contraseña"
+msgstr "Confirmar nova senha"
+
+msgid "Contraseña actual"
+msgstr "Senha atual"
+
+msgid "Contraseña restablecida"
+msgstr "Senha redefinida"
+
+msgid "Correo enviado"
+msgstr "E-mail enviado"
+
+msgid "Crea tu cuenta"
+msgstr "Crie sua conta"
+
+msgid "Crear cuenta"
+msgstr "Criar conta"
+
+msgid "Credenciales incorrectas"
+msgstr "Credenciais incorretas"
+
+msgid "Cupón"
+msgstr "Cupom"
+
+msgid "Cupón aplicado."
+msgstr "Cupom aplicado."
+
+msgid "Cupón de descuento"
+msgstr "Cupom de desconto"
+
+msgid "Cupón no válido."
+msgstr "Cupom inválido."
+
+msgid "Código del cupón"
+msgstr "Código do cupom"
+
+msgid "Devoluciones"
+msgstr "Devoluções"
+
+msgid "Disminuir cantidad"
+msgstr "Diminuir quantidade"
+
+msgid "Edad"
+msgstr "Idade"
+
+msgid "Editar direccion"
+msgstr "Editar endereço"
+
+msgid "Editar perfil"
+msgstr "Editar perfil"
+
 msgid ""
+"El enlace para restablecer la contraseña venció o ya se usó. Pide uno nuevo."
+msgstr "O link para redefinir a senha expirou ou já foi usado. Peça um novo."
+
+msgid "El envío se suma en el checkout y ahí verás el total final a pagar."
+msgstr "O frete é somado no checkout, onde você verá o total final a pagar."
+
+msgid "Elige cual usar por defecto en tus pedidos:"
+msgstr "Escolha qual usar por padrão nos seus pedidos:"
+
+msgid "Elige una contraseña segura para tu cuenta."
+msgstr "Escolha uma senha segura para sua conta."
+
+msgid "Eliminar"
+msgstr "Excluir"
+
+msgid "English"
+msgstr "English"
+
+msgid "Enviar instrucciones"
+msgstr "Enviar instruções"
+
+msgid "Envíos"
+msgstr "Envios"
+
+msgid "Español"
+msgstr "Español"
+
+msgid "Establece tu nueva contraseña"
+msgstr "Defina sua nova senha"
+
+msgid "Estado"
+msgstr "Status"
+
+msgid "Estado del pago"
+msgstr "Status do pagamento"
+
+msgid "Este enlace ya no sirve"
+msgstr "Este link não funciona mais"
+
+msgid "Filtros activos"
+msgstr "Filtros ativos"
+
+msgid "Garantía"
+msgstr "Garantia"
+
+msgid "Guardar"
+msgstr "Salvar"
+
+msgid "Guardar cambios"
+msgstr "Salvar alterações"
+
+msgid "Guardar direccion"
+msgstr "Salvar endereço"
+
+msgid "Herramienta de pruebas — no visible en producción real"
+msgstr "Ferramenta de testes — não visível em produção real"
+
+msgid "Historias relacionadas"
+msgstr "Histórias relacionadas"
+
+msgid "Imprimir recibo"
+msgstr "Imprimir recibo"
+
+msgid "Ingresa tu contraseña."
+msgstr "Digite sua senha."
+
+msgid ""
+"Ingresa tu correo y te enviaremos instrucciones para restablecer tu "
+"contraseña."
+msgstr "Digite seu e-mail e enviaremos instruções para redefinir sua senha."
+
+msgid "Ingresa tu cupón"
+msgstr "Digite seu cupom"
+
+msgid "Ingresa tu email"
+msgstr "Digite seu e-mail"
+
+msgid "Ingresa tu usuario o email."
+msgstr "Digite seu usuário ou e-mail."
+
+msgid "Inicia sesión"
+msgstr "Entrar"
+
+msgid "Inicia sesión para completar tu compra. Tu carrito se conserva."
+msgstr "Entre para concluir sua compra. Seu carrinho é mantido."
+
+msgid "Iniciar Sesión"
+msgstr "Entrar"
+
+msgid "Ir a pagar"
+msgstr "Ir para o pagamento"
+
+msgid "Limpiar todo"
+msgstr "Limpar tudo"
+
+msgid "Mantenerme informado"
+msgstr "Manter-me informado"
+
+msgid ""
+"Medidas del cuerpo, en centímetros. Es una referencia general, no una medida"
+" verificada de esta prenda: cada corte puede variar."
 msgstr ""
-"Content-Type: text/plain; charset=UTF-8\n"
-"Language: pt\n"
+"Medidas do corpo, em centímetros. É uma referência geral, não uma medida "
+"verificada desta peça: cada corte pode variar."
+
+msgid "Menu de usuario"
+msgstr "Menu do usuário"
+
+msgid "Mi cuenta"
+msgstr "Minha conta"
+
+msgid "Mis direcciones"
+msgstr "Meus endereços"
+
+msgid "Mis pedidos"
+msgstr "Meus pedidos"
+
+msgid "Mostrar contraseña"
+msgstr "Mostrar senha"
+
+msgid "Navegación principal"
+msgstr "Navegação principal"
+
+msgid "No se pudo agregar"
+msgstr "Não foi possível adicionar"
+
+msgid "Nueva contraseña"
+msgstr "Nova senha"
+
+msgid "Nueva direccion"
+msgstr "Novo endereço"
+
+msgid "Ocultar contraseña"
+msgstr "Ocultar senha"
+
+msgid "Opiniones de clientes"
+msgstr "Opiniões de clientes"
+
+msgid "Pago"
+msgstr "Pagamento"
+
+msgid "Pago aprobado. Tu pedido continuará su proceso."
+msgstr "Pagamento aprovado. Seu pedido seguirá o processo."
+
+msgid "Pago aprobado. Tu pedido quedó confirmado."
+msgstr "Pagamento aprovado. Seu pedido foi confirmado."
+
+msgid "Panel administrador"
+msgstr "Painel administrativo"
+
+msgid "Panel de afiliados"
+msgstr "Painel de afiliados"
+
+msgid "Pedido"
+msgstr "Pedido"
+
+msgid "Pedir un enlace nuevo"
+msgstr "Pedir um novo link"
+
+msgid "Políticas y condiciones"
+msgstr "Políticas e condições"
+
+msgid "Por"
+msgstr "Por"
+
+msgid "Predeterminada"
+msgstr "Padrão"
+
+msgid "Producto calificado"
+msgstr "Produto avaliado"
+
+msgid "Productos"
+msgstr "Produtos"
+
+msgid "Programa de afiliados"
+msgstr "Programa de afiliados"
+
+msgid "Publicar reseña"
+msgstr "Publicar avaliação"
+
+msgid "Recibo"
+msgstr "Recibo"
+
+msgid "Recupera tu acceso"
+msgstr "Recupere seu acesso"
+
+msgid "Recuperar contraseña"
+msgstr "Recuperar senha"
+
+msgid "Redes sociales"
+msgstr "Redes sociais"
+
+msgid "Referencia"
+msgstr "Referência"
+
+msgid "Referencias"
+msgstr "Referências"
+
+msgid "Registrarse"
+msgstr "Cadastrar-se"
+
+msgid "Reseñas del producto"
+msgstr "Avaliações do produto"
+
+msgid "Revisa tu correo"
+msgstr "Verifique seu e-mail"
+
+msgid "Saltar al contenido"
+msgstr "Pular para o conteúdo"
+
+msgid "Se calcula con tu ciudad"
+msgstr "Calculado com a sua cidade"
+
+msgid "Selecciona una calificación de 1 a 5 estrellas"
+msgstr "Selecione uma avaliação de 1 a 5 estrelas"
+
+msgid ""
+"Si el correo está registrado, recibirás un email con instrucciones para "
+"restablecer tu contraseña. Revisa también tu bandeja de spam o promociones."
+msgstr ""
+"Se o e-mail estiver cadastrado, você receberá uma mensagem com instruções "
+"para redefinir sua senha. Verifique também sua caixa de spam ou promoções."
+
+msgid "Simular"
+msgstr "Simular"
+
+msgid "Solicitud de afiliado"
+msgstr "Solicitação de afiliado"
+
+msgid "Suscribirme"
+msgstr "Inscrever-me"
+
+msgid "Telefono"
+msgstr "Telefone"
+
+msgid "Terminos"
+msgstr "Termos"
+
+msgid "Todavia no tienes direcciones guardadas."
+msgstr "Você ainda não tem endereços salvos."
+
+msgid "Tratamiento de datos"
+msgstr "Tratamento de dados"
+
+msgid ""
+"Tu contraseña ha sido cambiada correctamente. Ya puedes acceder a tu cuenta."
+msgstr ""
+"Sua senha foi alterada com sucesso. Agora você já pode acessar sua conta."
+
+msgid "Tu cuenta"
+msgstr "Sua conta"
+
+msgid ""
+"Tu pago fue aprobado, pero hubo un problema para completar el pedido. "
+"Nuestro equipo se pondrá en contacto contigo."
+msgstr ""
+"Seu pagamento foi aprovado, mas houve um problema ao concluir o pedido. "
+"Nossa equipe entrará em contato com você."
+
+msgid "Tu pedido quedó registrado y está pendiente de pago."
+msgstr "Seu pedido foi registrado e aguarda pagamento."
+
+msgid "Términos y Condiciones de GoToGym para Usuarios (Clientes)"
+msgstr "Termos e Condições da GoToGym para Usuários (Clientes)"
+
+msgid "Ver carrito"
+msgstr "Ver carrinho"
+
+msgid "Ver detalle del pedido"
+msgstr "Ver detalhes do pedido"
+
+msgid "Ver fuente"
+msgstr "Ver fonte"
+
+msgid "Ver guía de tallas"
+msgstr "Ver guia de tamanhos"
+
+msgid "Volver a iniciar sesión"
+msgstr "Voltar para o login"
+
+msgid "Volver a la tienda"
+msgstr "Voltar para a loja"
+
+msgid "de 5 estrellas"
+msgstr "de 5 estrelas"
+
+msgid "hasta"
+msgstr "até"
+
+msgid "min de lectura"
+msgstr "min de leitura"
+
+msgid "reseñas"
+msgstr "avaliações"
+
+msgid "términos y condiciones"
+msgstr "termos e condições"
+
+msgid "¡Contraseña restablecida!"
+msgstr "Senha redefinida!"
+
+msgid "¡Quedan pocas unidades!"
+msgstr "Restam poucas unidades!"
+
+msgid "¿Eliminar esta direccion?"
+msgstr "Excluir este endereço?"
+
+msgid "¿No tienes cuenta?"
+msgstr "Não tem conta?"
+
+msgid "¿Olvidaste tu contraseña?"
+msgstr "Esqueceu sua senha?"
+
+msgid "¿Ya tienes cuenta?"
+msgstr "Já tem conta?"
+
+msgid "Únete a la comunidad GoToGym."
+msgstr "Junte-se à comunidade GoToGym."
+
+msgid "Página %(num)s de %(total)s"
+msgstr "Página %(num)s de %(total)s"
+
+msgid "Agotado"
+msgstr "Esgotado"
+
+msgid "Al confirmar aceptas nuestra"
+msgstr "Ao confirmar, você aceita nossa"
+
+msgid "Anterior"
+msgstr "Anterior"
+
+msgid "Apellido"
+msgstr "Sobrenome"
+
+msgid "Aplicar"
+msgstr "Aplicar"
+
+msgid "Añadir al carrito"
+msgstr "Adicionar ao carrinho"
+
+msgid "Buscar"
+msgstr "Buscar"
+
+msgid "Cantidad"
+msgstr "Quantidade"
+
+msgid "Carrito"
+msgstr "Carrinho"
+
+msgid "Categoría"
+msgstr "Categoria"
+
+msgid "Checkout"
+msgstr "Checkout"
+
+msgid "Ciudad"
+msgstr "Cidade"
+
+msgid "Color"
+msgstr "Cor"
+
+msgid "Combinación sin unidades disponibles."
+msgstr "Combinação sem unidades disponíveis."
+
+msgid "Complemento (apartamento, torre, referencia)"
+msgstr "Complemento (apartamento, torre, referência)"
+
+msgid "Confirmar pedido"
+msgstr "Confirmar pedido"
+
+msgid "Correo electrónico"
+msgstr "E-mail"
+
+msgid "Código postal"
+msgstr "Código postal"
+
+msgid "Datos de contacto"
+msgstr "Dados de contato"
+
+msgid "Departamento"
+msgstr "Departamento"
+
+msgid "Dirección"
+msgstr "Endereço"
+
+msgid "Dirección de entrega"
+msgstr "Endereço de entrega"
+
+msgid "El costo exacto se confirma con tu dirección en el siguiente paso."
+msgstr "O custo exato é confirmado com o seu endereço na próxima etapa."
+
+msgid "Eliminar del carrito"
+msgstr "Remover do carrinho"
+
+msgid "Encuentra tu próximo movimiento"
+msgstr "Encontre o seu próximo movimento"
+
+msgid "Entrega"
+msgstr "Entrega"
+
+msgid "Envío"
+msgstr "Frete"
+
+msgid "Esa combinación no existe para este producto."
+msgstr "Essa combinação não existe para este produto."
+
+msgid "Filtros"
+msgstr "Filtros"
+
+msgid "Finalizar <em>compra</em>"
+msgstr "Finalizar <em>compra</em>"
+
+msgid "Gratis"
+msgstr "Grátis"
+
+msgid "Información adicional para la entrega"
+msgstr "Informações adicionais para a entrega"
+
+msgid "Limpiar"
+msgstr "Limpar"
+
+msgid "Marca"
+msgstr "Marca"
+
+msgid "Máx"
+msgstr "Máx"
+
+msgid "Mín"
+msgstr "Mín"
+
+msgid "No encontramos productos con esos filtros."
+msgstr "Não encontramos produtos com esses filtros."
+
+msgid "Nombre"
+msgstr "Nome"
+
+msgid "Nombre del producto"
+msgstr "Nome do produto"
+
+msgid "Nombre: A-Z"
+msgstr "Nome: A-Z"
+
+msgid "Nombre: Z-A"
+msgstr "Nome: Z-A"
+
+msgid "Ordenar por"
+msgstr "Ordenar por"
+
+msgid "Paginación"
+msgstr "Paginação"
+
+msgid "País"
+msgstr "País"
+
+msgid "Precio (COP)"
+msgstr "Preço (COP)"
+
+msgid "Precio máximo"
+msgstr "Preço máximo"
+
+msgid "Precio mínimo"
+msgstr "Preço mínimo"
+
+msgid "Precio: mayor a menor"
+msgstr "Preço: maior para menor"
+
+msgid "Precio: menor a mayor"
+msgstr "Preço: menor para maior"
+
+msgid "Productos relacionados"
+msgstr "Produtos relacionados"
+
+msgid "Relevancia"
+msgstr "Relevância"
+
+msgid "Resumen"
+msgstr "Resumo"
+
+msgid "Seguir comprando"
+msgstr "Continuar comprando"
+
+msgid "Selecciona primero un departamento"
+msgstr "Selecione primeiro um departamento"
+
+msgid "Selecciona un departamento"
+msgstr "Selecione um departamento"
+
+msgid "Selecciona una ciudad"
+msgstr "Selecione uma cidade"
+
+msgid "Selecciona una opción para ver disponibilidad."
+msgstr "Selecione uma opção para ver a disponibilidade."
+
+msgid "Selección GoToGym"
+msgstr "Seleção GoToGym"
+
+msgid "Siguiente"
+msgstr "Próxima"
+
+msgid "Sin reseñas todavía"
+msgstr "Ainda sem avaliações"
+
+msgid "Store"
+msgstr "Loja"
+
+msgid "Talla"
+msgstr "Tamanho"
+
+msgid "Teléfono"
+msgstr "Telefone"
+
+msgid "Todas"
+msgstr "Todas"
+
+msgid "Todos"
+msgstr "Todos"
+
+msgid "Total a pagar"
+msgstr "Total a pagar"
+
+msgid "Tu <em>carrito</em>"
+msgstr "Seu <em>carrinho</em>"
+
+msgid "Tu carrito está vacío."
+msgstr "Seu carrinho está vazio."
+
+msgid "Tu pedido"
+msgstr "Seu pedido"
+
+msgid "Volver al carrito"
+msgstr "Voltar ao carrinho"
+
+msgid "c/u"
+msgstr "cada"
+
+msgid "desde"
+msgstr "a partir de"
+
+msgid "devoluciones"
+msgstr "devoluções"
+
+msgid "envíos"
+msgstr "envios"
+
+msgid "política de cambios"
+msgstr "política de trocas"
+
+msgid "y"
+msgstr "e"
+
+msgid "%(counter)s artículo"
+msgid_plural "%(counter)s artículos"
+msgstr[0] "%(counter)s item"
+msgstr[1] "%(counter)s itens"
+
+msgid "%(counter)s producto disponible"
+msgid_plural "%(counter)s productos disponibles"
+msgstr[0] "%(counter)s produto disponível"
+msgstr[1] "%(counter)s produtos disponíveis"
+
+msgid "%(counter)s producto"
+msgid_plural "%(counter)s productos"
+msgstr[0] "%(counter)s produto"
+msgstr[1] "%(counter)s produtos"
+
+msgid "%(dias)s día hábil"
+msgid_plural "%(dias)s días hábiles"
+msgstr[0] "%(dias)s dia útil"
+msgstr[1] "%(dias)s dias úteis"
+
+msgid "Português"
+msgstr "Português"

@@ -51,8 +51,13 @@ for tool in ruff mypy; do
   fi
 done
 
+"${PY}" -c "import importlinter" >/dev/null 2>&1   || fail "falta 'import-linter' en el entorno. Instala las dependencias: ${PY} -m pip install -r requirements-dev.txt"
+
 echo "[validate] ruff (lint)..."
 "${PY}" -m ruff check gotogym || fail "ruff encontro errores de lint (puedes aplicar los arreglos automaticos con: ${PY} -m ruff check gotogym --fix)."
+
+echo "[validate] arquitectura (dependencias entre apps)..."
+(cd "${ROOT_DIR}/gotogym" && PYTHONPATH=. "${PY}" -c "from importlinter.cli import lint_imports_command as c; c()" --config ../pyproject.toml >/dev/null)   || fail "una app importa a otra en contra de la regla de capas (ver [tool.importlinter] en pyproject.toml; detalle: cd gotogym && PYTHONPATH=. lint-imports --config ../pyproject.toml)."
 
 echo "[validate] gobernanza de diseno (colores hexadecimales en plantillas)..."
 bash "${ROOT_DIR}/environments/frontend/check_design_governance.sh" >/dev/null \

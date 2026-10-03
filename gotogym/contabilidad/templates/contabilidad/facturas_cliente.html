@@ -1,5 +1,6 @@
 {% extends 'administracion/base.html' %}
 {% block title %}Facturas de {{ cliente.name }}{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 {% block content %}
 <div class="max-w-5xl mx-auto mt-10 p-8 bg-white/90 dark:bg-[#232526] rounded-3xl shadow-2xl">
   <h2 class="text-3xl font-extrabold text-[#C5A46B] dark:text-[#ffe6a0] mb-6 tracking-tight drop-shadow">Facturas de {{ cliente.name }}</h2>

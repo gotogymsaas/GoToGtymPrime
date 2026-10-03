@@ -6,20 +6,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="GoToGym - Ropa deportiva, tecnologia textil y bienestar.">
+  <meta name="description" content="{% block meta_description %}{{ seo_description|default:"GoToGym: ropa deportiva con tecnología textil, diseño y bienestar." }}{% endblock %}">
+  {% block meta_robots %}{% endblock %}
+  <link rel="canonical" href="{% block canonical %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
+  <meta property="og:site_name" content="GoToGym">
+  <meta property="og:type" content="{{ seo_type|default:'website' }}">
+  <meta property="og:title" content="{{ seo_title|default:'GoToGym' }}">
+  <meta property="og:description" content="{{ seo_description|default:"GoToGym: ropa deportiva con tecnología textil, diseño y bienestar." }}">
+  <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+  <meta property="og:image" content="{% if seo_image %}{{ seo_image }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/hero_gotogym.webp' %}{% endif %}">
+  <meta property="og:locale" content="{% if LANGUAGE_CODE == 'en' %}en_US{% elif LANGUAGE_CODE == 'pt' %}pt_BR{% else %}es_CO{% endif %}">
+  <meta name="twitter:card" content="summary_large_image">
+  {% if seo_json_ld %}<script type="application/ld+json">{{ seo_json_ld }}</script>{% endif %}
   <title>{% block title %}GoToGym{% endblock %}</title>
   <link rel="icon" type="image/png" href="{% static 'images/logo-gotogym-symbol-transparent.png' %}">
   <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
-  {% comment %}
-  Playfair Display, peso 700 (unico peso con archivo real descargado, ver
-  AUDITORIA_TIPOGRAFIA_UI.md hallazgo 5). Es la serif de marca para el
-  acento itálico dorado (.editorial-title em / .store-hero h1 em) -- sin
-  este link caia en Georgia, la serif del sistema operativo de cada
-  visitante. 700-italic.css usa los .woff/.woff2 itálicos que ya estaban
-  en disco sin una hoja @font-face que los declarara.
-  {% endcomment %}
-  <link href="{% static 'fonts/@fontsource/playfair-display/700.css' %}" rel="stylesheet">
-  <link href="{% static 'fonts/@fontsource/playfair-display/700-italic.css' %}" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/material_icons.css' %}?v=20260925-features">
   {% comment %}
   El almacenamiento de estaticos (CompressedStaticFilesStorage) no agrega
@@ -27,7 +28,7 @@
   hay: al editar style.css o tokens.css hay que subirlo o el navegador
   seguira sirviendo la copia vieja.
   {% endcomment %}
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261003-footer">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261004-tactil2">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
   {% block extra_head %}{% endblock %}
   {% comment %}

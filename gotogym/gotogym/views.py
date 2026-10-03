@@ -1,43 +1,47 @@
-from blog.models import Post
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import render
+from django.templatetags.static import static
 from django.urls import reverse
 from tienda.catalog import curated_product_cards
 
+from .seo import contexto_seo
+
 
 def home(request):
-    # Portada unica para visitantes y compradores: el catalogo y el blog se
-    # pueden explorar sin cuenta, y el login se pide solo al comprar o al
+    # Portada unica para visitantes y compradores: el catalogo y el Journal se
+    # pueden explorar sin cuenta (el Journal tiene su acceso en el menu), y el login se pide solo al comprar o al
     # entrar a un panel. Usa la misma fuente de verdad del catalogo que la
     # PLP, de modo que precio, variantes, imagen y disponibilidad no divergen
     # entre la portada y la tienda, y las relaciones se resuelven sin
     # consultas N+1.
     context = {
         'featured_cards': curated_product_cards(limit=4),
-        'latest_posts': (
-            Post.objects.filter(is_published=True)
-            .select_related('category', 'author')
-            .order_by('-published')[:3]
-        ),
     }
+    sitio = request.build_absolute_uri('/')
+    context.update(contexto_seo(
+        'GoToGym: diseñada para tu forma de avanzar',
+        'Ropa deportiva con tecnología textil. Explora la colección GoToGym, diseñada para entrenar, '
+        'moverte y avanzar a tu manera.',
+        datos=[
+            {
+                '@context': 'https://schema.org', '@type': 'Organization', 'name': 'GoToGym',
+                'url': sitio,
+                'logo': request.build_absolute_uri(static('images/logo-gotogym-symbol-transparent.png')),
+                'email': 'support@gotogym.store',
+            },
+            {
+                '@context': 'https://schema.org', '@type': 'WebSite', 'name': 'GoToGym', 'url': sitio,
+                'potentialAction': {
+                    '@type': 'SearchAction',
+                    'target': request.build_absolute_uri(reverse('tienda:producto_list')) + '?filtro={search_term_string}',
+                    'query-input': 'required name=search_term_string',
+                },
+            },
+        ],
+    ))
     return render(request, 'logged_home.html', context)
-
-
-def pedidos(request):
-    return redirect('carrito:cart_detail')
-
-
-def bienestar(request):
-    return redirect('blog:post_list')
-
-
-def gestion(request):
-    return redirect('contacto')
-
-
-def tecnologia(request):
-    return redirect('tienda:producto_list')
 
 
 def healthz(request):
@@ -45,11 +49,20 @@ def healthz(request):
 
 
 def acerca_de(request):
-    return render(request, 'static_pages/about.html')
+    return render(request, 'static_pages/about.html', contexto_seo(
+        'Acerca de GoToGym: tecnología y ciencia de materiales',
+        'La visión de GoToGym y lo que dice la ciencia sobre el grafeno en la ropa deportiva, '
+        'con sus fuentes y el nivel de evidencia de cada beneficio.',
+    ))
 
 
 def contacto(request):
-    return render(request, 'static_pages/contacto.html', {'back_url': reverse('home')})
+    context = {'back_url': reverse('home')}
+    context.update(contexto_seo(
+        'Contacto | GoToGym',
+        'Escríbenos o llámanos: atención sobre compras, productos, personalización y bienestar empresarial.',
+    ))
+    return render(request, 'static_pages/contacto.html', context)
 
 
 @login_required
@@ -150,3 +163,21 @@ def politica_pagos(request):
         'Este contenido es un texto de referencia (MOCK) y sera reemplazado antes de procesar '
         'pagos reales de clientes.',
     ], policy_key='payments', summary='Cómo protegemos el proceso de pago y qué información nunca almacenamos.')
+
+
+# Rutas que no tiene sentido indexar: privadas o sin contenido propio.
+RUTAS_NO_INDEXABLES = (
+    'admin-panel', 'admin', 'carrito', 'pedidos-tienda', 'pagos', 'accounts',
+    'influencer', 'contabilidad', 'analitica', 'products',
+)
+
+
+def robots_txt(request):
+    """`robots.txt`: todo es rastreable salvo lo privado, e indica el mapa del
+    sitio. Las rutas privadas llevan prefijo de idioma, asi que se listan por
+    cada idioma."""
+    lineas = ['User-agent: *', 'Allow: /']
+    for codigo, _nombre in settings.LANGUAGES:
+        lineas.extend(f'Disallow: /{codigo}/{ruta}/' for ruta in RUTAS_NO_INDEXABLES)
+    lineas.extend(['Disallow: /api/', 'Disallow: /setlang/', '', f'Sitemap: {request.build_absolute_uri("/sitemap.xml")}', ''])
+    return HttpResponse('\n'.join(lineas), content_type='text/plain; charset=utf-8')
