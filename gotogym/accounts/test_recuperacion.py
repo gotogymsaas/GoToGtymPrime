@@ -25,7 +25,7 @@ class RecuperarContrasenaTests(TestCase):
 
     def test_el_enlace_del_login_lleva_a_una_pagina_que_funciona(self):
         login = self.client.get(reverse('commercial_login')).content.decode()
-        destino = re.search(r'href="([^"]+)" class="commercial-auth__forgot"', login).group(1)
+        destino = re.search(r'class="commercial-auth__forgot" href="([^"]+)"', login).group(1)
         self.assertEqual(self.client.get(destino).status_code, 200)
 
     def test_flujo_completo_hasta_entrar_con_la_contrasena_nueva(self):

@@ -74,13 +74,13 @@ class RegistroTests(TestCase):
 
     def test_campos_obligatorios(self):
         respuesta = self.client.post(reverse('register'), {**self.DATOS, 'first_name': ''})
-        self.assertIn('Todos los campos son obligatorios.', self._mensajes(respuesta))
+        self.assertIn('Completa tu nombre, correo y contraseña, y acepta los términos.', self._mensajes(respuesta))
         self.assertFalse(get_user_model().objects.filter(email='luis@example.com').exists())
 
     def test_debe_aceptar_los_terminos(self):
         datos = {k: v for k, v in self.DATOS.items() if k != 'accepted_terms'}
         respuesta = self.client.post(reverse('register'), datos)
-        self.assertIn('Todos los campos son obligatorios.', self._mensajes(respuesta))
+        self.assertIn('Completa tu nombre, correo y contraseña, y acepta los términos.', self._mensajes(respuesta))
 
     def test_las_contrasenas_deben_coincidir(self):
         respuesta = self.client.post(reverse('register'), {**self.DATOS, 'password2': 'distinta'})

@@ -20,8 +20,8 @@ class TraduccionesTests(TestCase):
         self.assertNotIn('¿Olvidaste tu contraseña?', en + pt)
 
     def test_recuperar_contrasena_en_los_tres_idiomas(self):
-        self.assertIn('Recover your access', self._html('/en/accounts/password_reset/'))
-        self.assertIn('Recupere seu acesso', self._html('/pt/accounts/password_reset/'))
+        self.assertIn('Recover your <em>access</em>', self._html('/en/accounts/password_reset/'))
+        self.assertIn('Recupere seu <em>acesso</em>', self._html('/pt/accounts/password_reset/'))
 
     def test_los_plurales_siguen_la_regla_de_cada_idioma(self):
         from django.utils.translation import ngettext
@@ -40,3 +40,9 @@ class TraduccionesTests(TestCase):
             with translation.override(idioma):
                 for nombre in ('Español', 'English', 'Português'):
                     self.assertEqual(gettext(nombre), nombre, f'{nombre} en {idioma}')
+
+    def test_las_pantallas_de_cuenta_estan_traducidas(self):
+        self.assertIn('Log in to <em>your account</em>', self._html('/en/accounts/acceso/'))
+        self.assertIn('Entre na <em>sua conta</em>', self._html('/pt/accounts/acceso/'))
+        self.assertIn('Create your <em>account</em>', self._html('/en/accounts/register/'))
+        self.assertIn('Crie sua <em>conta</em>', self._html('/pt/accounts/register/'))

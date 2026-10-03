@@ -1,0 +1,17 @@
+{% load i18n tienda_filters %}
+{% comment %}
+Lo que el comprador dejo en el carrito, visible junto al formulario: entrar o
+crear la cuenta no le quita nada. Solo se muestra si hay articulos.
+{% endcomment %}
+{% if resumen_carrito %}
+<aside class="commercial-auth__summary" aria-label="{% trans 'Tu carrito' %}">
+  <p class="commercial-auth__summary-line">
+    <span class="material-icons-outlined" aria-hidden="true">shopping_cart</span>
+    <span>
+      {% blocktrans count counter=resumen_carrito.num_items %}{{ counter }} artículo{% plural %}{{ counter }} artículos{% endblocktrans %}
+      · <strong>${{ resumen_carrito.total|cop }} COP</strong>
+    </span>
+  </p>
+  <p class="commercial-auth__summary-note"><a href="{% url 'carrito:cart_detail' %}">{% trans "Ver o editar el carrito" %}</a></p>
+</aside>
+{% endif %}

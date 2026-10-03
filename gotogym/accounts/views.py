@@ -1,6 +1,13 @@
 import hashlib
 from pathlib import Path
+from urllib.parse import urlparse
 
+from carrito.services import (
+    CART_VERSION,
+    SESSION_CART_KEY,
+    SESSION_VERSION_KEY,
+    build_cart_context,
+)
 from django.contrib import messages
 from django.contrib.auth import (
     get_user_model,
@@ -37,30 +44,62 @@ def logout_view(request):
         return redirect(next_url)
     return redirect('home')
 
+def _es_pantalla_de_cuenta(url):
+    """Entrar o registrarse no es un destino: el menu pone `next` con la pagina
+    actual, y desde el login eso devolveria a quien acaba de entrar al login."""
+    ruta = urlparse(url).path
+    return ruta in {reverse(nombre) for nombre in ('commercial_login', 'login', 'register')}
+
+
 def _safe_next_url(request, fallback):
     """`next` recibido por POST o GET si apunta a este mismo sitio."""
     next_url = request.POST.get('next') or request.GET.get('next') or ''
-    if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+    if (
+        next_url
+        and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()})
+        and not _es_pantalla_de_cuenta(next_url)
+    ):
         return next_url
     return fallback
 
 
+def _resumen_carrito(request):
+    """Lo que hay en el carrito, para mostrarlo junto al formulario de
+    entrar o registrarse. Solo lee: no limpia ni reinicia el carrito de la
+    sesion (eso lo hace la vista del carrito, que avisa al usuario).
+    `None` si esta vacio."""
+    if request.session.get(SESSION_VERSION_KEY) != CART_VERSION:
+        return None
+    cart = request.session.get(SESSION_CART_KEY) or {}
+    if not cart:
+        return None
+    resumen = build_cart_context(cart)
+    return resumen if resumen['items'] else None
+
+
 @csrf_protect
 def register_view(request):
+    valores = {}
     if request.method == 'POST':
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        age = request.POST.get('age')
-        email = request.POST.get('email')
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        age = request.POST.get('age', '').strip()
+        email = request.POST.get('email', '').strip()
         username = email  # O puedes pedir username aparte si lo deseas
-        password1 = request.POST.get('password1')
+        password1 = request.POST.get('password1', '')
+        # La confirmacion es opcional: el formulario muestra un boton para ver
+        # la contrasena en vez de pedirla dos veces. Si llega, debe coincidir.
         password2 = request.POST.get('password2')
         accepted_terms = request.POST.get('accepted_terms')
-        # Validaciones básicas
-        if not all([first_name, last_name, age, email, password1, password2, accepted_terms]):
-            messages.error(request, 'Todos los campos son obligatorios.')
-        elif password1 != password2:
+        valores = {'first_name': first_name, 'email': email}
+        # Solo hacen falta nombre, correo, contrasena y los terminos; el
+        # apellido y la edad se completan despues en "Editar perfil".
+        if not all([first_name, email, password1, accepted_terms]):
+            messages.error(request, 'Completa tu nombre, correo y contraseña, y acepta los términos.')
+        elif password2 is not None and password1 != password2:
             messages.error(request, 'Las contraseñas no coinciden.')
+        elif age and not age.isdigit():
+            messages.error(request, 'La edad debe ser un número válido.')
         elif User.objects.filter(email=email).exists():
             messages.error(request, 'El correo ya está registrado.')
         else:
@@ -70,7 +109,7 @@ def register_view(request):
                 username=username,
                 first_name=first_name,
                 last_name=last_name,
-                age=age,
+                age=int(age) if age else None,
                 password=password1,
                 accepted_terms=True,
                 terms_accepted_at=timezone.now(),
@@ -81,7 +120,11 @@ def register_view(request):
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, 'Registro exitoso. Ya iniciaste sesión.')
             return redirect(_safe_next_url(request, reverse('home')))
-    return render(request, 'accounts/register.html', {'next': _safe_next_url(request, '')})
+    return render(request, 'accounts/register.html', {
+        'next': _safe_next_url(request, ''),
+        'valores': valores,
+        'resumen_carrito': _resumen_carrito(request),
+    })
 
 @csrf_protect
 def login_view(request):
@@ -97,6 +140,8 @@ def _login_response(request, template_name):
     show_logo = request.session.pop('show_logo', True)
     error_message = None
     redirect_to = request.POST.get('next') or request.GET.get('next') or reverse('home')
+    if _es_pantalla_de_cuenta(redirect_to):
+        redirect_to = reverse('home')
     if request.method == 'POST':
         username_or_email = request.POST.get('username', '').strip()
         password = request.POST.get('password')
@@ -122,6 +167,7 @@ def _login_response(request, template_name):
         'show_logo': show_logo,
         'next': redirect_to,
         'checkout_notice': checkout_notice,
+        'resumen_carrito': _resumen_carrito(request),
     })
 
 @login_required

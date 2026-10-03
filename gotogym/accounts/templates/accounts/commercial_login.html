@@ -1,77 +1,57 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends "accounts/auth_base.html" %}
 {% load i18n %}
 
-{% block title %}GoToGym - Iniciar Sesión{% endblock %}
-{% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block title %}GoToGym - {% trans "Iniciar Sesión" %}{% endblock %}
 
-{% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/commercial_auth.css' %}?v=20260930-token-unify">
+{% block auth_kicker %}{% if checkout_notice %}{% trans "Antes de pagar" %}{% else %}{% trans "Tu cuenta" %}{% endif %}{% endblock %}
+{% block auth_title %}{% blocktrans %}Entra a <em>tu cuenta</em>{% endblocktrans %}{% endblock %}
+
+{% block auth_lede %}
+{% if checkout_notice %}
+<p class="commercial-auth__lede" role="status">{% trans "Inicia sesión para completar tu compra. Tu carrito se conserva." %}</p>
+{% else %}
+<p class="commercial-auth__lede">{% trans "Sigue tus pedidos, guarda tus direcciones y paga más rápido." %}</p>
+{% endif %}
+{% include "accounts/_resumen_carrito.html" %}
 {% endblock %}
 
-{% block navbar %}{% endblock %}
-{% block footer %}{% endblock %}
+{% block auth_body %}
+<form method="post" class="commercial-auth__form" id="commercial-auth-form" novalidate>
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
 
-{% block content %}
-<section class="commercial-auth" aria-labelledby="commercial-auth-title">
-  <h1 id="commercial-auth-title" class="commercial-auth__sr-only">{% trans "Iniciar Sesión" %}</h1>
-
-  <div class="commercial-auth__scene" aria-hidden="true">
-    <span class="commercial-auth__watermark"></span>
-    <span class="commercial-auth__ring commercial-auth__ring--outer"><i></i></span>
-    <span class="commercial-auth__ring commercial-auth__ring--one"><i></i></span>
-    <span class="commercial-auth__ring commercial-auth__ring--two"><i></i></span>
-    <span class="commercial-auth__ring commercial-auth__ring--three"><i></i></span>
-    <span class="commercial-auth__nucleus"></span>
+  <div class="commercial-auth__field{% if error_message %} commercial-auth__field--invalid{% endif %}" data-field="username">
+    <input type="text" name="username" id="id_username" placeholder="{% trans 'Usuario o Email' %}" autocomplete="username" required aria-describedby="err-username">
+    <label for="id_username">{% trans "Usuario o Email" %}</label>
   </div>
+  <p class="commercial-auth__field-error" id="err-username" role="alert" {% if not error_message %}hidden{% endif %}>
+    {% if error_message %}{{ error_message }}{% else %}{% trans "Ingresa tu usuario o email." %}{% endif %}
+  </p>
 
-  <div class="commercial-auth__panel">
-    <a href="{% url 'home' %}" class="commercial-auth__logo" aria-label="GoToGym inicio">
-      <img src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" aria-hidden="true">
-    </a>
-
-    {% if checkout_notice %}
-    <p class="commercial-auth__subtitle" role="status">{% trans "Inicia sesión para completar tu compra. Tu carrito se conserva." %}</p>
-    {% endif %}
-
-    <form method="post" class="commercial-auth__form" id="commercial-auth-form" novalidate>
-      {% csrf_token %}
-      <input type="hidden" name="next" value="{{ next }}">
-
-      <div class="commercial-auth__field{% if error_message %} commercial-auth__field--invalid{% endif %}" data-field="username">
-        <input type="text" name="username" id="id_username" placeholder="{% trans 'Usuario o Email' %}" autocomplete="username" required aria-describedby="err-username">
-        <label for="id_username">{% trans "Usuario o Email" %}</label>
-      </div>
-      <p class="commercial-auth__field-error" id="err-username" role="alert" {% if not error_message %}hidden{% endif %}>
-        {% if error_message %}{{ error_message }}{% else %}{% trans "Ingresa tu usuario o email." %}{% endif %}
-      </p>
-
-      <div class="commercial-auth__field commercial-auth__password{% if error_message %} commercial-auth__field--invalid{% endif %}" data-field="password">
-        <input type="password" name="password" id="id_password" placeholder="{% trans 'Contraseña' %}" autocomplete="current-password" required aria-describedby="err-password">
-        <label for="id_password">{% trans "Contraseña" %}</label>
-        <button type="button" aria-label="{% trans 'Mostrar contraseña' %}" data-password-toggle>
-          <span class="material-icons-outlined">visibility</span>
-        </button>
-      </div>
-      <p class="commercial-auth__field-error" id="err-password" role="alert" hidden>
-        {% trans "Ingresa tu contraseña." %}
-      </p>
-
-      <button type="submit" class="commercial-auth__button commercial-auth__button--gold">
-        {% trans "Iniciar Sesión" %}
-      </button>
-    </form>
-
-    <a href="{% url 'password_reset_form' %}" class="commercial-auth__forgot">
-      {% trans "¿Olvidaste tu contraseña?" %}
-    </a>
-
-    <div class="commercial-auth__register">
-      <span>{% trans "¿No tienes cuenta?" %}</span>
-      <a href="{% url 'register' %}{% if next %}?next={{ next|urlencode }}{% endif %}">{% trans "Regístrate" %}</a>
-    </div>
+  <div class="commercial-auth__field commercial-auth__password{% if error_message %} commercial-auth__field--invalid{% endif %}" data-field="password">
+    <input type="password" name="password" id="id_password" placeholder="{% trans 'Contraseña' %}" autocomplete="current-password" required aria-describedby="err-password">
+    <label for="id_password">{% trans "Contraseña" %}</label>
+    <button type="button" aria-label="{% trans 'Mostrar contraseña' %}" data-password-toggle>
+      <span class="material-icons-outlined">visibility</span>
+    </button>
   </div>
-</section>
+  <p class="commercial-auth__field-error" id="err-password" role="alert" hidden>
+    {% trans "Ingresa tu contraseña." %}
+  </p>
+
+  <button type="submit" class="commercial-auth__button">
+    {% trans "Iniciar Sesión" %}
+  </button>
+</form>
+
+<p class="commercial-auth__aside">
+  <a class="commercial-auth__forgot" href="{% url 'password_reset_form' %}">{% trans "¿Olvidaste tu contraseña?" %}</a>
+</p>
+
+<p class="commercial-auth__register">
+  <span>{% trans "¿No tienes cuenta?" %}</span>
+  <a href="{% url 'register' %}{% if next %}?next={{ next|urlencode }}{% endif %}">{% trans "Regístrate" %}</a>
+</p>
 {% endblock %}
 
 {% block extra_scripts %}

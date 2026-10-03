@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+{% comment %}
+Estructura comun de las pantallas de cuenta (entrar, registrarse, recuperar
+contraseña). Conservan el menu y el pie del sitio para que quien viene a
+comprar no sienta que salio de la tienda, y repiten la cabecera editorial del
+carrito: etiqueta, titular ligero con acento dorado y bajada. La escena
+orbital (la firma Quantum de la marca) queda a un lado como acento.
+
+Bloques: auth_kicker, auth_title, auth_lede, auth_body y auth_after (fuera
+de la seccion, para ventanas modales).
+{% endcomment %}
+
+{% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/commercial_auth.css' %}?v=20261004-continuidad2">
+{% endblock %}
+
+{% block content %}
+<section class="commercial-auth" aria-labelledby="commercial-auth-title">
+  <div class="commercial-auth__scene" aria-hidden="true">
+    <span class="commercial-auth__watermark"></span>
+    <span class="commercial-auth__ring commercial-auth__ring--outer"><i></i></span>
+    <span class="commercial-auth__ring commercial-auth__ring--one"><i></i></span>
+    <span class="commercial-auth__ring commercial-auth__ring--two"><i></i></span>
+    <span class="commercial-auth__ring commercial-auth__ring--three"><i></i></span>
+    <span class="commercial-auth__nucleus"></span>
+  </div>
+
+  <div class="commercial-auth__shell">
+    <div class="commercial-auth__main">
+      <p class="commercial-auth__kicker">{% block auth_kicker %}{% endblock %}</p>
+      <h1 id="commercial-auth-title" class="commercial-auth__title">{% block auth_title %}{% endblock %}</h1>
+      {% block auth_lede %}{% endblock %}
+      {% block auth_body %}{% endblock %}
+    </div>
+  </div>
+</section>
+{% block auth_after %}{% endblock %}
+{% endblock %}

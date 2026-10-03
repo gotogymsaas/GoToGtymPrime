@@ -1,90 +1,66 @@
-{% extends "base.html" %}
-{% load static %}
-{% load i18n %}
+{% extends "accounts/auth_base.html" %}
+{% load static i18n %}
 
 {% block title %}GoToGym - {% trans "Crear cuenta" %}{% endblock %}
-{% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 
-{% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/commercial_auth.css' %}?v=20260930-token-unify">
+{% block auth_kicker %}{% trans "Únete a GoToGym" %}{% endblock %}
+{% block auth_title %}{% blocktrans %}Crea tu <em>cuenta</em>{% endblocktrans %}{% endblock %}
+
+{% block auth_lede %}
+<p class="commercial-auth__lede">{% trans "Solo necesitamos tu nombre, correo y una contraseña. El resto lo completas cuando quieras." %}</p>
+{% include "accounts/_resumen_carrito.html" %}
 {% endblock %}
 
-{% block navbar %}{% endblock %}
-{% block footer %}{% endblock %}
+{% block auth_body %}
+{% for message in messages %}
+{% if message.level_tag == 'error' %}
+<p class="commercial-auth__error" role="alert">{{ message }}</p>
+{% endif %}
+{% endfor %}
 
-{% block content %}
-<section class="commercial-auth" aria-labelledby="commercial-auth-title">
-  <h1 id="commercial-auth-title" class="commercial-auth__sr-only">{% trans "Crear cuenta" %}</h1>
+<form method="post" class="commercial-auth__form" id="register-form">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
 
-  <div class="commercial-auth__scene" aria-hidden="true">
-    <span class="commercial-auth__watermark"></span>
-    <span class="commercial-auth__ring commercial-auth__ring--outer"><i></i></span>
-    <span class="commercial-auth__ring commercial-auth__ring--one"><i></i></span>
-    <span class="commercial-auth__ring commercial-auth__ring--two"><i></i></span>
-    <span class="commercial-auth__ring commercial-auth__ring--three"><i></i></span>
-    <span class="commercial-auth__nucleus"></span>
+  <div class="commercial-auth__field">
+    <input type="text" name="first_name" id="first_name" value="{{ valores.first_name|default:'' }}" placeholder="{% trans 'Nombre' %}" autocomplete="given-name" required>
+    <label for="first_name">{% trans "Nombre" %}</label>
   </div>
 
-  <div class="commercial-auth__panel commercial-auth__panel--wide">
-    <a href="{% url 'home' %}" class="commercial-auth__logo" aria-label="GoToGym inicio">
-      <img src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" aria-hidden="true">
-    </a>
-
-    <h2 class="commercial-auth__heading">{% trans "Crea tu cuenta" %}</h2>
-    <p class="commercial-auth__subtitle">{% trans "Únete a la comunidad GoToGym." %}</p>
-
-    <form method="post" class="commercial-auth__form commercial-auth__form--grid" id="register-form">
-      {% csrf_token %}
-      <input type="hidden" name="next" value="{{ next }}">
-
-      <div class="commercial-auth__field">
-        <input type="text" name="first_name" id="first_name" placeholder="{% trans 'Nombre' %}" required>
-        <label for="first_name">{% trans "Nombre" %}</label>
-      </div>
-      <div class="commercial-auth__field">
-        <input type="text" name="last_name" id="last_name" placeholder="{% trans 'Apellido' %}" required>
-        <label for="last_name">{% trans "Apellido" %}</label>
-      </div>
-
-      <div class="commercial-auth__field">
-        <input type="number" name="age" id="age" min="10" max="120" placeholder="{% trans 'Edad' %}" required>
-        <label for="age">{% trans "Edad" %}</label>
-      </div>
-      <div class="commercial-auth__field">
-        <input type="email" name="email" id="email" placeholder="{% trans 'Correo electrónico' %}" autocomplete="email" required>
-        <label for="email">{% trans "Correo electrónico" %}</label>
-      </div>
-
-      <div class="commercial-auth__field">
-        <input type="password" name="password1" id="password1" placeholder="{% trans 'Contraseña' %}" autocomplete="new-password" required>
-        <label for="password1">{% trans "Contraseña" %}</label>
-      </div>
-      <div class="commercial-auth__field">
-        <input type="password" name="password2" id="password2" placeholder="{% trans 'Confirmar contraseña' %}" autocomplete="new-password" required>
-        <label for="password2">{% trans "Confirmar contraseña" %}</label>
-      </div>
-
-      <label class="commercial-auth__checkbox commercial-auth__field--full">
-        <input type="checkbox" name="accepted_terms" id="accepted_terms" required>
-        <span>{% trans "Acepto los" %} <button type="button" id="show-terms">{% trans "términos y condiciones" %}</button></span>
-      </label>
-
-      <button type="submit" class="commercial-auth__button commercial-auth__button--gold commercial-auth__field--full">
-        {% trans "Registrarse" %}
-      </button>
-    </form>
-
-    <div class="commercial-auth__register">
-      <span>{% trans "¿Ya tienes cuenta?" %}</span>
-      <a href="{% url 'commercial_login' %}">{% trans "Inicia sesión" %}</a>
-    </div>
+  <div class="commercial-auth__field">
+    <input type="email" name="email" id="email" value="{{ valores.email|default:'' }}" placeholder="{% trans 'Correo electrónico' %}" autocomplete="email" required>
+    <label for="email">{% trans "Correo electrónico" %}</label>
   </div>
-</section>
 
+  <div class="commercial-auth__field commercial-auth__password">
+    <input type="password" name="password1" id="password1" placeholder="{% trans 'Contraseña' %}" autocomplete="new-password" required>
+    <label for="password1">{% trans "Contraseña" %}</label>
+    <button type="button" aria-label="{% trans 'Mostrar contraseña' %}" data-password-toggle>
+      <span class="material-icons-outlined">visibility</span>
+    </button>
+  </div>
+
+  <label class="commercial-auth__checkbox">
+    <input type="checkbox" name="accepted_terms" id="accepted_terms" required>
+    <span>{% trans "Acepto los" %} <button type="button" id="show-terms">{% trans "términos y condiciones" %}</button></span>
+  </label>
+
+  <button type="submit" class="commercial-auth__button">
+    {% trans "Registrarse" %}
+  </button>
+</form>
+
+<p class="commercial-auth__register">
+  <span>{% trans "¿Ya tienes cuenta?" %}</span>
+  <a href="{% url 'commercial_login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">{% trans "Inicia sesión" %}</a>
+</p>
+{% endblock %}
+
+{% block auth_after %}
 <div id="terms-modal" class="commercial-auth__modal" hidden>
   <div class="commercial-auth__modal-panel">
     <button type="button" id="close-terms" class="commercial-auth__modal-close" aria-label="{% trans 'Cerrar' %}">&times;</button>
-    <h3>{% trans "Términos y Condiciones de GoToGym para Usuarios (Clientes)" %}</h3>
+    <h2>{% trans "Términos y Condiciones de GoToGym para Usuarios (Clientes)" %}</h2>
     {% include 'accounts/terms_and_conditions.html' %}
   </div>
 </div>
@@ -101,6 +77,18 @@
       closeBtn.addEventListener('click', function () { modal.hidden = true; });
       window.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') modal.hidden = true;
+      });
+    }
+
+    const toggle = document.querySelector('[data-password-toggle]');
+    const password = document.getElementById('password1');
+    if (toggle && password) {
+      toggle.addEventListener('click', function () {
+        const isHidden = password.type === 'password';
+        password.type = isHidden ? 'text' : 'password';
+        toggle.setAttribute('aria-label', isHidden ? "{% trans 'Ocultar contraseña' %}" : "{% trans 'Mostrar contraseña' %}");
+        const icon = toggle.querySelector('.material-icons-outlined');
+        if (icon) icon.textContent = isHidden ? 'visibility_off' : 'visibility';
       });
     }
   });

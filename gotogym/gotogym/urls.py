@@ -42,6 +42,7 @@ urlpatterns = [
     path('api/v1/auth/login', accounts_api_views.developer_login, name='developer_auth_login'),
     path('api/login/', accounts_api_views.developer_login, name='developer_login'),
     path('api/users/', accounts_api_views.developer_users, name='developer_users'),
+    path('products/products/', RedirectView.as_view(pattern_name='tienda:producto_list', permanent=False), name='legacy_products_products'),
     # Fuera de i18n_patterns a proposito: un webhook real no antepone un
     # prefijo de idioma a la URL.
     path('pagos/webhook/mercadopago/', payments_views.mercadopago_webhook, name='mercadopago_webhook'),
@@ -51,6 +52,7 @@ urlpatterns += i18n_patterns(
     path('', views.home, name='home'),
     # Alias de la antigua portada con sesion: ahora es la misma de '/'.
     path('welcome/', RedirectView.as_view(pattern_name='home', permanent=True), name='logged_home'),
+    path('products/products/', RedirectView.as_view(pattern_name='tienda:producto_list', permanent=False), name='legacy_products_products_i18n'),
     path('acerca-de/', views.acerca_de, name='acerca_de'),
     path('contacto/', views.contacto, name='contacto'),
     path('politicas-privacidad-usuario/', views.politicas_privacidad_usuario, name='politicas_privacidad_usuario'),

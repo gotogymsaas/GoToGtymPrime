@@ -895,3 +895,46 @@ msgstr[1] "%(dias)s dias úteis"
 
 msgid "Português"
 msgstr "Português"
+
+msgid "Antes de pagar"
+msgstr "Antes de pagar"
+
+msgid "Contraseña <em>restablecida</em>"
+msgstr "Senha <em>redefinida</em>"
+
+msgid "Crea tu <em>cuenta</em>"
+msgstr "Crie sua <em>conta</em>"
+
+msgid "Entra a <em>tu cuenta</em>"
+msgstr "Entre na <em>sua conta</em>"
+
+msgid "Este enlace <em>ya no sirve</em>"
+msgstr "Este link <em>não funciona mais</em>"
+
+msgid "Recupera tu <em>acceso</em>"
+msgstr "Recupere seu <em>acesso</em>"
+
+msgid "Revisa tu <em>correo</em>"
+msgstr "Verifique seu <em>e-mail</em>"
+
+msgid "Sigue tus pedidos, guarda tus direcciones y paga más rápido."
+msgstr "Acompanhe seus pedidos, salve seus endereços e pague mais rápido."
+
+msgid ""
+"Solo necesitamos tu nombre, correo y una contraseña. El resto lo completas "
+"cuando quieras."
+msgstr ""
+"Só precisamos do seu nome, e-mail e uma senha. O resto você completa quando "
+"quiser."
+
+msgid "Tu carrito"
+msgstr "Seu carrinho"
+
+msgid "Tu nueva <em>contraseña</em>"
+msgstr "Sua nova <em>senha</em>"
+
+msgid "Ver o editar el carrito"
+msgstr "Ver ou editar o carrinho"
+
+msgid "Únete a GoToGym"
+msgstr "Junte-se à GoToGym"
