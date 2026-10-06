@@ -5,7 +5,7 @@
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261002-importes">
+<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261006-perfil">
 {% endblock %}
 
 {% block content %}
@@ -43,17 +43,22 @@
     <div class="actions" style="margin-bottom: 24px;">
       <a href="{% url 'influencer_dashboard' %}" class="ghost btn-sm">Resumen</a>
       <a href="{% url 'influencer_compras_referidas' %}" class="ghost btn-sm">Compras referidas</a>
+      <a href="{% url 'influencer_editar_perfil' %}" class="ghost btn-sm">Mi perfil</a>
       {% if not pending_withdrawal %}
+      {% if payout_account %}
       <details class="request-commission">
         <summary class="button btn-sm">Solicitar comision</summary>
         <form method="post" action="{% url 'influencer_solicitar_retiro' %}" class="request-commission__form">
           {% csrf_token %}
-          <label for="payment_details">Indique el numero de cuenta e indicaciones. Le responderemos con la mayor brevedad posible.</label>
-          <textarea id="payment_details" name="payment_details" rows="5" maxlength="1000" required
-                    placeholder="Ej.: banco, tipo y numero de cuenta, nombre del titular y documento."></textarea>
+          <p>Te pagaremos a tu llave Bre-B <strong>{{ payout_account.breb_key }}</strong>. Si necesitas, agrega una indicacion.</p>
+          <label for="payment_details">Nota (opcional)</label>
+          <textarea id="payment_details" name="payment_details" rows="3" maxlength="1000"></textarea>
           <button type="submit" class="button btn-sm">Enviar solicitud</button>
         </form>
       </details>
+      {% else %}
+      <a href="{% url 'influencer_cuenta_pago' %}" class="button btn-sm">Inscribir cuenta para solicitar comision</a>
+      {% endif %}
       {% endif %}
       <form method="post" action="{% url 'influencer_quitar_suscripcion' %}">
         {% csrf_token %}
@@ -78,13 +83,65 @@
     </section>
 
     {% if pending_withdrawal %}
-    <div class="panel">
+    <div class="panel panel-status">
       <h2>Solicitud de comision en curso</h2>
       <p>Solicitaste ${{ pending_withdrawal.amount|cop }} COP el {{ pending_withdrawal.requested_at|date:"d/m/Y" }}. Te responderemos con la mayor brevedad posible y te avisaremos por correo cuando se pague.</p>
     </div>
     {% endif %}
 
-    <div class="panel">
+    <div class="panel panel-account" id="cuenta-bre-b">
+      <h2>Cuenta Bre-B para tus pagos</h2>
+      {% if payout_account %}
+      <p>Tus comisiones se pagan a esta cuenta. Si cambias de banco o de llave, actual&iacute;zala antes de solicitar tu pr&oacute;ximo pago.</p>
+      <dl class="payout-summary">
+        <dt>Titular</dt><dd>{{ payout_account.full_name }}</dd>
+        <dt>Documento</dt><dd>{{ payout_account.get_document_type_display }} &middot; {{ payout_account.document_number }}</dd>
+        <dt>Llave Bre-B</dt><dd>{{ payout_account.breb_key }}</dd>
+        <dt>Contacto</dt><dd>{{ payout_account.phone }} &middot; {{ payout_account.address }}</dd>
+      </dl>
+      <a href="{% url 'influencer_cuenta_pago' %}" class="ghost btn-sm">Editar cuenta</a>
+      {% else %}
+      <p><strong>Bre-B</strong> es el sistema de pagos inmediatos del Banco de la Rep&uacute;blica: el dinero llega en segundos, a cualquier banco o billetera, usando una &laquo;llave&raquo; (tu documento, celular, correo o un c&oacute;digo alfanum&eacute;rico) que registraste en tu entidad. Inscribe tu cuenta para que podamos pagarte tus comisiones.</p>
+      <a href="{% url 'influencer_cuenta_pago' %}" class="button btn-sm">Inscribir cuenta Bre-B</a>
+      {% endif %}
+    </div>
+
+    <div class="grid-two">
+      <div class="panel panel-account" id="mis-redes">
+        <h2>Tus redes sociales</h2>
+        {% if redes %}
+        <p>{{ redes|length }} red{{ redes|length|pluralize:"es" }} &middot; {{ total_seguidores|cop }} seguidores en total.</p>
+        <dl class="payout-summary">
+          {% for red in redes %}
+          <dt>{{ red.platform_label }}</dt><dd>@{{ red.username }} &middot; {{ red.followers|cop }} seguidores</dd>
+          {% endfor %}
+        </dl>
+        <a href="{% url 'influencer_editar_perfil' %}#redes" class="ghost btn-sm">Editar redes</a>
+        {% else %}
+        <p>A&uacute;n no has registrado tus redes sociales. Agr&eacute;galas para que el equipo conozca tu audiencia.</p>
+        <a href="{% url 'influencer_editar_perfil' %}#redes" class="button btn-sm">Agregar redes</a>
+        {% endif %}
+      </div>
+
+      <div class="panel panel-account" id="mis-datos">
+        <h2>Tu informaci&oacute;n personal</h2>
+        {% if profile.first_name %}
+        <p>Mantenla al d&iacute;a para que podamos contactarte.</p>
+        <dl class="payout-summary">
+          <dt>Nombre</dt><dd>{{ profile.full_name }}</dd>
+          <dt>Documento</dt><dd>{{ profile.get_document_type_display }} &middot; {{ profile.document_number }}</dd>
+          <dt>Tel&eacute;fono</dt><dd>{{ profile.phone }}</dd>
+          <dt>Direcci&oacute;n</dt><dd>{{ profile.address }}</dd>
+        </dl>
+        <a href="{% url 'influencer_editar_perfil' %}" class="ghost btn-sm">Editar mi perfil</a>
+        {% else %}
+        <p>Completa tus datos personales: los necesitamos para identificarte como afiliado.</p>
+        <a href="{% url 'influencer_editar_perfil' %}" class="button btn-sm">Completar mi perfil</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="panel panel-status">
       <h2>&iexcl;Comparte tu c&oacute;digo y gana comisiones!</h2>
       <p>Comparte tu c&oacute;digo o enlace de referido. Cada compra que realicen usando tu c&oacute;digo te sumar&aacute; comisiones.</p>
     </div>
@@ -110,22 +167,25 @@
     {% endif %}
 
     {% elif profile.status == 'pending' %}
-    <div class="panel">
+    <div class="panel panel-status">
       <h2>Tu solicitud esta en revision</h2>
       <p>Un administrador va a revisar tu solicitud para unirte al programa de afiliados. Te avisaremos por aqui cuando quede aprobada.</p>
-      <form method="post" action="{% url 'influencer_quitar_suscripcion' %}">
-        {% csrf_token %}
-        <button type="submit" class="danger btn-sm">Cancelar solicitud</button>
-      </form>
+      <div class="actions">
+        <a href="{% url 'influencer_editar_perfil' %}" class="ghost btn-sm">Editar mi perfil</a>
+        <form method="post" action="{% url 'influencer_quitar_suscripcion' %}">
+          {% csrf_token %}
+          <button type="submit" class="danger btn-sm">Cancelar solicitud</button>
+        </form>
+      </div>
     </div>
     {% elif profile.status == 'rejected' %}
-    <div class="panel">
+    <div class="panel panel-status">
       <h2>Tu solicitud fue rechazada</h2>
       <p>Puedes volver a postularte si crees que las condiciones cambiaron.</p>
       <a href="{% url 'influencer_suscribete' %}" class="button btn-sm">Volver a postularme</a>
     </div>
     {% else %}
-    <div class="panel">
+    <div class="panel panel-status">
       <h2>Tu suscripcion esta inactiva</h2>
       <p>Cancelaste tu participacion en el programa de afiliados. Puedes volver a postularte cuando quieras.</p>
       <a href="{% url 'influencer_suscribete' %}" class="button btn-sm">Volver a postularme</a>

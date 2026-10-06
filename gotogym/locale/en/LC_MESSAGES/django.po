@@ -965,3 +965,6 @@ msgstr "View or edit cart"
 
 msgid "Únete a GoToGym"
 msgstr "Join GoToGym"
+
+msgid "No puedes usar tu propio código de afiliado en tus compras."
+msgstr "You cannot use your own affiliate code on your purchases."

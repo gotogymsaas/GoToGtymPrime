@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from .models import InfluencerProfile, InfluencerStatus, WithdrawalRequest, WithdrawalStatus
 from .services import approve_influencer
-from .tests import InfluencerTestBase
+from .tests import InfluencerTestBase, datos_postulacion
 
 
 def _mensajes(respuesta):
@@ -18,7 +18,7 @@ def _mensajes(respuesta):
 class RePostulacionTests(InfluencerTestBase):
     def _postular(self, codigo='NUEVOCODIGO'):
         self.client.force_login(self.afiliado_user)
-        return self.client.post(reverse('influencer_suscribete'), {'accept_terms': '1', 'referral_code': codigo})
+        return self.client.post(reverse('influencer_suscribete'), datos_postulacion(codigo))
 
     def test_quien_se_dio_de_baja_puede_volver_a_postularse_con_otro_codigo(self):
         perfil = self._crear_perfil_aprobado()
@@ -61,7 +61,7 @@ class RePostulacionTests(InfluencerTestBase):
 
         perfil.refresh_from_db()
         self.assertEqual(perfil.referral_code, codigo)
-        self.assertIn('Ya eres influencer', _mensajes(respuesta)[-1])
+        self.assertIn('Ya eres afiliado', _mensajes(respuesta)[-1])
 
     def test_el_propio_codigo_no_cuenta_como_ocupado_al_re_postularse(self):
         perfil = InfluencerProfile.objects.create(
@@ -82,14 +82,15 @@ class RePostulacionTests(InfluencerTestBase):
         respuesta = self._postular('CUPONAJENO')
 
         self.assertFalse(InfluencerProfile.objects.filter(user=self.afiliado_user).exists())
-        self.assertIn('ya esta en uso', _mensajes(respuesta)[-1])
+        self.assertIn('ya esta en uso', ' '.join(respuesta.context['form'].errors['referral_code']))
 
-    def test_un_error_de_base_de_datos_al_crear_el_perfil_se_informa_sin_romper(self):
-        with patch('influencer.views.InfluencerProfile.objects.create', side_effect=IntegrityError):
+    def test_un_error_de_base_de_datos_al_guardar_se_informa_y_no_deja_un_perfil_a_medias(self):
+        with patch('influencer.views.SocialNetwork.objects.bulk_create', side_effect=IntegrityError):
             respuesta = self._postular()
 
-        self.assertRedirects(respuesta, reverse('influencer_dashboard'), fetch_redirect_response=False)
+        self.assertRedirects(respuesta, reverse('influencer_suscribete'), fetch_redirect_response=False)
         self.assertIn('Hubo un problema', _mensajes(respuesta)[-1])
+        self.assertFalse(InfluencerProfile.objects.filter(user=self.afiliado_user).exists())
 
 
 class AccesoSinPerfilTests(InfluencerTestBase):
@@ -119,15 +120,18 @@ class AccesoSinPerfilTests(InfluencerTestBase):
 class SolicitarComisionTests(InfluencerTestBase):
     def setUp(self):
         self.perfil = self._crear_perfil_aprobado()
+        self._inscribir_cuenta(self.perfil)
         self.client.force_login(self.afiliado_user)
         self.url = reverse('influencer_solicitar_retiro')
 
     def test_un_get_no_hace_nada(self):
         self.assertRedirects(self.client.get(self.url), reverse('influencer_dashboard'), fetch_redirect_response=False)
 
-    def test_sin_datos_de_pago_se_pide_completarlos(self):
-        respuesta = self.client.post(self.url, {'payment_details': '   '})
-        self.assertIn('numero de cuenta', _mensajes(respuesta)[-1])
+    def test_sin_cuenta_bre_b_se_pide_inscribirla(self):
+        self.perfil.payout_account.delete()
+        self._pedido_entregado(self.perfil)
+        respuesta = self.client.post(self.url, {'payment_details': 'Cuenta 123'})
+        self.assertIn('Inscribe tu cuenta Bre-B', _mensajes(respuesta)[-1])
         self.assertFalse(WithdrawalRequest.objects.exists())
 
     def test_un_mensaje_demasiado_largo_se_rechaza(self):

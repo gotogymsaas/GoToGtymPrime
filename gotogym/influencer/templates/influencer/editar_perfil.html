@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi perfil de afiliado{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261006-perfil">
+{% endblock %}
+
+{% block content %}
+<div class="panel-shell">
+  <section class="panel-hero">
+    <div class="editorial-shell">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;">
+        <span class="quantum-emblem"><span class="quantum-emblem__core"></span></span>
+        <span class="quantum-signal-line"></span>
+      </div>
+      <p class="eyebrow">Programa de afiliados</p>
+      <h1>Editar mi perfil</h1>
+    </div>
+  </section>
+
+  <div class="editorial-shell">
+    <form method="post" class="panel" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div role="alert">{{ form.non_field_errors }}</div>{% endif %}
+
+      <div class="form-grid">
+        <h2 id="datos">Datos personales</h2>
+        {% for campo in form %}
+        <label class="{% if campo.name == 'address' %}field-full{% endif %}" for="{{ campo.id_for_label }}">
+          <span>{{ campo.label }}</span>
+          {{ campo }}
+          {% if campo.errors %}<small class="field-error" role="alert">{{ campo.errors|join:" " }}</small>{% endif %}
+        </label>
+        {% endfor %}
+        <p class="hint field-full">Estos son tus datos como afiliado. Los de tu cuenta Bre-B (el titular al que se paga) se editan aparte, en tu cuenta de pago.</p>
+
+        <h2 id="redes">Redes sociales</h2>
+        <p class="hint field-full">Mant&eacute;n al d&iacute;a tus usuarios y seguidores. Puedes agregar o quitar redes.</p>
+        {% include 'influencer/_redes_formset.html' %}
+
+        <div class="form-actions">
+          <a href="{% url 'influencer_dashboard' %}" class="ghost">Cancelar</a>
+          <button type="submit" class="button">Guardar cambios</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/afiliado_redes.js' %}?v=20261006"></script>
+{% endblock %}

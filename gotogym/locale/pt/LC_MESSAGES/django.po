@@ -938,3 +938,6 @@ msgstr "Ver ou editar o carrinho"
 
 msgid "Únete a GoToGym"
 msgstr "Junte-se à GoToGym"
+
+msgid "No puedes usar tu propio código de afiliado en tus compras."
+msgstr "Você não pode usar seu próprio código de afiliado nas suas compras."

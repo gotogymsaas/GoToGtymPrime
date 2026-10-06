@@ -1027,6 +1027,7 @@ def influencer_settings_update(request):
 def influencer_detail(request, pk):
     profile = get_object_or_404(InfluencerProfile.objects.select_related("user", "reviewed_by"), pk=pk)
     commissions = profile.commissions.select_related("order").order_by("-created_at")[:50]
+    redes = list(profile.social_networks.all())
     click_count = profile.referral_clicks.count()
     conversion_rate = f"{profile.total_referred / click_count * 100:.1f}" if click_count else None
     return render(
@@ -1037,6 +1038,8 @@ def influencer_detail(request, pk):
             "commissions": commissions,
             "coupons": profile.coupons.order_by("-created_at"),
             "withdrawal_requests": profile.withdrawal_requests.order_by("-requested_at"),
+            "redes": redes,
+            "total_seguidores": sum(red.followers for red in redes),
             "click_count": click_count,
             "conversion_rate": conversion_rate,
         },

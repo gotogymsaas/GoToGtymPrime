@@ -21,6 +21,15 @@ class InfluencerStatus(models.TextChoices):
     REJECTED = 'rejected', 'Rechazado'
 
 
+class DocumentType(models.TextChoices):
+    CC = 'CC', 'Cedula de ciudadania'
+    CE = 'CE', 'Cedula de extranjeria'
+    NIT = 'NIT', 'NIT'
+    PA = 'PA', 'Pasaporte'
+    PPT = 'PPT', 'Permiso por proteccion temporal (PPT)'
+    PEP = 'PEP', 'Permiso especial de permanencia (PEP)'
+
+
 class InfluencerProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='influencer_profile')
     referral_code = models.CharField(max_length=36, unique=True, default=generate_referral_code)
@@ -52,8 +61,109 @@ class InfluencerProfile(models.Model):
     # solicitud o re-solicitud (ver `influencer.views.suscribete`).
     terms_accepted_at = models.DateTimeField(null=True, blank=True)
 
+    # Datos personales de la postulacion: el equipo necesita saber quien es
+    # la persona detras de la marca antes de aprobarla. Vacios en los
+    # perfiles anteriores a que se pidieran (`blank=True`, sin migracion de
+    # datos que los invente).
+    first_name = models.CharField(max_length=150, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
+    phone = models.CharField(max_length=40, blank=True)
+    address = models.CharField(max_length=255, blank=True)
+    document_type = models.CharField(max_length=3, choices=DocumentType.choices, blank=True)
+    document_number = models.CharField(max_length=20, blank=True)
+
     def __str__(self):
         return f"Influencer: {self.user.email} ({self.referral_code})"
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}".strip()
+
+
+class SocialPlatform(models.TextChoices):
+    INSTAGRAM = 'instagram', 'Instagram'
+    TIKTOK = 'tiktok', 'TikTok'
+    YOUTUBE = 'youtube', 'YouTube'
+    FACEBOOK = 'facebook', 'Facebook'
+    X = 'x', 'X (Twitter)'
+    TWITCH = 'twitch', 'Twitch'
+    LINKEDIN = 'linkedin', 'LinkedIn'
+    PINTEREST = 'pinterest', 'Pinterest'
+    OTHER = 'other', 'Otra'
+
+
+class SocialNetwork(models.Model):
+    """Una red social del afiliado con su usuario y audiencia declarada.
+
+    Es lo que el equipo mira para decidir si aprueba la postulacion. El numero
+    de seguidores lo declara la persona: no se verifica contra la red."""
+
+    influencer = models.ForeignKey(InfluencerProfile, on_delete=models.CASCADE, related_name='social_networks')
+    platform = models.CharField(max_length=12, choices=SocialPlatform.choices)
+    # Nombre de la red cuando `platform` es "Otra".
+    other_name = models.CharField(max_length=60, blank=True)
+    username = models.CharField(max_length=60)
+    followers = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return f"{self.platform_label}: @{self.username} ({self.followers})"
+
+    @property
+    def platform_label(self):
+        if self.platform == SocialPlatform.OTHER and self.other_name:
+            return self.other_name
+        return self.get_platform_display()
+
+
+class PayoutAccount(models.Model):
+    """Cuenta Bre-B donde se le paga al afiliado, con la identidad del
+    titular para poder asociar cada pago a una persona concreta.
+
+    Bre-B (Banco de la Republica) mueve el dinero a una *llave* que el
+    titular registro en su banco o billetera: documento, celular, correo o
+    un codigo alfanumerico (que lleva "@"). No se pregunta de que tipo es: el
+    afiliado la escribe tal como la creo en su banco. La llave no basta para saber a quien se paga, de
+    ahi el nombre, el documento y el contacto. Son datos personales y
+    financieros: solo los ve el propio afiliado y el personal del panel."""
+
+    influencer = models.OneToOneField(InfluencerProfile, on_delete=models.CASCADE, related_name='payout_account')
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    phone = models.CharField(max_length=40)
+    address = models.CharField(max_length=255)
+    document_type = models.CharField(max_length=3, choices=DocumentType.choices)
+    document_number = models.CharField(max_length=20)
+    breb_key = models.CharField(max_length=80)
+    # Consentimiento a los terminos del pago por Bre-B y a la autorizacion de
+    # tratamiento de datos personales (Ley 1581 de 2012), registrado cada vez
+    # que el afiliado guarda su cuenta (ver `influencer.views.cuenta_de_pago`).
+    terms_accepted_at = models.DateTimeField(null=True, blank=True)
+    data_consent_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Cuenta Bre-B de {self.influencer.user.email}"
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}".strip()
+
+    def as_payment_details(self):
+        """Copia en texto de los datos de pago, para fijarla en la solicitud
+        de comision: si el afiliado cambia su cuenta despues, un pago ya
+        solicitado conserva a donde se iba a enviar."""
+        return (
+            f"Llave Bre-B: {self.breb_key}\n"
+            f"Titular: {self.full_name}\n"
+            f"Documento: {self.document_type} {self.document_number}\n"
+            f"Telefono: {self.phone}\n"
+            f"Direccion: {self.address}"
+        )
 
 
 class InfluencerProgramSettings(models.Model):

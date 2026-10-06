@@ -1,0 +1,16 @@
+{% comment %}
+Filas de redes sociales del afiliado. Lo usan la postulacion y la edicion del
+perfil; el comportamiento vive en static/js/afiliado_redes.js. Va dentro de
+un .form-grid.
+{% endcomment %}
+{{ redes.management_form }}
+{% if redes.non_form_errors %}<div role="alert" class="field-error field-full">{{ redes.non_form_errors }}</div>{% endif %}
+<div class="social-list field-full" id="redes-lista">
+  {% for fr in redes %}
+  {% if forloop.first %}{% include 'influencer/_red_social.html' with f=fr removible=False %}{% else %}{% include 'influencer/_red_social.html' with f=fr removible=True %}{% endif %}
+  {% endfor %}
+</div>
+<div class="field-full">
+  <button type="button" class="ghost btn-sm" id="agregar-red">+ Agregar otra red</button>
+</div>
+<template id="red-vacia">{% include 'influencer/_red_social.html' with f=redes.empty_form removible=True %}</template>

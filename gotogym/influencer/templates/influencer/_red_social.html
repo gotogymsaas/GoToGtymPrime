@@ -1,0 +1,23 @@
+<div class="social-row" data-social-row>
+  <label class="social-row__platform">
+    <span>Red social</span>
+    {{ f.platform }}
+    {% if f.platform.errors %}<small class="field-error" role="alert">{{ f.platform.errors|join:" " }}</small>{% endif %}
+  </label>
+  <label class="social-row__other"{% if f.platform.value != 'other' %} hidden{% endif %}>
+    <span>Nombre de la red</span>
+    {{ f.other_name }}
+    {% if f.other_name.errors %}<small class="field-error" role="alert">{{ f.other_name.errors|join:" " }}</small>{% endif %}
+  </label>
+  <label class="social-row__user">
+    <span>Usuario</span>
+    {{ f.username }}
+    {% if f.username.errors %}<small class="field-error" role="alert">{{ f.username.errors|join:" " }}</small>{% endif %}
+  </label>
+  <label class="social-row__followers">
+    <span>Seguidores</span>
+    {{ f.followers }}
+    {% if f.followers.errors %}<small class="field-error" role="alert">{{ f.followers.errors|join:" " }}</small>{% endif %}
+  </label>
+  <div class="social-row__action">{% if removible %}<button type="button" class="ghost btn-sm" data-remove-social aria-label="Quitar esta red">Quitar</button>{% endif %}</div>
+</div>

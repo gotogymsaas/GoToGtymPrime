@@ -66,7 +66,11 @@ urlpatterns += i18n_patterns(
     path('politica-pagos/', views.politica_pagos, name='politica_pagos'),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
-    path('influencer/', include('influencer.urls')),
+    path('afiliados/', include('influencer.urls')),
+    # Ruta anterior del programa (antes se llamaba "influencer"): se redirige
+    # para no romper enlaces guardados o enviados por correo.
+    path('influencer/', views.ruta_antigua_de_afiliados, {'resto': ''}),
+    path('influencer/<path:resto>', views.ruta_antigua_de_afiliados),
     # Password reset URLs
     path('accounts/password_reset/', auth_views.PasswordResetView.as_view(template_name='accounts/password_reset_form.html'), name='password_reset'),
     path('accounts/password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='accounts/password_reset_done.html'), name='password_reset_done'),

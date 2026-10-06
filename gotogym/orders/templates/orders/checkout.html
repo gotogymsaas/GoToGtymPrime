@@ -248,7 +248,9 @@
           mensajeCupon.className = 'checkout-coupon__feedback is-success';
         } else {
           descuentoActual = 0;
-          mensajeCupon.textContent = '{% trans "Cupón no válido." %}';
+          mensajeCupon.textContent = datos.reason === 'own_code'
+            ? '{% trans "No puedes usar tu propio código de afiliado en tus compras." %}'
+            : '{% trans "Cupón no válido." %}';
           mensajeCupon.className = 'checkout-coupon__feedback is-error';
         }
         actualizarTotal(envioActual);

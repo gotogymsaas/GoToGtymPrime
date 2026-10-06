@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import render
 from django.templatetags.static import static
 from django.urls import reverse
@@ -166,10 +166,20 @@ def politica_pagos(request):
 
 
 # Rutas que no tiene sentido indexar: privadas o sin contenido propio.
+# 'influencer' es la ruta anterior del programa de afiliados (solo redirige).
 RUTAS_NO_INDEXABLES = (
     'admin-panel', 'admin', 'carrito', 'pedidos-tienda', 'pagos', 'accounts',
-    'influencer', 'contabilidad', 'analitica', 'products',
+    'afiliados', 'influencer', 'contabilidad', 'analitica', 'products',
 )
+
+
+def ruta_antigua_de_afiliados(request, resto):
+    """/<idioma>/influencer/... -> /<idioma>/afiliados/... (301), con la
+    misma cadena de consulta."""
+    destino = request.path.replace('/influencer/', '/afiliados/', 1)
+    if request.META.get('QUERY_STRING'):
+        destino = f"{destino}?{request.META['QUERY_STRING']}"
+    return HttpResponsePermanentRedirect(destino)
 
 
 def robots_txt(request):

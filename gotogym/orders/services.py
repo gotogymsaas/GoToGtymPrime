@@ -53,6 +53,18 @@ def get_usable_coupon(coupon_code, user=None):
     return cupon
 
 
+def es_cupon_propio(coupon_code, user):
+    """Si el codigo es el cupon personal del afiliado que esta comprando.
+
+    `get_usable_coupon` lo rechaza igual que a uno inexistente; esto permite
+    decirle a la persona por que, en vez de un "no valido" que la hace creer
+    que su codigo esta roto."""
+    codigo = (coupon_code or '').strip().upper()
+    if not codigo or user is None or not getattr(user, 'is_authenticated', False):
+        return False
+    return Coupon.objects.filter(code=codigo, influencer__user=user).exists()
+
+
 def calculate_coupon_discount(subtotal, coupon_code='', user=None):
     """Calcula el descuento del cupon indicado, si existe y es utilizable."""
     cupon = get_usable_coupon(coupon_code, user=user)

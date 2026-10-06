@@ -9,7 +9,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from .colombia_data import DEPARTAMENTOS, municipios_de
-from .services import get_usable_coupon
+from .services import es_cupon_propio, get_usable_coupon
 
 TELEFONO_VALIDO = re.compile(r'^[0-9+()\s-]{7,20}$')
 
@@ -72,7 +72,10 @@ class CheckoutForm(forms.Form):
         cleaned_data = super().clean()
         codigo_cupon = cleaned_data.get('coupon_code', '').strip().upper()
         if codigo_cupon and get_usable_coupon(codigo_cupon, user=self._user) is None:
-            self.add_error('coupon_code', 'El cupón no es válido.')
+            if es_cupon_propio(codigo_cupon, self._user):
+                self.add_error('coupon_code', 'No puedes usar tu propio código de afiliado en tus compras.')
+            else:
+                self.add_error('coupon_code', 'El cupón no es válido.')
         cleaned_data['coupon_code'] = codigo_cupon
         departamento = cleaned_data.get('department')
         ciudad = cleaned_data.get('city', '').strip()

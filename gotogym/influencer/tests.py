@@ -31,6 +31,7 @@ from .models import (
     InfluencerProfile,
     InfluencerProgramSettings,
     InfluencerStatus,
+    PayoutAccount,
     ReferralClick,
     WithdrawalRequest,
     WithdrawalStatus,
@@ -90,6 +91,13 @@ class InfluencerTestBase(TestCase):
         perfil.refresh_from_db()
         return perfil
 
+    def _inscribir_cuenta(self, perfil):
+        return PayoutAccount.objects.create(
+            influencer=perfil, first_name='Ana', last_name='Perez', phone='3001234567',
+            address='Calle 1 # 2-3, Bogota', document_type='CC', document_number='1020304050',
+            breb_key='3001234567',
+        )
+
     def _crear_pedido_referido(self, perfil, cantidad=1):
         cupon = perfil.coupons.first()
         datos = dict(DATOS_ENTREGA, coupon_code=cupon.code)
@@ -102,10 +110,24 @@ class InfluencerTestBase(TestCase):
         return pedido
 
 
+def datos_postulacion(codigo='MIMARCA2026', **cambios):
+    """Formulario de postulacion completo y valido; `cambios` pisa campos
+    sueltos (para probar un dato faltante o invalido)."""
+    datos = {
+        'first_name': 'Ana', 'last_name': 'Perez', 'phone': '300 123 4567',
+        'address': 'Calle 1 # 2-3, Bogota', 'document_type': 'CC', 'document_number': '1020304050',
+        'referral_code': codigo, 'accept_terms': '1',
+        'redes-TOTAL_FORMS': '1', 'redes-INITIAL_FORMS': '0', 'redes-MIN_NUM_FORMS': '1', 'redes-MAX_NUM_FORMS': '15',
+        'redes-0-platform': 'instagram', 'redes-0-other_name': '', 'redes-0-username': 'anafit', 'redes-0-followers': '1200',
+    }
+    datos.update(cambios)
+    return datos
+
+
 class SolicitudDeAfiliacionTests(InfluencerTestBase):
     def test_suscribirse_crea_perfil_pendiente_sin_activar_rol(self):
         self.client.force_login(self.afiliado_user)
-        self.client.post(reverse('influencer_suscribete'), {'accept_terms': '1', 'referral_code': 'MIMARCA2026'})
+        self.client.post(reverse('influencer_suscribete'), datos_postulacion('MIMARCA2026'))
 
         perfil = InfluencerProfile.objects.get(user=self.afiliado_user)
         self.assertEqual(perfil.status, InfluencerStatus.PENDING)
@@ -116,14 +138,14 @@ class SolicitudDeAfiliacionTests(InfluencerTestBase):
 
     def test_el_codigo_propuesto_debe_ser_valido(self):
         self.client.force_login(self.afiliado_user)
-        self.client.post(reverse('influencer_suscribete'), {'accept_terms': '1', 'referral_code': 'a b!'})
+        self.client.post(reverse('influencer_suscribete'), datos_postulacion('a b!'))
 
         self.assertFalse(InfluencerProfile.objects.filter(user=self.afiliado_user).exists())
 
     def test_el_codigo_propuesto_debe_estar_disponible(self):
         InfluencerProfile.objects.create(user=self.comprador, referral_code='OCUPADO1')
         self.client.force_login(self.afiliado_user)
-        self.client.post(reverse('influencer_suscribete'), {'accept_terms': '1', 'referral_code': 'ocupado1'})
+        self.client.post(reverse('influencer_suscribete'), datos_postulacion('ocupado1'))
 
         self.assertFalse(InfluencerProfile.objects.filter(user=self.afiliado_user).exists())
 
@@ -295,6 +317,7 @@ class RetiroDeComisionesTests(InfluencerTestBase):
 
     def test_no_se_puede_pedir_dos_retiros_pendientes_a_la_vez(self):
         perfil = self._crear_perfil_aprobado()
+        self._inscribir_cuenta(perfil)
         self._pedido_entregado(perfil)
         self.client.force_login(self.afiliado_user)
 
@@ -305,7 +328,8 @@ class RetiroDeComisionesTests(InfluencerTestBase):
 
 
 class SolicitudDeComisionTests(InfluencerTestBase):
-    """El afiliado escribe su cuenta e indicaciones; el equipo le responde."""
+    """La comision se paga a la cuenta Bre-B inscrita; el afiliado solo suma
+    una nota opcional."""
 
     def _solicitar(self, **datos):
         return self.client.post(reverse('influencer_solicitar_retiro'), datos)
@@ -313,31 +337,55 @@ class SolicitudDeComisionTests(InfluencerTestBase):
     def setUp(self):
         super().setUp()
         self.perfil = self._crear_perfil_aprobado()
+        self.cuenta = self._inscribir_cuenta(self.perfil)
         self._pedido_entregado(self.perfil)
         self.client.force_login(self.afiliado_user)
 
-    def test_el_panel_ofrece_el_desplegable_con_el_mensaje_abierto(self):
+    def test_el_panel_ofrece_el_desplegable_con_la_llave_inscrita(self):
         respuesta = self.client.get(reverse('influencer_dashboard'))
         self.assertContains(respuesta, 'Solicitar comision')
         self.assertNotContains(respuesta, 'Solicitar retiro')
-        self.assertContains(respuesta, 'Indique el numero de cuenta e indicaciones')
-        self.assertContains(respuesta, 'Le responderemos con la mayor brevedad posible')
+        self.assertContains(respuesta, 'Te pagaremos a tu llave Bre-B')
+        self.assertContains(respuesta, '3001234567')
         self.assertContains(respuesta, 'name="payment_details"')
 
-    def test_guarda_el_mensaje_con_la_solicitud(self):
-        self._solicitar(payment_details='  Bancolombia ahorros 000-111  \nTitular: Ana  ')
+    def test_sin_cuenta_el_panel_pide_inscribirla_en_lugar_del_desplegable(self):
+        self.cuenta.delete()
+        respuesta = self.client.get(reverse('influencer_dashboard'))
+        self.assertContains(respuesta, 'Inscribir cuenta para solicitar comision')
+        self.assertNotContains(respuesta, 'name="payment_details"')
+
+    def test_la_solicitud_copia_los_datos_de_la_cuenta_y_la_nota(self):
+        self._solicitar(payment_details='  Pagar despues del 15  ')
         solicitud = WithdrawalRequest.objects.get(influencer=self.perfil)
-        self.assertEqual(solicitud.payment_details, 'Bancolombia ahorros 000-111  \nTitular: Ana')
+        self.assertIn('Llave Bre-B: 3001234567', solicitud.payment_details)
+        self.assertIn('Titular: Ana Perez', solicitud.payment_details)
+        self.assertIn('Documento: CC 1020304050', solicitud.payment_details)
+        self.assertTrue(solicitud.payment_details.endswith('Nota del afiliado: Pagar despues del 15'))
         self.assertGreater(solicitud.amount, 0)
 
-    def test_sin_mensaje_no_se_crea_la_solicitud_ni_se_reservan_comisiones(self):
-        respuesta = self._solicitar(payment_details='   ', follow=False)
+    def test_la_nota_es_opcional(self):
+        self._solicitar(payment_details='   ')
+        solicitud = WithdrawalRequest.objects.get(influencer=self.perfil)
+        self.assertNotIn('Nota del afiliado', solicitud.payment_details)
+
+    def test_cambiar_la_cuenta_despues_no_altera_una_solicitud_ya_hecha(self):
+        self._solicitar()
+        self.cuenta.breb_key = '3109999999'
+        self.cuenta.save()
+        solicitud = WithdrawalRequest.objects.get(influencer=self.perfil)
+        self.assertIn('3001234567', solicitud.payment_details)
+        self.assertNotIn('3109999999', solicitud.payment_details)
+
+    def test_sin_cuenta_inscrita_no_se_crea_la_solicitud_ni_se_reservan_comisiones(self):
+        self.cuenta.delete()
+        respuesta = self._solicitar(payment_details='Cuenta 1', follow=False)
         self.assertEqual(respuesta.status_code, 302)
         self.assertFalse(WithdrawalRequest.objects.exists())
         self.perfil.refresh_from_db()
         self.assertGreater(self.perfil.commission_balance, 0)
 
-    def test_un_mensaje_demasiado_largo_se_rechaza(self):
+    def test_una_nota_demasiado_larga_se_rechaza(self):
         self._solicitar(payment_details='x' * 1001)
         self.assertFalse(WithdrawalRequest.objects.exists())
 
@@ -346,7 +394,7 @@ class SolicitudDeComisionTests(InfluencerTestBase):
         self.assertFalse(WithdrawalRequest.objects.exists())
 
     def test_con_una_solicitud_en_curso_el_panel_la_muestra_y_no_ofrece_otra(self):
-        self._solicitar(payment_details='Cuenta 1')
+        self._solicitar()
         respuesta = self.client.get(reverse('influencer_dashboard'))
         self.assertContains(respuesta, 'Solicitud de comision en curso')
         self.assertNotContains(respuesta, 'name="payment_details"')
@@ -509,6 +557,27 @@ class ControlDeAutorreferenciaTests(InfluencerTestBase):
         respuesta = self.client.get(reverse('orders:validar_cupon'), {'code': cupon.code})
 
         self.assertFalse(respuesta.json()['valid'])
+        # Se dice por que, para que no parezca que el codigo esta roto.
+        self.assertEqual(respuesta.json()['reason'], 'own_code')
+
+    def test_un_codigo_inexistente_no_se_confunde_con_el_propio(self):
+        self._crear_perfil_aprobado()
+        self.client.force_login(self.afiliado_user)
+        self.client.post(reverse('carrito:add_to_cart', args=[self.variante.pk]))
+
+        datos = self.client.get(reverse('orders:validar_cupon'), {'code': 'NOEXISTE'}).json()
+
+        self.assertFalse(datos['valid'])
+        self.assertNotIn('reason', datos)
+
+    def test_es_cupon_propio_solo_para_el_dueno(self):
+        from orders.services import es_cupon_propio
+
+        perfil = self._crear_perfil_aprobado()
+        codigo = perfil.coupons.first().code.lower()
+        self.assertTrue(es_cupon_propio(codigo, self.afiliado_user))
+        self.assertFalse(es_cupon_propio(codigo, self.comprador))
+        self.assertFalse(es_cupon_propio('', self.afiliado_user))
 
 
 class TrackingDeClicsTests(InfluencerTestBase):

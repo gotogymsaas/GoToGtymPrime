@@ -5,7 +5,7 @@
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261002-importes">
+<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261006-perfil">
 {% endblock %}
 
 {% block content %}
@@ -24,31 +24,57 @@
   <div class="editorial-shell">
     <div class="panel">
       <h2>Como funciona</h2>
-      <p>Tu solicitud sera revisada por un administrador. Tu propio codigo (el que elijas abajo) se activa como cupon al aprobarse: cada compra hecha con el genera una comision.</p>
+      <p>Tu solicitud sera revisada por un administrador, que ver&aacute; tus datos y tus redes. Tu propio c&oacute;digo (el que elijas abajo) se activa como cup&oacute;n al aprobarse: cada compra hecha con &eacute;l genera una comisi&oacute;n.</p>
     </div>
 
-    <div class="panel">
-      <h2>Terminos del programa</h2>
-      <p>Al participar te comprometes a divulgar claramente a tu audiencia que usas un codigo o enlace de afiliado cuando lo promociones, conforme a la normativa de publicidad con influenciadores aplicable. El programa puede suspender el acceso de un afiliado que incumpla estas condiciones.</p>
+    <form method="post" class="panel" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div role="alert">{{ form.non_field_errors }}</div>{% endif %}
 
-      <form method="post" class="form-grid">
-        {% csrf_token %}
-        <label class="field-full">
-          <span>Tu codigo de afiliado</span>
-          <input type="text" name="referral_code" maxlength="20" placeholder="Ej: TUMARCA2026" required
-                 pattern="[A-Za-z0-9]{4,20}" title="4 a 20 letras o numeros, sin espacios ni simbolos">
+      <div class="form-grid">
+        <h2>Tus datos personales</h2>
+        {% for campo in form %}
+        {% if campo.name != 'referral_code' and campo.name != 'accept_terms' %}
+        <label class="{% if campo.name == 'address' %}field-full{% endif %}" for="{{ campo.id_for_label }}">
+          <span>{{ campo.label }}</span>
+          {{ campo }}
+          {% if campo.errors %}<small class="field-error" role="alert">{{ campo.errors|join:" " }}</small>{% endif %}
+        </label>
+        {% endif %}
+        {% endfor %}
+
+        <h2>Tus redes sociales</h2>
+        <p class="hint field-full">Indica el usuario y cu&aacute;ntos seguidores tienes en cada red donde publicas. Instagram aparece por defecto; agrega las dem&aacute;s que apliquen o elige &laquo;Otra&raquo;.</p>
+        {% include 'influencer/_redes_formset.html' %}
+
+        <h2>Tu c&oacute;digo y los t&eacute;rminos</h2>
+        <label class="field-full" for="{{ form.referral_code.id_for_label }}">
+          <span>{{ form.referral_code.label }}</span>
+          <input type="text" name="referral_code" id="{{ form.referral_code.id_for_label }}" maxlength="20"
+                 placeholder="Ej: TUMARCA2026" required pattern="[A-Za-z0-9]{4,20}"
+                 title="4 a 20 letras o numeros, sin espacios ni simbolos" value="{{ form.referral_code.value|default:'' }}">
+          {% if form.referral_code.errors %}<small class="field-error" role="alert">{{ form.referral_code.errors|join:" " }}</small>{% endif %}
         </label>
         <p class="hint field-full">Elige un codigo de 4 a 20 letras o numeros que te represente a ti y a tu marca (sin espacios ni simbolos). Sera tu cupon de descuento una vez aprobado.</p>
-        <label class="check field-full">
-          <input type="checkbox" name="accept_terms" required>
+
+        <p class="hint field-full">Al participar te comprometes a divulgar claramente a tu audiencia que usas un codigo o enlace de afiliado cuando lo promociones, conforme a la normativa de publicidad con influenciadores aplicable. El programa puede suspender el acceso de un afiliado que incumpla estas condiciones.</p>
+        <label class="check field-full" for="{{ form.accept_terms.id_for_label }}">
+          <input type="checkbox" name="accept_terms" id="{{ form.accept_terms.id_for_label }}" required{% if form.accept_terms.value %} checked{% endif %}>
           <span>Acepto los terminos del programa de afiliados y la obligacion de divulgacion publicitaria.</span>
         </label>
+        {% if form.accept_terms.errors %}<small class="field-error field-full" role="alert">{{ form.accept_terms.errors|join:" " }}</small>{% endif %}
+
         <div class="form-actions">
           <a href="{% url 'home' %}" class="ghost">Cancelar</a>
           <button type="submit" class="button">Enviar solicitud</button>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
   </div>
 </div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/afiliado_redes.js' %}?v=20261006"></script>
 {% endblock %}

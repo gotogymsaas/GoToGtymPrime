@@ -103,6 +103,60 @@
 </div>
 
 <div class="panel">
+  <h2>Datos personales</h2>
+  {% if profile.first_name %}
+  <table>
+    <tbody>
+      <tr><th>Nombre</th><td>{{ profile.full_name }}</td></tr>
+      <tr><th>Documento</th><td>{{ profile.get_document_type_display }} &middot; {{ profile.document_number }}</td></tr>
+      <tr><th>Telefono</th><td>{{ profile.phone }}</td></tr>
+      <tr><th>Direccion</th><td>{{ profile.address }}</td></tr>
+    </tbody>
+  </table>
+  {% else %}
+  <p>Este afiliado se postulo antes de que se pidieran sus datos personales.</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Redes sociales</h2>
+  {% if redes %}
+  <table>
+    <thead><tr><th>Red</th><th>Usuario</th><th>Seguidores declarados</th></tr></thead>
+    <tbody>
+      {% for red in redes %}
+      <tr><td>{{ red.platform_label }}</td><td>@{{ red.username }}</td><td>{{ red.followers|cop }}</td></tr>
+      {% endfor %}
+    </tbody>
+    <tfoot><tr><th colspan="2">Total</th><th>{{ total_seguidores|cop }}</th></tr></tfoot>
+  </table>
+  <p class="hint">Las cifras las declara la persona; no se verifican contra cada red.</p>
+  {% else %}
+  <p>Este afiliado no declaro redes sociales.</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Cuenta Bre-B</h2>
+  {% if profile.payout_account %}
+  {% with cuenta=profile.payout_account %}
+  <table>
+    <tbody>
+      <tr><th>Titular</th><td>{{ cuenta.full_name }}</td></tr>
+      <tr><th>Documento</th><td>{{ cuenta.get_document_type_display }} &middot; {{ cuenta.document_number }}</td></tr>
+      <tr><th>Llave Bre-B</th><td>{{ cuenta.breb_key }}</td></tr>
+      <tr><th>Telefono</th><td>{{ cuenta.phone }}</td></tr>
+      <tr><th>Direccion</th><td>{{ cuenta.address }}</td></tr>
+      <tr><th>Actualizada</th><td>{{ cuenta.updated_at|date:"d/m/Y H:i" }}</td></tr>
+    </tbody>
+  </table>
+  {% endwith %}
+  {% else %}
+  <p>Este afiliado todavia no inscribe su cuenta Bre-B.</p>
+  {% endif %}
+</div>
+
+<div class="panel">
   <h2>Solicitudes de comision</h2>
   <table>
     <thead><tr><th>Monto</th><th>Estado</th><th>Datos de pago</th><th>Solicitada</th><th>Resuelta</th></tr></thead>

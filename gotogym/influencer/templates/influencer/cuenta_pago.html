@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cuenta Bre-B{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261006-perfil">
+{% endblock %}
+
+{% block content %}
+<div class="panel-shell">
+  <section class="panel-hero">
+    <div class="editorial-shell">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;">
+        <span class="quantum-emblem"><span class="quantum-emblem__core"></span></span>
+        <span class="quantum-signal-line"></span>
+      </div>
+      <p class="eyebrow">Programa de afiliados</p>
+      <h1>{% if cuenta %}Editar cuenta Bre-B{% else %}Inscribe tu cuenta Bre-B{% endif %}</h1>
+    </div>
+  </section>
+
+  <div class="editorial-shell">
+    <form method="post" class="panel" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+      <div role="alert">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <h2>T&eacute;rminos y autorizaci&oacute;n</h2>
+      <div class="legal-text">
+        <p><strong>T&eacute;rminos del pago por Bre-B.</strong> Declaro que la cuenta y la llave Bre-B que inscribo son de mi titularidad y que los datos que entrego son ver&iacute;dicos y completos. Entiendo que GoToGym pagar&aacute; mis comisiones &uacute;nicamente a la llave inscrita, por lo que soy responsable de mantenerla vigente y escrita tal como la cre&eacute; en mi banco o billetera; un pago enviado a la llave registrada se considera bien hecho. Acepto que los pagos est&aacute;n sujetos a los <a href="{% url 'terminos' %}" target="_blank" rel="noopener">t&eacute;rminos</a> del programa de afiliados, a que existan comisiones aprobadas y a las retenciones de impuestos que la ley aplique. Puedo actualizar mis datos en cualquier momento; el cambio aplica a las solicitudes futuras.</p>
+        <p><strong>Autorizaci&oacute;n de tratamiento de datos personales.</strong> Autorizo de manera previa, expresa e informada a GoToGym para recolectar, almacenar, usar y consultar mis datos personales (nombre, documento de identidad, tel&eacute;fono, direcci&oacute;n y llave Bre-B) con el fin de identificarme como titular, asociar y ejecutar el pago de mis comisiones, cumplir obligaciones contables y tributarias y prevenir fraudes, conforme a la Ley 1581 de 2012 y a la <a href="{% url 'politica_tratamiento_datos' %}" target="_blank" rel="noopener">pol&iacute;tica de tratamiento de datos</a>. Como titular puedo conocer, actualizar y rectificar mis datos, solicitar su supresi&oacute;n y revocar esta autorizaci&oacute;n, salvo que la ley obligue a conservarlos. No se me solicitan datos sensibles.</p>
+      </div>
+
+      <div class="form-grid">
+        <label class="check field-full" for="{{ form.accept_terms.id_for_label }}">
+          <input type="checkbox" name="accept_terms" id="{{ form.accept_terms.id_for_label }}" required{% if form.accept_terms.value %} checked{% endif %}>
+          <span>Acepto los t&eacute;rminos del pago por Bre-B.</span>
+        </label>
+        {% if form.accept_terms.errors %}<small class="field-error field-full" role="alert">{{ form.accept_terms.errors|join:" " }}</small>{% endif %}
+        <label class="check field-full" for="{{ form.accept_data.id_for_label }}">
+          <input type="checkbox" name="accept_data" id="{{ form.accept_data.id_for_label }}" required{% if form.accept_data.value %} checked{% endif %}>
+          <span>Autorizo el tratamiento de mis datos personales.</span>
+        </label>
+        {% if form.accept_data.errors %}<small class="field-error field-full" role="alert">{{ form.accept_data.errors|join:" " }}</small>{% endif %}
+
+        <h2>Datos del titular y de la llave</h2>
+        {% for campo in form %}
+        {% if campo.field.widget.input_type != 'checkbox' %}
+        <label class="{% if campo.name == 'address' or campo.name == 'breb_key' %}field-full{% endif %}" for="{{ campo.id_for_label }}">
+          <span>{{ campo.label }}</span>
+          {{ campo }}
+          {% if campo.errors %}<small class="field-error" role="alert">{{ campo.errors|join:" " }}</small>{% endif %}
+        </label>
+        {% endif %}
+        {% endfor %}
+        <p class="hint field-full">Escribe tu llave exactamente como la creaste en tu banco o billetera: debe ser la misma. Si tu llave es un c&oacute;digo alfanum&eacute;rico que empieza por @, aseg&uacute;rate de incluir el @.</p>
+        <div class="form-actions">
+          <a href="{% url 'influencer_dashboard' %}" class="ghost">Cancelar</a>
+          <button type="submit" class="button">Guardar cuenta</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

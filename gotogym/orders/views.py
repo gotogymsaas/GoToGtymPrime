@@ -13,7 +13,7 @@ from tienda.catalog import curated_product_cards
 from .colombia_data import MUNICIPIOS_POR_DEPARTAMENTO
 from .forms import CheckoutForm
 from .models import Order, OrderItem, OrderStatus
-from .services import CheckoutError, create_order_from_cart, get_usable_coupon
+from .services import CheckoutError, create_order_from_cart, es_cupon_propio, get_usable_coupon
 
 REVIEWABLE_ORDER_STATUSES = {
     OrderStatus.CONFIRMED,
@@ -150,6 +150,8 @@ def validar_cupon(request):
     subtotal = Decimal(resumen['subtotal']).quantize(Decimal('0.01'))
     cupon = get_usable_coupon(codigo, user=request.user)
     if cupon is None:
+        if es_cupon_propio(codigo, request.user):
+            return JsonResponse({'valid': False, 'reason': 'own_code'})
         return JsonResponse({'valid': False})
 
     descuento = cupon.compute_discount(subtotal)
