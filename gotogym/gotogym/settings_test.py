@@ -6,10 +6,16 @@ from .settings import *
 # que agregarla dos veces -- exactamente lo que paso con 'analitica', que
 # quedó sin registrar en esta lista hasta que un test lo hizo evidente.
 
+# En memoria, no en `db.sqlite3`: la suite crea su propia base de pruebas, y
+# comandos como `makemigrations --check` (que valida el historial de la base
+# a la que apuntan) no deben depender de un archivo local con el estado en que
+# lo dejo la ultima vez que alguien migro. Con un archivo viejo, el hook de
+# pre-push fallaba con InconsistentMigrationHistory mientras el CI -- que parte
+# de una base vacia -- pasaba. Asi se comportan igual.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': str(BASE_DIR / 'db.sqlite3'),
+        'NAME': ':memory:',
     }
 }
 
