@@ -44,10 +44,10 @@ ADMIN_PERM_SPECS = [
     ('auth', 'change_group'),
     ('auth', 'delete_group'),
     ('administracion', 'change_panelsettings'),
-    ('influencer', 'change_influencerprofile'),
-    ('influencer', 'delete_influencerprofile'),
-    ('influencer', 'change_withdrawalrequest'),
-    ('influencer', 'change_influencerprogramsettings'),
+    ('afiliados', 'change_perfilafiliado'),
+    ('afiliados', 'delete_perfilafiliado'),
+    ('afiliados', 'change_withdrawalrequest'),
+    ('afiliados', 'change_configuracionprogramaafiliados'),
     ('payments', 'add_refund'),
 ]
 

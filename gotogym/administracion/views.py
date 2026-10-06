@@ -1,6 +1,21 @@
 import csv
 from datetime import datetime, timedelta
 
+from afiliados.models import (
+    Commission,
+    CommissionStatus,
+    ConfiguracionProgramaAfiliados,
+    EstadoAfiliado,
+    PerfilAfiliado,
+    WithdrawalRequest,
+    WithdrawalStatus,
+)
+from afiliados.services import (
+    approve_afiliado,
+    deactivate_afiliado,
+    reject_afiliado,
+    resolve_withdrawal,
+)
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
@@ -12,21 +27,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
-from influencer.models import (
-    Commission,
-    CommissionStatus,
-    InfluencerProfile,
-    InfluencerProgramSettings,
-    InfluencerStatus,
-    WithdrawalRequest,
-    WithdrawalStatus,
-)
-from influencer.services import (
-    approve_influencer,
-    deactivate_influencer,
-    reject_influencer,
-    resolve_withdrawal,
-)
 from inventory.models import Inventory, InventoryAdjustment, InventoryAdjustmentReason
 from inventory.services import record_adjustment
 from orders.models import Coupon, Order, OrderStatus
@@ -50,12 +50,12 @@ from tienda.catalog import SIZE_ORDER
 
 from . import metrics
 from .forms import (
+    AfiliadoCommissionRateForm,
     BrandForm,
     CategoryForm,
+    ConfiguracionProgramaAfiliadosForm,
     CouponForm,
     GroupForm,
-    InfluencerCommissionRateForm,
-    InfluencerProgramSettingsForm,
     PanelSettingsForm,
     ProductAdminForm,
     ProductTagForm,
@@ -151,10 +151,10 @@ def dashboard(request):
         "low_stock_threshold": threshold,
         "product_count": Product.objects.count(),
         "user_count": User.objects.count(),
-        "influencer_count": InfluencerProfile.objects.filter(
-            is_active=True, status=InfluencerStatus.APPROVED,
+        "afiliado_count": PerfilAfiliado.objects.filter(
+            is_active=True, status=EstadoAfiliado.APPROVED,
         ).count(),
-        "pending_influencer_count": InfluencerProfile.objects.filter(status=InfluencerStatus.PENDING).count(),
+        "pending_afiliado_count": PerfilAfiliado.objects.filter(status=EstadoAfiliado.PENDING).count(),
         "pending_withdrawal_count": WithdrawalRequest.objects.filter(status=WithdrawalStatus.PENDING).count(),
         "category_count": ProductCategory.objects.count(),
         "low_stock_count": Inventory.objects.filter(
@@ -705,10 +705,10 @@ def users_list(request):
         )
     if role == "admin":
         users = users.filter(is_staff=True)
-    elif role == "influencer":
-        users = users.filter(is_staff=False, es_influencer=True)
+    elif role == "afiliado":
+        users = users.filter(is_staff=False, es_afiliado=True)
     elif role == "user":
-        users = users.filter(is_staff=False, es_influencer=False)
+        users = users.filter(is_staff=False, es_afiliado=False)
     elif role == "inactive":
         users = users.filter(is_active=False)
     paginator = Paginator(users, 50)
@@ -728,9 +728,9 @@ def users_list(request):
 @require_perms("accounts.change_user")
 @require_POST
 def user_role_update(request, pk):
-    """Cambia el rol (Usuario/Influencer/Administrador) de un usuario.
+    """Cambia el rol (Usuario/Afiliado/Administrador) de un usuario.
 
-    is_staff y es_influencer son los flags ya existentes en el modelo; el
+    is_staff y es_afiliado son los flags ya existentes en el modelo; el
     rol es una combinacion de ambos, no un campo nuevo. Un admin no puede
     quitarse a si mismo el acceso administrativo desde aqui, para evitar
     quedar bloqueado fuera del panel sin otro administrador presente.
@@ -744,18 +744,18 @@ def user_role_update(request, pk):
 
     if nuevo_rol == "admin":
         target.is_staff = True
-        target.es_influencer = False
-    elif nuevo_rol == "influencer":
+        target.es_afiliado = False
+    elif nuevo_rol == "afiliado":
         target.is_staff = False
-        target.es_influencer = True
+        target.es_afiliado = True
     elif nuevo_rol == "user":
         target.is_staff = False
-        target.es_influencer = False
+        target.es_afiliado = False
     else:
         messages.error(request, "Rol invalido.")
         return _safe_redirect(request, "admin_users")
 
-    target.save(update_fields=["is_staff", "es_influencer"])
+    target.save(update_fields=["is_staff", "es_afiliado"])
 
     # El paquete completo de permisos es lo que hace que "Administrador"
     # tenga acceso a todo sin depender de un Grupo armado a mano; al bajar
@@ -808,8 +808,8 @@ def user_delete(request, pk):
 def user_groups_update(request, pk):
     """Asigna a un usuario los grupos (roles intermedios) marcados.
 
-    Distinto de `user_role_update`: el rol basico (Usuario/Influencer/
-    Administrador) sigue viviendo en `is_staff`/`es_influencer`, y esto
+    Distinto de `user_role_update`: el rol basico (Usuario/Afiliado/
+    Administrador) sigue viviendo en `is_staff`/`es_afiliado`, y esto
     es un permiso adicional, acotado, que solo tiene efecto si el usuario
     ya es staff (el panel completo sigue exigiendo `is_staff=True`; un
     Grupo nunca lo otorga por si solo).
@@ -968,15 +968,15 @@ def coupon_delete(request, pk):
 
 
 @staff_required
-def influencers_list(request):
+def afiliados_list(request):
     """Pagina unica del programa de afiliados: antes "Afiliados" y "Retiros
     de afiliados" vivian en pantallas separadas aunque un retiro no se
     entiende sin ver primero al afiliado que lo pide. Ahora la info de
     afiliados va arriba y los retiros abajo, en la misma pagina."""
     status = request.GET.get("status", "").strip()
     query = request.GET.get("q", "").strip()
-    profiles = InfluencerProfile.objects.select_related("user").order_by("-created_at")
-    if status in dict(InfluencerStatus.choices):
+    profiles = PerfilAfiliado.objects.select_related("user").order_by("-created_at")
+    if status in dict(EstadoAfiliado.choices):
         profiles = profiles.filter(status=status)
     if query:
         profiles = profiles.filter(
@@ -987,11 +987,11 @@ def influencers_list(request):
     page_obj = paginator.get_page(request.GET.get("page"))
 
     settings_form = None
-    if request.user.has_perm("influencer.change_influencerprogramsettings"):
-        settings_form = InfluencerProgramSettingsForm(instance=InfluencerProgramSettings.load())
+    if request.user.has_perm("afiliados.change_configuracionprogramaafiliados"):
+        settings_form = ConfiguracionProgramaAfiliadosForm(instance=ConfiguracionProgramaAfiliados.load())
 
     withdrawal_status = request.GET.get("wstatus", WithdrawalStatus.PENDING).strip()
-    withdrawals_qs = WithdrawalRequest.objects.select_related("influencer__user").order_by("-requested_at")
+    withdrawals_qs = WithdrawalRequest.objects.select_related("afiliado__user").order_by("-requested_at")
     if withdrawal_status in dict(WithdrawalStatus.choices):
         withdrawals_qs = withdrawals_qs.filter(status=withdrawal_status)
     withdrawal_paginator = Paginator(withdrawals_qs, 20)
@@ -999,7 +999,7 @@ def influencers_list(request):
 
     return render(
         request,
-        "administracion/influencers.html",
+        "administracion/afiliados.html",
         {
             "page_obj": page_obj,
             "query": query,
@@ -1011,28 +1011,28 @@ def influencers_list(request):
     )
 
 
-@require_perms("influencer.change_influencerprogramsettings")
+@require_perms("afiliados.change_configuracionprogramaafiliados")
 @require_POST
-def influencer_settings_update(request):
-    form = InfluencerProgramSettingsForm(request.POST, instance=InfluencerProgramSettings.load())
+def afiliado_settings_update(request):
+    form = ConfiguracionProgramaAfiliadosForm(request.POST, instance=ConfiguracionProgramaAfiliados.load())
     if form.is_valid():
         form.save()
         messages.success(request, "Configuracion del programa de afiliados actualizada.")
     else:
         messages.error(request, "No se pudo guardar la configuracion.")
-    return redirect("admin_influencers")
+    return redirect("admin_afiliados")
 
 
 @staff_required
-def influencer_detail(request, pk):
-    profile = get_object_or_404(InfluencerProfile.objects.select_related("user", "reviewed_by"), pk=pk)
+def afiliado_detail(request, pk):
+    profile = get_object_or_404(PerfilAfiliado.objects.select_related("user", "reviewed_by"), pk=pk)
     commissions = profile.commissions.select_related("order").order_by("-created_at")[:50]
     redes = list(profile.social_networks.all())
     click_count = profile.referral_clicks.count()
     conversion_rate = f"{profile.total_referred / click_count * 100:.1f}" if click_count else None
     return render(
         request,
-        "administracion/influencer_detail.html",
+        "administracion/afiliado_detail.html",
         {
             "profile": profile,
             "commissions": commissions,
@@ -1046,55 +1046,55 @@ def influencer_detail(request, pk):
     )
 
 
-@require_perms("influencer.change_influencerprofile")
+@require_perms("afiliados.change_perfilafiliado")
 @require_POST
-def influencer_commission_rate_update(request, pk):
-    profile = get_object_or_404(InfluencerProfile, pk=pk)
-    form = InfluencerCommissionRateForm(request.POST, instance=profile)
+def afiliado_commission_rate_update(request, pk):
+    profile = get_object_or_404(PerfilAfiliado, pk=pk)
+    form = AfiliadoCommissionRateForm(request.POST, instance=profile)
     if form.is_valid():
         form.save()
         messages.success(request, "Tasa de comision actualizada.")
     else:
         messages.error(request, "No se pudo guardar la tasa de comision.")
-    return redirect("admin_influencer_detail", pk=pk)
+    return redirect("admin_afiliado_detail", pk=pk)
 
 
-@require_perms("influencer.change_influencerprofile")
+@require_perms("afiliados.change_perfilafiliado")
 @require_POST
-def influencer_approve(request, pk):
-    profile = get_object_or_404(InfluencerProfile, pk=pk)
-    approve_influencer(profile, request.user)
+def afiliado_approve(request, pk):
+    profile = get_object_or_404(PerfilAfiliado, pk=pk)
+    approve_afiliado(profile, request.user)
     messages.success(request, f"Afiliado {profile.user.email} aprobado.")
-    return _safe_redirect(request, "admin_influencers")
+    return _safe_redirect(request, "admin_afiliados")
 
 
-@require_perms("influencer.change_influencerprofile")
+@require_perms("afiliados.change_perfilafiliado")
 @require_POST
-def influencer_reject(request, pk):
-    profile = get_object_or_404(InfluencerProfile, pk=pk)
-    reject_influencer(profile, request.user)
+def afiliado_reject(request, pk):
+    profile = get_object_or_404(PerfilAfiliado, pk=pk)
+    reject_afiliado(profile, request.user)
     messages.success(request, f"Solicitud de {profile.user.email} rechazada.")
-    return _safe_redirect(request, "admin_influencers")
+    return _safe_redirect(request, "admin_afiliados")
 
 
-@require_perms("influencer.change_influencerprofile")
+@require_perms("afiliados.change_perfilafiliado")
 @require_POST
-def influencer_deactivate(request, pk):
-    profile = get_object_or_404(InfluencerProfile, pk=pk)
-    deactivate_influencer(profile)
+def afiliado_deactivate(request, pk):
+    profile = get_object_or_404(PerfilAfiliado, pk=pk)
+    deactivate_afiliado(profile)
     messages.success(request, f"Afiliado {profile.user.email} desactivado.")
-    return _safe_redirect(request, "admin_influencers")
+    return _safe_redirect(request, "admin_afiliados")
 
 
 @staff_required
 def withdrawals_list(request):
     # "Comisiones de afiliados" se unifico dentro de "Afiliados" (ver
-    # `influencers_list`); esta ruta se conserva solo para no romper
+    # `afiliados_list`); esta ruta se conserva solo para no romper
     # enlaces viejos.
-    return redirect("admin_influencers")
+    return redirect("admin_afiliados")
 
 
-@require_perms("influencer.change_withdrawalrequest")
+@require_perms("afiliados.change_withdrawalrequest")
 @require_POST
 def withdrawal_resolve(request, pk):
     solicitud = get_object_or_404(WithdrawalRequest, pk=pk)
@@ -1104,23 +1104,23 @@ def withdrawal_resolve(request, pk):
         request,
         "Solicitud de comision pagada. Se le aviso al afiliado por correo." if aprobar else "Solicitud de comision rechazada.",
     )
-    return _safe_redirect(request, "admin_influencers")
+    return _safe_redirect(request, "admin_afiliados")
 
 
-@require_perms("influencer.delete_influencerprofile")
+@require_perms("afiliados.delete_perfilafiliado")
 @require_POST
-def influencer_delete(request, pk):
-    profile = get_object_or_404(InfluencerProfile, pk=pk)
+def afiliado_delete(request, pk):
+    profile = get_object_or_404(PerfilAfiliado, pk=pk)
     email = profile.user.email
     profile.delete()
     messages.success(request, f"Afiliado {email} eliminado.")
-    return redirect("admin_influencers")
+    return redirect("admin_afiliados")
 
 
 @staff_required
 def groups_list(request):
     """Roles intermedios: Grupos de Django con un subconjunto de permisos
-    del panel. Aparte de Usuario/Influencer/Administrador, un Grupo permite
+    del panel. Aparte de Usuario/Afiliado/Administrador, un Grupo permite
     darle a alguien acceso solo a, por ejemplo, inventario y cupones."""
     groups = Group.objects.order_by("name").prefetch_related("permissions")
     return render(request, "administracion/groups.html", {"groups": groups})

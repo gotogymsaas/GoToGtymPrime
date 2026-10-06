@@ -41,7 +41,7 @@ A continuación se listan los aspectos que requieren revisión o implementación
   - Mostrar banners in‑app con alertas dinámicas.
   - Disparar emails mediante n8n en eventos clave.
 
-- [ ] **Influencer Marketing**
+- [ ] **Afiliado Marketing**
   - Permitir a cualquier usuario activar su perfil embajador con código de referido.
   - Completar dashboard con referidos, ventas, comisión y opción de retiro.
 

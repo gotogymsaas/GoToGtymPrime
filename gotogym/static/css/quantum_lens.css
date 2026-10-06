@@ -1,7 +1,7 @@
 /* Lente gravitacional Quantum: definicion unica del componente.
  *
  * El nombre .quantum-lens no es decorativo: .quantum-field ya nombra las
- * orbitas de la entrada publica en home_figma.css e influencer_figma.css.
+ * orbitas de la entrada publica en home_figma.css e afiliado_figma.css.
  * Eran dos componentes distintos con la misma clase, y solo no chocaban
  * porque ninguna plantilla cargaba las dos hojas a la vez. Con nombres
  * separados esta hoja se puede cargar donde haga falta sin romper la

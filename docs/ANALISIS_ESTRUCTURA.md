@@ -33,7 +33,7 @@ Un monolito Django (`gotogym/`) que sirve la tienda, el blog, el panel administr
 | `payments` | Pagos: proveedor simulado y de Mercado Pago, webhook, reembolsos | `PaymentTransaction`, `Refund` |
 | `shipping` | Cotización de envío (simulada) | `ShippingQuote` |
 | `blog` | Journal: entradas con referencias | `Post`, `Category` |
-| `influencer` | Programa de afiliados: solicitud, comisiones, retiros, clics | `InfluencerProfile`, `Commission`, `WithdrawalRequest`, `ReferralClick`, `InfluencerProgramSettings` |
+| `afiliados` | Programa de afiliados: solicitud, comisiones, retiros, clics | `PerfilAfiliado`, `Commission`, `WithdrawalRequest`, `ReferralClick`, `ConfiguracionProgramaAfiliados` |
 | `administracion` | Panel interno: dashboard de ventas, analítica, productos, pedidos, cupones, usuarios, afiliados | `PanelSettings` |
 | `analitica` | Eventos de uso del sitio, sin datos personales | `EventoAnalitica` |
 | `contabilidad` | Consulta de clientes y facturas en Alegra (solo personal) | (sin modelos) |
@@ -53,7 +53,7 @@ Todas las rutas públicas llevan prefijo de idioma (`/es/`, `/en/`, `/pt/`); el 
 | `/es/accounts/acceso/`, `/es/accounts/register/` | Todos | Login y registro (aceptan `?next=`) |
 | `/es/pedidos-tienda/checkout/` | Con sesión | Checkout |
 | `/es/pedidos-tienda/mis-pedidos/`, `/es/accounts/editar-perfil/` | Con sesión | Cuenta del cliente |
-| `/es/influencer/dashboard/` | Con sesión | Panel de afiliados |
+| `/es/afiliados/dashboard/` | Con sesión | Panel de afiliados |
 | `/es/admin-panel/` | Personal (`is_staff`) | Panel interno: ventas, analítica (`/analitica/`), productos, pedidos, cupones, usuarios, afiliados, catálogos |
 | `/es/contabilidad/` | Personal | Clientes y facturas de Alegra |
 | `/es/admin/` | Superusuario | Administración de Django |

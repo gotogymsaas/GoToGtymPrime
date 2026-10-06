@@ -18,7 +18,7 @@
   <article><span>{{ category_count }}</span><p>Categorias</p></article>
   <article><span>{{ active_coupon_count }}</span><p>Cupones activos</p></article>
   <article><span>{{ user_count }}</span><p>Usuarios inscritos</p></article>
-  <article><span>{{ influencer_count }}</span><p>Afiliados activos</p></article>
+  <article><span>{{ afiliado_count }}</span><p>Afiliados activos</p></article>
 </section>
 
 <section class="page-head">
@@ -29,8 +29,8 @@
     <span>{{ anuladas.por_devolver_pedidos }}</span>
     <p>Pedidos pagados y anulados sin reembolso{% if anuladas.por_devolver_monto %} (${{ anuladas.por_devolver_monto|cop }} COP){% endif %}</p>
   </article>
-  <article class="{% if pending_influencer_count %}is-gold stat-warning{% else %}is-green{% endif %}">
-    <a href="{% url 'admin_influencers' %}?status=pending"><span>{{ pending_influencer_count }}</span><p>Solicitudes de afiliado</p></a>
+  <article class="{% if pending_afiliado_count %}is-gold stat-warning{% else %}is-green{% endif %}">
+    <a href="{% url 'admin_afiliados' %}?status=pending"><span>{{ pending_afiliado_count }}</span><p>Solicitudes de afiliado</p></a>
   </article>
   <article class="{% if pending_withdrawal_count %}is-gold stat-warning{% else %}is-green{% endif %}">
     <a href="{% url 'admin_withdrawals' %}"><span>{{ pending_withdrawal_count }}</span><p>Solicitudes de comision</p></a>

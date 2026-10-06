@@ -117,21 +117,21 @@
         <div id="userDropdown" class="gtg-dropdown" hidden>
           <a href="{% url 'orders:my_orders' %}">{% trans "Mis pedidos" %}</a>
           <a href="{% url 'edit_profile' %}">{% trans "Editar perfil" %}</a>
-          {% if user.influencer_profile.is_active %}
-          <a href="{% url 'influencer_dashboard' %}">
-            {% if user.influencer_profile.status == 'approved' %}{% trans "Panel de afiliados" %}{% else %}{% trans "Solicitud de afiliado" %}{% endif %}
+          {% if user.perfil_afiliado.is_active %}
+          <a href="{% url 'afiliado_dashboard' %}">
+            {% if user.perfil_afiliado.status == 'approved' %}{% trans "Panel de afiliados" %}{% else %}{% trans "Solicitud de afiliado" %}{% endif %}
           </a>
           {% else %}
           {% comment %}
           Antes vivia como modal en la entrada publica (home.html), pero esa
           vista redirige a los usuarios con sesion antes de que el modal
-          pudiera mostrarse -- quedo huerfano. El programa de influencers
+          pudiera mostrarse -- quedo huerfano. El programa de afiliados
           debe quedar fuera del Home del comprador y del camino critico de
           compra (ver PROPUESTA_HOME_STORE_QUANTUM.md, seccion 2), asi que
-          vuelve como un enlace tranquilo junto a "Panel influencer", no
+          vuelve como un enlace tranquilo junto a "Panel afiliado", no
           como una interrupcion.
           {% endcomment %}
-          <a href="{% url 'influencer_suscribete' %}">{% trans "Programa de afiliados" %}</a>
+          <a href="{% url 'afiliado_suscribete' %}">{% trans "Programa de afiliados" %}</a>
           {% endif %}
           {% if user.is_staff %}
           <a href="{% url 'admin_dashboard' %}">{% trans "Panel administrador" %}</a>

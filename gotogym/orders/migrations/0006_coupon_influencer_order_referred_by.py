@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('influencer', '0001_initial'),
+        ('afiliados', '0001_initial'),
         ('orders', '0005_alter_order_order_status'),
     ]
 
@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='coupon',
             name='influencer',
-            field=models.ForeignKey(blank=True, help_text='Si se asigna, las ventas hechas con este cupon se atribuyen a este afiliado.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='coupons', to='influencer.influencerprofile'),
+            field=models.ForeignKey(blank=True, help_text='Si se asigna, las ventas hechas con este cupon se atribuyen a este afiliado.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='coupons', to='afiliados.influencerprofile'),
         ),
         migrations.AddField(
             model_name='order',
             name='referred_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='referred_orders', to='influencer.influencerprofile'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='referred_orders', to='afiliados.influencerprofile'),
         ),
     ]

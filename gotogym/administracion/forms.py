@@ -1,12 +1,12 @@
 import re
 from decimal import ROUND_HALF_UP, Decimal
 
+from afiliados.models import ConfiguracionProgramaAfiliados, PerfilAfiliado
 from django import forms
 from django.contrib.auth.models import Group, Permission
 from django.db.models import Q
 from django.forms import BaseInlineFormSet, inlineformset_factory
 from django.utils.text import slugify
-from influencer.models import InfluencerProfile, InfluencerProgramSettings
 from inventory.models import Inventory, InventoryAdjustmentReason
 from inventory.services import record_adjustment
 from orders.models import Coupon
@@ -392,9 +392,9 @@ class SalesGoalForm(forms.ModelForm):
         labels = {"monthly_sales_goal": "Meta de ventas (COP)"}
 
 
-class InfluencerProgramSettingsForm(forms.ModelForm):
+class ConfiguracionProgramaAfiliadosForm(forms.ModelForm):
     class Meta:
-        model = InfluencerProgramSettings
+        model = ConfiguracionProgramaAfiliados
         fields = ["default_commission_rate", "default_customer_discount"]
         labels = {
             "default_commission_rate": "Tasa de comision global (%)",
@@ -402,8 +402,8 @@ class InfluencerProgramSettingsForm(forms.ModelForm):
         }
 
 
-class InfluencerCommissionRateForm(forms.ModelForm):
+class AfiliadoCommissionRateForm(forms.ModelForm):
     class Meta:
-        model = InfluencerProfile
+        model = PerfilAfiliado
         fields = ["commission_rate"]
         labels = {"commission_rate": "Tasa propia (vacio = usar la tasa global)"}

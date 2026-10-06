@@ -56,8 +56,8 @@ class User(AbstractUser):
     accepted_terms = models.BooleanField(default=False)
     terms_accepted_at = models.DateTimeField(null=True, blank=True)
     terms_hash = models.CharField(max_length=128, blank=True)
-    show_influencer_modal = models.BooleanField(default=True)  # Nuevo campo
-    es_influencer = models.BooleanField(default=False, verbose_name="Es influencer")
+    show_afiliado_modal = models.BooleanField(default=True)  # Nuevo campo
+    es_afiliado = models.BooleanField(default=False, verbose_name="Es afiliado")
     customer_segments = models.ManyToManyField(
         CustomerSegment, blank=True, related_name='members', verbose_name="Segmentos de cliente",
     )

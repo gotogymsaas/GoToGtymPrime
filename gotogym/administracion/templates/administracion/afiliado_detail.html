@@ -1,0 +1,180 @@
+{% extends "administracion/base.html" %}
+{% load tienda_filters %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Afiliado</p>
+    <h1>{{ profile.user.email }}</h1>
+  </div>
+  <a class="button ghost" href="{% url 'admin_afiliados' %}">Volver</a>
+</section>
+
+<div class="panel">
+  <p><strong>Codigo de referido:</strong> {{ profile.referral_code }}</p>
+  <p><strong>Estado:</strong>
+    {% if profile.status == 'approved' and profile.is_active %}<span class="pill pill-ok">Aprobado</span>
+    {% elif profile.status == 'pending' %}<span class="badge badge-gold">Pendiente</span>
+    {% elif profile.status == 'rejected' %}<span class="pill pill-off">Rechazado</span>
+    {% else %}<span class="pill pill-off">Inactivo</span>{% endif %}
+  </p>
+  {% if profile.reviewed_by %}<p><strong>Revisado por:</strong> {{ profile.reviewed_by.email }} el {{ profile.reviewed_at|date:"d/m/Y H:i" }}</p>{% endif %}
+  <p><strong>Terminos aceptados:</strong> {% if profile.terms_accepted_at %}{{ profile.terms_accepted_at|date:"d/m/Y H:i" }}{% else %}No registrado{% endif %}</p>
+  <p><strong>Personas referidas:</strong> {{ profile.total_referred }} &middot; <strong>Ventas generadas:</strong> ${{ profile.total_sales|cop }} COP &middot; <strong>Comision disponible:</strong> ${{ profile.commission_balance|cop }} COP</p>
+  <p><strong>Clics en el enlace:</strong> {{ click_count }} &middot; <strong>Tasa de conversion:</strong> {% if conversion_rate %}{{ conversion_rate }}%{% else %}&mdash;{% endif %}</p>
+  <p><strong>Tasa de comision:</strong> {% if profile.commission_rate %}{{ profile.commission_rate }}% (propia){% else %}Tasa global del programa{% endif %}</p>
+
+  {% if perms.afiliados.change_perfilafiliado %}
+  <form method="post" action="{% url 'admin_afiliado_commission_rate_update' profile.pk %}" class="form-grid">
+    {% csrf_token %}
+    <label>
+      <span>Tasa propia de comision (%)</span>
+      <input type="number" step="0.01" min="0" max="100" name="commission_rate" value="{{ profile.commission_rate|default_if_none:'' }}" placeholder="Vacio = tasa global">
+    </label>
+    <div class="form-actions"><button class="button" type="submit">Guardar tasa</button></div>
+  </form>
+  {% endif %}
+
+  {% if perms.afiliados.change_perfilafiliado %}
+  <div class="form-actions">
+    {% if profile.status == 'pending' %}
+    <form method="post" action="{% url 'admin_afiliado_approve' profile.pk %}">
+      {% csrf_token %}
+      <button class="button" type="submit">Aprobar</button>
+    </form>
+    <form method="post" action="{% url 'admin_afiliado_reject' profile.pk %}">
+      {% csrf_token %}
+      <button class="button product-delete-button" type="submit">Rechazar</button>
+    </form>
+    {% elif profile.status == 'approved' and profile.is_active %}
+    <form method="post" action="{% url 'admin_afiliado_deactivate' profile.pk %}" onsubmit="return confirm('¿Desactivar a este afiliado?');">
+      {% csrf_token %}
+      <button class="ghost" type="submit">Desactivar</button>
+    </form>
+    {% elif not profile.is_active %}
+    <form method="post" action="{% url 'admin_afiliado_approve' profile.pk %}">
+      {% csrf_token %}
+      <button class="button" type="submit">Reactivar</button>
+    </form>
+    {% endif %}
+  </div>
+  {% endif %}
+  {% if perms.afiliados.delete_perfilafiliado %}
+  <div class="form-actions">
+    <form method="post" action="{% url 'admin_afiliado_delete' profile.pk %}" onsubmit="return confirm('¿Eliminar definitivamente a {{ profile.user.email|escapejs }} del programa de afiliados? Esta accion no se puede deshacer.');">
+      {% csrf_token %}
+      <button class="button product-delete-button" type="submit">Eliminar afiliado</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Cupones</h2>
+  <table>
+    <thead><tr><th>Codigo</th><th>Descuento</th><th>Usos</th><th>Estado</th></tr></thead>
+    <tbody>
+      {% for coupon in coupons %}
+      <tr>
+        <td><strong>{{ coupon.code }}</strong></td>
+        <td>{% if coupon.discount_type == 'percentage' %}{{ coupon.value }}%{% else %}${{ coupon.value }} COP{% endif %}</td>
+        <td>{{ coupon.times_used }}{% if coupon.max_uses %} / {{ coupon.max_uses }}{% endif %}</td>
+        <td>{% if coupon.is_usable %}<span class="pill pill-ok">Vigente</span>{% elif coupon.is_active %}<span class="badge badge-gold">Fuera de vigencia</span>{% else %}<span class="pill pill-off">Desactivado</span>{% endif %}</td>
+      </tr>
+      {% empty %}<tr><td colspan="4">Sin cupones todavia.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="panel">
+  <h2>Comisiones</h2>
+  <table>
+    <thead><tr><th>Pedido</th><th>Monto</th><th>Estado</th><th>Fecha</th></tr></thead>
+    <tbody>
+      {% for commission in commissions %}
+      <tr>
+        <td><a href="{% url 'admin_order_detail' commission.order.order_number %}">{{ commission.order.order_number }}</a></td>
+        <td class="nowrap">${{ commission.amount|cop }} COP</td>
+        <td>{{ commission.get_status_display }}</td>
+        <td><small>{{ commission.created_at|date:"d/m/Y" }}</small></td>
+      </tr>
+      {% empty %}<tr><td colspan="4">Sin comisiones todavia.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="panel">
+  <h2>Datos personales</h2>
+  {% if profile.first_name %}
+  <table>
+    <tbody>
+      <tr><th>Nombre</th><td>{{ profile.full_name }}</td></tr>
+      <tr><th>Documento</th><td>{{ profile.get_document_type_display }} &middot; {{ profile.document_number }}</td></tr>
+      <tr><th>Telefono</th><td>{{ profile.phone }}</td></tr>
+      <tr><th>Direccion</th><td>{{ profile.address }}</td></tr>
+    </tbody>
+  </table>
+  {% else %}
+  <p>Este afiliado se postulo antes de que se pidieran sus datos personales.</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Redes sociales</h2>
+  {% if redes %}
+  <table>
+    <thead><tr><th>Red</th><th>Usuario</th><th>Seguidores declarados</th></tr></thead>
+    <tbody>
+      {% for red in redes %}
+      <tr><td>{{ red.platform_label }}</td><td>@{{ red.username }}</td><td>{{ red.followers|cop }}</td></tr>
+      {% endfor %}
+    </tbody>
+    <tfoot><tr><th colspan="2">Total</th><th>{{ total_seguidores|cop }}</th></tr></tfoot>
+  </table>
+  <p class="hint">Las cifras las declara la persona; no se verifican contra cada red.</p>
+  {% else %}
+  <p>Este afiliado no declaro redes sociales.</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Cuenta Bre-B</h2>
+  {% if profile.payout_account %}
+  {% with cuenta=profile.payout_account %}
+  <table>
+    <tbody>
+      <tr><th>Titular</th><td>{{ cuenta.full_name }}</td></tr>
+      <tr><th>Documento</th><td>{{ cuenta.get_document_type_display }} &middot; {{ cuenta.document_number }}</td></tr>
+      <tr><th>Llave Bre-B</th><td>{{ cuenta.breb_key }}</td></tr>
+      <tr><th>Telefono</th><td>{{ cuenta.phone }}</td></tr>
+      <tr><th>Direccion</th><td>{{ cuenta.address }}</td></tr>
+      <tr><th>Actualizada</th><td>{{ cuenta.updated_at|date:"d/m/Y H:i" }}</td></tr>
+    </tbody>
+  </table>
+  {% endwith %}
+  {% else %}
+  <p>Este afiliado todavia no inscribe su cuenta Bre-B.</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Solicitudes de comision</h2>
+  <table>
+    <thead><tr><th>Monto</th><th>Estado</th><th>Datos de pago</th><th>Solicitada</th><th>Resuelta</th></tr></thead>
+    <tbody>
+      {% for withdrawal in withdrawal_requests %}
+      <tr>
+        <td class="nowrap">${{ withdrawal.amount|cop }} COP</td>
+        <td>{{ withdrawal.get_status_display }}</td>
+        <td>
+          {% if withdrawal.payment_details %}
+          <details class="payment-details"><summary>Ver mensaje</summary><p>{{ withdrawal.payment_details|linebreaksbr }}</p></details>
+          {% else %}&mdash;{% endif %}
+        </td>
+        <td><small>{{ withdrawal.requested_at|date:"d/m/Y" }}</small></td>
+        <td><small>{{ withdrawal.resolved_at|date:"d/m/Y"|default:"—" }}</small></td>
+      </tr>
+      {% empty %}<tr><td colspan="5">Sin solicitudes todavia.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

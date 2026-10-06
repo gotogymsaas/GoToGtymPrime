@@ -57,7 +57,7 @@ referencia versionada en el repo.
 - `shipping` - Cotización de envío
 - `blog` - Sistema de blog
 - `contabilidad` - Integración con Alegra
-- `influencer` - Gestión de influencers y referidos
+- `afiliado` - Gestión de afiliados y referidos
 - `administracion` - Panel administrativo interno
 - `analitica` - Analítica de producto sin PII
 

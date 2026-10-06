@@ -68,7 +68,7 @@ INSTALLED_APPS = [
     'payments',
     'shipping',
     'contabilidad',
-    'influencer',
+    'afiliados',
     'tienda',
     'carrito',
     'administracion',
@@ -87,7 +87,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'influencer.middleware.ReferralTrackingMiddleware',
+    'afiliados.middleware.ReferralTrackingMiddleware',
 ]
 
 ROOT_URLCONF = 'gotogym.urls'

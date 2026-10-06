@@ -9,7 +9,7 @@
 <div class="filter-tabs">
   <a href="?q={{ query }}" class="{% if not role %}active{% endif %}">Todos</a>
   <a href="?q={{ query }}&role=user" class="{% if role == 'user' %}active{% endif %}">Usuario</a>
-  <a href="?q={{ query }}&role=influencer" class="{% if role == 'influencer' %}active{% endif %}">Afiliado</a>
+  <a href="?q={{ query }}&role=afiliado" class="{% if role == 'afiliado' %}active{% endif %}">Afiliado</a>
   <a href="?q={{ query }}&role=admin" class="{% if role == 'admin' %}active{% endif %}">Administrador</a>
   <a href="?q={{ query }}&role=inactive" class="{% if role == 'inactive' %}active{% endif %}">Inactivos</a>
 </div>
@@ -31,7 +31,7 @@
         <td>
           {% if member.is_superuser %}<span class="badge badge-gold">Superusuario</span>
           {% elif member.is_staff %}<span class="badge badge-gold">Administrador</span>
-          {% elif member.es_influencer %}<span class="badge badge-accent">Afiliado</span>
+          {% elif member.es_afiliado %}<span class="badge badge-accent">Afiliado</span>
           {% else %}<span class="badge badge-muted">Usuario</span>{% endif %}
         </td>
         <td>
@@ -39,8 +39,8 @@
           <form class="role-form" method="post" action="{% url 'admin_user_role_update' member.pk %}">
             {% csrf_token %}
             <select name="role">
-              <option value="user" {% if not member.is_staff and not member.es_influencer %}selected{% endif %}>Usuario</option>
-              <option value="influencer" {% if not member.is_staff and member.es_influencer %}selected{% endif %}>Afiliado</option>
+              <option value="user" {% if not member.is_staff and not member.es_afiliado %}selected{% endif %}>Usuario</option>
+              <option value="afiliado" {% if not member.is_staff and member.es_afiliado %}selected{% endif %}>Afiliado</option>
               <option value="admin" {% if member.is_staff %}selected{% endif %}>Administrador</option>
             </select>
             <button class="ghost btn-sm" type="submit">Aplicar</button>

@@ -6,11 +6,11 @@ prueba que la protege tiene que cambiar a proposito."""
 from datetime import date, timedelta
 from decimal import Decimal
 
+from afiliados.models import PerfilAfiliado
 from analitica.models import EventoAnalitica
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils import timezone
-from influencer.models import InfluencerProfile
 from inventory.models import Inventory
 from orders.models import Coupon, Order, OrderStatus
 from orders.services import apply_order_status_transition, confirm_payment, create_order_from_cart
@@ -232,8 +232,8 @@ class ClientesYCanalesTests(MetricasBase):
         self.assertEqual(filas[0]['descuento'], Decimal('80000'))
 
     def test_origen_de_la_venta(self):
-        perfil = InfluencerProfile.objects.create(user=self.luis)
-        Coupon.objects.create(code='AFIL1', discount_type='percentage', value=10, influencer=perfil)
+        perfil = PerfilAfiliado.objects.create(user=self.luis)
+        Coupon.objects.create(code='AFIL1', discount_type='percentage', value=10, afiliado=perfil)
         Coupon.objects.create(code='GENERAL', discount_type='percentage', value=5)
         self._venta(self.ana, [(self.v_caro, 1)], cupon='AFIL1')
         self._venta(self.ana, [(self.v_caro, 1)], cupon='GENERAL')

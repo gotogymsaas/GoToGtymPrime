@@ -3,11 +3,11 @@ from django.db import migrations, models
 
 def sync_existing_influencers(apps, schema_editor):
     table_names = schema_editor.connection.introspection.table_names()
-    if "influencer_influencerprofile" not in table_names:
+    if "afiliados_influencerprofile" not in table_names:
         return
 
     with schema_editor.connection.cursor() as cursor:
-        cursor.execute("SELECT user_id FROM influencer_influencerprofile")
+        cursor.execute("SELECT user_id FROM afiliados_influencerprofile")
         user_ids = [row[0] for row in cursor.fetchall()]
 
     if user_ids:

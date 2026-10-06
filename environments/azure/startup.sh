@@ -15,6 +15,11 @@ if [ ! -f gotogym/manage.py ]; then
   exit 1
 fi
 
+# `migrate` es el del proyecto (afiliados/management/commands/migrate.py): si
+# la base viene de cuando el programa se llamaba "influencer", antes de migrar
+# renombra sus tablas y registros a "afiliados" (ver afiliados/adaptar_base.py).
+# En una base ya adaptada o nueva no hace nada. Conviene un respaldo de la base
+# antes del primer despliegue que incluya este cambio.
 echo "[startup] Aplicando migraciones..."
 "${PYTHON_BIN}" gotogym/manage.py migrate --noinput
 

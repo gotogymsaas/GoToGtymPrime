@@ -3,18 +3,18 @@ programa de afiliados. Cubre el flujo normal, los filtros de listado y que un
 miembro del personal sin el permiso concreto no pueda ejecutar la accion."""
 from decimal import Decimal
 
+from afiliados.models import (
+    ConfiguracionProgramaAfiliados,
+    EstadoAfiliado,
+    PerfilAfiliado,
+    WithdrawalRequest,
+    WithdrawalStatus,
+)
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
-from influencer.models import (
-    InfluencerProfile,
-    InfluencerProgramSettings,
-    InfluencerStatus,
-    WithdrawalRequest,
-    WithdrawalStatus,
-)
 from orders.models import Coupon
 from products.models import Brand, Product, ProductCategory, ProductTag
 
@@ -141,45 +141,45 @@ class CuponesListadoTests(BaseAdminTests):
 class AfiliadosAdminTests(BaseAdminTests):
     def setUp(self):
         super().setUp()
-        self.perfil = InfluencerProfile.objects.create(user=self.cliente, status=InfluencerStatus.PENDING)
+        self.perfil = PerfilAfiliado.objects.create(user=self.cliente, status=EstadoAfiliado.PENDING)
 
     def test_listado_filtra_por_estado_y_texto(self):
-        url = reverse('admin_influencers')
+        url = reverse('admin_afiliados')
         self.assertContains(self.client.get(url, {'status': 'pending'}), self.cliente.email)
         self.assertNotContains(self.client.get(url, {'status': 'rejected'}), self.cliente.email)
         self.assertContains(self.client.get(url, {'q': 'cliente-cat'}), self.cliente.email)
         self.assertNotContains(self.client.get(url, {'q': 'inexistente'}), self.cliente.email)
 
     def test_listado_filtra_las_solicitudes_de_comision_por_estado(self):
-        solicitud = WithdrawalRequest.objects.create(influencer=self.perfil, amount=Decimal('5000'))
-        respuesta = self.client.get(reverse('admin_influencers'), {'wstatus': WithdrawalStatus.PAID})
+        solicitud = WithdrawalRequest.objects.create(afiliado=self.perfil, amount=Decimal('5000'))
+        respuesta = self.client.get(reverse('admin_afiliados'), {'wstatus': WithdrawalStatus.PAID})
         self.assertNotIn(solicitud, list(respuesta.context['withdrawal_page_obj']))
-        respuesta = self.client.get(reverse('admin_influencers'))
+        respuesta = self.client.get(reverse('admin_afiliados'))
         self.assertIn(solicitud, list(respuesta.context['withdrawal_page_obj']))
 
     def test_actualizar_la_configuracion_del_programa(self):
-        url = reverse('admin_influencer_settings_update')
+        url = reverse('admin_afiliado_settings_update')
         self.client.post(url, {'default_commission_rate': '12.50', 'default_customer_discount': '8.00'})
-        self.assertEqual(InfluencerProgramSettings.load().default_commission_rate, Decimal('12.50'))
+        self.assertEqual(ConfiguracionProgramaAfiliados.load().default_commission_rate, Decimal('12.50'))
 
         respuesta = self.client.post(url, {'default_commission_rate': 'abc', 'default_customer_discount': ''})
         self.assertIn('No se pudo guardar', _mensajes(respuesta)[-1])
-        self.assertEqual(InfluencerProgramSettings.load().default_commission_rate, Decimal('12.50'))
+        self.assertEqual(ConfiguracionProgramaAfiliados.load().default_commission_rate, Decimal('12.50'))
 
     def test_detalle_de_afiliado_con_conversion(self):
         self.perfil.referral_clicks.create()
         self.perfil.referral_clicks.create()
         self.perfil.total_referred = 1
         self.perfil.save(update_fields=['total_referred'])
-        respuesta = self.client.get(reverse('admin_influencer_detail', args=[self.perfil.pk]))
+        respuesta = self.client.get(reverse('admin_afiliado_detail', args=[self.perfil.pk]))
         self.assertEqual(respuesta.context['conversion_rate'], '50.0')
 
     def test_detalle_sin_clics_no_calcula_conversion(self):
-        respuesta = self.client.get(reverse('admin_influencer_detail', args=[self.perfil.pk]))
+        respuesta = self.client.get(reverse('admin_afiliado_detail', args=[self.perfil.pk]))
         self.assertIsNone(respuesta.context['conversion_rate'])
 
     def test_tasa_propia_valida_e_invalida(self):
-        url = reverse('admin_influencer_commission_rate_update', args=[self.perfil.pk])
+        url = reverse('admin_afiliado_commission_rate_update', args=[self.perfil.pk])
         self.client.post(url, {'commission_rate': '15.00'})
         self.perfil.refresh_from_db()
         self.assertEqual(self.perfil.commission_rate, Decimal('15.00'))
@@ -188,32 +188,32 @@ class AfiliadosAdminTests(BaseAdminTests):
         self.assertIn('No se pudo guardar', _mensajes(respuesta)[-1])
 
     def test_aprobar_rechazar_y_desactivar(self):
-        self.client.post(reverse('admin_influencer_approve', args=[self.perfil.pk]))
+        self.client.post(reverse('admin_afiliado_approve', args=[self.perfil.pk]))
         self.perfil.refresh_from_db()
-        self.assertEqual(self.perfil.status, InfluencerStatus.APPROVED)
+        self.assertEqual(self.perfil.status, EstadoAfiliado.APPROVED)
 
-        self.client.post(reverse('admin_influencer_deactivate', args=[self.perfil.pk]))
+        self.client.post(reverse('admin_afiliado_deactivate', args=[self.perfil.pk]))
         self.perfil.refresh_from_db()
         self.assertFalse(self.perfil.is_active)
 
-        self.client.post(reverse('admin_influencer_reject', args=[self.perfil.pk]))
+        self.client.post(reverse('admin_afiliado_reject', args=[self.perfil.pk]))
         self.perfil.refresh_from_db()
-        self.assertEqual(self.perfil.status, InfluencerStatus.REJECTED)
+        self.assertEqual(self.perfil.status, EstadoAfiliado.REJECTED)
 
     def test_aprobar_vuelve_a_la_pagina_de_origen_solo_si_es_del_mismo_sitio(self):
-        url = reverse('admin_influencer_approve', args=[self.perfil.pk])
-        destino = reverse('admin_influencer_detail', args=[self.perfil.pk])
+        url = reverse('admin_afiliado_approve', args=[self.perfil.pk])
+        destino = reverse('admin_afiliado_detail', args=[self.perfil.pk])
         self.assertRedirects(
             self.client.post(url, {'next': destino}), destino, fetch_redirect_response=False,
         )
         self.assertRedirects(
-            self.client.post(url, {'next': 'https://sitio-malicioso.example/'}), reverse('admin_influencers'),
+            self.client.post(url, {'next': 'https://sitio-malicioso.example/'}), reverse('admin_afiliados'),
             fetch_redirect_response=False,
         )
 
     def test_pagar_y_rechazar_solicitud_de_comision(self):
-        pagar = WithdrawalRequest.objects.create(influencer=self.perfil, amount=Decimal('5000'))
-        rechazar = WithdrawalRequest.objects.create(influencer=self.perfil, amount=Decimal('3000'))
+        pagar = WithdrawalRequest.objects.create(afiliado=self.perfil, amount=Decimal('5000'))
+        rechazar = WithdrawalRequest.objects.create(afiliado=self.perfil, amount=Decimal('3000'))
 
         r1 = self.client.post(reverse('admin_withdrawal_resolve', args=[pagar.pk]), {'action': 'pay'})
         r2 = self.client.post(reverse('admin_withdrawal_resolve', args=[rechazar.pk]), {'action': 'reject'})
@@ -227,19 +227,19 @@ class AfiliadosAdminTests(BaseAdminTests):
 
     def test_rutas_antiguas_de_comisiones_llevan_a_afiliados(self):
         self.assertRedirects(
-            self.client.get(reverse('admin_withdrawals')), reverse('admin_influencers'), fetch_redirect_response=False,
+            self.client.get(reverse('admin_withdrawals')), reverse('admin_afiliados'), fetch_redirect_response=False,
         )
         self.assertRedirects(
-            self.client.get('/es/admin-panel/retiros/'), reverse('admin_influencers'), fetch_redirect_response=False,
+            self.client.get('/es/admin-panel/retiros/'), reverse('admin_afiliados'), fetch_redirect_response=False,
         )
 
     def test_eliminar_afiliado(self):
-        self.client.post(reverse('admin_influencer_delete', args=[self.perfil.pk]))
-        self.assertFalse(InfluencerProfile.objects.filter(pk=self.perfil.pk).exists())
+        self.client.post(reverse('admin_afiliado_delete', args=[self.perfil.pk]))
+        self.assertFalse(PerfilAfiliado.objects.filter(pk=self.perfil.pk).exists())
 
     def test_sin_permiso_no_se_puede_aprobar_ni_eliminar(self):
         self._como_personal_sin_permisos()
-        self.client.post(reverse('admin_influencer_approve', args=[self.perfil.pk]))
-        self.client.post(reverse('admin_influencer_delete', args=[self.perfil.pk]))
+        self.client.post(reverse('admin_afiliado_approve', args=[self.perfil.pk]))
+        self.client.post(reverse('admin_afiliado_delete', args=[self.perfil.pk]))
         self.perfil.refresh_from_db()
-        self.assertEqual(self.perfil.status, InfluencerStatus.PENDING)
+        self.assertEqual(self.perfil.status, EstadoAfiliado.PENDING)

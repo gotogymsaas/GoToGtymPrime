@@ -22,17 +22,17 @@ class CustomerAddressAdmin(admin.ModelAdmin):
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        (_("Personal info"), {"fields": ("first_name", "last_name", "age", "accepted_terms", "terms_accepted_at", "terms_hash", "show_influencer_modal", "es_influencer", "customer_segments")}),
+        (_("Personal info"), {"fields": ("first_name", "last_name", "age", "accepted_terms", "terms_accepted_at", "terms_hash", "show_afiliado_modal", "es_afiliado", "customer_segments")}),
         (_("Permissions"), {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
     add_fieldsets = (
         (None, {
             "classes": ("wide",),
-            "fields": ("email", "username", "first_name", "last_name", "age", "password1", "password2", "accepted_terms", "show_influencer_modal", "es_influencer"),
+            "fields": ("email", "username", "first_name", "last_name", "age", "password1", "password2", "accepted_terms", "show_afiliado_modal", "es_afiliado"),
         }),
     )
-    list_display = ("email", "first_name", "last_name", "age", "is_staff", "accepted_terms", "show_influencer_modal", "es_influencer")
+    list_display = ("email", "first_name", "last_name", "age", "is_staff", "accepted_terms", "show_afiliado_modal", "es_afiliado")
     search_fields = ("email", "first_name", "last_name")
     ordering = ("email",)
     filter_horizontal = ("groups", "user_permissions", "customer_segments")

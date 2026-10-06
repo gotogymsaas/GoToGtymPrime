@@ -1,0 +1,338 @@
+.afiliado-page {
+  --afiliado-mint: #0fc8bd;
+  --afiliado-panel: rgba(20, 22, 25, 0.9);
+  --afiliado-panel-strong: rgba(13, 16, 18, 0.96);
+  --afiliado-muted: rgba(255, 255, 255, 0.66);
+  --afiliado-soft: rgba(255, 255, 255, 0.08);
+}
+
+.afiliado-page .quantum-hero {
+  width: min(100% - 36px, 1180px);
+  min-height: 100vh;
+  padding: var(--space-4) 0 var(--space-6);
+  align-items: start;
+}
+
+.afiliado-page .quantum-field {
+  top: 50%;
+  width: min(92vw, 980px);
+}
+
+.afiliado-shell {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  padding-top: 8px;
+}
+
+.afiliado-logo {
+  width: 172px;
+  height: 172px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 3px solid var(--afiliado-mint);
+  border-radius: 50%;
+  background: rgba(8, 8, 6, 0.22);
+  box-shadow: 0 0 34px rgba(15, 200, 189, 0.45), 0 0 90px rgba(15, 200, 189, 0.2);
+}
+
+.afiliado-logo img {
+  width: 132px;
+  height: auto;
+}
+
+.afiliado-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.afiliado-referral {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 28px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.afiliado-referral__label {
+  color: var(--afiliado-mint);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.afiliado-referral__code {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px var(--space-4);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: clamp(16px, 2vw, 28px);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.afiliado-link,
+.afiliado-action {
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.74);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.afiliado-link:hover,
+.afiliado-link:focus-visible,
+.afiliado-action:hover,
+.afiliado-action:focus-visible {
+  color: var(--afiliado-mint);
+  outline: none;
+}
+
+.afiliado-referral__copy {
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.afiliado-layout {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.afiliado-sidebar {
+  display: grid;
+  gap: 18px;
+  padding-top: 26px;
+}
+
+.afiliado-nav {
+  display: grid;
+  gap: 18px;
+}
+
+.afiliado-form {
+  margin: 0;
+}
+
+.afiliado-terms-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 18px;
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.afiliado-terms-check input {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.afiliado-action {
+  width: 100%;
+  min-height: 34px;
+  padding: 0;
+  text-align: left;
+}
+
+.afiliado-action--danger {
+  color: #ff9b9b;
+  font-weight: 400;
+}
+
+.afiliado-home-link {
+  margin-top: 18px;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.15;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.afiliado-home-link:hover,
+.afiliado-home-link:focus-visible {
+  color: var(--afiliado-mint);
+  outline: none;
+}
+
+.afiliado-main {
+  display: grid;
+  gap: 28px;
+}
+
+.afiliado-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.afiliado-stat,
+.afiliado-callout,
+.afiliado-table-card {
+  border-radius: 8px;
+  background: var(--afiliado-panel-strong);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+}
+
+.afiliado-stat {
+  min-height: 142px;
+  display: grid;
+  place-items: center;
+  gap: var(--space-2);
+  padding: 24px;
+  text-align: center;
+}
+
+.afiliado-stat__label {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.afiliado-stat__value {
+  color: var(--afiliado-mint);
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.afiliado-callout {
+  padding: 36px 42px;
+  text-align: center;
+}
+
+.afiliado-callout h3 {
+  margin: 0 0 var(--space-3);
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.afiliado-callout p,
+.afiliado-empty {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.afiliado-table-card {
+  width: min(100%, 900px);
+  padding: var(--space-5);
+  overflow-x: auto;
+}
+
+.afiliado-table-card h2 {
+  margin: 0 0 18px;
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.afiliado-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.afiliado-table th,
+.afiliado-table td {
+  padding: 13px var(--space-3);
+  border-bottom: 1px solid var(--afiliado-soft);
+  color: rgba(255, 255, 255, 0.76);
+  text-align: left;
+}
+
+.afiliado-table th {
+  color: var(--afiliado-mint);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+@media (max-width: 920px) {
+  .afiliado-referral,
+  .afiliado-layout,
+  .afiliado-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .afiliado-referral {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .afiliado-sidebar {
+    width: 100%;
+    padding-top: 0;
+  }
+
+  .afiliado-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .afiliado-action {
+    text-align: center;
+  }
+
+  .afiliado-home-link {
+    text-align: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .afiliado-page .quantum-hero {
+    width: min(100% - 24px, 1180px);
+  }
+
+  .afiliado-logo {
+    width: 142px;
+    height: 142px;
+  }
+
+  .afiliado-logo img {
+    width: 108px;
+  }
+
+  .afiliado-title {
+    font-size: 27px;
+  }
+
+  .afiliado-referral {
+    padding: var(--space-4);
+  }
+
+  .afiliado-callout,
+  .afiliado-table-card {
+    padding: 22px;
+  }
+}

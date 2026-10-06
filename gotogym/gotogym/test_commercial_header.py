@@ -120,29 +120,29 @@ class CommercialHeaderTests(TestCase):
         self.assertNotIn('onclick="toggleMobileMenu', html)
         self.assertNotIn('onclick="toggleUserMenu', html)
 
-    def test_quien_no_es_influencer_ve_el_enlace_para_serlo(self):
+    def test_quien_no_es_afiliado_ve_el_enlace_para_serlo(self):
         # Reemplaza al modal que vivia en home.html (retirado en 04c678d):
         # esa vista redirige a los usuarios con sesion antes de que el
         # modal pudiera mostrarse, asi que habia quedado inalcanzable. Vive
-        # aqui y no en el Home porque el programa de influencers debe
+        # aqui y no en el Home porque el programa de afiliados debe
         # quedar fuera del camino critico de compra (ver
         # PROPUESTA_HOME_STORE_QUANTUM.md, seccion 2).
         self.client.force_login(self.user)
 
         html = self._html(reverse('home'))
 
-        self.assertIn(reverse('influencer_suscribete'), html)
+        self.assertIn(reverse('afiliado_suscribete'), html)
         self.assertIn('Programa de afiliados', html)
         self.assertNotIn('Panel de afiliados', html)
 
-    def test_quien_ya_es_influencer_ve_su_panel_y_no_la_invitacion(self):
-        from influencer.models import InfluencerProfile
+    def test_quien_ya_es_afiliado_ve_su_panel_y_no_la_invitacion(self):
+        from afiliados.models import PerfilAfiliado
 
-        InfluencerProfile.objects.create(user=self.user)
+        PerfilAfiliado.objects.create(user=self.user)
         self.client.force_login(self.user)
 
         html = self._html(reverse('home'))
 
-        self.assertIn(reverse('influencer_dashboard'), html)
+        self.assertIn(reverse('afiliado_dashboard'), html)
         self.assertIn('Panel de afiliados', html)
         self.assertNotIn('Programa de afiliados', html)

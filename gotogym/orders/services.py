@@ -6,15 +6,15 @@ un precio que venga de la sesion o del formulario.
 """
 from decimal import Decimal
 
-from carrito.services import build_cart_context
-from django.db import IntegrityError, transaction
-from django.db.models import F
-from django.utils import timezone
-from influencer.services import (
+from afiliados.services import (
     approve_order_commission,
     register_order_commission,
     revert_order_commission,
 )
+from carrito.services import build_cart_context
+from django.db import IntegrityError, transaction
+from django.db.models import F
+from django.utils import timezone
 from inventory.services import InsufficientStockError, decrement_stock, get_available_quantity
 from shipping.models import ShippingQuote
 from shipping.services import get_mock_quote
@@ -38,11 +38,11 @@ def get_usable_coupon(coupon_code, user=None):
     codigo = (coupon_code or '').strip().upper()
     if not codigo:
         return None
-    cupon = Coupon.objects.filter(code=codigo).select_related('influencer').first()
+    cupon = Coupon.objects.filter(code=codigo).select_related('afiliado').first()
     if cupon is None or not cupon.is_usable():
         return None
     autenticado = user is not None and getattr(user, 'is_authenticated', False)
-    if cupon.influencer_id and autenticado and cupon.influencer.user_id == user.id:
+    if cupon.afiliado_id and autenticado and cupon.afiliado.user_id == user.id:
         return None
     if cupon.customer_segment_id:
         # Cupon restringido a un segmento de cliente (p. ej. entrenadores,
@@ -62,7 +62,7 @@ def es_cupon_propio(coupon_code, user):
     codigo = (coupon_code or '').strip().upper()
     if not codigo or user is None or not getattr(user, 'is_authenticated', False):
         return False
-    return Coupon.objects.filter(code=codigo, influencer__user=user).exists()
+    return Coupon.objects.filter(code=codigo, afiliado__user=user).exists()
 
 
 def calculate_coupon_discount(subtotal, coupon_code='', user=None):
@@ -258,7 +258,7 @@ def create_order_from_cart(user, cart, datos):
                     total=total,
                     order_status=OrderStatus.PENDING_PAYMENT,
                     payment_status=PaymentStatus.PENDING,
-                    referred_by=cupon.influencer if cupon else None,
+                    referred_by=cupon.afiliado if cupon else None,
                     coupon=cupon,
                 )
             break

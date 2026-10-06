@@ -35,7 +35,7 @@ Todas las rutas llevan prefijo de idioma; en español es `/es/`.
 | Analítica de comportamiento | `/es/admin-panel/analitica/` |
 | Administración de Django | `/es/admin/` |
 | Contabilidad (Alegra) | `/es/contabilidad/clientes/` |
-| Panel de afiliados | `/es/influencer/dashboard/` |
+| Panel de afiliados | `/es/afiliados/dashboard/` |
 | Comprobación de salud | `/healthz` |
 
 El panel interno exige una cuenta con `is_staff`; la administración de Django, un superusuario.

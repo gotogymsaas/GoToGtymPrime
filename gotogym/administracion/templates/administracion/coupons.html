@@ -33,9 +33,9 @@
         </td>
         <td>{{ coupon.times_used }}{% if coupon.max_uses %} / {{ coupon.max_uses }}{% endif %}</td>
         <td>
-          {% if coupon.influencer %}{{ coupon.influencer.user.email }}{% endif %}
+          {% if coupon.afiliado %}{{ coupon.afiliado.user.email }}{% endif %}
           {% if coupon.customer_segment %}<small>{{ coupon.customer_segment.name }}</small>{% endif %}
-          {% if not coupon.influencer and not coupon.customer_segment %}<small>&mdash;</small>{% endif %}
+          {% if not coupon.afiliado and not coupon.customer_segment %}<small>&mdash;</small>{% endif %}
         </td>
         <td>
           {% if coupon.is_usable %}<span class="pill pill-ok">Vigente</span>

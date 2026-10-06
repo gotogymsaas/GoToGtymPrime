@@ -47,8 +47,8 @@ class Coupon(models.Model):
     max_uses = models.PositiveIntegerField(null=True, blank=True)
     times_used = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    influencer = models.ForeignKey(
-        'influencer.InfluencerProfile', on_delete=models.SET_NULL, null=True, blank=True,
+    afiliado = models.ForeignKey(
+        'afiliados.PerfilAfiliado', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='coupons',
         help_text='Si se asigna, las ventas hechas con este cupon se atribuyen a este afiliado.',
     )
@@ -126,10 +126,10 @@ class Order(models.Model):
     internal_note = models.TextField(blank=True)
 
     # Afiliado cuyo cupon se uso en este pedido, si aplica. Se fija una sola
-    # vez al crear el pedido (a partir de `Coupon.influencer`) y no cambia
+    # vez al crear el pedido (a partir de `Coupon.afiliado`) y no cambia
     # aunque el cupon se reasigne despues: es la atribucion de esa venta.
     referred_by = models.ForeignKey(
-        'influencer.InfluencerProfile', on_delete=models.SET_NULL, null=True, blank=True,
+        'afiliados.PerfilAfiliado', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='referred_orders',
     )
     # Cupon aplicado. Sin este vinculo solo se sabia cuanto se descontaba, no

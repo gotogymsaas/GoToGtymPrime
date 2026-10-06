@@ -661,7 +661,7 @@ entre documentación y código en ejecución.
 - **carrito**: agregar, quitar, actualizar productos y checkout.
 - **blog**: listado de posts publicados con búsqueda y paginación.
 - **contabilidad**: consulta de clientes y facturas vía Alegra.
-- **influencer**: activación de perfil, dashboard y simulación de compras
+- **afiliado**: activación de perfil, dashboard y simulación de compras
     referidas.
 - **configuracion_marca**: administración de paleta/identidad de marca.
 - **crm**: endpoint de salud (`/crm/healthz`) activo.

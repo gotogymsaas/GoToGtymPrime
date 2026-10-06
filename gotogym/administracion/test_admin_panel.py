@@ -248,13 +248,13 @@ class UsuariosRolesAdminTests(PanelAdminBaseTestCase):
             password='secret123', is_staff=True,
         )
 
-    def test_asciende_usuario_a_influencer(self):
+    def test_asciende_usuario_a_afiliado(self):
         respuesta = self.client.post(
-            reverse('admin_user_role_update', args=[self.cliente.pk]), {'role': 'influencer'},
+            reverse('admin_user_role_update', args=[self.cliente.pk]), {'role': 'afiliado'},
         )
         self.assertRedirects(respuesta, reverse('admin_users'))
         self.cliente.refresh_from_db()
-        self.assertTrue(self.cliente.es_influencer)
+        self.assertTrue(self.cliente.es_afiliado)
         self.assertFalse(self.cliente.is_staff)
 
     def test_asciende_usuario_a_administrador(self):

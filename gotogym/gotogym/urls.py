@@ -66,7 +66,7 @@ urlpatterns += i18n_patterns(
     path('politica-pagos/', views.politica_pagos, name='politica_pagos'),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
-    path('afiliados/', include('influencer.urls')),
+    path('afiliados/', include('afiliados.urls')),
     # Ruta anterior del programa (antes se llamaba "influencer"): se redirige
     # para no romper enlaces guardados o enviados por correo.
     path('influencer/', views.ruta_antigua_de_afiliados, {'resto': ''}),
