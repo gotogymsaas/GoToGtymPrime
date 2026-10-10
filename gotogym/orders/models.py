@@ -140,6 +140,12 @@ class Order(models.Model):
         related_name='orders',
     )
 
+    # Cuando el pedido paso a entregado. Marca el inicio del periodo de
+    # devolucion y, con el, del periodo de validacion de la comision del
+    # afiliado. Los pedidos entregados antes de este campo quedan con la fecha
+    # de su ultima actualizacion.
+    delivered_at = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -48,6 +48,10 @@ ADMIN_PERM_SPECS = [
     ('afiliados', 'delete_perfilafiliado'),
     ('afiliados', 'change_withdrawalrequest'),
     ('afiliados', 'change_configuracionprogramaafiliados'),
+    ('afiliados', 'change_commission'),
+    ('afiliados', 'add_recursomarca'),
+    ('afiliados', 'change_recursomarca'),
+    ('afiliados', 'delete_recursomarca'),
     ('payments', 'add_refund'),
 ]
 

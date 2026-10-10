@@ -1,13 +1,15 @@
 """Ramas de las vistas del afiliado: re-postulacion, accesos sin perfil,
 solicitud de comision y baja del programa."""
+from datetime import timedelta
 from unittest.mock import patch
 
 from django.contrib.messages import get_messages
 from django.db import IntegrityError
 from django.urls import reverse
+from django.utils import timezone
 
 from .models import EstadoAfiliado, PerfilAfiliado, WithdrawalRequest, WithdrawalStatus
-from .services import approve_afiliado
+from .services import aplicar_bajas_vencidas, approve_afiliado
 from .tests import AfiliadoTestBase, datos_postulacion
 
 
@@ -24,6 +26,8 @@ class RePostulacionTests(AfiliadoTestBase):
         perfil = self._crear_perfil_aprobado()
         self.client.force_login(self.afiliado_user)
         self.client.post(reverse('afiliado_quitar_suscripcion'))
+        # La baja exige un preaviso: se hace efectiva al vencer.
+        aplicar_bajas_vencidas(ahora=timezone.now() + timedelta(days=16))
 
         respuesta = self._postular('REGRESO2026')
 
@@ -141,7 +145,7 @@ class SolicitarComisionTests(AfiliadoTestBase):
 
     def test_sin_comisiones_disponibles_se_avisa(self):
         respuesta = self.client.post(self.url, {'payment_details': 'Cuenta 123'})
-        self.assertIn('No tienes comisiones disponibles', _mensajes(respuesta)[-1])
+        self.assertIn('No tienes comisiones confirmadas disponibles', _mensajes(respuesta)[-1])
 
     def test_con_saldo_se_crea_la_solicitud_y_una_segunda_se_bloquea(self):
         self._pedido_entregado(self.perfil)

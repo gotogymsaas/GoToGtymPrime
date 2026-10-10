@@ -9,5 +9,6 @@
   <a href="{% url 'politica_envios' %}"{% if policy_key == 'shipping' %} aria-current="page"{% endif %}>Envíos</a>
   <a href="{% url 'politica_pagos' %}"{% if policy_key == 'payments' %} aria-current="page"{% endif %}>Pagos</a>
   <a href="{% url 'politica_tratamiento_datos' %}"{% if policy_key == 'data' %} aria-current="page"{% endif %}>Tratamiento de datos</a>
+  <a href="{% url 'afiliado_terminos' %}"{% if policy_key == 'afiliados' %} aria-current="page"{% endif %}>Afiliados</a>
   <a href="{% url 'contacto' %}">Contacto</a>
 </nav>

@@ -1,0 +1,69 @@
+{% load tienda_filters %}
+<div class="filter-tabs" aria-label="Año">
+  {% for a in anios %}<a href="?anio={{ a }}" class="{% if a == anio %}active{% endif %}">{{ a }}</a>{% endfor %}
+</div>
+
+<section class="stats">
+  <article class="is-teal"><span>${{ total_del_anio|cop }} COP</span><p>Recibido en {{ anio }}</p></article>
+  <article><span>{{ cantidad_del_anio }}</span><p>Pago{{ cantidad_del_anio|pluralize }} en {{ anio }}</p></article>
+  <article class="is-gold"><span>${{ gastos_del_anio|cop }} COP</span><p>Gastos de transacción en {{ anio }}</p></article>
+  <article><span>${{ total_historico|cop }} COP</span><p>Total pagado, todos los años</p></article>
+</section>
+
+{% if solicitudes_en_curso %}
+<div class="panel panel-status">
+  <h2>Solicitudes en curso</h2>
+  <table>
+    <thead><tr><th>Solicitada</th><th>Monto</th></tr></thead>
+    <tbody>
+      {% for solicitud in solicitudes_en_curso %}
+      <tr><td>{{ solicitud.requested_at|date:"d/m/Y" }}</td><td class="nowrap">${{ solicitud.amount|cop }} COP</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<div class="panel">
+  <h2>Pagos por mes · {{ anio }}</h2>
+  <table>
+    <thead><tr><th>Mes</th><th>Pagos</th><th>Monto</th><th>Gastos</th><th>Recibido</th></tr></thead>
+    <tbody>
+      {% for fila in meses %}
+      <tr{% if not fila.cantidad %} class="is-muted"{% endif %}>
+        <td>{{ fila.mes|date:"F"|capfirst }}</td>
+        <td>{{ fila.cantidad }}</td>
+        <td class="nowrap">{% if fila.cantidad %}${{ fila.bruto|cop }} COP{% else %}&mdash;{% endif %}</td>
+        <td class="nowrap">{% if fila.cantidad %}${{ fila.gastos|cop }} COP{% else %}&mdash;{% endif %}</td>
+        <td class="nowrap">{% if fila.cantidad %}<strong>${{ fila.neto|cop }} COP</strong>{% else %}&mdash;{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr><th>Total {{ anio }}</th><th>{{ cantidad_del_anio }}</th><th class="nowrap">${{ bruto_del_anio|cop }} COP</th><th class="nowrap">${{ gastos_del_anio|cop }} COP</th><th class="nowrap">${{ total_del_anio|cop }} COP</th></tr>
+    </tfoot>
+  </table>
+  <p class="hint">Los pagos se cuentan por la fecha en que se pagaron. «Recibido» es el monto menos los gastos de transacción; el programa no aplica retenciones.</p>
+</div>
+
+<div class="panel">
+  <h2>Cada pago de {{ anio }}</h2>
+  {% if pagos %}
+  <table>
+    <thead><tr><th>Fecha de pago</th><th>Solicitada</th><th>Monto</th><th>Gastos</th><th>Recibido</th></tr></thead>
+    <tbody>
+      {% for pago in pagos %}
+      <tr>
+        <td>{{ pago.resolved_at|date:"d/m/Y" }}</td>
+        <td><small>{{ pago.requested_at|date:"d/m/Y" }}</small></td>
+        <td class="nowrap">${{ pago.amount|cop }} COP{% if pago.recovery_amount %}<br><small>Incluye ${{ pago.recovery_amount|cop }} descontados por devoluciones</small>{% endif %}</td>
+        <td class="nowrap">${{ pago.transaction_fee|cop }} COP</td>
+        <td class="nowrap"><strong>${{ pago.net_paid|cop }} COP</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No hay pagos registrados en {{ anio }}.</p>
+  {% endif %}
+</div>

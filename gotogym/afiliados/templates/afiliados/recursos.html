@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Recursos para afiliados{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261006-perfil">
+{% endblock %}
+
+{% block content %}
+<div class="panel-shell">
+  <section class="panel-hero">
+    <div class="editorial-shell">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;">
+        <span class="quantum-emblem"><span class="quantum-emblem__core"></span></span>
+        <span class="quantum-signal-line"></span>
+      </div>
+      <p class="eyebrow">Programa de afiliados</p>
+      <h1>Recursos para afiliados</h1>
+    </div>
+  </section>
+
+  <div class="editorial-shell">
+    <div class="actions" style="margin-bottom: 24px;">
+      <a href="{% url 'afiliado_dashboard' %}" class="ghost btn-sm">Resumen</a>
+    </div>
+
+    <div class="panel">
+      <h2>Material de marca</h2>
+      {% if recursos %}
+      <table>
+        <thead><tr><th>Recurso</th><th>Formato</th><th><span class="sr-only">Descargar</span></th></tr></thead>
+        <tbody>
+          {% for recurso in recursos %}
+          <tr>
+            <td><strong>{{ recurso.title }}</strong>{% if recurso.description %}<br><small>{{ recurso.description }}</small>{% endif %}</td>
+            <td>{{ recurso.extension }}</td>
+            <td><a class="ghost btn-sm" href="{% url 'afiliado_recurso_descargar' recurso.pk %}">Descargar</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>Todavía no hay material publicado. Si necesitas imágenes, logos o información de nuevos lanzamientos, escríbenos a <a href="mailto:support@gotogym.store">support@gotogym.store</a>.</p>
+      {% endif %}
+    </div>
+
+    <div class="panel">
+      <h2>Cómo promocionar GoToGym</h2>
+      <p><strong>Sé auténtico.</strong> Habla desde tu experiencia y sé fiel a la verdad sobre los productos. No hagas afirmaciones falsas, no prometas descuentos que no existen y no saturés de spam a tus seguidores.</p>
+      <p><strong>Etiqueta a la marca.</strong> Menciona a @GoToGym y usa los hashtags oficiales: {% for hashtag in guia.hashtags %}<code>{{ hashtag }}</code>{% if not forloop.last %}, {% endif %}{% endfor %}.</p>
+      <p><strong>Indica que es publicidad.</strong> La ley exige identificar claramente el contenido promocional. Usa de forma visible {% for hashtag in guia.publicidad %}<code>{{ hashtag }}</code>{% if not forloop.last %}, {% endif %}{% endfor %} u otra mención equivalente, y deja claro que obtienes un beneficio si usan tu código.</p>
+      <p><strong>Comparte tu código con sentido.</strong> No lo publiques en sitios masivos de cupones ni en páginas o comentarios donde no es relevante.</p>
+      <p><strong>Ejemplo permitido:</strong> «#Publicidad ¡Lista para mi rutina con mi nuevo outfit de @GoToGym! Usa mi código {{ profile.referral_code }} y entra a {{ enlace }}.»</p>
+      <p><strong>Ejemplo no permitido:</strong> repetir tu enlace en comentarios ajenos al tema, o publicar tu código como si fuera un cupón universal.</p>
+      <p>GoToGym puede compartir en sus redes el contenido que publiques, siempre dándote crédito. Si hay una foto o un testimonio tuyo que no quieras que republiquemos, escríbenos a <a href="mailto:support@gotogym.store">support@gotogym.store</a> y lo respetaremos.</p>
+      <p><a href="{% url 'afiliado_terminos' %}">Ver los términos completos del programa</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

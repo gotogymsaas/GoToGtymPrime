@@ -159,8 +159,11 @@ class AfiliadosAdminTests(BaseAdminTests):
 
     def test_actualizar_la_configuracion_del_programa(self):
         url = reverse('admin_afiliado_settings_update')
-        self.client.post(url, {'default_commission_rate': '12.50', 'default_customer_discount': '8.00'})
-        self.assertEqual(ConfiguracionProgramaAfiliados.load().default_commission_rate, Decimal('12.50'))
+        completo = {'default_customer_discount': '8.00', 'minimum_payout': '100000', 'inactivity_days': '90'}
+        self.client.post(url, {**completo, 'default_commission_rate': '12.50'})
+        configuracion = ConfiguracionProgramaAfiliados.load()
+        self.assertEqual(configuracion.default_commission_rate, Decimal('12.50'))
+        self.assertEqual(configuracion.minimum_payout, Decimal('100000.00'))
 
         respuesta = self.client.post(url, {'default_commission_rate': 'abc', 'default_customer_discount': ''})
         self.assertIn('No se pudo guardar', _mensajes(respuesta)[-1])
@@ -196,9 +199,16 @@ class AfiliadosAdminTests(BaseAdminTests):
         self.perfil.refresh_from_db()
         self.assertFalse(self.perfil.is_active)
 
-        self.client.post(reverse('admin_afiliado_reject', args=[self.perfil.pk]))
+        # El motivo es obligatorio: se le comunica al postulante.
+        sin_motivo = self.client.post(reverse('admin_afiliado_reject', args=[self.perfil.pk]))
+        self.perfil.refresh_from_db()
+        self.assertEqual(self.perfil.status, EstadoAfiliado.APPROVED)
+        self.assertIn('motivo', _mensajes(sin_motivo)[-1])
+
+        self.client.post(reverse('admin_afiliado_reject', args=[self.perfil.pk]), {'reason': 'Perfil sin contenido de fitness'})
         self.perfil.refresh_from_db()
         self.assertEqual(self.perfil.status, EstadoAfiliado.REJECTED)
+        self.assertEqual(self.perfil.rejection_reason, 'Perfil sin contenido de fitness')
 
     def test_aprobar_vuelve_a_la_pagina_de_origen_solo_si_es_del_mismo_sitio(self):
         url = reverse('admin_afiliado_approve', args=[self.perfil.pk])

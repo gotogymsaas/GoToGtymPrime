@@ -6,6 +6,7 @@ el panel del afiliado mostraba compras de ejemplo hardcodeadas en el
 propio codigo (ver historial) y no habia ninguna prueba sobre el flujo
 real.
 """
+from datetime import timedelta
 from decimal import Decimal
 from unittest.mock import patch
 
@@ -14,6 +15,7 @@ from django.contrib.auth.models import Group
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 from inventory.models import Inventory
 from orders.models import Coupon, OrderStatus
 from orders.services import (
@@ -38,6 +40,7 @@ from .models import (
 )
 from .services import (
     approve_afiliado,
+    confirmar_comisiones_vencidas,
     deactivate_afiliado,
     reject_afiliado,
     request_withdrawal,
@@ -65,6 +68,20 @@ def _crear_variante(producto, sku, size, color, stock):
 
 
 class AfiliadoTestBase(TestCase):
+    # Los perfiles que las pruebas crean a mano no registran la version de los
+    # terminos que aceptaron, y por eso el panel les pediria aceptarlos antes
+    # de cada accion. Se desactiva esa puerta salvo en las pruebas que la
+    # ejercen (`exigir_terminos_vigentes = True`).
+    exigir_terminos_vigentes = False
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        if not cls.exigir_terminos_vigentes:
+            parche = patch('afiliados.views.necesita_reaceptar_terminos', return_value=False)
+            parche.start()
+            cls.addClassCleanup(parche.stop)
+
     @classmethod
     def setUpTestData(cls):
         User = get_user_model()
@@ -76,6 +93,11 @@ class AfiliadoTestBase(TestCase):
         )
         cls.admin = User.objects.create_user(
             email='admin@example.com', username='admin@example.com', password='secret123', is_staff=True,
+        )
+        # Los flujos de pago de estas pruebas manejan montos pequenos: el minimo
+        # de pago se prueba aparte, fijandolo explicitamente.
+        ConfiguracionProgramaAfiliados.objects.update_or_create(
+            pk=1, defaults={'minimum_payout': Decimal('0.00')},
         )
         categoria = ProductCategory.objects.create(name='Categoria afiliado')
         marca = Brand.objects.create(name='Marca afiliado')
@@ -111,6 +133,13 @@ class AfiliadoTestBase(TestCase):
         return create_order_from_cart(self.comprador, {str(self.variante.pk): cantidad}, datos)
 
     def _pedido_entregado(self, perfil):
+        """Pedido pagado y entregado, con el periodo de validacion de su
+        comision ya cumplido (comision confirmada)."""
+        pedido = self._pedido_entregado_en_validacion(perfil)
+        confirmar_comisiones_vencidas(ahora=timezone.now() + timedelta(days=60))
+        return pedido
+
+    def _pedido_entregado_en_validacion(self, perfil):
         pedido = self._crear_pedido_referido(perfil)
         confirm_payment(pedido, _FakeTransaction('approved'))
         apply_order_status_transition(pedido, OrderStatus.DELIVERED)
@@ -232,7 +261,7 @@ class AtribucionYComisionTests(AfiliadoTestBase):
         pedido = self._crear_pedido_referido(perfil)
         self.assertEqual(pedido.referred_by_id, perfil.pk)
 
-    def test_pago_aprobado_genera_comision_pendiente_sobre_el_neto(self):
+    def test_pago_aprobado_genera_comision_pendiente_sobre_el_subtotal(self):
         perfil = self._crear_perfil_aprobado()
         pedido = self._crear_pedido_referido(perfil)
         confirm_payment(pedido, _FakeTransaction('approved'))
@@ -240,8 +269,13 @@ class AtribucionYComisionTests(AfiliadoTestBase):
         comision = Commission.objects.get(order=pedido)
         self.assertEqual(comision.status, CommissionStatus.PENDING)
         tasa = ConfiguracionProgramaAfiliados.load().default_commission_rate
-        esperado = ((pedido.subtotal - pedido.discount_total) * tasa / Decimal('100')).quantize(Decimal('0.01'))
+        self.assertEqual(tasa, Decimal('20.00'))
+        # La base es el subtotal, antes del descuento del cupon, sin envio.
+        self.assertGreater(pedido.discount_total, 0)
+        esperado = (pedido.subtotal * tasa / Decimal('100')).quantize(Decimal('0.01'))
         self.assertEqual(comision.amount, esperado)
+        self.assertEqual(comision.base_amount, pedido.subtotal)
+        self.assertEqual(comision.rate_applied, tasa)
 
     def test_la_tasa_propia_del_afiliado_tiene_prioridad_sobre_la_global(self):
         perfil = self._crear_perfil_aprobado()
@@ -252,19 +286,26 @@ class AtribucionYComisionTests(AfiliadoTestBase):
         confirm_payment(pedido, _FakeTransaction('approved'))
 
         comision = Commission.objects.get(order=pedido)
-        esperado = ((pedido.subtotal - pedido.discount_total) * Decimal('25.00') / Decimal('100')).quantize(Decimal('0.01'))
+        esperado = (pedido.subtotal * Decimal('25.00') / Decimal('100')).quantize(Decimal('0.01'))
         self.assertEqual(comision.amount, esperado)
+        self.assertEqual(comision.rate_applied, Decimal('25.00'))
 
     def test_pedido_sin_cupon_no_genera_comision(self):
         pedido = create_order_from_cart(self.comprador, {str(self.variante.pk): 1}, DATOS_ENTREGA)
         confirm_payment(pedido, _FakeTransaction('approved'))
         self.assertFalse(Commission.objects.filter(order=pedido).exists())
 
-    def test_entregado_aprueba_la_comision_y_pasa_al_balance_disponible(self):
+    def test_entregado_confirma_la_comision_al_terminar_la_validacion_y_pasa_al_balance(self):
         perfil = self._crear_perfil_aprobado()
-        pedido = self._pedido_entregado(perfil)
-
+        pedido = self._pedido_entregado_en_validacion(perfil)
         comision = Commission.objects.get(order=pedido)
+        self.assertEqual(comision.status, CommissionStatus.PENDING)
+        perfil.refresh_from_db()
+        self.assertEqual(perfil.commission_balance, Decimal('0.00'))
+
+        confirmar_comisiones_vencidas(ahora=timezone.now() + timedelta(days=60))
+
+        comision.refresh_from_db()
         self.assertEqual(comision.status, CommissionStatus.APPROVED)
         perfil.refresh_from_db()
         self.assertEqual(perfil.commission_balance, comision.amount)

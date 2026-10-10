@@ -35,3 +35,5 @@ htmlcov/
 # Archivos temporales de trabajo, no forman parte del proyecto
 Temp/
 
+# Material de marca subido por el equipo (contenido de la operacion, no del codigo)
+gotogym/recursos_afiliados/

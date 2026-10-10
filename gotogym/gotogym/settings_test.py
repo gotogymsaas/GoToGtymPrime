@@ -22,6 +22,11 @@ DATABASES = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# El material de marca de las pruebas no debe mezclarse con el real.
+import tempfile  # noqa: E402
+
+RECURSOS_AFILIADOS_ROOT = str(Path(tempfile.gettempdir()) / 'gotogym_pruebas_recursos_afiliados')
+
 REST_FRAMEWORK = {
     # Tupla vacia a proposito (sin auth/permission requeridos en tests);
     # mypy infiere el literal `()` como tuple[()] y no como tuple[str, ...],

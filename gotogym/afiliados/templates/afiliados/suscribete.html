@@ -25,6 +25,7 @@
     <div class="panel">
       <h2>Como funciona</h2>
       <p>Tu solicitud sera revisada por un administrador, que ver&aacute; tus datos y tus redes. Tu propio c&oacute;digo (el que elijas abajo) se activa como cup&oacute;n al aprobarse: cada compra hecha con &eacute;l genera una comisi&oacute;n.</p>
+      <p>Para participar debes ser mayor de 18 a&ntilde;os y tener al menos una cuenta activa en redes sociales orientada al fitness o al estilo de vida saludable.</p>
     </div>
 
     <form method="post" class="panel" novalidate>
@@ -60,7 +61,7 @@
         <p class="hint field-full">Al participar te comprometes a divulgar claramente a tu audiencia que usas un codigo o enlace de afiliado cuando lo promociones, conforme a la normativa de publicidad con influenciadores aplicable. El programa puede suspender el acceso de un afiliado que incumpla estas condiciones.</p>
         <label class="check field-full" for="{{ form.accept_terms.id_for_label }}">
           <input type="checkbox" name="accept_terms" id="{{ form.accept_terms.id_for_label }}" required{% if form.accept_terms.value %} checked{% endif %}>
-          <span>Acepto los terminos del programa de afiliados y la obligacion de divulgacion publicitaria.</span>
+          <span>Acepto los <a href="{% url 'afiliado_terminos' %}" target="_blank" rel="noopener">t&eacute;rminos del programa de afiliados</a> y la obligacion de divulgacion publicitaria.</span>
         </label>
         {% if form.accept_terms.errors %}<small class="field-error field-full" role="alert">{{ form.accept_terms.errors|join:" " }}</small>{% endif %}
 

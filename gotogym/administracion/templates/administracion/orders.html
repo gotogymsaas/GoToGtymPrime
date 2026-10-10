@@ -7,6 +7,9 @@
     <h1>Pedidos y pagos</h1>
   </div>
 </section>
+{% if demorados %}
+<div class="panel"><p>Pedidos enviados hace mas de {{ dias_de_envio_demorado }} dias que siguen sin marcarse como entregados. Mientras no se entreguen, la comision del afiliado no empieza su periodo de validacion. <a href="{% url 'admin_orders' %}">Ver todos</a></p></div>
+{% endif %}
 <form class="search" method="get">
   <input name="q" value="{{ query }}" placeholder="Buscar por numero, correo o referencia de pago">
   <select name="order_status" aria-label="Estado del pedido">
@@ -21,6 +24,7 @@
     <option value="{{ value }}" {% if payment_status == value %}selected{% endif %}>{{ label }}</option>
     {% endfor %}
   </select>
+  {% if demorados %}<input type="hidden" name="demorados" value="1">{% endif %}
   <button type="submit">Filtrar</button>
 </form>
 <div class="panel">

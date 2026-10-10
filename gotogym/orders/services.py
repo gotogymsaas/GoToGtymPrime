@@ -7,9 +7,10 @@ un precio que venga de la sesion o del formulario.
 from decimal import Decimal
 
 from afiliados.services import (
-    approve_order_commission,
+    afiliado_operativo,
     register_order_commission,
     revert_order_commission,
+    schedule_order_commission_validation,
 )
 from carrito.services import build_cart_context
 from django.db import IntegrityError, transaction
@@ -40,6 +41,10 @@ def get_usable_coupon(coupon_code, user=None):
         return None
     cupon = Coupon.objects.filter(code=codigo).select_related('afiliado').first()
     if cupon is None or not cupon.is_usable():
+        return None
+    # Un afiliado cuyo preaviso de baja ya vencio deja de aceptarse aunque la
+    # baja todavia no se haya aplicado en la base.
+    if cupon.afiliado_id and not afiliado_operativo(cupon.afiliado):
         return None
     autenticado = user is not None and getattr(user, 'is_authenticated', False)
     if cupon.afiliado_id and autenticado and cupon.afiliado.user_id == user.id:
@@ -172,14 +177,18 @@ def apply_order_status_transition(order, nuevo_estado):
         raise InvalidOrderTransitionError(order, nuevo_estado)
 
     order.order_status = nuevo_estado
-    order.save(update_fields=['order_status', 'updated_at'])
-
-    # Efecto sobre la comision del afiliado, si el pedido tiene una: se
-    # aprueba al entregarse (ya paso la ventana de devolucion) y se
-    # revierte si se cancela o se devuelve. No hace nada si el pedido no
-    # esta referido o no tiene comision todavia.
+    campos = ['order_status', 'updated_at']
     if nuevo_estado == OrderStatus.DELIVERED:
-        approve_order_commission(order)
+        order.delivered_at = timezone.now()
+        campos.append('delivered_at')
+    order.save(update_fields=campos)
+
+    # Efecto sobre la comision del afiliado, si el pedido tiene una: al
+    # entregarse empieza su periodo de validacion (el plazo de devolucion del
+    # cliente) y se revierte si el pedido se cancela o se devuelve. No hace
+    # nada si el pedido no esta referido o no tiene comision todavia.
+    if nuevo_estado == OrderStatus.DELIVERED:
+        schedule_order_commission_validation(order)
     elif nuevo_estado in (OrderStatus.CANCELLED, OrderStatus.RETURNED):
         revert_order_commission(order)
 

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Términos del programa de afiliados | GoToGym{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">{% endblock %}
+{% block content %}
+<div class="editorial-page editorial-quantum">
+  <div class="editorial-quantum__background" aria-hidden="true"><span></span></div>
+  <header class="editorial-hero"><div class="editorial-shell">
+    <p class="editorial-kicker">GoToGym · Programa de afiliados</p>
+    <h1 class="editorial-title">Términos del programa de <em>afiliados.</em></h1>
+    <p class="editorial-lead">Tus derechos y responsabilidades como afiliado GoToGym.</p>
+  </div></header>
+  <section class="editorial-section"><div class="editorial-shell legal-layout">
+    {% include 'partials/_legal_nav.html' with policy_key='afiliados' %}
+    <article class="legal-document">
+      <p class="legal-document__summary">Versión {{ version }} · vigente desde el {{ vigente_desde|date:"j \d\e F \d\e Y" }}.</p>
+
+      <h2>1. Introducción</h2>
+      <p>Bienvenido al Programa de Afiliados de GoToGym. Este programa está diseñado para fans apasionados del fitness que deseen representar nuestra marca y compartir un estilo de vida saludable con su comunidad. Al inscribirte en el programa, aceptas los presentes términos y condiciones, que describen tus derechos y responsabilidades como afiliado.</p>
+      <p>GoToGym se enorgullece de crear una comunidad motivadora y de apoyo mutuo. Como afiliado, te unes a nuestra familia y contribuyes a difundir el mensaje positivo de la marca. Nuestra visión es que, juntos, inspiremos a más personas a superar sus límites y llevar una vida sana y activa. GoToGym es mucho más que ropa deportiva: es un estilo de vida que encarna superación personal y valentía.</p>
+      <p>¡Gracias por creer en GoToGym y ayudarnos a motivar a otros a alcanzar sus metas!</p>
+
+      <h2>2. Inscripción y requisitos</h2>
+      <p><strong>Participación voluntaria.</strong> Unirte al programa es gratuito y no exige ninguna compra previa de nuestros productos.</p>
+      <p><strong>Perfil del afiliado.</strong> Debes ser mayor de edad (18 años o más) y contar con al menos una cuenta activa en redes sociales (Instagram, TikTok, Facebook u otra) orientada al fitness o al estilo de vida saludable. Buscamos personas cuyo contenido refleje valores positivos y afinidad con la marca.</p>
+      <p><strong>Proceso de solicitud.</strong> Completa el formulario de inscripción. GoToGym se reserva el derecho de aceptar o rechazar solicitudes a su discreción, con base en criterios internos como la actividad en redes, la calidad del contenido y la afinidad con nuestros valores. Si no aprobamos tu solicitud, te comunicaremos el motivo por correo y podrás volver a postularte.</p>
+      <p><strong>Información veraz.</strong> Debes proporcionar datos reales y exactos en tu solicitud (nombre, documento, contacto, redes sociales, etc.) y mantenerlos actualizados desde tu panel. Si algún dato cambia, actualízalo oportunamente.</p>
+      <p><strong>Independencia.</strong> Tu participación en el programa es en calidad de afiliado independiente. Esto no crea una relación laboral, agencia, sociedad o franquicia con GoToGym. No podrás contraer obligaciones en nombre de la empresa, y serás responsable de cumplir las obligaciones fiscales o legales que correspondan a las comisiones que recibas.</p>
+
+      <h2>3. Códigos y enlaces de referido</h2>
+      <h3>3.1. Tu código personal</h3>
+      <p>Al ser aprobado como afiliado GoToGym, tu código único de referido queda asociado a tu cuenta. Tú eliges el código al postularte, y debe ser distinto al de cualquier otro afiliado o cupón. Este código te identifica ante nosotros y nos permite rastrear las compras que generas para calcular tus comisiones.</p>
+      <h3>3.2. Cómo funciona el enlace de referido</h3>
+      <p>En tu panel encontrarás tu enlace personal (por ejemplo: https://gotogym.store/?ref=TuCodigo). Puedes compartirlo libremente en tus redes sociales, blog o páginas web. Cuando alguien visite GoToGym usando tu enlace, sabremos automáticamente que viene referido por ti.</p>
+      <h3>3.3. Registro automático de ventas y comisiones</h3>
+      <p>Cada vez que un cliente haga una compra usando tu enlace o tu código, nuestro sistema automáticamente registrará la venta y la asociará a tu cuenta, calculará tu comisión por esa venta y actualizará tu saldo de comisiones. Podrás ver siempre cuántas ventas generaste, tu saldo actual y otra información útil directamente desde tu panel.</p>
+      <h3>3.4. Uso ético del código</h3>
+      <p>Tu código es personal y exclusivo. No está permitido hacer spam, publicar tu código en sitios masivos de cupones, ni utilizarlo en actividades fraudulentas. Su uso debe ser honesto, motivador y alineado con los valores de GoToGym.</p>
+      <p><strong>Ejemplo permitido:</strong> «¡Usa mi código MARIA10 para que pruebes la mejor ropa deportiva de GoToGym! Entra a gotogym.store/?ref=MARIA10 y toma la decisión de mejorar tu estilo de vida fitness.»</p>
+      <p><strong>Ejemplo no permitido:</strong> publicar repetidamente tu enlace en páginas o comentarios donde no es relevante (spam), o prometer descuentos inexistentes. El descuento que recibe el cliente es el vigente que se muestra al aplicar el código en el pago.</p>
+      <p>El mal uso o abuso del código podrá causar la terminación inmediata de tu participación en el programa.</p>
+
+      <h2>4. Comisiones por ventas</h2>
+      <p><strong>Porcentaje de comisión.</strong> Por cada venta concretada en nuestra tienda en línea a través de tu código o enlace de referido, obtendrás una comisión del <strong>20 %</strong> sobre el valor neto de la compra, esto es, sobre el subtotal de los productos, sin incluir costos de envío ni impuestos.</p>
+      <p><strong>Condiciones de la venta.</strong> Solo se genera comisión por ventas válidas y completadas. No se cuenta como venta válida cualquier pedido cancelado, devuelto, reembolsado, fraudulento o no pagado finalmente: en esos casos la comisión queda anulada. Las compras realizadas por el propio afiliado con su código <strong>no</strong> generan comisión (el código está pensado para tus referidos). Si una compra parece hecha por ti o por tu entorno (por ejemplo, coincide tu correo, teléfono o dirección), la comisión queda en revisión y no se confirma hasta que el equipo la revise.</p>
+      <p><strong>Revisión de comisiones.</strong> GoToGym se reserva el derecho de revisar y ajustar las comisiones reportadas si identifica actividad irregular, fraude o errores de seguimiento. Cualquier intento de manipular el sistema de referidos resultará en la descalificación del programa y la pérdida de las comisiones pendientes. Si una venta cuya comisión ya te pagamos se devuelve o se reembolsa después, esa comisión se descuenta de tu siguiente pago.</p>
+
+      <h3>4.1. Confirmación y periodo de validación de ventas</h3>
+      <p>Cuando alguien realiza una compra usando tu enlace o código de referido, la comisión queda registrada en tu cuenta como <strong>pendiente</strong>. Antes de que puedas disponer del dinero, existe un periodo de validación que nos permite asegurarnos de que:</p>
+      <ul>
+        <li>La compra es real y fue efectivamente pagada.</li>
+        <li>El cliente no devuelve ni cancela la compra.</li>
+        <li>No existen problemas o reclamos relacionados con fraude.</li>
+      </ul>
+      <p>El periodo de validación termina <strong>5 días hábiles después de la entrega del pedido</strong>, que es el plazo con el que cuenta el cliente para solicitar una devolución. Solo después de completarlo, y de validar plenamente la venta, la comisión pasa a estado <strong>confirmada</strong> y queda disponible para ser retirada. En tu panel ves cada comisión como pendiente, con la fecha hasta la que se valida, o como confirmada.</p>
+      <p>GoToGym se reserva el derecho de extender este periodo en casos especiales o cuando existan sospechas razonables de fraude, siempre notificándote por correo y explicando claramente las razones del retraso.</p>
+
+      <h2>5. Pagos de comisiones</h2>
+      <p><strong>Medio de pago.</strong> Las comisiones se pagan a través de <strong>Bre-B</strong>, el sistema de pagos inmediatos del Banco de la República, a la llave que inscribas en tu panel. La cuenta y la llave deben ser de tu titularidad, y el documento del titular debe coincidir con el de tu perfil. Eres responsable de mantener la llave vigente y escrita tal como la creaste en tu banco o billetera: un pago enviado a la llave registrada se considera bien hecho.</p>
+      <p><strong>Monto mínimo.</strong> Para solicitar un pago necesitas tener al menos <strong>$100.000 COP</strong> en comisiones confirmadas. Si no alcanzas este mínimo, tus comisiones seguirán acumulándose hasta que lo superes.</p>
+      <p><strong>Solicitud y frecuencia de pago.</strong> Solicitas el pago desde tu panel. Las solicitudes de cada mes calendario se pagan dentro de los primeros 10 días hábiles del mes siguiente. Por ejemplo, una solicitud hecha en enero se paga en los primeros días hábiles de febrero.</p>
+      <p><strong>Gastos de transacción.</strong> Si el pago genera costos de transferencia u otros gastos de transacción, serán deducidos del monto pagado. GoToGym procura usar medios con costos bajos o nulos para maximizar lo que recibes.</p>
+      <p><strong>Impuestos.</strong> Eres responsable de reportar y pagar los impuestos que correspondan a las comisiones recibidas. En tu panel podrás ver el total que se te ha pagado en cada año.</p>
+
+      <h2>6. Promoción en redes sociales</h2>
+      <p><strong>Autenticidad y buen comportamiento.</strong> Se espera que promociones a GoToGym de forma auténtica, respetuosa y creativa, manteniendo tu propio estilo pero siempre fiel a la verdad sobre nuestros productos. Habla desde tu experiencia y sé honesto con tu audiencia. Está prohibido incurrir en publicidad engañosa, hacer afirmaciones falsas o saturar de spam a tus seguidores. Recuerda que eres un representante de nuestra marca: cuida el lenguaje y evita cualquier contenido ofensivo, discriminatorio o que vaya en contra de nuestros valores (por ejemplo, no asociar GoToGym con actividades ilegales o peligrosas).</p>
+      <p><strong>Alineación con la marca.</strong> Tu contenido debe reflejar la imagen positiva de GoToGym y contribuir a reforzar nuestro mensaje de superación personal y valentía. Te invitamos a compartir logros, retos y motivaciones en tu viaje fitness, mostrando cómo GoToGym te acompaña como aliado. Historias de superación, consejos saludables y demostraciones de nuestros productos en uso son ideales.</p>
+      <p><strong>Etiquetas y menciones.</strong> En las publicaciones donde promociones a GoToGym, etiqueta nuestra cuenta oficial (en Instagram: @GoToGym) y utiliza los hashtags oficiales de la marca si los hemos definido (por ejemplo, #GoToGym, #GoToGymTeam, #VidaSaludable). Esto aumentará la visibilidad de tu contenido y facilitará que podamos verlo y compartirlo.</p>
+      <p><strong>Transparencia publicitaria.</strong> Cumple con las normas de publicidad para influenciadores vigentes. En Colombia se exige que cualquier contenido con fines promocionales se identifique claramente como publicidad. Informa a tu audiencia cuando una publicación sea en colaboración con GoToGym, con hashtags como #Publicidad, #Ad o #ColaboraciónPagada, u otra mención equivalente visible. Tu comunidad debe saber que eres afiliado de la marca y que obtienes un beneficio si usan tu código.</p>
+      <p><strong>Frecuencia recomendada.</strong> No establecemos un número fijo de publicaciones, pero te sugerimos compartir contenido de GoToGym con regularidad (por ejemplo, al menos una vez al mes). Si pasas largos periodos inactivo, entenderemos que ya no estás interesado y podríamos contactarte o incluso darte de baja del programa.</p>
+      <p><strong>Colaboración de la marca.</strong> Nuestro equipo de marketing publica en la sección «Recursos» de tu panel material de apoyo: imágenes, logos, información de nuevos lanzamientos, etc. GoToGym podrá compartir o republicar en sus propias redes el contenido que publiques promoviendo la marca, siempre dándote crédito como creador. Si hay alguna fotografía o testimonio tuyo que no quieras que republiquemos, avísanos a support@gotogym.store y lo respetaremos.</p>
+
+      <h2>7. Duración y terminación</h2>
+      <p><strong>Vigencia del programa.</strong> Tu participación inicia cuando recibes la confirmación de aceptación y continúa vigente hasta que alguna de las partes decida terminarla. No hay un plazo fijo de duración.</p>
+      <p><strong>Renuncia voluntaria.</strong> Puedes darte de baja del programa en cualquier momento, por cualquier motivo, solicitándolo desde tu panel con al menos 15 días de antelación. Tu código y tu panel siguen activos hasta la fecha en que la baja se hace efectiva; desde entonces dejamos de rastrear nuevas compras con tu código. Si al salir tienes comisiones confirmadas por encima del mínimo de pago, te las liquidaremos en el siguiente ciclo de pagos.</p>
+      <p><strong>Terminación por parte de GoToGym.</strong> GoToGym se reserva el derecho de suspender o finalizar tu participación de forma anticipada si incumples estos términos o incurres en comportamientos que perjudiquen a la marca. Ejemplos de causales: fraude o uso indebido de códigos, desprestigiar públicamente a la empresa o sus productos, inactividad prolongada y violaciones graves de las pautas de contenido. En caso de incumplimiento, podremos desactivar tu código de referido de inmediato y te notificaremos la terminación. Te comunicaremos el motivo por correo. Cualquier comisión válida confirmada que supere el mínimo establecido será pagada en el siguiente ciclo, mientras que las comisiones por ventas fraudulentas o violatorias se invalidarán.</p>
+      <p><strong>Modificación o fin del programa.</strong> GoToGym se reserva el derecho de modificar, suspender o dar por terminado el programa si lo considera necesario. Cualquier cambio significativo a los términos, o la finalización del programa, te será comunicado oportunamente por correo y en tu panel, con antelación razonable, y las modificaciones entran en vigor una vez notificadas. Para seguir usando tu panel deberás aceptar la nueva versión de los términos. Si no estás de acuerdo con los cambios, podrás darte de baja sin penalización. GoToGym puede actualizar beneficios, requisitos o porcentajes de comisión conforme evolucione el programa; los cambios aplican a las ventas posteriores a su entrada en vigor.</p>
+
+      <h2>8. Aceptación de términos y contacto</h2>
+      <p>Al unirte al Programa de Afiliados GoToGym confirmas que has leído, entendido y aceptado estos términos y condiciones en su totalidad. Este documento constituye el acuerdo completo entre GoToGym (Friends N Gifts S.A.S.) y el afiliado en relación con el programa, y prevalece sobre cualquier comunicación previa.</p>
+      <p>Si tienes dudas, preguntas o sugerencias respecto al programa o a estos términos, puedes escribirnos en cualquier momento a <a href="mailto:support@gotogym.store">support@gotogym.store</a>. Estaremos felices de ayudarte.</p>
+      <p>¡Gracias por ser parte de GoToGym y por promover juntos un estilo de vida fitness y saludable!</p>
+
+      <footer class="legal-document__footer"><a class="editorial-text-link" href="{{ back_url }}">← Volver</a><a class="editorial-text-link" href="{% url 'contacto' %}">Resolver una duda →</a></footer>
+    </article>
+  </div></section>
+</div>
+{% endblock %}

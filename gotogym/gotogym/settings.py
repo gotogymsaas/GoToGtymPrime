@@ -313,6 +313,10 @@ LOGIN_REDIRECT_URL = 'home'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Material de marca para afiliados: fuera de MEDIA_ROOT, que se sirve a
+# cualquiera. Se descarga por una vista que exige ser afiliado aprobado.
+RECURSOS_AFILIADOS_ROOT = os.environ.get('RECURSOS_AFILIADOS_ROOT') or str(BASE_DIR / 'recursos_afiliados')
+
 # Envío de correo (recuperación de contraseña, notificaciones transaccionales).
 # Sin EMAIL_HOST en el entorno, cae a console backend para no romper en un
 # despliegue que aún no tenga el proveedor SMTP configurado.
@@ -327,3 +331,6 @@ if EMAIL_HOST:
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'GoToGym <no-reply@gotogym.store>')
+
+# Direccion publica del sitio, para los enlaces que viajan en correos.
+SITIO_URL = os.environ.get('SITIO_URL', 'https://gotogym.store').rstrip('/')

@@ -1,0 +1,38 @@
+{% extends "administracion/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Programa de afiliados</p>
+    <h1>Recursos de marca</h1>
+  </div>
+  <div class="actions">
+    <a class="ghost" href="{% url 'admin_afiliados' %}">Volver a afiliados</a>
+    {% if perms.afiliados.add_recursomarca %}<a class="button" href="{% url 'admin_recurso_new' %}">Subir recurso</a>{% endif %}
+  </div>
+</section>
+<div class="panel">
+  <p class="hint">Material de apoyo (logos, imagenes, lanzamientos) que solo ven los afiliados activos desde su panel. Formatos: PNG, JPG, WEBP, PDF, ZIP y MP4, hasta 25 MB.</p>
+  <table>
+    <thead><tr><th>Recurso</th><th>Formato</th><th>Orden</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
+    <tbody>
+      {% for recurso in recursos %}
+      <tr>
+        <td><strong>{{ recurso.title }}</strong>{% if recurso.description %}<br><small>{{ recurso.description }}</small>{% endif %}</td>
+        <td>{{ recurso.extension }}</td>
+        <td>{{ recurso.order }}</td>
+        <td>{% if recurso.is_active %}<span class="pill pill-ok">Visible</span>{% else %}<span class="pill pill-off">Oculto</span>{% endif %}</td>
+        <td class="actions">
+          {% if perms.afiliados.change_recursomarca %}<a class="ghost btn-sm" href="{% url 'admin_recurso_edit' recurso.pk %}">Editar</a>{% endif %}
+          {% if perms.afiliados.delete_recursomarca %}
+          <form method="post" action="{% url 'admin_recurso_delete' recurso.pk %}" onsubmit="return confirm('¿Eliminar este recurso?');">
+            {% csrf_token %}
+            <button class="button btn-sm product-delete-button" type="submit">Eliminar</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="5">Todavia no hay recursos.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

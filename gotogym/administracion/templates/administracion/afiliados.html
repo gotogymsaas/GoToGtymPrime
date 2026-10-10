@@ -6,7 +6,21 @@
     <p class="eyebrow">Programa de afiliados</p>
     <h1>Afiliados</h1>
   </div>
+  <div class="actions">
+    <a class="ghost btn-sm" href="{% url 'admin_recursos' %}">Recursos de marca</a>
+    <a class="ghost btn-sm" href="{% url 'admin_orders' %}?demorados=1">Pedidos enviados sin entregar</a>
+  </div>
 </section>
+
+{% if en_revision %}
+<div class="panel"><p><strong>{{ en_revision }}</strong> comision{{ en_revision|pluralize:"es" }} marcada{{ en_revision|pluralize }} para revision (posible autocompra). No se confirman solas: abre el afiliado para resolverlas.</p></div>
+{% endif %}
+
+{% if tasa_difiere_de_los_terminos %}
+<div class="panel" role="alert">
+  <p><span class="badge badge-gold">Revisar</span> La tasa de comision global es distinta de la que prometen los terminos publicados ({{ tasa_en_terminos }} %). Si el cambio es intencional, actualiza el texto de los terminos y sube su version para que los afiliados lo acepten.</p>
+</div>
+{% endif %}
 
 {% if settings_form %}
 <div class="panel">
@@ -24,50 +38,65 @@
       <button class="button" type="submit">Guardar</button>
     </div>
   </form>
+  <p class="hint">Los terminos publicados prometen {{ tasa_en_terminos }} % sobre el subtotal. Al cambiar la comision global se avisa por correo a los afiliados que usan la tasa global. Aplica a las ventas posteriores.</p>
+</div>
+{% endif %}
+
+{% if perms.afiliados.change_perfilafiliado %}
+<div class="panel">
+  <h2>Avisar a los afiliados</h2>
+  <form class="form-grid" method="post" action="{% url 'admin_afiliados_notify' %}">
+    {% csrf_token %}
+    <label><span>Asunto</span><input type="text" name="subject" maxlength="150" required></label>
+    <label class="field-full"><span>Mensaje</span><textarea name="message" rows="4" maxlength="3000" required></textarea></label>
+    <div class="form-actions"><button class="button" type="submit" onclick="return confirm('Se enviara por correo a todos los afiliados activos. ¿Continuar?');">Enviar aviso</button></div>
+  </form>
+  <p class="hint">Usalo para anunciar cambios de terminos o del programa con antelacion razonable. Quien tenga una version anterior de los terminos debera aceptarlos al entrar a su panel.</p>
 </div>
 {% endif %}
 
 <div class="filter-tabs">
-  <a href="?q={{ query }}" class="{% if not status %}active{% endif %}">Todos</a>
+  <a href="?q={{ query }}" class="{% if not status and not inactivos %}active{% endif %}">Todos</a>
   <a href="?q={{ query }}&status=pending" class="{% if status == 'pending' %}active{% endif %}">Pendientes</a>
   <a href="?q={{ query }}&status=approved" class="{% if status == 'approved' %}active{% endif %}">Aprobados</a>
   <a href="?q={{ query }}&status=rejected" class="{% if status == 'rejected' %}active{% endif %}">Rechazados</a>
+  <a href="?q={{ query }}&inactivos=1" class="{% if inactivos %}active{% endif %}">Inactivos</a>
 </div>
 <form class="search" method="get">
   <input type="hidden" name="status" value="{{ status }}">
+  {% if inactivos %}<input type="hidden" name="inactivos" value="1">{% endif %}
   <input name="q" value="{{ query }}" placeholder="Buscar por email o codigo">
   <button type="submit">Buscar</button>
 </form>
 <div class="panel">
   <table>
-    <thead><tr><th>Afiliado</th><th>Codigo</th><th>Estado</th><th>Comision disponible</th><th>Solicitado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
+    <thead><tr><th>Afiliado</th><th>Codigo</th><th>Estado</th><th>Comision disponible</th>{% if inactivos %}<th>Ultima actividad</th>{% endif %}<th>Solicitado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
     <tbody>
       {% for profile in page_obj %}
       <tr>
         <td><strong>{{ profile.user.email }}</strong></td>
         <td>{{ profile.referral_code }}</td>
         <td>
-          {% if profile.status == 'approved' and profile.is_active %}<span class="pill pill-ok">Aprobado</span>
+          {% if profile.status == 'approved' and profile.is_active %}<span class="pill pill-ok">Aprobado</span>{% if profile.baja_solicitada %}<br><small>Baja el {{ profile.exit_effective_at|date:"d/m/Y" }}</small>{% endif %}
           {% elif profile.status == 'pending' %}<span class="badge badge-gold">Pendiente</span>
           {% elif profile.status == 'rejected' %}<span class="pill pill-off">Rechazado</span>
           {% else %}<span class="pill pill-off">Inactivo</span>{% endif %}
         </td>
         <td class="nowrap">${{ profile.commission_balance|cop }} COP</td>
+        {% if inactivos %}<td><small>{{ profile.ultima_actividad|date:"d/m/Y" }}</small></td>{% endif %}
         <td><small>{{ profile.created_at|date:"d/m/Y" }}</small></td>
         <td class="actions">
           <a class="ghost btn-sm" href="{% url 'admin_afiliado_detail' profile.pk %}">Ver</a>
+          <a class="ghost btn-sm" href="{% url 'admin_afiliado_pagos' profile.pk %}">Pagos</a>
+          {% if inactivos %}<a class="ghost btn-sm" href="mailto:{{ profile.user.email }}?subject=Tu%20participaci%C3%B3n%20en%20el%20programa%20de%20afiliados%20de%20GoToGym">Contactar</a>{% endif %}
           {% if perms.afiliados.change_perfilafiliado %}
             {% if profile.status == 'pending' %}
             <form method="post" action="{% url 'admin_afiliado_approve' profile.pk %}">
               {% csrf_token %}
               <button class="ghost btn-sm" type="submit">Aprobar</button>
             </form>
-            <form method="post" action="{% url 'admin_afiliado_reject' profile.pk %}">
-              {% csrf_token %}
-              <button class="button btn-sm product-delete-button" type="submit">Rechazar</button>
-            </form>
             {% elif profile.status == 'approved' and profile.is_active %}
-            <form method="post" action="{% url 'admin_afiliado_deactivate' profile.pk %}" onsubmit="return confirm('¿Desactivar a {{ profile.user.email|escapejs }} del programa de afiliados?');">
+            <form method="post" action="{% url 'admin_afiliado_deactivate' profile.pk %}" onsubmit="return confirm('¿Desactivar a {{ profile.user.email|escapejs }} del programa de afiliados? Para terminarlo por incumplimiento usa su detalle.');">
               {% csrf_token %}
               <button class="ghost btn-sm" type="submit">Desactivar</button>
             </form>
@@ -86,9 +115,10 @@
           {% endif %}
         </td>
       </tr>
-      {% empty %}<tr><td colspan="6">No hay afiliados registrados.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="8">No hay afiliados registrados.</td></tr>{% endfor %}
     </tbody>
   </table>
+  <p class="hint">Para rechazar una solicitud abre el afiliado: el motivo se le comunica al postulante.</p>
 </div>
 {% include "administracion/pagination.html" %}
 
@@ -105,24 +135,30 @@
 </div>
 <div class="panel">
   <table>
-    <thead><tr><th>Afiliado</th><th>Monto</th><th>Datos de pago</th><th>Solicitada</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
+    <thead><tr><th>Afiliado</th><th>Monto</th><th>Datos de pago</th><th>Solicitada</th><th>Pagar antes de</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
     <tbody>
       {% for withdrawal in withdrawal_page_obj %}
       <tr>
         <td><a href="{% url 'admin_afiliado_detail' withdrawal.afiliado.pk %}">{{ withdrawal.afiliado.user.email }}</a></td>
-        <td class="nowrap">${{ withdrawal.amount|cop }} COP</td>
+        <td class="nowrap">
+          ${{ withdrawal.amount|cop }} COP
+          {% if withdrawal.recovery_amount %}<br><small>Incluye ${{ withdrawal.recovery_amount|cop }} descontados por devoluciones</small>{% endif %}
+          {% if withdrawal.status == 'paid' and withdrawal.transaction_fee %}<br><small>Gastos ${{ withdrawal.transaction_fee|cop }} &middot; Recibe ${{ withdrawal.net_paid|cop }}</small>{% endif %}
+        </td>
         <td>
           {% if withdrawal.payment_details %}
           <details class="payment-details"><summary>Ver mensaje</summary><p>{{ withdrawal.payment_details|linebreaksbr }}</p></details>
           {% else %}&mdash;{% endif %}
         </td>
         <td><small>{{ withdrawal.requested_at|date:"d/m/Y H:i" }}</small></td>
+        <td><small>{% if withdrawal.status == 'pending' %}{{ withdrawal.fecha_limite|date:"d/m/Y" }}{% else %}&mdash;{% endif %}</small></td>
         <td>{{ withdrawal.get_status_display }}</td>
         <td class="actions">
           {% if withdrawal.status == 'pending' and perms.afiliados.change_withdrawalrequest %}
           <form method="post" action="{% url 'admin_withdrawal_resolve' withdrawal.pk %}">
             {% csrf_token %}
             <input type="hidden" name="action" value="pay">
+            <input type="text" name="transaction_fee" inputmode="decimal" placeholder="Gastos (0)" size="8" aria-label="Gastos de transaccion">
             <button class="ghost btn-sm" type="submit">Marcar pagada</button>
           </form>
           <form method="post" action="{% url 'admin_withdrawal_resolve' withdrawal.pk %}">
@@ -133,7 +169,7 @@
           {% endif %}
         </td>
       </tr>
-      {% empty %}<tr><td colspan="6">No hay solicitudes en este estado.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="7">No hay solicitudes en este estado.</td></tr>{% endfor %}
     </tbody>
   </table>
 </div>

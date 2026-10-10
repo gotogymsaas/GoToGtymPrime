@@ -8,6 +8,7 @@ complete una compra."""
 from orders.models import Coupon
 
 from .models import ReferralClick
+from .services import afiliado_operativo
 
 REFERRAL_QUERY_PARAM = 'ref'
 SESSION_CODE_KEY = 'referral_code'
@@ -31,7 +32,7 @@ class ReferralTrackingMiddleware:
             .select_related('afiliado')
             .first()
         )
-        if cupon is None:
+        if cupon is None or not afiliado_operativo(cupon.afiliado):
             return
 
         contados = request.session.get(SESSION_COUNTED_KEY, [])

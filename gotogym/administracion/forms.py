@@ -1,7 +1,12 @@
 import re
 from decimal import ROUND_HALF_UP, Decimal
 
-from afiliados.models import ConfiguracionProgramaAfiliados, PerfilAfiliado
+from afiliados.models import (
+    ConfiguracionProgramaAfiliados,
+    MotivoSalida,
+    PerfilAfiliado,
+    RecursoMarca,
+)
 from django import forms
 from django.contrib.auth.models import Group, Permission
 from django.db.models import Q
@@ -395,10 +400,12 @@ class SalesGoalForm(forms.ModelForm):
 class ConfiguracionProgramaAfiliadosForm(forms.ModelForm):
     class Meta:
         model = ConfiguracionProgramaAfiliados
-        fields = ["default_commission_rate", "default_customer_discount"]
+        fields = ["default_commission_rate", "default_customer_discount", "minimum_payout", "inactivity_days"]
         labels = {
             "default_commission_rate": "Tasa de comision global (%)",
             "default_customer_discount": "Descuento al cliente final (%)",
+            "minimum_payout": "Minimo para solicitar pago (COP)",
+            "inactivity_days": "Dias sin actividad para listar como inactivo",
         }
 
 
@@ -407,3 +414,43 @@ class AfiliadoCommissionRateForm(forms.ModelForm):
         model = PerfilAfiliado
         fields = ["commission_rate"]
         labels = {"commission_rate": "Tasa propia (vacio = usar la tasa global)"}
+
+
+MOTIVOS_DE_TERMINACION = [(valor, etiqueta) for valor, etiqueta in MotivoSalida.choices if valor != MotivoSalida.VOLUNTARY]
+
+EXTENSIONES_DE_RECURSO = ('png', 'jpg', 'jpeg', 'webp', 'pdf', 'zip', 'mp4')
+TAMANO_MAXIMO_DE_RECURSO = 25 * 1024 * 1024
+
+
+class TerminacionAfiliadoForm(forms.Form):
+    """Terminacion de un afiliado por parte de GoToGym: el motivo es
+    obligatorio y se le comunica por correo."""
+
+    reason = forms.ChoiceField(label="Motivo", choices=MOTIVOS_DE_TERMINACION)
+    notes = forms.CharField(label="Detalle para el afiliado", required=False, max_length=1000, widget=forms.Textarea)
+    void_commissions = forms.BooleanField(label="Anular sus comisiones pendientes y por pagar", required=False)
+
+
+class RecursoMarcaForm(forms.ModelForm):
+    class Meta:
+        model = RecursoMarca
+        fields = ["title", "description", "file", "order", "is_active"]
+        labels = {
+            "title": "Titulo",
+            "description": "Descripcion",
+            "file": "Archivo",
+            "order": "Orden",
+            "is_active": "Visible para afiliados",
+        }
+
+    def clean_file(self):
+        archivo = self.cleaned_data["file"]
+        # Sin archivo nuevo, `archivo` es el ya guardado: no se vuelve a validar.
+        if not hasattr(archivo, "content_type"):
+            return archivo
+        extension = archivo.name.rsplit(".", 1)[-1].lower() if "." in archivo.name else ""
+        if extension not in EXTENSIONES_DE_RECURSO:
+            raise forms.ValidationError(f"Formato no permitido. Usa: {', '.join(EXTENSIONES_DE_RECURSO)}.")
+        if archivo.size > TAMANO_MAXIMO_DE_RECURSO:
+            raise forms.ValidationError("El archivo supera los 25 MB.")
+        return archivo

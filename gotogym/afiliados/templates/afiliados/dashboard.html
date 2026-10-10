@@ -30,7 +30,7 @@
       <div class="panel-referral">
         <div>
           <small>Tu enlace para compartir</small><br>
-          <code id="afiliado-referral-link">{{ request.scheme }}://{{ request.get_host }}{% url 'tienda:producto_list' %}?ref={{ profile.referral_code }}</code>
+          <code id="afiliado-referral-link">{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}?ref={{ profile.referral_code }}</code>
         </div>
         <button type="button" class="ghost btn-sm" data-copy-target="afiliado-referral-link">Copiar enlace</button>
       </div>
@@ -44,13 +44,15 @@
       <a href="{% url 'afiliado_dashboard' %}" class="ghost btn-sm">Resumen</a>
       <a href="{% url 'afiliado_compras_referidas' %}" class="ghost btn-sm">Compras referidas</a>
       <a href="{% url 'afiliado_editar_perfil' %}" class="ghost btn-sm">Mi perfil</a>
-      {% if not pending_withdrawal %}
+      <a href="{% url 'afiliado_pagos' %}" class="ghost btn-sm">Mis pagos</a>
+      <a href="{% url 'afiliado_recursos' %}" class="ghost btn-sm">Recursos</a>
+      {% if puede_solicitar %}
       {% if payout_account %}
       <details class="request-commission">
         <summary class="button btn-sm">Solicitar comision</summary>
         <form method="post" action="{% url 'afiliado_solicitar_retiro' %}" class="request-commission__form">
           {% csrf_token %}
-          <p>Te pagaremos a tu llave Bre-B <strong>{{ payout_account.breb_key }}</strong>. Si necesitas, agrega una indicacion.</p>
+          <p>Te pagaremos a tu llave Bre-B <strong>{{ payout_account.breb_key }}</strong> ${{ saldo_neto|cop }} COP. Las solicitudes de cada mes se pagan en los primeros 10 dias habiles del mes siguiente. Si necesitas, agrega una indicacion.</p>
           <label for="payment_details">Nota (opcional)</label>
           <textarea id="payment_details" name="payment_details" rows="3" maxlength="1000"></textarea>
           <button type="submit" class="button btn-sm">Enviar solicitud</button>
@@ -60,16 +62,30 @@
       <a href="{% url 'afiliado_cuenta_pago' %}" class="button btn-sm">Inscribir cuenta para solicitar comision</a>
       {% endif %}
       {% endif %}
-      <form method="post" action="{% url 'afiliado_quitar_suscripcion' %}">
+      {% if not profile.baja_solicitada %}
+      <form method="post" action="{% url 'afiliado_quitar_suscripcion' %}" onsubmit="return confirm('Tu baja se hara efectiva 15 dias despues del aviso. Hasta entonces tu codigo sigue activo. ¿Continuar?');">
         {% csrf_token %}
-        <button type="submit" class="danger btn-sm">Quitar suscripcion</button>
+        <button type="submit" class="danger btn-sm">Solicitar baja</button>
       </form>
+      {% endif %}
     </div>
 
+    {% if profile.baja_solicitada %}
+    <div class="panel panel-status">
+      <h2>Tu baja esta programada</h2>
+      <p>Avisaste que quieres salir del programa. Tu baja sera efectiva el {{ profile.exit_effective_at|date:"d/m/Y" }}; hasta entonces tu codigo y tu panel siguen activos. Tus comisiones confirmadas se te pagan igual despues de esa fecha.</p>
+      <form method="post" action="{% url 'afiliado_cancelar_baja' %}">
+        {% csrf_token %}
+        <button type="submit" class="ghost btn-sm">Cancelar mi aviso de baja</button>
+      </form>
+    </div>
+    {% endif %}
+
     <section class="stats">
-      <article class="is-violet"><span>{{ profile.total_referred }}</span><p>Personas referidas</p></article>
+      <article class="is-violet"><span>{{ profile.total_referred }}</span><p>Ventas referidas</p></article>
       <article class="is-teal"><span>${{ profile.commission_balance|cop }} COP</span><p>Comision disponible</p></article>
       <article class="is-gold"><span>${{ pending_commission_total|cop }} COP</span><p>Comision pendiente</p></article>
+      <article><span>${{ pagado_en_el_anio|cop }} COP</span><p>Pagado en {{ anio_actual }}</p></article>
       <article><span>{{ click_count }}</span><p>Clics en tu enlace</p></article>
       <article class="is-green">
         <span>{% if conversion_rate %}{{ conversion_rate }}%{% else %}&mdash;{% endif %}</span>
@@ -82,29 +98,7 @@
       </article>
     </section>
 
-    {% if pending_withdrawal %}
-    <div class="panel panel-status">
-      <h2>Solicitud de comision en curso</h2>
-      <p>Solicitaste ${{ pending_withdrawal.amount|cop }} COP el {{ pending_withdrawal.requested_at|date:"d/m/Y" }}. Te responderemos con la mayor brevedad posible y te avisaremos por correo cuando se pague.</p>
-    </div>
-    {% endif %}
-
-    <div class="panel panel-account" id="cuenta-bre-b">
-      <h2>Cuenta Bre-B para tus pagos</h2>
-      {% if payout_account %}
-      <p>Tus comisiones se pagan a esta cuenta. Si cambias de banco o de llave, actual&iacute;zala antes de solicitar tu pr&oacute;ximo pago.</p>
-      <dl class="payout-summary">
-        <dt>Titular</dt><dd>{{ payout_account.full_name }}</dd>
-        <dt>Documento</dt><dd>{{ payout_account.get_document_type_display }} &middot; {{ payout_account.document_number }}</dd>
-        <dt>Llave Bre-B</dt><dd>{{ payout_account.breb_key }}</dd>
-        <dt>Contacto</dt><dd>{{ payout_account.phone }} &middot; {{ payout_account.address }}</dd>
-      </dl>
-      <a href="{% url 'afiliado_cuenta_pago' %}" class="ghost btn-sm">Editar cuenta</a>
-      {% else %}
-      <p><strong>Bre-B</strong> es el sistema de pagos inmediatos del Banco de la Rep&uacute;blica: el dinero llega en segundos, a cualquier banco o billetera, usando una &laquo;llave&raquo; (tu documento, celular, correo o un c&oacute;digo alfanum&eacute;rico) que registraste en tu entidad. Inscribe tu cuenta para que podamos pagarte tus comisiones.</p>
-      <a href="{% url 'afiliado_cuenta_pago' %}" class="button btn-sm">Inscribir cuenta Bre-B</a>
-      {% endif %}
-    </div>
+    {% include 'afiliados/_pagos.html' %}
 
     <div class="grid-two">
       <div class="panel panel-account" id="mis-redes">
@@ -143,7 +137,7 @@
 
     <div class="panel panel-status">
       <h2>&iexcl;Comparte tu c&oacute;digo y gana comisiones!</h2>
-      <p>Comparte tu c&oacute;digo o enlace de referido. Cada compra que realicen usando tu c&oacute;digo te sumar&aacute; comisiones.</p>
+      <p>Comparte tu c&oacute;digo o enlace de referido. Cada compra que realicen usando tu c&oacute;digo te sumar&aacute; comisiones. Revisa la <a href="{% url 'afiliado_recursos' %}">gu&iacute;a de contenido</a> y recuerda identificar tus publicaciones como publicidad.</p>
     </div>
 
     {% if compras %}
@@ -158,7 +152,7 @@
             <td>{{ order.created_at|date:'d/m/Y' }}</td>
             <td>${{ order.subtotal|cop }} COP</td>
             <td>{% if order.commission %}${{ order.commission.amount|cop }} COP{% else %}&mdash;{% endif %}</td>
-            <td>{% if order.commission %}{{ order.commission.get_status_display }}{% else %}&mdash;{% endif %}</td>
+            <td>{% include 'afiliados/_estado_comision.html' with comision=order.commission %}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -169,7 +163,7 @@
     {% elif profile.status == 'pending' %}
     <div class="panel panel-status">
       <h2>Tu solicitud esta en revision</h2>
-      <p>Un administrador va a revisar tu solicitud para unirte al programa de afiliados. Te avisaremos por aqui cuando quede aprobada.</p>
+      <p>Un administrador va a revisar tu solicitud para unirte al programa de afiliados. Te avisaremos por correo cuando tengamos una respuesta.</p>
       <div class="actions">
         <a href="{% url 'afiliado_editar_perfil' %}" class="ghost btn-sm">Editar mi perfil</a>
         <form method="post" action="{% url 'afiliado_quitar_suscripcion' %}">
@@ -181,15 +175,30 @@
     {% elif profile.status == 'rejected' %}
     <div class="panel panel-status">
       <h2>Tu solicitud fue rechazada</h2>
+      {% if profile.rejection_reason %}<p><strong>Motivo:</strong> {{ profile.rejection_reason }}</p>{% endif %}
       <p>Puedes volver a postularte si crees que las condiciones cambiaron.</p>
       <a href="{% url 'afiliado_suscribete' %}" class="button btn-sm">Volver a postularme</a>
     </div>
     {% else %}
     <div class="panel panel-status">
       <h2>Tu suscripcion esta inactiva</h2>
-      <p>Cancelaste tu participacion en el programa de afiliados. Puedes volver a postularte cuando quieras.</p>
+      <p>{% if ex_afiliado %}Tu participacion en el programa de afiliados termino{% if profile.exited_at %} el {{ profile.exited_at|date:"d/m/Y" }}{% endif %}: tu codigo ya no genera comisiones. Las que ya tenias confirmadas, y las que aun estan en validacion, se te siguen pagando.{% else %}Cancelaste tu participacion en el programa de afiliados.{% endif %} Puedes volver a postularte cuando quieras.</p>
       <a href="{% url 'afiliado_suscribete' %}" class="button btn-sm">Volver a postularme</a>
     </div>
+    {% if ex_afiliado %}
+    {% if puede_solicitar and payout_account %}
+    <div class="panel">
+      <form method="post" action="{% url 'afiliado_solicitar_retiro' %}" class="request-commission__form">
+        {% csrf_token %}
+        <p>Te pagaremos a tu llave Bre-B <strong>{{ payout_account.breb_key }}</strong> ${{ saldo_neto|cop }} COP.</p>
+        <label for="payment_details">Nota (opcional)</label>
+        <textarea id="payment_details" name="payment_details" rows="3" maxlength="1000"></textarea>
+        <button type="submit" class="button btn-sm">Solicitar comision</button>
+      </form>
+    </div>
+    {% endif %}
+    {% include 'afiliados/_pagos.html' %}
+    {% endif %}
     {% endif %}
   </div>
 </div>
