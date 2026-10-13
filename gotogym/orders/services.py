@@ -70,14 +70,6 @@ def es_cupon_propio(coupon_code, user):
     return Coupon.objects.filter(code=codigo, afiliado__user=user).exists()
 
 
-def calculate_coupon_discount(subtotal, coupon_code='', user=None):
-    """Calcula el descuento del cupon indicado, si existe y es utilizable."""
-    cupon = get_usable_coupon(coupon_code, user=user)
-    if cupon is None:
-        return Decimal('0.00')
-    return cupon.compute_discount(subtotal)
-
-
 class CheckoutError(Exception):
     """Error de negocio que impide crear el pedido."""
 

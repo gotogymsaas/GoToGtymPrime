@@ -7,10 +7,9 @@
   <meta name="robots" content="noindex, nofollow">
   <title>{% block title %}GoToGym Admin{% endblock %}</title>
   <link rel="icon" type="image/png" href="{% static 'images/logo-gotogym-symbol-transparent.png' %}">
-  <link href="{% static 'fonts/@fontsource/outfit/400.css' %}" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261003-footer">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
-  <link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261006-perfil">
+  <link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261012-iconos">
 </head>
 <body class="panel-shell">
   <aside class="sidebar">
@@ -25,14 +24,14 @@
       </button>
     </div>
     <nav id="panel-nav" aria-label="Secciones del panel">
-      <a href="{% url 'admin_dashboard' %}">Panel</a>
-      <a href="{% url 'admin_analytics' %}">Analitica</a>
-      <a href="{% url 'admin_products' %}">Productos</a>
-      <a href="{% url 'admin_coupons' %}">Cupones y descuentos</a>
-      <a href="{% url 'admin_orders' %}">Pedidos y pagos</a>
-      <a href="{% url 'admin_users' %}">Usuarios y roles</a>
-      <a href="{% url 'admin_afiliados' %}">Afiliados</a>
-      <a href="{% url 'admin_catalogs' %}">Catalogos y etiquetas</a>
+      <a class="panel-nav__link" href="{% url 'admin_dashboard' %}">{% include "administracion/_nav_icon.html" with name="panel" %}<span>Panel</span></a>
+      <a class="panel-nav__link" href="{% url 'admin_analytics' %}">{% include "administracion/_nav_icon.html" with name="analitica" %}<span>Analitica</span></a>
+      <a class="panel-nav__link" href="{% url 'admin_products' %}">{% include "administracion/_nav_icon.html" with name="productos" %}<span>Productos</span></a>
+      <a class="panel-nav__link" href="{% url 'admin_coupons' %}">{% include "administracion/_nav_icon.html" with name="cupones" %}<span>Cupones y descuentos</span></a>
+      <a class="panel-nav__link" href="{% url 'admin_orders' %}">{% include "administracion/_nav_icon.html" with name="pedidos" %}<span>Pedidos y pagos</span></a>
+      <a class="panel-nav__link" href="{% url 'admin_afiliados' %}">{% include "administracion/_nav_icon.html" with name="afiliados" %}<span>Afiliados</span></a>
+      <a class="panel-nav__link" href="{% url 'admin_catalogs' %}">{% include "administracion/_nav_icon.html" with name="catalogos" %}<span>Catalogos y etiquetas</span></a>
+      <a class="panel-nav__link" href="{% url 'admin_users' %}">{% include "administracion/_nav_icon.html" with name="usuarios" %}<span>Usuarios y roles</span></a>
     </nav>
   </aside>
   <main class="main">
