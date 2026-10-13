@@ -2,8 +2,8 @@
 import re
 
 from django.test import TestCase
-from django.utils import translation
 from django.urls import reverse
+from django.utils import translation
 
 
 class AcercaDeCienciaTests(TestCase):

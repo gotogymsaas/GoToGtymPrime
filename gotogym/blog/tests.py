@@ -242,8 +242,3 @@ class RssYMedicionTests(TestCase):
         html = self.client.get(reverse('blog:post_detail', args=[self.post.slug])).content.decode()
         self.assertIn('data-track-read-end', html)
         self.assertIn('data-track="reference_click"', html)
-
-    def test_los_eventos_nuevos_estan_permitidos(self):
-        from analitica.views import EVENTOS_PERMITIDOS
-        for evento in ('journal_post_click', 'journal_read_complete', 'reference_click'):
-            self.assertIn(evento, EVENTOS_PERMITIDOS)

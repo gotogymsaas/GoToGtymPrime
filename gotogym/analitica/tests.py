@@ -8,7 +8,7 @@ persona detras de la sesion.
 import json
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 
 from .models import EventoAnalitica
@@ -203,3 +203,10 @@ class EventosDeServidorTests(TestCase):
         with patch('analitica.services.EventoAnalitica.objects.create', side_effect=RuntimeError('db')):
             with self.assertLogs('analitica.services', level='ERROR'):
                 self.assertIsNone(registrar_evento(peticion, 'order_created', valor=1))
+
+
+class EventosDelJournalTests(SimpleTestCase):
+    def test_los_eventos_del_journal_estan_permitidos(self):
+        from .views import EVENTOS_PERMITIDOS
+        for evento in ('journal_post_click', 'journal_read_complete', 'reference_click'):
+            self.assertIn(evento, EVENTOS_PERMITIDOS)

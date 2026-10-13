@@ -9,7 +9,6 @@ from django.utils import timezone
 from blog.journal_content import POSTS
 from blog.models import Category, Post
 
-
 PORTADAS = Path(__file__).resolve().parents[2] / 'portadas'
 
 
