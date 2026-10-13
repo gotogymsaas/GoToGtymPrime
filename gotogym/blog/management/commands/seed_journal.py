@@ -1,11 +1,16 @@
 from datetime import timedelta
+from pathlib import Path
 
 from django.contrib.auth import get_user_model
+from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
 from blog.journal_content import POSTS
 from blog.models import Category, Post
+
+
+PORTADAS = Path(__file__).resolve().parents[2] / 'portadas'
 
 
 class Command(BaseCommand):
@@ -43,14 +48,15 @@ class Command(BaseCommand):
                     'excerpt': datos['excerpt'],
                     'content': datos['content'],
                     'references': datos['references'],
-                    'reading_time': datos['reading_time'],
                     'is_published': True,
                 },
             )
-            # `published` es auto_now_add: se escalonan las fechas con
-            # update() para que el Journal muestre un orden estable.
-            Post.objects.filter(pk=post.pk).update(published=ahora - timedelta(days=orden * 3))
+            self._adjuntar_portada(post)
             if creada:
+                # `published` es auto_now_add y queda con la fecha real de carga.
+                # Se separan unos segundos solo para que el orden sea estable:
+                # la primera entrada de la lista es la mas reciente.
+                Post.objects.filter(pk=post.pk).update(published=ahora - timedelta(seconds=orden))
                 creadas += 1
             else:
                 actualizadas += 1
@@ -59,6 +65,14 @@ class Command(BaseCommand):
             f'Journal: {creadas} entradas creadas, {actualizadas} actualizadas, {omitidas} sin cambios '
             f'(autor: {autor.email}).'
         ))
+
+    def _adjuntar_portada(self, post):
+        """Portada de la entrada, solo si aun no tiene una (no pisa la que se suba a mano)."""
+        archivo = PORTADAS / f'{post.slug}.png'
+        if post.featured or not archivo.exists():
+            return
+        with archivo.open('rb') as f:
+            post.featured.save(archivo.name, File(f), save=True)
 
     def _autor(self, email):
         User = get_user_model()

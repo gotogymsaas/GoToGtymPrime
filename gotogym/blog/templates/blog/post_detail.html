@@ -5,7 +5,7 @@
 
 {% block title %}{{ post.title }}{% endblock %}
 
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">{% endblock %}
+{% block extra_head %}<link rel="alternate" type="application/rss+xml" title="GoToGym Journal" href="{% url 'blog:feed' %}"><link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">{% endblock %}
 
 {% block content %}
 <div class="editorial-page">
@@ -13,7 +13,7 @@
     <div class="editorial-shell">
       <p class="editorial-kicker">{{ post.category.name|default:"GoToGym Journal" }} · {{ post.published|date:"d M Y" }}</p>
       <h1 class="editorial-title">{{ post.title }}</h1>
-      <p class="editorial-lead">{% trans "Por" %} {{ post.author.get_full_name|default:post.author.username }} · {{ post.reading_time }} {% trans "min de lectura" %}</p>
+      <p class="editorial-lead">{{ post.firma }} · {{ post.reading_time }} {% trans "min de lectura" %} · {% trans "Última revisión" %}: {{ post.updated|date:"d M Y" }}</p>
     </div>
   </header>
 
@@ -24,12 +24,13 @@
         <img src="{{ post.featured.url }}" alt="" loading="lazy" class="editorial-article__cover">
         {% endif %}
         {{ post.content|post_body }}
+        <div data-track-read-end data-track-entrada="{{ post.slug }}" aria-hidden="true"></div>
         {% if post.reference_items %}
         <section class="editorial-references" aria-labelledby="referencias-titulo">
           <h2 id="referencias-titulo">{% trans "Referencias" %}</h2>
           <ol>
             {% for ref in post.reference_items %}
-            <li id="ref-{{ forloop.counter }}">{{ ref.text }}{% if ref.url %} <a href="{{ ref.url }}" target="_blank" rel="noopener noreferrer">{% trans "Ver fuente" %}</a>{% endif %}</li>
+            <li id="ref-{{ forloop.counter }}">{{ ref.text }}{% if ref.url %} <a href="{{ ref.url }}" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="journal" data-track-entrada="{{ post.slug }}" data-track-referencia="{{ forloop.counter }}">{% trans "Ver fuente" %}</a>{% endif %}</li>
             {% endfor %}
           </ol>
         </section>

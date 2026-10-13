@@ -118,7 +118,6 @@ POSTS = [
         'slug': 'grafeno-el-material-de-un-solo-atomo-de-espesor',
         'title': 'Grafeno: el material de un solo átomo de espesor',
         'category': 'Materiales',
-        'reading_time': 5,
         'excerpt': (
             'Una sola capa de átomos de carbono, aislada en 2004 y premiada con el Nobel en 2010, reúne '
             'propiedades que ninguna fibra convencional iguala. Esto es lo que se sabe y lo que no se debe '
@@ -157,7 +156,6 @@ En GoToGym revisamos la ciencia de materiales para separar lo que está demostra
         'slug': 'cuando-una-prenda-conduce-el-calor-grafeno-y-gestion-termica',
         'title': 'Cuando una prenda conduce el calor: grafeno y gestión térmica',
         'category': 'Tecnología textil',
-        'reading_time': 5,
         'excerpt': (
             'El grafeno conduce el calor mejor que casi cualquier material conocido. Qué significa eso en una '
             'tela, qué se ha demostrado en prototipos y dónde están los límites.'
@@ -188,7 +186,6 @@ Cuando una prenda promete "regular la temperatura", conviene preguntar qué se m
         'slug': 'corres-mas-con-grafeno-lo-que-dice-un-ensayo-en-humanos',
         'title': '¿Corres más con grafeno? Lo que dice (y lo que no) un ensayo en humanos',
         'category': 'Ciencia deportiva',
-        'reading_time': 5,
         'excerpt': (
             'Una prueba con personas: un ensayo aleatorizado de doble ciego con prendas de '
             'compresión de grafeno. Resultados, límites y cómo interpretarlos con honestidad.'
@@ -197,7 +194,7 @@ Cuando una prenda promete "regular la temperatura", conviene preguntar qué se m
 
 ## El estudio
 
-En 2025, un equipo de investigación publicó en Sports Medicine - Open un ensayo aleatorizado, cruzado y de doble ciego [1]. Participaron 15 estudiantes universitarios varones, de 18 a 25 años, físicamente activos. Cada uno hizo dos pruebas incrementales en cinta, con siete días de separación: una con una camiseta y un pantalón de compresión fabricados con fibras compuestas de nailon y grafeno (emisividad infrarroja del 92 %), y otra con prendas idénticas sin grafeno.
+En 2025, un equipo de investigación publicó en Sports Medicine - Open un ensayo aleatorizado, cruzado y de doble ciego [1]. Se analizaron los datos de 15 estudiantes universitarios varones (de 20 reclutados), de entre 18 y 22 años y físicamente activos. Cada uno hizo dos pruebas incrementales en cinta, con siete días de separación: una con una camiseta y un pantalón de compresión fabricados con fibras compuestas de nailon y grafeno (emisividad infrarroja de 0,88, por encima del mínimo de 0,83 de la norma), y otra con prendas idénticas sin grafeno.
 
 ## Lo que encontraron
 
@@ -222,7 +219,6 @@ Es un resultado prometedor y una hipótesis que merece replicarse con más perso
         'slug': 'prendas-que-sienten-sensores-textiles-de-grafeno',
         'title': 'Prendas que sienten: sensores textiles de grafeno',
         'category': 'Tecnología textil',
-        'reading_time': 4,
         'excerpt': (
             'Movimiento articular y señales del cuerpo: el grafeno permite integrar sensores finos y flexibles '
             'en la propia tela. Qué se ha logrado y qué falta para que salga del laboratorio.'
@@ -233,10 +229,10 @@ Es un resultado prometedor y una hipótesis que merece replicarse con más perso
 
 Las revisiones de sensores de grafeno para monitoreo de salud describen aplicaciones no invasivas y portátiles [1]. En textiles, los prototipos publicados se han probado en la detección del movimiento humano, como el de las articulaciones [2][3].
 
-Algunas cifras de la literatura, que dependen mucho del diseño de cada sensor [1]:
+Algunos ejemplos publicados, que dependen mucho del diseño de cada sensor y no son valores típicos [1]:
 
-- Sensores de presión con sensibilidades entre 0,82 y 25,1 kPa⁻¹.
-- Sensores de deformación con factores de galga entre 25,2 y 502.
+- Sensores de presión con sensibilidades de 0,82 y de 25,1 kPa⁻¹.
+- Sensores de deformación con factores de galga de 25,2 y de 502.
 - Electrodos flexibles que admiten más de un 40 % de estiramiento.
 
 ## Por qué el grafeno
@@ -258,7 +254,6 @@ Es un campo con avances reales y publicados, pero mayoritariamente en fase de pr
         'slug': 'antibacteriano-y-seguro-separar-evidencia-y-marketing-en-el-grafeno',
         'title': 'Antibacteriano y seguro: separar evidencia y marketing en el grafeno',
         'category': 'Materiales',
-        'reading_time': 6,
         'excerpt': (
             'El grafeno daña bacterias en el laboratorio, pero eso no equivale a una prenda antibacteriana. '
             'Qué dice la ciencia sobre actividad antimicrobiana y sobre seguridad, y cómo leer una etiqueta.'
@@ -302,7 +297,6 @@ Si no hay respuestas, la palabra es solo una palabra.''',
         'slug': 'ropa-deportiva-funcionalizada-como-se-disena-la-respuesta-de-una-tela',
         'title': 'Ropa deportiva funcionalizada: cómo se diseña la respuesta de una tela',
         'category': 'Tecnología textil',
-        'reading_time': 5,
         'excerpt': (
             'Humedad, temperatura, sensado: una tela "funcional" es la suma de fibras, estructura y acabados. '
             'Un mapa de las estrategias y de dónde encaja el grafeno.'

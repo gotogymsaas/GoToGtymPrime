@@ -22,7 +22,8 @@ class EditorialPagesTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Tecnología alrededor de')
-        self.assertContains(response, 'Personalización')
+        self.assertContains(response, 'Tecnología + Moda')
+        self.assertContains(response, 'Bienestar accesible')
         self.assertTemplateUsed(response, 'static_pages/about.html')
 
     def test_journal_sin_posts_no_muestra_filtros(self):

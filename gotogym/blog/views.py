@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
@@ -11,18 +10,14 @@ def post_list(request):
     posts = Post.objects.filter(is_published=True).select_related('category', 'author').order_by('-published')
     has_published_posts = posts.exists()
     categories = Category.objects.all()
-    authors = get_user_model().objects.filter(posts__isnull=False).distinct()
 
     search = request.GET.get('search', '')
     category = request.GET.get('category', '')
-    author = request.GET.get('author', '')
 
     if search:
         posts = posts.filter(Q(title__icontains=search) | Q(content__icontains=search))
     if category:
         posts = posts.filter(category_id=category)
-    if author:
-        posts = posts.filter(author_id=author)
 
     paginator = Paginator(posts, 9)
     page_number = request.GET.get('page')
@@ -35,12 +30,11 @@ def post_list(request):
     context = {
         'posts': page_obj.object_list,
         'categories': categories,
-        'authors': authors,
         'is_paginated': page_obj.has_other_pages(),
         'page_obj': page_obj,
         'params': params,
         'has_published_posts': has_published_posts,
-        'has_active_filters': any([search, category, author]),
+        'has_active_filters': any([search, category]),
     }
     context.update(contexto_seo(
         'GoToGym Journal: historias para avanzar',
@@ -67,10 +61,12 @@ def post_detail(request, slug):
         'headline': post.title,
         'datePublished': post.published.isoformat(),
         'dateModified': post.updated.isoformat(),
-        'author': {'@type': 'Person', 'name': post.author.get_full_name() or 'GoToGym'},
+        'author': {'@type': 'Organization', 'name': post.firma},
         'publisher': {'@type': 'Organization', 'name': 'GoToGym'},
         'mainEntityOfPage': request.build_absolute_uri(request.path),
     }
+    if post.reference_items:
+        datos['citation'] = [ref['text'] for ref in post.reference_items]
     if imagen:
         datos['image'] = imagen
     context = {'post': post, 'related_posts': related_posts}

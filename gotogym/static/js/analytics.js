@@ -96,7 +96,7 @@
       var nombre = atributos[i].name;
       if (nombre.indexOf('data-track-') !== 0) continue;
       var clave = nombre.slice('data-track-'.length);
-      if (!clave || clave === 'impression') continue;
+      if (!clave || clave === 'impression' || clave === 'read-end') continue;
       propiedades[clave] = atributos[i].value;
     }
     return propiedades;
@@ -170,6 +170,23 @@
 
     Array.prototype.forEach.call(candidatas, function (elemento) {
       observador.observe(elemento);
+    });
+  }
+
+  // --- Lectura completa de una entrada -----------------------------------
+  /* Un marcador al final del texto: se mide cuando llega a pantalla, no
+   * cuando se abre la pagina, para distinguir quien lee de quien rebota. */
+  var finales = document.querySelectorAll('[data-track-read-end]');
+  if (finales.length && 'IntersectionObserver' in window) {
+    var lectura = new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (entrada) {
+        if (!entrada.isIntersecting) return;
+        lectura.unobserve(entrada.target);
+        encolar('journal_read_complete', propiedadesDe(entrada.target));
+      });
+    });
+    Array.prototype.forEach.call(finales, function (elemento) {
+      lectura.observe(elemento);
     });
   }
 

@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% load static i18n %}
 {% block title %}GoToGym Journal{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">{% endblock %}
+{% block extra_head %}<link rel="alternate" type="application/rss+xml" title="GoToGym Journal" href="{% url 'blog:feed' %}"><link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">{% endblock %}
 {% block content %}
 <div class="editorial-page">
   <header class="editorial-hero editorial-hero--compact">
     <div class="editorial-shell">
       <p class="editorial-kicker">GoToGym Journal</p>
       <h1 class="editorial-title">Historias para <em>avanzar.</em></h1>
-      <p class="editorial-lead">Diseño, rendimiento, tecnología y bienestar desde una mirada que pone a las personas en el centro.</p>
+      <p class="editorial-lead">Movimiento, tecnología y cultura desde adentro. Lo que aprendemos, lo que probamos, lo que nos mueve.</p>
     </div>
   </header>
 
@@ -18,7 +18,6 @@
       <form method="get" class="editorial-filters">
         <div class="editorial-field"><label for="journal-search">Buscar</label><input id="journal-search" name="search" value="{{ request.GET.search }}" placeholder="Título o tema"></div>
         <div class="editorial-field"><label for="journal-category">Categoría</label><select id="journal-category" name="category"><option value="">Todas</option>{% for category in categories %}<option value="{{ category.id }}"{% if request.GET.category == category.id|stringformat:'s' %} selected{% endif %}>{{ category.name }}</option>{% endfor %}</select></div>
-        <div class="editorial-field"><label for="journal-author">Autor</label><select id="journal-author" name="author"><option value="">Todos</option>{% for author in authors %}<option value="{{ author.id }}"{% if request.GET.author == author.id|stringformat:'s' %} selected{% endif %}>{{ author.get_full_name|default:author.username }}</option>{% endfor %}</select></div>
         <div class="editorial-filter-actions"><button type="submit">Explorar</button>{% if has_active_filters %}<a href="{% url 'blog:post_list' %}">Limpiar</a>{% endif %}</div>
       </form>
     </div>
@@ -30,14 +29,14 @@
       <div class="editorial-grid">
         {% for post in posts %}
         <article class="editorial-card">
-          <a class="editorial-card__media" href="{% url 'blog:post_detail' post.slug %}" aria-label="Leer {{ post.title }}">
+          <a class="editorial-card__media" data-track="journal_post_click" data-track-entrada="{{ post.slug }}" href="{% url 'blog:post_detail' post.slug %}" aria-label="Leer {{ post.title }}">
             {% if post.featured %}<img src="{{ post.featured.url }}" alt="" loading="lazy">{% else %}<span class="editorial-card__lattice" aria-hidden="true"></span>{% endif %}
           </a>
           <div class="editorial-card__copy">
             <span class="editorial-meta">{{ post.category.name|default:'GoToGym' }} · {{ post.reading_time }} min</span>
-            <h2><a href="{% url 'blog:post_detail' post.slug %}">{{ post.title }}</a></h2>
+            <h2><a data-track="journal_post_click" data-track-entrada="{{ post.slug }}" href="{% url 'blog:post_detail' post.slug %}">{{ post.title }}</a></h2>
             <p>{{ post.excerpt|default:post.content|striptags|truncatewords:28 }}</p>
-            <a class="editorial-text-link" href="{% url 'blog:post_detail' post.slug %}">Leer historia →</a>
+            <a class="editorial-text-link" data-track="journal_post_click" data-track-entrada="{{ post.slug }}" href="{% url 'blog:post_detail' post.slug %}">Leer historia →</a>
           </div>
         </article>
         {% endfor %}

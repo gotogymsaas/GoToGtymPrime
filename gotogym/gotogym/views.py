@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import render
 from django.templatetags.static import static
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from tienda.catalog import curated_product_cards
 
 from .seo import contexto_seo
@@ -21,7 +22,7 @@ def home(request):
     }
     sitio = request.build_absolute_uri('/')
     context.update(contexto_seo(
-        'GoToGym: diseñada para tu forma de avanzar',
+        'GoToGym: Wear the intelligence',
         'Ropa deportiva con tecnología textil. Explora la colección GoToGym, diseñada para entrenar, '
         'moverte y avanzar a tu manera.',
         datos=[
@@ -50,9 +51,9 @@ def healthz(request):
 
 def acerca_de(request):
     return render(request, 'static_pages/about.html', contexto_seo(
-        'Acerca de GoToGym: tecnología y ciencia de materiales',
-        'La visión de GoToGym y lo que dice la ciencia sobre el grafeno en la ropa deportiva, '
-        'con sus fuentes y el nivel de evidencia de cada beneficio.',
+        _('Acerca de GoToGym: marca y ciencia de materiales'),
+        _('Propósito y valores de GoToGym y lo que dice la ciencia sobre el grafeno '
+          'en la ropa deportiva, con sus fuentes.'),
     ))
 
 

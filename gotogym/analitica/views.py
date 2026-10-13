@@ -39,6 +39,9 @@ EVENTOS_PERMITIDOS = frozenset({
     'product_click',
     'add_to_cart',
     'search_submit',
+    'journal_post_click',
+    'journal_read_complete',
+    'reference_click',
 })
 
 MAX_EVENTOS_POR_LOTE = 40

@@ -8,6 +8,11 @@
  *
  *   python -m fontTools.subset "<origen>.otf"  *     --unicodes="U+0000-00FF,U+0100-017F,U+2000-206F,U+2190-21FF,..."  *     --layout-features="kern,liga,clig,calt,ccmp,locl,mark,mkmk"  *     --flavor=woff2 --output-file="<destino>.woff2"
  */
+/* Tipografia segun el Brand Book: TT Norms. Se sirven Regular (400) y
+ * ExtraBold (800); el manual lista ademas Bold y Black y variantes cursivas.
+ * Las cursivas no se usan a proposito: el enfasis se hace con color. Para
+ * servir Bold o Black basta con subsetear el .otf como se indica arriba y
+ * declarar aqui su @font-face. */
 @font-face {
   font-family: "TT Norms GoToGym";
   src: url("../fonts/tt-norms/tt-norms-regular.woff2") format("woff2");
@@ -29,9 +34,10 @@
   --color-bg-elevated: #141416;
   --color-bg-card: #222225;
   --color-bg-overlay: rgba(0, 0, 0, 0.62);
-  --color-accent: #00d4c7;
-  --color-accent-hover: #00b8ad;
-  --color-accent-soft: rgba(0, 212, 199, 0.16);
+  /* Turquesa Grafeno del Brand Book: unico turquesa del sitio. */
+  --color-accent: #0fbfb0;
+  --color-accent-hover: #0a9f92;
+  --color-accent-soft: rgba(15, 191, 176, 0.16);
   --color-text-primary: #ffffff;
   --color-text-secondary: #b8b8b8;
   --color-text-muted: #808080;
@@ -40,8 +46,8 @@
   --color-gold: #d4b46a;
   --shadow-card: 0 24px 70px rgba(0, 0, 0, 0.45);
 
-  --font-display: "TT Norms GoToGym", "Outfit", system-ui, sans-serif;
-  --font-body: "TT Norms GoToGym", "Outfit", system-ui, sans-serif;
+  --font-display: "TT Norms GoToGym", system-ui, sans-serif;
+  --font-body: "TT Norms GoToGym", system-ui, sans-serif;
 
   /* Escala en base 1.25 (major third), un tamaño por rol semantico en vez
    * de por t-shirt size -- ver AUDITORIA_TIPOGRAFIA_UI.md seccion C. Nace
@@ -105,6 +111,7 @@ body.gtg-theme {
   background: var(--color-bg-base);
   color: var(--color-text-primary);
   font-family: var(--font-body);
+  font-synthesis: none;
   letter-spacing: 0;
 }
 
@@ -261,7 +268,7 @@ picture source {
   color: #ffffff;
   background: rgba(13, 13, 15, 0.72);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .pdp-gallery__thumbs {
@@ -494,7 +501,7 @@ picture source {
      llegado a transparente al borde inferior de su propia caja y se veia
      el corte como un rectangulo. La elipse cierra el desvanecido dentro
      de la caja en los dos ejes. */
-  background-image: radial-gradient(ellipse at 0% 0%, rgba(0, 212, 199, 0.20) 0%, transparent 72%);
+  background-image: radial-gradient(ellipse at 0% 0%, rgba(15, 191, 176, 0.20) 0%, transparent 72%);
   background-repeat: no-repeat;
   background-size: 520px 360px;
   background-position: -110px -130px;
@@ -515,8 +522,8 @@ picture source {
   transform: translateY(-4px);
   box-shadow:
     0 22px 44px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(0, 212, 199, 0.35),
-    0 0 34px rgba(0, 212, 199, 0.28);
+    0 0 0 1px rgba(15, 191, 176, 0.35),
+    0 0 34px rgba(15, 191, 176, 0.28);
 }
 
 /* Boton que cierra cada pantalla de decision (anadir al carrito, continuar,
@@ -537,8 +544,8 @@ picture source {
   50% {
     box-shadow:
       0 8px 22px rgba(0, 0, 0, 0.35),
-      0 0 18px rgba(0, 212, 199, 0.45),
-      0 0 38px rgba(0, 212, 199, 0.18);
+      0 0 18px rgba(15, 191, 176, 0.45),
+      0 0 38px rgba(15, 191, 176, 0.18);
   }
 }
 
@@ -578,7 +585,7 @@ picture source {
   margin: 0;
   padding: 0;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-text-primary);
@@ -622,7 +629,7 @@ picture source {
   padding: 0 var(--space-3);
   border-radius: var(--radius-pill);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 800;
   text-decoration: none;
   white-space: nowrap;
   transition: color 0.2s ease, background 0.2s ease;
@@ -664,7 +671,7 @@ picture source {
 .gtg-icon-button:hover,
 .gtg-menu-toggle:hover {
   color: var(--color-accent);
-  background: rgba(0, 212, 199, 0.08);
+  background: rgba(15, 191, 176, 0.08);
 }
 
 .gtg-user-button {
@@ -685,7 +692,7 @@ picture source {
 .gtg-user-button:hover,
 .gtg-user-button.is-accent:hover {
   color: var(--color-accent);
-  background: rgba(0, 212, 199, 0.08);
+  background: rgba(15, 191, 176, 0.08);
 }
 
 .gtg-account-icon {
@@ -710,7 +717,7 @@ picture source {
   min-width: 0;
   color: #ffffff;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 800;
   letter-spacing: .01em;
   line-height: 1.25;
   text-align: left;
@@ -736,7 +743,7 @@ picture source {
 .gtg-user-button:hover .gtg-user-email-label,
 .gtg-admin-user-button:hover .gtg-user-email-label {
   color: var(--color-accent);
-  font-weight: 700;
+  font-weight: 800;
 }
 
 /* Con el carrito vacio el contador se oculta, pero el elemento sigue en el
@@ -856,7 +863,7 @@ picture source {
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   padding: 10px var(--space-5);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1;
   cursor: pointer;
   transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
@@ -1019,8 +1026,8 @@ picture source {
 /* Mismo enfasis turquesa que los botones del header: el footer es la otra
    punta de la misma barra de marca y debe responder igual al puntero. */
 .gtg-socials a:hover {
-  border-color: rgba(0, 212, 199, 0.55);
-  background: rgba(0, 212, 199, 0.12);
+  border-color: rgba(15, 191, 176, 0.55);
+  background: rgba(15, 191, 176, 0.12);
   color: var(--color-accent);
   transform: translateY(-3px);
 }
@@ -1066,7 +1073,7 @@ picture source {
 }
 
 .gtg-footer-legal a:hover {
-  background: rgba(0, 212, 199, 0.08);
+  background: rgba(15, 191, 176, 0.08);
   color: var(--color-accent);
 }
 
@@ -1093,7 +1100,7 @@ picture source {
   margin-bottom: 6px;
   color: var(--text-primary);
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .gtg-input {
@@ -1145,7 +1152,7 @@ picture source {
   background: var(--color-accent);
   color: #001a18;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
   transition: transform 0.2s ease;
 }
 
@@ -1174,7 +1181,7 @@ picture source {
 
 .gtg-nav-search:focus-within {
   border-color: var(--color-accent);
-  background: rgba(0, 212, 199, 0.06);
+  background: rgba(15, 191, 176, 0.06);
 }
 
 .gtg-nav-search .material-icons-outlined {
@@ -1289,7 +1296,7 @@ picture source {
   margin: 0 0 var(--space-1);
   color: var(--color-text-primary);
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.35;
 }
 

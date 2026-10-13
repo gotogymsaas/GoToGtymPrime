@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.urls import reverse
 from django.utils.text import slugify
 
 
@@ -35,12 +36,25 @@ class Post(models.Model):
     reading_time = models.PositiveIntegerField(default=3)
     is_published = models.BooleanField(default=True)
 
+    FIRMA = 'Equipo de investigación GoToGym'
+    PALABRAS_POR_MINUTO = 200
+
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('blog:post_detail', args=[self.slug])
+
+    @property
+    def firma(self):
+        """Las entradas las firma el equipo, no la cuenta que las carga: el
+        usuario de esa cuenta suele ser un correo y no debe verse en publico."""
+        return self.FIRMA
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
+        self.reading_time = max(1, round(len(self.content.split()) / self.PALABRAS_POR_MINUTO))
         super().save(*args, **kwargs)
 
     @property

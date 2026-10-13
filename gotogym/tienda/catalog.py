@@ -243,7 +243,7 @@ def build_variant_matrix(product):
 # regenerar ese subconjunto.
 FEATURE_KEYWORDS = [
     (('microfibra', 'mirofibra'), 'texture', 'Microfibra',
-     'Tejido ligero y de secado rápido.'),
+     'Tejido ligero, pensado para el movimiento.'),
     (('licra',), 'straighten', 'Licra elástica',
      'Se ajusta al movimiento sin perder forma.'),
     (('grafeno',), 'bolt', 'Con grafeno',

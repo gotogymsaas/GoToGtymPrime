@@ -62,7 +62,7 @@ class LoggedHomeTests(TestCase):
         response = self.client.get(reverse('home'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Diseñada para tu')
+        self.assertContains(response, 'Wear the')
         # La portada es la misma con y sin sesion: no saluda por el nombre.
         self.assertNotContains(response, 'Hola, Ana')
         self.assertContains(response, 'Ropa deportiva con tecnología textil')
@@ -108,7 +108,7 @@ class LoggedHomeTests(TestCase):
         response = self.client.get(reverse('home'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Diseñada para tu')
+        self.assertContains(response, 'Wear the')
         self.assertContains(response, reverse('commercial_login'))
         self.assertContains(response, reverse('register'))
 

@@ -1,6 +1,6 @@
 .figma-home {
   --home-gold: var(--color-gold, #d4b46a);
-  --home-mint: var(--color-accent, #00d4c7);
+  --home-mint: var(--color-accent, #0fbfb0);
   --home-muted: rgba(255, 255, 255, 0.64);
   position: relative;
   min-height: 100vh;
@@ -22,7 +22,7 @@
 
 .figma-home::before {
   background:
-    radial-gradient(circle at 50% 42%, rgba(0, 212, 199, 0.2), transparent 18%),
+    radial-gradient(circle at 50% 42%, rgba(15, 191, 176, 0.2), transparent 18%),
     linear-gradient(180deg, rgba(3, 4, 5, 0.28), rgba(3, 4, 5, 0.92));
 }
 
@@ -123,13 +123,13 @@
   width: 66%;
   height: 66%;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 90px rgba(0, 212, 199, 0.2);
+  box-shadow: 0 0 90px rgba(15, 191, 176, 0.2);
 }
 
 .quantum-field::after {
   width: 34%;
   height: 34%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.2), rgba(0, 212, 199, 0.1) 42%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2), rgba(15, 191, 176, 0.1) 42%, transparent 70%);
   filter: blur(2px);
 }
 
@@ -137,7 +137,7 @@
   width: 14px;
   height: 14px;
   background: #ffffff;
-  box-shadow: 0 0 22px #ffffff, 0 0 64px rgba(0, 212, 199, 0.7);
+  box-shadow: 0 0 22px #ffffff, 0 0 64px rgba(15, 191, 176, 0.7);
 }
 
 .quantum-watermark {
@@ -146,7 +146,7 @@
   height: 188px;
   background: url("../images/logo-gotogym-symbol-transparent.png") center / contain no-repeat;
   opacity: 0.2;
-  filter: drop-shadow(0 0 22px rgba(0, 212, 199, 0.28));
+  filter: drop-shadow(0 0 22px rgba(15, 191, 176, 0.28));
 }
 
 .quantum-orbit {
@@ -172,7 +172,7 @@
   display: block;
   border-radius: 50%;
   background: #ffffff;
-  box-shadow: 0 0 18px #ffffff, 0 0 34px rgba(0, 212, 199, 0.9);
+  box-shadow: 0 0 18px #ffffff, 0 0 34px rgba(15, 191, 176, 0.9);
   offset-path: ellipse(50% 50% at 50% 50%);
   offset-distance: 0%;
   offset-rotate: 0deg;
@@ -192,7 +192,7 @@
   height: 13px;
   margin: -6.5px 0 0 -6.5px;
   background: var(--home-mint);
-  box-shadow: 0 0 18px var(--home-mint), 0 0 38px rgba(0, 212, 199, 0.9);
+  box-shadow: 0 0 18px var(--home-mint), 0 0 38px rgba(15, 191, 176, 0.9);
 }
 
 .quantum-orbit--one {
@@ -442,7 +442,7 @@
 
 .quantum-privacy {
   --home-gold: var(--color-gold, #d4b46a);
-  --home-mint: var(--color-accent, #00d4c7);
+  --home-mint: var(--color-accent, #0fbfb0);
   --home-muted: rgba(255, 255, 255, 0.68);
   position: relative;
   min-height: 100vh;
@@ -460,7 +460,7 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 50% 42%, rgba(0, 212, 199, 0.2), transparent 18%),
+    radial-gradient(circle at 50% 42%, rgba(15, 191, 176, 0.2), transparent 18%),
     linear-gradient(180deg, rgba(3, 4, 5, 0.28), rgba(3, 4, 5, 0.92));
 }
 

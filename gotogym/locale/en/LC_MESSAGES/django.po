@@ -968,3 +968,595 @@ msgstr "Join GoToGym"
 
 msgid "No puedes usar tu propio código de afiliado en tus compras."
 msgstr "You cannot use your own affiliate code on your purchases."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Nuestra razón de movernos"
+msgstr "Why we move"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Tecnología alrededor de <em>la persona.</em>"
+msgstr "Technology built around <em>the person.</em>"
+
+#: gotogym/templates/static_pages/about.html
+msgid "En esta página"
+msgstr "On this page"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Valores"
+msgstr "Values"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Grafeno"
+msgstr "Graphene"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Laboratorio"
+msgstr "Laboratory"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Evidencia"
+msgstr "Evidence"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Fuentes"
+msgstr "Sources"
+
+#: gotogym/templates/static_pages/about.html
+msgid "El manifiesto"
+msgstr "The manifesto"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"Diseñamos para el movimiento real, no para una versión idealizada de las "
+"personas."
+msgstr "We design for real movement, not for an idealized version of people."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Por qué existimos"
+msgstr "Why we exist"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Bienestar para todos."
+msgstr "Wellbeing for everyone."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Propósito"
+msgstr "Purpose"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Crear bienestar para todos."
+msgstr "To create wellbeing for everyone."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Misión"
+msgstr "Mission"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Visión"
+msgstr "Vision"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Cómo lo hacemos"
+msgstr "How we do it"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Tres pilares sostienen la marca."
+msgstr "Three pillars support the brand."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Tecnología + Moda"
+msgstr "Technology + Fashion"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Bienestar accesible"
+msgstr "Accessible wellbeing"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Cuatro valores que guían cada decisión."
+msgstr "Four values that guide every decision."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Lealtad"
+msgstr "Loyalty"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Confianza"
+msgstr "Trust"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Competitividad"
+msgstr "Competitiveness"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Honestidad"
+msgstr "Honesty"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Ciencia de materiales"
+msgstr "Materials science"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Grafeno: un átomo de espesor, propiedades <em>fuera de escala.</em>"
+msgstr "Graphene: one atom thick, properties <em>off the scale.</em>"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"En 2004 se aisló por primera vez una capa de carbono de un solo átomo de "
+"grosor<sup class=\"cite\"><a href=\"#ref-1\">[1]</a></sup>. Seis años "
+"después, el hallazgo recibió el Premio Nobel de Física<sup class=\"cite\"><a"
+" href=\"#ref-2\">[2]</a></sup>. Hoy se investiga cómo llevar esas "
+"propiedades a la ropa deportiva. Esto es lo que está demostrado, con su "
+"fuente."
+msgstr ""
+"In 2004 a layer of carbon just one atom thick was isolated for the first "
+"time<sup class=\"cite\"><a href=\"#ref-1\">[1]</a></sup>. Six years later, "
+"the finding won the Nobel Prize in Physics<sup class=\"cite\"><a "
+"href=\"#ref-2\">[2]</a></sup>. Today researchers are exploring how to bring "
+"those properties to sportswear. This is what has been demonstrated, with its"
+" source."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Propiedades medidas del grafeno"
+msgstr "Measured properties of graphene"
+
+#: gotogym/templates/static_pages/about.html
+msgid "1 átomo"
+msgstr "1 atom"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"de espesor: una sola capa de carbono<sup class=\"cite\"><a "
+"href=\"#ref-3\">[3]</a></sup>"
+msgstr ""
+"thick: a single layer of carbon<sup class=\"cite\"><a "
+"href=\"#ref-3\">[3]</a></sup>"
+
+#: gotogym/templates/static_pages/about.html
+msgid "≈ 5.000 <small>W/m·K</small>"
+msgstr "≈ 5,000 <small>W/m·K</small>"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"conductividad térmica, más de 10 veces la del cobre<sup class=\"cite\"><a "
+"href=\"#ref-6\">[6]</a><a href=\"#ref-7\">[7]</a></sup>"
+msgstr ""
+"thermal conductivity, more than 10 times that of copper<sup "
+"class=\"cite\"><a href=\"#ref-6\">[6]</a><a href=\"#ref-7\">[7]</a></sup>"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"resistencia intrínseca medida en una monocapa<sup class=\"cite\"><a "
+"href=\"#ref-5\">[5]</a></sup>"
+msgstr ""
+"intrinsic strength measured in a monolayer<sup class=\"cite\"><a "
+"href=\"#ref-5\">[5]</a></sup>"
+
+#: gotogym/templates/static_pages/about.html
+msgid "2,3 %%"
+msgstr "2.3%%"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"de la luz que absorbe una sola capa<sup class=\"cite\"><a "
+"href=\"#ref-8\">[8]</a></sup>"
+msgstr ""
+"of the light that a single layer absorbs<sup class=\"cite\"><a "
+"href=\"#ref-8\">[8]</a></sup>"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"Valores medidos en una monocapa casi ideal, en condiciones de laboratorio. "
+"Describen el material, no una prenda."
+msgstr ""
+"Values measured in a nearly ideal monolayer under laboratory conditions. "
+"They describe the material, not a garment."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Qué es, con precisión"
+msgstr "What it is, precisely"
+
+#: gotogym/templates/static_pages/about.html
+msgid "De grafito a grafeno: es cuestión de capas."
+msgstr "From graphite to graphene: it is a matter of layers."
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"La norma ISO/TS 80004-13 define el grafeno como una sola capa de átomos de "
+"carbono<sup class=\"cite\"><a href=\"#ref-3\">[3]</a></sup>. Entre tres y "
+"diez capas se llama grafeno de pocas capas<sup class=\"cite\"><a "
+"href=\"#ref-4\">[4]</a></sup>; con muchas, es grafito. En los textiles es "
+"habitual usar derivados como el óxido de grafeno, que no se comportan igual "
+"que la lámina ideal<sup class=\"cite\"><a href=\"#ref-16\">[16]</a></sup>. "
+"Saber qué forma lleva una prenda es la primera pregunta útil."
+msgstr ""
+"The ISO/TS 80004-13 standard defines graphene as a single layer of carbon "
+"atoms<sup class=\"cite\"><a href=\"#ref-3\">[3]</a></sup>. Between three and"
+" ten layers it is called few-layer graphene<sup class=\"cite\"><a "
+"href=\"#ref-4\">[4]</a></sup>; with many, it is graphite. In textiles it is "
+"common to use derivatives such as graphene oxide, which do not behave like "
+"the ideal sheet<sup class=\"cite\"><a href=\"#ref-16\">[16]</a></sup>. "
+"Knowing which form a garment contains is the first useful question."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Del grafito al grafeno"
+msgstr "From graphite to graphene"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"Tres pilas de capas de carbono: grafito con muchas capas, grafeno de pocas "
+"capas con tres a diez, y grafeno con una sola capa."
+msgstr ""
+"Three stacks of carbon layers: graphite with many layers, few-layer graphene"
+" with three to ten, and graphene with a single layer."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Grafito"
+msgstr "Graphite"
+
+#: gotogym/templates/static_pages/about.html
+msgid "muchas capas"
+msgstr "many layers"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Pocas capas"
+msgstr "Few layers"
+
+#: gotogym/templates/static_pages/about.html
+msgid "de 3 a 10"
+msgstr "3 to 10"
+
+#: gotogym/templates/static_pages/about.html
+msgid "1 capa"
+msgstr "1 layer"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Calor"
+msgstr "Heat"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Un conductor térmico fuera de lo común."
+msgstr "An extraordinary thermal conductor."
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"En una monocapa suspendida se midió una conductividad térmica de entre 4.840"
+" y 5.300 W/m·K a temperatura ambiente<sup class=\"cite\"><a "
+"href=\"#ref-6\">[6]</a></sup>. El cobre, referencia de los buenos "
+"conductores, ronda los 401 W/m·K<sup class=\"cite\"><a "
+"href=\"#ref-7\">[7]</a></sup>. De esa propiedad nace el interés por prendas "
+"que repartan mejor el calor del cuerpo<sup class=\"cite\"><a "
+"href=\"#ref-9\">[9]</a></sup>."
+msgstr ""
+"In a suspended monolayer, a thermal conductivity of between 4,840 and 5,300 "
+"W/m·K was measured at room temperature<sup class=\"cite\"><a "
+"href=\"#ref-6\">[6]</a></sup>. Copper, the benchmark for good conductors, is"
+" around 401 W/m·K<sup class=\"cite\"><a href=\"#ref-7\">[7]</a></sup>. That "
+"property is behind the interest in garments that distribute body heat "
+"better<sup class=\"cite\"><a href=\"#ref-9\">[9]</a></sup>."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Conductividad térmica: cobre frente a grafeno"
+msgstr "Thermal conductivity: copper versus graphene"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"Gráfico de barras en vatios por metro y kelvin. Cobre: 401. Grafeno "
+"monocapa: entre 4.840 y 5.300."
+msgstr ""
+"Bar chart in watts per meter-kelvin. Copper: 401. Monolayer graphene: "
+"between 4,840 and 5,300."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Cobre"
+msgstr "Copper"
+
+#: gotogym/templates/static_pages/about.html
+msgid "4.840 – 5.300"
+msgstr "4,840 – 5,300"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"W/m·K a temperatura ambiente. Grafeno: monocapa suspendida, medida en "
+"laboratorio."
+msgstr ""
+"W/m·K at room temperature. Graphene: suspended monolayer, measured in the "
+"laboratory."
+
+#: gotogym/templates/static_pages/about.html
+msgid "De la lámina a la prenda"
+msgstr "From the sheet to the garment"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Tres maneras de llevar grafeno a un textil."
+msgstr "Three ways to bring graphene to a textile."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Recubrimiento"
+msgstr "Coating"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"La tela se trata con grafeno o con óxido de grafeno reducido. Es la vía de "
+"los calefactores textiles y de varios sensores<sup class=\"cite\"><a "
+"href=\"#ref-10\">[10]</a><a href=\"#ref-14\">[14]</a></sup>."
+msgstr ""
+"The fabric is treated with graphene or reduced graphene oxide. It is the "
+"route used by textile heaters and several sensors<sup class=\"cite\"><a "
+"href=\"#ref-10\">[10]</a><a href=\"#ref-14\">[14]</a></sup>."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Fibra compuesta"
+msgstr "Composite fiber"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"El grafeno se integra al polímero antes de hilar. Es el caso de las prendas "
+"de compresión del ensayo en humanos<sup class=\"cite\"><a "
+"href=\"#ref-11\">[11]</a></sup>."
+msgstr ""
+"Graphene is integrated into the polymer before spinning. This is the case of"
+" the compression garments in the human trial<sup class=\"cite\"><a "
+"href=\"#ref-11\">[11]</a></sup>."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Película laminada"
+msgstr "Laminated film"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"Una película de grafeno se encapsula junto a un tejido, como en sensores de "
+"deformación sobre nailon<sup class=\"cite\"><a "
+"href=\"#ref-13\">[13]</a></sup>."
+msgstr ""
+"A graphene film is encapsulated together with a fabric, as in strain sensors"
+" on nylon<sup class=\"cite\"><a href=\"#ref-13\">[13]</a></sup>."
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"En los tres casos, el resultado depende de cuánto material hay, de su forma "
+"y de que siga adherido tras el uso y el lavado."
+msgstr ""
+"In all three cases, the result depends on how much material there is, its "
+"form, and whether it stays attached after use and washing."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Beneficios posibles"
+msgstr "Possible benefits"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Qué puede aportar, y con qué evidencia."
+msgstr "What it can offer, and with what evidence."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Nivel de evidencia 2 de 4: prototipos en prendas"
+msgstr "Evidence level 2 of 4: garment prototypes"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Gestión térmica"
+msgstr "Thermal management"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"Reparte el calor y, con una pequeña fuente de energía, puede generarlo en "
+"prendas con calefacción<sup class=\"cite\"><a href=\"#ref-9\">[9]</a><a "
+"href=\"#ref-10\">[10]</a></sup>."
+msgstr ""
+"It spreads heat and, with a small power source, can generate it in heated "
+"garments<sup class=\"cite\"><a href=\"#ref-9\">[9]</a><a "
+"href=\"#ref-10\">[10]</a></sup>."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Prototipos y revisiones"
+msgstr "Prototypes and reviews"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Sensado del movimiento"
+msgstr "Motion sensing"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"Sensores finos y flexibles integrados en la tela para seguir el movimiento "
+"del cuerpo<sup class=\"cite\"><a href=\"#ref-12\">[12]</a><a "
+"href=\"#ref-13\">[13]</a><a href=\"#ref-14\">[14]</a></sup>."
+msgstr ""
+"Thin, flexible sensors built into the fabric to track body movement<sup "
+"class=\"cite\"><a href=\"#ref-12\">[12]</a><a href=\"#ref-13\">[13]</a><a "
+"href=\"#ref-14\">[14]</a></sup>."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Mayormente prototipos"
+msgstr "Mostly prototypes"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Nivel de evidencia 3 de 4: ensayo en humanos"
+msgstr "Evidence level 3 of 4: human trial"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Rendimiento aeróbico"
+msgstr "Aerobic performance"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"En un ensayo cruzado de doble ciego con 15 personas, el esfuerzo duró 38,4 s"
+" más (cerca de un 5 %%) con prendas de grafeno. El VO₂máx no cambió<sup "
+"class=\"cite\"><a href=\"#ref-11\">[11]</a></sup>."
+msgstr ""
+"In a double-blind crossover trial with 15 people, the effort lasted 38.4 s "
+"longer (about 5%%) with graphene garments. VO₂max did not change<sup "
+"class=\"cite\"><a href=\"#ref-11\">[11]</a></sup>."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Un estudio pequeño, sin replicar"
+msgstr "A small study, not replicated"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Nivel de evidencia 1 de 4: laboratorio"
+msgstr "Evidence level 1 of 4: laboratory"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Actividad antibacteriana"
+msgstr "Antibacterial activity"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"El grafeno y el óxido de grafeno dañaron bacterias en el laboratorio<sup "
+"class=\"cite\"><a href=\"#ref-15\">[15]</a></sup>. En una prenda depende de "
+"la forma, del método de medición y del lavado<sup class=\"cite\"><a "
+"href=\"#ref-17\">[17]</a></sup>."
+msgstr ""
+"Graphene and graphene oxide damaged bacteria in the laboratory<sup "
+"class=\"cite\"><a href=\"#ref-15\">[15]</a></sup>. In a garment it depends "
+"on the form, the measurement method and washing<sup class=\"cite\"><a "
+"href=\"#ref-17\">[17]</a></sup>."
+
+#: gotogym/templates/static_pages/about.html
+msgid "Ensayos de laboratorio"
+msgstr "Laboratory tests"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Resistencia mecánica"
+msgstr "Mechanical strength"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Propiedad del material"
+msgstr "Property of the material"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Escala de evidencia"
+msgstr "Evidence scale"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Prototipos en prendas"
+msgstr "Garment prototypes"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Ensayo en humanos"
+msgstr "Human trial"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Resultado replicado"
+msgstr "Replicated result"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Da el paso"
+msgstr "Take the step"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Descubrir la colección"
+msgstr "Discover the collection"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Leer el Journal"
+msgstr "Read the Journal"
+
+#: gotogym/templates/static_pages/about.html
+msgid "Referencias."
+msgstr "References."
+
+#: gotogym/templates/static_pages/about.html
+msgid "A. Geim y K. Novoselov"
+msgstr "A. Geim and K. Novoselov"
+
+#: gotogym/templates/static_pages/about.html
+msgid "401 W/m·K a 20 °C"
+msgstr "401 W/m·K at 20 °C"
+
+#: gotogym/templates/static_pages/about.html
+msgid ""
+"muestra de la norma: definiciones de grafeno y de grafeno de pocas capas"
+msgstr "standard sample: definitions of graphene and few-layer graphene"
+
+msgid ""
+"Módulo de Young de 1,0 TPa en una monocapa<sup class=\"cite\"><a "
+"href=\"#ref-5\">[5]</a></sup>. En una tela, lo que importa es cómo se "
+"integra a la fibra."
+msgstr ""
+"Young's modulus of 1.0 TPa in a monolayer<sup class=\"cite\"><a "
+"href=\"#ref-5\">[5]</a></sup>. In a fabric, what matters is how it is "
+"integrated into the fiber."
+
+msgid ""
+"Propósito y valores de GoToGym y lo que dice la ciencia sobre el grafeno en "
+"la ropa deportiva, con sus fuentes."
+msgstr ""
+"GoToGym's purpose and values, and what science says about graphene in "
+"sportswear, with its sources."
+
+msgid "Acerca de GoToGym: marca y ciencia de materiales"
+msgstr "About GoToGym: brand and materials science"
+
+msgid ""
+"GoToGym es una marca de sastrería deportiva de alta tecnología. "
+"Desarrollamos prendas con materiales de nueva generación — probados, "
+"certificados y diseñados para responder al cuerpo en movimiento. No hacemos "
+"ropa que parece técnica. Hacemos ropa que lo es."
+msgstr ""
+"GoToGym is a high-tech sports tailoring brand. We develop garments with "
+"next-generation materials — tested, certified and designed to respond to the"
+" body in motion. We don't make clothes that look technical. We make clothes "
+"that are."
+
+msgid ""
+"La tecnología adquiere valor cuando se integra con naturalidad a la vida. "
+"Por eso cada prenda comienza con una necesidad humana y termina en una "
+"experiencia clara, útil y propia. Creemos que cada persona puede liderar su "
+"propia revolución interna — y estamos aquí para acompañarla con la prenda, "
+"la tecnología y la comunidad que eso requiere."
+msgstr ""
+"Technology gains value when it blends naturally into life. That is why every"
+" garment starts with a human need and ends in a clear, useful and personal "
+"experience. We believe everyone can lead their own inner revolution — and we"
+" are here to support them with the garment, the technology and the community"
+" that takes."
+
+msgid "Hacer el bienestar personalizado universalmente accesible."
+msgstr "To make personalized wellbeing universally accessible."
+
+msgid "Un mundo donde cada persona pueda vivir en bienestar — en movimiento."
+msgstr "A world where everyone can live in wellbeing — on the move."
+
+msgid ""
+"Prendas que combinan sastrería deportiva con textiles avanzados como el "
+"grafeno, diseñadas para tu bienestar real."
+msgstr ""
+"Garments that combine sports tailoring with advanced textiles such as "
+"graphene, designed for your real wellbeing."
+
+msgid ""
+"Reducimos barreras de producción y distribución para que la tecnología "
+"llegue a más personas."
+msgstr ""
+"We lower production and distribution barriers so that technology reaches "
+"more people."
+
+msgid "Ecosistema conectado"
+msgstr "Connected ecosystem"
+
+msgid ""
+"Cada prenda forma parte de un servicio inteligente, personalizado y en "
+"evolución."
+msgstr "Every garment is part of a smart, personalized and evolving service."
+
+msgid "Cumplimos lo que prometemos, con las personas y con el planeta."
+msgstr "We deliver what we promise, to people and to the planet."
+
+msgid "Decimos lo que hacemos y hacemos lo que decimos."
+msgstr "We say what we do and do what we say."
+
+msgid "Nos fijamos metas ambiciosas y las perseguimos con responsabilidad."
+msgstr "We set ambitious goals and pursue them responsibly."
+
+msgid ""
+"Hablamos claro, actuamos con integridad y reconocemos lo que podemos "
+"mejorar."
+msgstr ""
+"We speak plainly, act with integrity and acknowledge what we can improve."
+
+msgid ""
+"Empieza por la colección o profundiza en el Journal: ciencia textil, "
+"tecnología aplicada al movimiento y todo lo que hay detrás de cada prenda — "
+"con sus referencias."
+msgstr ""
+"Start with the collection or go deeper in the Journal: textile science, "
+"technology applied to movement and everything behind each garment — with its"
+" references."

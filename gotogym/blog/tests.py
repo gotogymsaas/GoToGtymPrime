@@ -1,10 +1,11 @@
 import re
+import tempfile
 from io import StringIO
 
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .journal_content import POSTS
@@ -94,6 +95,7 @@ class ContenidoDelJournalTests(TestCase):
         self.assertEqual(len(slugs), len(set(slugs)))
 
 
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp(prefix='journal-media-'))
 class SeedJournalTests(TestCase):
     def _admin(self):
         return get_user_model().objects.create_superuser(
@@ -131,6 +133,16 @@ class SeedJournalTests(TestCase):
     def test_un_autor_inexistente_falla_con_mensaje_claro(self):
         with self.assertRaises(CommandError):
             self._correr('--author', 'nadie@example.com')
+
+    def test_adjunta_una_portada_a_cada_entrada_sin_pisar_las_subidas(self):
+        self._admin()
+        self._correr()
+        self.assertFalse(Post.objects.filter(featured='').exists())
+        propia = Post.objects.get(slug=POSTS[0]['slug'])
+        propia.featured.name = 'blog/featured/propia.png'
+        propia.save()
+        self._correr()
+        self.assertEqual(Post.objects.get(pk=propia.pk).featured.name, 'blog/featured/propia.png')
 
     def test_es_idempotente(self):
         self._admin()
@@ -174,3 +186,64 @@ class SeedJournalTests(TestCase):
         self.assertEqual(detalle.status_code, 200)
         self.assertContains(detalle, 'id="ref-1"')
         self.assertContains(detalle, '<h2>')
+
+
+class FirmaYLecturaTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        autor = get_user_model().objects.create_user(
+            email='privado@example.com', username='privado@example.com', password='secret123',
+        )
+        cls.post = Post.objects.create(title='Firma', author=autor, content='palabra ' * 450)
+
+    def test_la_firma_es_el_equipo_y_no_expone_el_usuario(self):
+        detalle = self.client.get(reverse('blog:post_detail', args=[self.post.slug])).content.decode()
+        listado = self.client.get(reverse('blog:post_list')).content.decode()
+        self.assertIn('Equipo de investigación GoToGym', detalle)
+        for html in (detalle, listado):
+            self.assertNotIn('privado@example.com', html)
+
+    def test_el_tiempo_de_lectura_se_calcula_a_200_palabras_por_minuto(self):
+        self.assertEqual(self.post.reading_time, 2)
+        self.post.content = 'palabra ' * 10
+        self.post.save()
+        self.assertEqual(self.post.reading_time, 1)
+
+    def test_el_detalle_muestra_la_ultima_revision(self):
+        html = self.client.get(reverse('blog:post_detail', args=[self.post.slug])).content.decode()
+        self.assertIn('Última revisión', html)
+
+
+class RssYMedicionTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        autor = get_user_model().objects.create_user(
+            email='rss@example.com', username='rss@example.com', password='secret123',
+        )
+        cls.post = Post.objects.create(
+            title='Para el feed', author=autor, content='Texto [1].', excerpt='Resumen.',
+            references='Autor (2020). Titulo. | https://example.org/a',
+        )
+
+    def test_el_feed_lista_las_entradas_con_la_firma_del_equipo(self):
+        respuesta = self.client.get(reverse('blog:feed'))
+        self.assertEqual(respuesta.status_code, 200)
+        cuerpo = respuesta.content.decode()
+        self.assertIn('Para el feed', cuerpo)
+        self.assertIn('Equipo de investigación GoToGym', cuerpo)
+        self.assertNotIn('rss@example.com', cuerpo)
+
+    def test_el_listado_y_el_detalle_anuncian_el_feed(self):
+        for url in (reverse('blog:post_list'), reverse('blog:post_detail', args=[self.post.slug])):
+            html = self.client.get(url).content.decode()
+            self.assertIn('application/rss+xml', html)
+
+    def test_el_detalle_mide_lectura_completa_y_clic_en_fuentes(self):
+        html = self.client.get(reverse('blog:post_detail', args=[self.post.slug])).content.decode()
+        self.assertIn('data-track-read-end', html)
+        self.assertIn('data-track="reference_click"', html)
+
+    def test_los_eventos_nuevos_estan_permitidos(self):
+        from analitica.views import EVENTOS_PERMITIDOS
+        for evento in ('journal_post_click', 'journal_read_complete', 'reference_click'):
+            self.assertIn(evento, EVENTOS_PERMITIDOS)

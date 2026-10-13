@@ -1,37 +1,94 @@
 {% extends 'base.html' %}
 {% load static i18n %}
-{% block title %}Acerca de GoToGym{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">{% endblock %}
+{% block title %}{% trans "Acerca de GoToGym" %}{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261012-marca">{% endblock %}
 {% block content %}
 <div class="editorial-page">
   <header class="editorial-hero editorial-hero--compact">
     <div class="editorial-shell">
-      <p class="editorial-kicker">Nuestra razón de movernos</p>
-      <h1 class="editorial-title">Tecnología alrededor de <em>la persona.</em></h1>
-      <p class="editorial-lead">GoToGym une diseño deportivo, personalización y bienestar para crear experiencias que acompañan la manera única en que cada persona avanza.</p>
+      <p class="editorial-kicker">{% trans "Nuestra razón de movernos" %}</p>
+      <h1 class="editorial-title">{% blocktrans trimmed %}Tecnología alrededor de <em>la persona.</em>{% endblocktrans %}</h1>
+      <p class="editorial-lead">{% trans "GoToGym es una marca de sastrería deportiva de alta tecnología. Desarrollamos prendas con materiales de nueva generación — probados, certificados y diseñados para responder al cuerpo en movimiento. No hacemos ropa que parece técnica. Hacemos ropa que lo es." %}</p>
+      <ul class="about-index" aria-label="{% trans "En esta página" %}">
+        <li><a href="#valores">{% trans "Valores" %}</a></li>
+        <li><a href="#grafeno">{% trans "Grafeno" %}</a></li>
+        <li><a href="#evidencia">{% trans "Evidencia" %}</a></li>
+        <li><a href="#fuentes">{% trans "Fuentes" %}</a></li>
+      </ul>
     </div>
   </header>
-  <section class="editorial-section">
+
+  <section class="editorial-section" id="manifiesto">
     <div class="editorial-shell about-manifesto">
-      <p class="editorial-kicker">El manifiesto</p>
+      <p class="editorial-kicker">{% trans "El manifiesto" %}</p>
       <div class="about-manifesto__copy">
-        <blockquote>Diseñamos para el movimiento real, no para una versión idealizada de las personas.</blockquote>
-        <p>Exploramos materiales, construcción y servicios conectados con una convicción sencilla: la tecnología adquiere valor cuando se integra con naturalidad a la vida. Por eso cada prenda comienza con una necesidad humana y termina en una experiencia clara, útil y propia.</p>
+        <blockquote>{% trans "Diseñamos para el movimiento real, no para una versión idealizada de las personas." %}</blockquote>
+        <p>{% trans "La tecnología adquiere valor cuando se integra con naturalidad a la vida. Por eso cada prenda comienza con una necesidad humana y termina en una experiencia clara, útil y propia. Creemos que cada persona puede liderar su propia revolución interna — y estamos aquí para acompañarla con la prenda, la tecnología y la comunidad que eso requiere." %}</p>
       </div>
     </div>
   </section>
-  <section class="editorial-section editorial-section--dark">
+
+  <section class="editorial-section editorial-section--dark" id="proposito" aria-labelledby="proposito-titulo">
     <div class="editorial-shell">
-      <p class="editorial-kicker">Nuestro sistema</p>
-      <h2 class="sr-only">Nuestro sistema</h2>
-      <div class="about-pillars">
-        <article class="about-pillar"><small>01</small><h3>Diseño</h3><p>Prendas con intención, presencia y libertad de movimiento.</p></article>
-        <article class="about-pillar"><small>02</small><h3>Tecnología</h3><p>Innovación aplicada con propósito y evidencia.</p></article>
-        <article class="about-pillar"><small>03</small><h3>Personalización</h3><p>Opciones más cercanas a cada contexto y estilo.</p></article>
-        <article class="about-pillar"><small>04</small><h3>Bienestar</h3><p>Progreso sostenible, sin culpa ni promesas irreales.</p></article>
+      <p class="editorial-kicker">{% trans "Por qué existimos" %}</p>
+      <h2 id="proposito-titulo">{% trans "Bienestar para todos." %}</h2>
+      <div class="about-statements">
+        <article class="about-statement"><small>{% trans "Propósito" %}</small><p>{% trans "Crear bienestar para todos." %}</p></article>
+        <article class="about-statement"><small>{% trans "Misión" %}</small><p>{% trans "Hacer el bienestar personalizado universalmente accesible." %}</p></article>
+        <article class="about-statement"><small>{% trans "Visión" %}</small><p>{% trans "Un mundo donde cada persona pueda vivir en bienestar — en movimiento." %}</p></article>
       </div>
     </div>
   </section>
+
+  <section class="editorial-section editorial-section--mist" id="pilares" aria-labelledby="pilares-titulo">
+    <div class="editorial-shell">
+      <p class="editorial-kicker">{% trans "Cómo lo hacemos" %}</p>
+      <h2 id="pilares-titulo">{% trans "Tres pilares sostienen la marca." %}</h2>
+      <div class="about-cards">
+        <article class="about-card">
+          <small>01</small>
+          <h3>{% trans "Tecnología + Moda" %}</h3>
+          <p>{% trans "Prendas que combinan sastrería deportiva con textiles avanzados como el grafeno, diseñadas para tu bienestar real." %}</p>
+        </article>
+        <article class="about-card">
+          <small>02</small>
+          <h3>{% trans "Bienestar accesible" %}</h3>
+          <p>{% trans "Reducimos barreras de producción y distribución para que la tecnología llegue a más personas." %}</p>
+        </article>
+        <article class="about-card">
+          <small>03</small>
+          <h3>{% trans "Ecosistema conectado" %}</h3>
+          <p>{% trans "Cada prenda forma parte de un servicio inteligente, personalizado y en evolución." %}</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="editorial-section" id="valores" aria-labelledby="valores-titulo">
+    <div class="editorial-shell">
+      <p class="editorial-kicker">{% trans "Valores" %}</p>
+      <h2 id="valores-titulo">{% trans "Cuatro valores que guían cada decisión." %}</h2>
+      <div class="about-values">
+        <article class="about-value">
+          <h3>{% trans "Lealtad" %}</h3>
+          <p>{% trans "Cumplimos lo que prometemos, con las personas y con el planeta." %}</p>
+        </article>
+        <article class="about-value">
+          <h3>{% trans "Confianza" %}</h3>
+          <p>{% trans "Decimos lo que hacemos y hacemos lo que decimos." %}</p>
+        </article>
+        <article class="about-value">
+          <h3>{% trans "Competitividad" %}</h3>
+          <p>{% trans "Nos fijamos metas ambiciosas y las perseguimos con responsabilidad." %}</p>
+        </article>
+        <article class="about-value">
+          <h3>{% trans "Honestidad" %}</h3>
+          <p>{% trans "Hablamos claro, actuamos con integridad y reconocemos lo que podemos mejorar." %}</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
   {# ---------- Ciencia de materiales: grafeno ---------- #}
   <section class="editorial-section editorial-section--dark science-hero" id="grafeno" aria-labelledby="grafeno-titulo">
     <svg class="science-lattice" viewBox="0 0 660 520" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
@@ -46,43 +103,43 @@
       <rect width="660" height="520" fill="url(#panal)" mask="url(#panal-mask)"/>
     </svg>
     <div class="editorial-shell science-hero__content">
-      <p class="editorial-kicker">Ciencia de materiales</p>
-      <h2 id="grafeno-titulo">Grafeno: un átomo de espesor, propiedades <em>fuera de escala.</em></h2>
-      <p class="science-lead">En 2004 se aisló por primera vez una capa de carbono de un solo átomo de grosor<sup class="cite"><a href="#ref-1">[1]</a></sup>. Seis años después, el hallazgo recibió el Premio Nobel de Física<sup class="cite"><a href="#ref-2">[2]</a></sup>. Hoy se investiga cómo llevar esas propiedades a la ropa deportiva. Esto es lo que está demostrado, con su fuente.</p>
+      <p class="editorial-kicker">{% trans "Ciencia de materiales" %}</p>
+      <h2 id="grafeno-titulo">{% blocktrans trimmed %}Grafeno: un átomo de espesor, propiedades <em>fuera de escala.</em>{% endblocktrans %}</h2>
+      <p class="science-lead">{% blocktrans trimmed %}En 2004 se aisló por primera vez una capa de carbono de un solo átomo de grosor<sup class="cite"><a href="#ref-1">[1]</a></sup>. Seis años después, el hallazgo recibió el Premio Nobel de Física<sup class="cite"><a href="#ref-2">[2]</a></sup>. Hoy se investiga cómo llevar esas propiedades a la ropa deportiva. Esto es lo que está demostrado, con su fuente.{% endblocktrans %}</p>
 
-      <ul class="science-stats" aria-label="Propiedades medidas del grafeno">
+      <ul class="science-stats" aria-label="{% trans "Propiedades medidas del grafeno" %}">
         <li class="science-stat">
-          <strong class="science-stat__value">1 átomo</strong>
-          <span class="science-stat__label">de espesor: una sola capa de carbono<sup class="cite"><a href="#ref-3">[3]</a></sup></span>
+          <strong class="science-stat__value">{% trans "1 átomo" %}</strong>
+          <span class="science-stat__label">{% blocktrans trimmed %}de espesor: una sola capa de carbono<sup class="cite"><a href="#ref-3">[3]</a></sup>{% endblocktrans %}</span>
         </li>
         <li class="science-stat">
-          <strong class="science-stat__value">≈ 5.000 <small>W/m·K</small></strong>
-          <span class="science-stat__label">conductividad térmica, más de 10 veces la del cobre<sup class="cite"><a href="#ref-6">[6]</a><a href="#ref-7">[7]</a></sup></span>
+          <strong class="science-stat__value">{% blocktrans trimmed %}≈ 5.000 <small>W/m·K</small>{% endblocktrans %}</strong>
+          <span class="science-stat__label">{% blocktrans trimmed %}conductividad térmica, más de 10 veces la del cobre<sup class="cite"><a href="#ref-6">[6]</a><a href="#ref-7">[7]</a></sup>{% endblocktrans %}</span>
         </li>
         <li class="science-stat">
           <strong class="science-stat__value">130 <small>GPa</small></strong>
-          <span class="science-stat__label">resistencia intrínseca medida en una monocapa<sup class="cite"><a href="#ref-5">[5]</a></sup></span>
+          <span class="science-stat__label">{% blocktrans trimmed %}resistencia intrínseca medida en una monocapa<sup class="cite"><a href="#ref-5">[5]</a></sup>{% endblocktrans %}</span>
         </li>
         <li class="science-stat">
-          <strong class="science-stat__value">2,3 %</strong>
-          <span class="science-stat__label">de la luz que absorbe una sola capa<sup class="cite"><a href="#ref-8">[8]</a></sup></span>
+          <strong class="science-stat__value">{% blocktrans trimmed %}2,3 %{% endblocktrans %}</strong>
+          <span class="science-stat__label">{% blocktrans trimmed %}de la luz que absorbe una sola capa<sup class="cite"><a href="#ref-8">[8]</a></sup>{% endblocktrans %}</span>
         </li>
       </ul>
-      <p class="science-note">Valores medidos en una monocapa casi ideal, en condiciones de laboratorio. Describen el material, no una prenda.</p>
+      <p class="science-note">{% trans "Valores medidos en una monocapa casi ideal, en condiciones de laboratorio. Describen el material, no una prenda." %}</p>
     </div>
   </section>
 
   <section class="editorial-section" aria-labelledby="capas-titulo">
     <div class="editorial-shell science-split">
       <div>
-        <p class="editorial-kicker">Qué es, con precisión</p>
-        <h2 id="capas-titulo">De grafito a grafeno: es cuestión de capas.</h2>
-        <p class="science-copy">La norma ISO/TS 80004-13 define el grafeno como una sola capa de átomos de carbono<sup class="cite"><a href="#ref-3">[3]</a></sup>. Entre tres y diez capas se llama grafeno de pocas capas<sup class="cite"><a href="#ref-4">[4]</a></sup>; con muchas, es grafito. En los textiles es habitual usar derivados como el óxido de grafeno, que no se comportan igual que la lámina ideal<sup class="cite"><a href="#ref-16">[16]</a></sup>. Saber qué forma lleva una prenda es la primera pregunta útil.</p>
+        <p class="editorial-kicker">{% trans "Qué es, con precisión" %}</p>
+        <h2 id="capas-titulo">{% trans "De grafito a grafeno: es cuestión de capas." %}</h2>
+        <p class="science-copy">{% blocktrans trimmed %}La norma ISO/TS 80004-13 define el grafeno como una sola capa de átomos de carbono<sup class="cite"><a href="#ref-3">[3]</a></sup>. Entre tres y diez capas se llama grafeno de pocas capas<sup class="cite"><a href="#ref-4">[4]</a></sup>; con muchas, es grafito. En los textiles es habitual usar derivados como el óxido de grafeno, que no se comportan igual que la lámina ideal<sup class="cite"><a href="#ref-16">[16]</a></sup>. Saber qué forma lleva una prenda es la primera pregunta útil.{% endblocktrans %}</p>
       </div>
       <figure class="science-figure">
         <svg viewBox="0 0 640 250" role="img" aria-labelledby="capas-svg-t capas-svg-d">
-          <title id="capas-svg-t">Del grafito al grafeno</title>
-          <desc id="capas-svg-d">Tres pilas de capas de carbono: grafito con muchas capas, grafeno de pocas capas con tres a diez, y grafeno con una sola capa.</desc>
+          <title id="capas-svg-t">{% trans "Del grafito al grafeno" %}</title>
+          <desc id="capas-svg-d">{% trans "Tres pilas de capas de carbono: grafito con muchas capas, grafeno de pocas capas con tres a diez, y grafeno con una sola capa." %}</desc>
           <g class="layers layers--many">
             <rect x="20" y="40" width="170" height="7" rx="3.5"/><rect x="20" y="54" width="170" height="7" rx="3.5"/><rect x="20" y="68" width="170" height="7" rx="3.5"/><rect x="20" y="82" width="170" height="7" rx="3.5"/><rect x="20" y="96" width="170" height="7" rx="3.5"/><rect x="20" y="110" width="170" height="7" rx="3.5"/><rect x="20" y="124" width="170" height="7" rx="3.5"/><rect x="20" y="138" width="170" height="7" rx="3.5"/><rect x="20" y="152" width="170" height="7" rx="3.5"/>
           </g>
@@ -92,12 +149,12 @@
           <g class="layers layers--one">
             <rect x="450" y="152" width="170" height="7" rx="3.5"/>
           </g>
-          <text class="figure-label" x="105" y="196" text-anchor="middle">Grafito</text>
-          <text class="figure-sub" x="105" y="216" text-anchor="middle">muchas capas</text>
-          <text class="figure-label" x="320" y="196" text-anchor="middle">Pocas capas</text>
-          <text class="figure-sub" x="320" y="216" text-anchor="middle">de 3 a 10</text>
-          <text class="figure-label figure-label--accent" x="535" y="196" text-anchor="middle">Grafeno</text>
-          <text class="figure-sub" x="535" y="216" text-anchor="middle">1 capa</text>
+          <text class="figure-label" x="105" y="196" text-anchor="middle">{% trans "Grafito" %}</text>
+          <text class="figure-sub" x="105" y="216" text-anchor="middle">{% trans "muchas capas" %}</text>
+          <text class="figure-label" x="320" y="196" text-anchor="middle">{% trans "Pocas capas" %}</text>
+          <text class="figure-sub" x="320" y="216" text-anchor="middle">{% trans "de 3 a 10" %}</text>
+          <text class="figure-label figure-label--accent" x="535" y="196" text-anchor="middle">{% trans "Grafeno" %}</text>
+          <text class="figure-sub" x="535" y="216" text-anchor="middle">{% trans "1 capa" %}</text>
         </svg>
       </figure>
     </div>
@@ -106,22 +163,22 @@
   <section class="editorial-section editorial-section--dark" aria-labelledby="calor-titulo">
     <div class="editorial-shell science-split science-split--chart">
       <div>
-        <p class="editorial-kicker">Calor</p>
-        <h2 id="calor-titulo">Un conductor térmico fuera de lo común.</h2>
-        <p class="science-copy">En una monocapa suspendida se midió una conductividad térmica de entre 4.840 y 5.300 W/m·K a temperatura ambiente<sup class="cite"><a href="#ref-6">[6]</a></sup>. El cobre, referencia de los buenos conductores, ronda los 401 W/m·K<sup class="cite"><a href="#ref-7">[7]</a></sup>. De esa propiedad nace el interés por prendas que repartan mejor el calor del cuerpo<sup class="cite"><a href="#ref-9">[9]</a></sup>.</p>
+        <p class="editorial-kicker">{% trans "Calor" %}</p>
+        <h2 id="calor-titulo">{% trans "Un conductor térmico fuera de lo común." %}</h2>
+        <p class="science-copy">{% blocktrans trimmed %}En una monocapa suspendida se midió una conductividad térmica de entre 4.840 y 5.300 W/m·K a temperatura ambiente<sup class="cite"><a href="#ref-6">[6]</a></sup>. El cobre, referencia de los buenos conductores, ronda los 401 W/m·K<sup class="cite"><a href="#ref-7">[7]</a></sup>. De esa propiedad nace el interés por prendas que repartan mejor el calor del cuerpo<sup class="cite"><a href="#ref-9">[9]</a></sup>.{% endblocktrans %}</p>
       </div>
       <figure class="science-figure science-figure--dark">
         <svg viewBox="0 0 640 230" role="img" aria-labelledby="calor-svg-t calor-svg-d">
-          <title id="calor-svg-t">Conductividad térmica: cobre frente a grafeno</title>
-          <desc id="calor-svg-d">Gráfico de barras en vatios por metro y kelvin. Cobre: 401. Grafeno monocapa: entre 4.840 y 5.300.</desc>
-          <text class="figure-label" x="0" y="64">Cobre</text>
+          <title id="calor-svg-t">{% trans "Conductividad térmica: cobre frente a grafeno" %}</title>
+          <desc id="calor-svg-d">{% trans "Gráfico de barras en vatios por metro y kelvin. Cobre: 401. Grafeno monocapa: entre 4.840 y 5.300." %}</desc>
+          <text class="figure-label" x="0" y="64">{% trans "Cobre" %}</text>
           <rect class="bar bar--ref" x="150" y="40" width="36" height="32" rx="2"/>
           <text class="figure-value" x="196" y="62">401</text>
-          <text class="figure-label figure-label--accent" x="0" y="134">Grafeno</text>
+          <text class="figure-label figure-label--accent" x="0" y="134">{% trans "Grafeno" %}</text>
           <rect class="bar bar--main" x="150" y="110" width="429" height="32" rx="2"/>
           <rect class="bar bar--range" x="579" y="110" width="41" height="32" rx="2"/>
-          <text class="figure-value figure-value--accent" x="150" y="172">4.840 – 5.300</text>
-          <text class="figure-sub" x="0" y="214">W/m·K a temperatura ambiente. Grafeno: monocapa suspendida, medida en laboratorio.</text>
+          <text class="figure-value figure-value--accent" x="150" y="172">{% trans "4.840 – 5.300" %}</text>
+          <text class="figure-sub" x="0" y="214">{% trans "W/m·K a temperatura ambiente. Grafeno: monocapa suspendida, medida en laboratorio." %}</text>
         </svg>
       </figure>
     </div>
@@ -129,70 +186,70 @@
 
   <section class="editorial-section editorial-section--mist" aria-labelledby="rutas-titulo">
     <div class="editorial-shell">
-      <p class="editorial-kicker">De la lámina a la prenda</p>
-      <h2 id="rutas-titulo">Tres maneras de llevar grafeno a un textil.</h2>
+      <p class="editorial-kicker">{% trans "De la lámina a la prenda" %}</p>
+      <h2 id="rutas-titulo">{% trans "Tres maneras de llevar grafeno a un textil." %}</h2>
       <div class="science-routes">
         <article class="science-route">
           <small>01</small>
-          <h3>Recubrimiento</h3>
-          <p>La tela se trata con grafeno o con óxido de grafeno reducido. Es la vía de los calefactores textiles y de varios sensores<sup class="cite"><a href="#ref-10">[10]</a><a href="#ref-14">[14]</a></sup>.</p>
+          <h3>{% trans "Recubrimiento" %}</h3>
+          <p>{% blocktrans trimmed %}La tela se trata con grafeno o con óxido de grafeno reducido. Es la vía de los calefactores textiles y de varios sensores<sup class="cite"><a href="#ref-10">[10]</a><a href="#ref-14">[14]</a></sup>.{% endblocktrans %}</p>
         </article>
         <article class="science-route">
           <small>02</small>
-          <h3>Fibra compuesta</h3>
-          <p>El grafeno se integra al polímero antes de hilar. Es el caso de las prendas de compresión del ensayo en humanos<sup class="cite"><a href="#ref-11">[11]</a></sup>.</p>
+          <h3>{% trans "Fibra compuesta" %}</h3>
+          <p>{% blocktrans trimmed %}El grafeno se integra al polímero antes de hilar. Es el caso de las prendas de compresión del ensayo en humanos<sup class="cite"><a href="#ref-11">[11]</a></sup>.{% endblocktrans %}</p>
         </article>
         <article class="science-route">
           <small>03</small>
-          <h3>Película laminada</h3>
-          <p>Una película de grafeno se encapsula junto a un tejido, como en sensores de deformación sobre nailon<sup class="cite"><a href="#ref-13">[13]</a></sup>.</p>
+          <h3>{% trans "Película laminada" %}</h3>
+          <p>{% blocktrans trimmed %}Una película de grafeno se encapsula junto a un tejido, como en sensores de deformación sobre nailon<sup class="cite"><a href="#ref-13">[13]</a></sup>.{% endblocktrans %}</p>
         </article>
       </div>
-      <p class="science-copy science-copy--wide">En los tres casos, el resultado depende de cuánto material hay, de su forma y de que siga adherido tras el uso y el lavado.</p>
+      <p class="science-copy science-copy--wide">{% trans "En los tres casos, el resultado depende de cuánto material hay, de su forma y de que siga adherido tras el uso y el lavado." %}</p>
     </div>
   </section>
 
-  <section class="editorial-section" aria-labelledby="beneficios-titulo">
+  <section class="editorial-section" id="evidencia" aria-labelledby="beneficios-titulo">
     <div class="editorial-shell">
-      <p class="editorial-kicker">Beneficios posibles</p>
-      <h2 id="beneficios-titulo">Qué puede aportar, y con qué evidencia.</h2>
+      <p class="editorial-kicker">{% trans "Beneficios posibles" %}</p>
+      <h2 id="beneficios-titulo">{% trans "Qué puede aportar, y con qué evidencia." %}</h2>
       <div class="science-benefits">
         <article class="science-benefit">
-          <span class="evidence" data-level="2" role="img" aria-label="Nivel de evidencia 2 de 4: prototipos en prendas"><i></i><i></i><i></i><i></i></span>
-          <h3>Gestión térmica</h3>
-          <p>Reparte el calor y, con una pequeña fuente de energía, puede generarlo en prendas con calefacción<sup class="cite"><a href="#ref-9">[9]</a><a href="#ref-10">[10]</a></sup>.</p>
-          <small>Prototipos y revisiones</small>
+          <span class="evidence" data-level="2" role="img" aria-label="{% trans "Nivel de evidencia 2 de 4: prototipos en prendas" %}"><i></i><i></i><i></i><i></i></span>
+          <h3>{% trans "Gestión térmica" %}</h3>
+          <p>{% blocktrans trimmed %}Reparte el calor y, con una pequeña fuente de energía, puede generarlo en prendas con calefacción<sup class="cite"><a href="#ref-9">[9]</a><a href="#ref-10">[10]</a></sup>.{% endblocktrans %}</p>
+          <small>{% trans "Prototipos y revisiones" %}</small>
         </article>
         <article class="science-benefit">
-          <span class="evidence" data-level="2" role="img" aria-label="Nivel de evidencia 2 de 4: prototipos en prendas"><i></i><i></i><i></i><i></i></span>
-          <h3>Sensado del movimiento</h3>
-          <p>Sensores finos y flexibles integrados en la tela para seguir el movimiento del cuerpo<sup class="cite"><a href="#ref-12">[12]</a><a href="#ref-13">[13]</a><a href="#ref-14">[14]</a></sup>.</p>
-          <small>Mayormente prototipos</small>
+          <span class="evidence" data-level="2" role="img" aria-label="{% trans "Nivel de evidencia 2 de 4: prototipos en prendas" %}"><i></i><i></i><i></i><i></i></span>
+          <h3>{% trans "Sensado del movimiento" %}</h3>
+          <p>{% blocktrans trimmed %}Sensores finos y flexibles integrados en la tela para seguir el movimiento del cuerpo<sup class="cite"><a href="#ref-12">[12]</a><a href="#ref-13">[13]</a><a href="#ref-14">[14]</a></sup>.{% endblocktrans %}</p>
+          <small>{% trans "Mayormente prototipos" %}</small>
         </article>
         <article class="science-benefit">
-          <span class="evidence" data-level="3" role="img" aria-label="Nivel de evidencia 3 de 4: ensayo en humanos"><i></i><i></i><i></i><i></i></span>
-          <h3>Rendimiento aeróbico</h3>
-          <p>En un ensayo cruzado de doble ciego con 15 personas, el esfuerzo duró 38,4 s más (cerca de un 5 %) con prendas de grafeno. El VO₂máx no cambió<sup class="cite"><a href="#ref-11">[11]</a></sup>.</p>
-          <small>Un estudio pequeño, sin replicar</small>
+          <span class="evidence" data-level="3" role="img" aria-label="{% trans "Nivel de evidencia 3 de 4: ensayo en humanos" %}"><i></i><i></i><i></i><i></i></span>
+          <h3>{% trans "Rendimiento aeróbico" %}</h3>
+          <p>{% blocktrans trimmed %}En un ensayo cruzado de doble ciego con 15 personas, el esfuerzo duró 38,4 s más (cerca de un 5 %) con prendas de grafeno. El VO₂máx no cambió<sup class="cite"><a href="#ref-11">[11]</a></sup>.{% endblocktrans %}</p>
+          <small>{% trans "Un estudio pequeño, sin replicar" %}</small>
         </article>
         <article class="science-benefit">
-          <span class="evidence" data-level="1" role="img" aria-label="Nivel de evidencia 1 de 4: laboratorio"><i></i><i></i><i></i><i></i></span>
-          <h3>Actividad antibacteriana</h3>
-          <p>El grafeno y el óxido de grafeno dañaron bacterias en el laboratorio<sup class="cite"><a href="#ref-15">[15]</a></sup>. En una prenda depende de la forma, del método de medición y del lavado<sup class="cite"><a href="#ref-17">[17]</a></sup>.</p>
-          <small>Ensayos de laboratorio</small>
+          <span class="evidence" data-level="1" role="img" aria-label="{% trans "Nivel de evidencia 1 de 4: laboratorio" %}"><i></i><i></i><i></i><i></i></span>
+          <h3>{% trans "Actividad antibacteriana" %}</h3>
+          <p>{% blocktrans trimmed %}El grafeno y el óxido de grafeno dañaron bacterias en el laboratorio<sup class="cite"><a href="#ref-15">[15]</a></sup>. En una prenda depende de la forma, del método de medición y del lavado<sup class="cite"><a href="#ref-17">[17]</a></sup>.{% endblocktrans %}</p>
+          <small>{% trans "Ensayos de laboratorio" %}</small>
         </article>
         <article class="science-benefit">
-          <span class="evidence" data-level="1" role="img" aria-label="Nivel de evidencia 1 de 4: laboratorio"><i></i><i></i><i></i><i></i></span>
-          <h3>Resistencia mecánica</h3>
-          <p>Módulo de Young de 1,0 TPa en una monocapa<sup class="cite"><a href="#ref-5">[5]</a></sup>. En una tela, lo que importa es cómo se integra a la fibra.</p>
-          <small>Propiedad del material</small>
+          <span class="evidence" data-level="1" role="img" aria-label="{% trans "Nivel de evidencia 1 de 4: laboratorio" %}"><i></i><i></i><i></i><i></i></span>
+          <h3>{% trans "Resistencia mecánica" %}</h3>
+          <p>{% blocktrans trimmed %}Módulo de Young de 1,0 TPa en una monocapa<sup class="cite"><a href="#ref-5">[5]</a></sup>. En una tela, lo que importa es cómo se integra a la fibra.{% endblocktrans %}</p>
+          <small>{% trans "Propiedad del material" %}</small>
         </article>
       </div>
-      <ul class="evidence-legend" aria-label="Escala de evidencia">
-        <li><span class="evidence" data-level="1" aria-hidden="true"><i></i><i></i><i></i><i></i></span> Laboratorio</li>
-        <li><span class="evidence" data-level="2" aria-hidden="true"><i></i><i></i><i></i><i></i></span> Prototipos en prendas</li>
-        <li><span class="evidence" data-level="3" aria-hidden="true"><i></i><i></i><i></i><i></i></span> Ensayo en humanos</li>
-        <li><span class="evidence" data-level="4" aria-hidden="true"><i></i><i></i><i></i><i></i></span> Resultado replicado</li>
+      <ul class="evidence-legend" aria-label="{% trans "Escala de evidencia" %}">
+        <li><span class="evidence" data-level="1" aria-hidden="true"><i></i><i></i><i></i><i></i></span> {% trans "Laboratorio" %}</li>
+        <li><span class="evidence" data-level="2" aria-hidden="true"><i></i><i></i><i></i><i></i></span> {% trans "Prototipos en prendas" %}</li>
+        <li><span class="evidence" data-level="3" aria-hidden="true"><i></i><i></i><i></i><i></i></span> {% trans "Ensayo en humanos" %}</li>
+        <li><span class="evidence" data-level="4" aria-hidden="true"><i></i><i></i><i></i><i></i></span> {% trans "Resultado replicado" %}</li>
       </ul>
     </div>
   </section>
@@ -200,49 +257,40 @@
   <section class="editorial-section editorial-section--mist">
     <div class="editorial-shell science-cta">
       <div>
-        <p class="editorial-kicker">Seguir leyendo</p>
-        <h2>Más ciencia de materiales en el Journal.</h2>
-        <p class="science-copy">Entradas sobre grafeno, gestión térmica, sensores textiles y ropa deportiva funcionalizada, cada una con sus referencias.</p>
+        <p class="editorial-kicker">{% trans "Da el paso" %}</p>
+        <h2>Wear the intelligence.</h2>
+        <p class="science-copy">{% trans "Empieza por la colección o profundiza en el Journal: ciencia textil, tecnología aplicada al movimiento y todo lo que hay detrás de cada prenda — con sus referencias." %}</p>
       </div>
       <div class="science-cta__actions">
-        <a class="editorial-action" href="{% url 'blog:post_list' %}">Leer el Journal</a>
-        <a class="editorial-text-link" href="{% url 'tienda:producto_list' %}">Ver la colección</a>
+        <a class="editorial-action" href="{% url 'tienda:producto_list' %}">{% trans "Descubrir la colección" %}</a>
+        <a class="editorial-text-link" href="{% url 'blog:post_list' %}">{% trans "Leer el Journal" %}</a>
       </div>
     </div>
   </section>
 
-  <section class="editorial-section editorial-section--mist">
+  <section class="editorial-section" id="fuentes" aria-labelledby="referencias-titulo">
     <div class="editorial-shell">
-      <p class="editorial-kicker">La visión</p>
-      <h2>Crear bienestar personalizado y hacerlo universalmente accesible.</h2>
-      <a class="editorial-action" href="{% url 'tienda:producto_list' %}">Descubrir la colección</a>
-    </div>
-  </section>
-
-  <section class="editorial-section" aria-labelledby="referencias-titulo">
-    <div class="editorial-shell">
-      <p class="editorial-kicker">Fuentes</p>
-      <h2 id="referencias-titulo">Referencias.</h2>
+      <p class="editorial-kicker">{% trans "Fuentes" %}</p>
+      <h2 id="referencias-titulo">{% trans "Referencias." %}</h2>
       <ol class="science-references">
-        <li id="ref-1">Novoselov, K. S., Geim, A. K., Morozov, S. V., et al. (2004). Electric Field Effect in Atomically Thin Carbon Films. Science 306(5696), 666-669. <a href="https://www.semanticscholar.org/paper/Electric-Field-Effect-in-Atomically-Thin-Carbon-Novoselov-Geim/c92bd747a97eeafdb164985b0d044caa1dc6e73e" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-2">NobelPrize.org. The Nobel Prize in Physics 2010 (A. Geim y K. Novoselov). <a href="https://www.nobelprize.org/prizes/physics/2010/illustrated-information/" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-3">ISO/TS 80004-13:2024. Nanotechnologies - Vocabulary - Part 13: Graphene and other two-dimensional (2D) materials. <a href="https://www.iso.org/obp/ui/#iso:std:iso:ts:80004:-13:ed-2:v1:en" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-4">ISO/TS 80004-13:2017 (muestra de la norma: definiciones de grafeno y de grafeno de pocas capas). <a href="https://cdn.standards.iteh.ai/samples/64741/47fb2d4f20aa4801a560bb8cb38f6e8e/ISO-TS-80004-13-2017.pdf" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-5">Lee, C., Wei, X., Kysar, J. W., Hone, J. (2008). Measurement of the Elastic Properties and Intrinsic Strength of Monolayer Graphene. Science 321(5887), 385-388. <a href="https://www.science.org/doi/10.1126/science.1157996" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-6">Balandin, A. A., Ghosh, S., Bao, W., et al. (2008). Superior thermal conductivity of single-layer graphene. Nano Letters 8(3), 902-907. <a href="https://pubmed.ncbi.nlm.nih.gov/18284217/" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-7">Langley Alloys. What is the thermal conductivity of copper? (401 W/m·K a 20 °C). <a href="https://www.langleyalloys.com/knowledge-advice/what-is-the-thermal-conductivity-of-copper/" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-8">Nair, R. R., Blake, P., et al. (2008). Fine Structure Constant Defines Visual Transparency of Graphene. Science 320(5881), 1308. <a href="https://www.science.org/doi/10.1126/science.1156965" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-9">Ge et al. (2022). Graphene-Based Textiles for Thermal Management and Flame Retardancy. Advanced Functional Materials. <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/adfm.202205934" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-10">Graphene-functionalized textile composites for wearable Joule heating applications. <a href="https://www.sciencedirect.com/science/article/pii/S2949944525000012" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-11">Peng, Y., Wang, D., Zheng, H., et al. (2025). Effects of Graphene-Based Far-Infrared Compression Garments on Aerobic Capacity in Healthy Young Males: A Randomized Crossover Trial. Sports Medicine - Open 11, 114. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12514096/" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-12">Huang, H., Su, S., Wu, N., et al. (2019). Graphene-Based Sensors for Human Health Monitoring. Frontiers in Chemistry. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6580932/" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-13">Wearable graphene film strain sensors encapsulated with nylon fabric for human motion monitoring. Sensors and Actuators A. <a href="https://www.sciencedirect.com/science/article/abs/pii/S0924424719302146" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-14">Graphene Textile Strain Sensor with Negative Resistance Variation for Human Motion Detection. ACS Nano. <a href="https://pubs.acs.org/doi/10.1021/acsnano.8b03391" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-15">Akhavan, O., Ghaderi, E. (2010). Toxicity of Graphene and Graphene Oxide Nanowalls Against Bacteria. ACS Nano 4, 5731-5736. <a href="https://doi.org/10.1021/nn101390x" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-16">Graphene Flagship. Understanding the health and safety of graphene. <a href="https://graphene-flagship.eu/materials/news/understanding-the-health-and-safety-of-graphene" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
-        <li id="ref-17">ISO 20743:2021. Textiles - Determination of antibacterial activity of textile products. <a href="https://www.iso.org/standard/79819.html" target="_blank" rel="noopener noreferrer">Ver fuente</a></li>
+        <li id="ref-1">Novoselov, K. S., Geim, A. K., Morozov, S. V., et al. (2004). Electric Field Effect in Atomically Thin Carbon Films. Science 306(5696), 666-669. <a href="https://www.semanticscholar.org/paper/Electric-Field-Effect-in-Atomically-Thin-Carbon-Novoselov-Geim/c92bd747a97eeafdb164985b0d044caa1dc6e73e" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="1">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-2">NobelPrize.org. The Nobel Prize in Physics 2010 ({% trans "A. Geim y K. Novoselov" %}). <a href="https://www.nobelprize.org/prizes/physics/2010/illustrated-information/" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="2">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-3">ISO/TS 80004-13:2024. Nanotechnologies - Vocabulary - Part 13: Graphene and other two-dimensional (2D) materials. <a href="https://www.iso.org/obp/ui/#iso:std:iso:ts:80004:-13:ed-2:v1:en" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="3">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-4">ISO/TS 80004-13:2017 ({% trans "muestra de la norma: definiciones de grafeno y de grafeno de pocas capas" %}). <a href="https://cdn.standards.iteh.ai/samples/64741/47fb2d4f20aa4801a560bb8cb38f6e8e/ISO-TS-80004-13-2017.pdf" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="4">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-5">Lee, C., Wei, X., Kysar, J. W., Hone, J. (2008). Measurement of the Elastic Properties and Intrinsic Strength of Monolayer Graphene. Science 321(5887), 385-388. <a href="https://www.science.org/doi/10.1126/science.1157996" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="5">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-6">Balandin, A. A., Ghosh, S., Bao, W., et al. (2008). Superior thermal conductivity of single-layer graphene. Nano Letters 8(3), 902-907. <a href="https://pubmed.ncbi.nlm.nih.gov/18284217/" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="6">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-7">Langley Alloys. What is the thermal conductivity of copper? ({% trans "401 W/m·K a 20 °C" %}). <a href="https://www.langleyalloys.com/knowledge-advice/what-is-the-thermal-conductivity-of-copper/" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="7">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-8">Nair, R. R., Blake, P., et al. (2008). Fine Structure Constant Defines Visual Transparency of Graphene. Science 320(5881), 1308. <a href="https://www.science.org/doi/10.1126/science.1156965" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="8">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-9">Ge et al. (2022). Graphene-Based Textiles for Thermal Management and Flame Retardancy. Advanced Functional Materials. <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/adfm.202205934" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="9">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-10">Graphene-functionalized textile composites for wearable Joule heating applications. <a href="https://www.sciencedirect.com/science/article/pii/S2949944525000012" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="10">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-11">Peng, Y., Wang, D., Zheng, H., et al. (2025). Effects of Graphene-Based Far-Infrared Compression Garments on Aerobic Capacity in Healthy Young Males: A Randomized Crossover Trial. Sports Medicine - Open 11, 114. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12514096/" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="11">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-12">Huang, H., Su, S., Wu, N., et al. (2019). Graphene-Based Sensors for Human Health Monitoring. Frontiers in Chemistry. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6580932/" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="12">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-13">Wearable graphene film strain sensors encapsulated with nylon fabric for human motion monitoring. Sensors and Actuators A. <a href="https://www.sciencedirect.com/science/article/abs/pii/S0924424719302146" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="13">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-14">Graphene Textile Strain Sensor with Negative Resistance Variation for Human Motion Detection. ACS Nano. <a href="https://pubs.acs.org/doi/10.1021/acsnano.8b03391" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="14">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-15">Akhavan, O., Ghaderi, E. (2010). Toxicity of Graphene and Graphene Oxide Nanowalls Against Bacteria. ACS Nano 4, 5731-5736. <a href="https://doi.org/10.1021/nn101390x" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="15">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-16">Graphene Flagship. Understanding the health and safety of graphene. <a href="https://graphene-flagship.eu/materials/news/understanding-the-health-and-safety-of-graphene" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="16">{% trans "Ver fuente" %}</a></li>
+        <li id="ref-17">ISO 20743:2021. Textiles - Determination of antibacterial activity of textile products. <a href="https://www.iso.org/standard/79819.html" target="_blank" rel="noopener noreferrer" data-track="reference_click" data-track-origen="acerca_de" data-track-referencia="17">{% trans "Ver fuente" %}</a></li>
       </ol>
-      <p class="science-note science-note--light">Contenido informativo sobre el estado de la ciencia; no describe las propiedades de una prenda GoToGym en particular.</p>
     </div>
   </section>
 </div>

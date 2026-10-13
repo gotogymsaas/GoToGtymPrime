@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static i18n imagenes %}
 
-{% block title %}GoToGym — Diseñada para tu forma de avanzar{% endblock %}
+{% block title %}GoToGym — Wear the intelligence{% endblock %}
 
 {% block extra_head %}
 {% comment %}
@@ -29,14 +29,14 @@ ancho de pantalla, incluido el movil.
 
     <div class="store-shell store-hero__content">
       <p class="store-eyebrow">Ropa deportiva con tecnología textil</p>
-      <h1 id="store-hero-title">Diseñada para tu<br><em>forma de avanzar.</em></h1>
-      <p class="store-hero__lead">Sportwear de alta tecnología que une precisión, movimiento y estilo. Prendas creadas para rendir contigo, dentro y fuera del entrenamiento.</p>
+      <h1 id="store-hero-title">Wear the <em>intelligence.</em></h1>
+      <p class="store-hero__lead">Prendas construidas con materiales de nueva generación que regulan, protegen y duran. Tecnología que no se ve — pero se siente cada vez que te mueves.</p>
       <div class="store-actions">
         <a class="store-button store-button--primary" data-track="hero_collection" href="{% url 'tienda:producto_list' %}">Descubrir la colección</a>
         <a class="store-link" data-track="hero_technology" href="#tecnologia">Conocer la tecnología <span aria-hidden="true">↗</span></a>
       </div>
       <ul class="store-proof" aria-label="Beneficios de compra">
-        <li>Diseño colombiano</li><li>Compra segura</li><li>Envíos nacionales</li>
+        <li>Diseño colombiano</li>
       </ul>
     </div>
   </section>
@@ -46,11 +46,11 @@ ancho de pantalla, incluido el movil.
       <p class="store-eyebrow">Elige tu intención</p>
       <div class="store-heading-row">
         <h2 id="intent-title">Encuentra tu próximo movimiento</h2>
-        <p>Diseño técnico para entrenar, trabajar y vivir con la misma intención.</p>
+        <p>Prendas que van del entrenamiento al día a día sin perder un paso. La misma tecnología, en cada momento.</p>
       </div>
       <div class="intent-grid">
         <a class="intent-card intent-card--performance" data-track="intent_performance" href="{% url 'tienda:producto_list' %}">
-          <span class="intent-card__number">01</span><span><strong>Rendimiento</strong><small>Intensidad, movilidad y recuperación.</small></span><b aria-hidden="true">↗</b>
+          <span class="intent-card__number">01</span><span><strong>Rendimiento</strong><small>Intensidad y movilidad.</small></span><b aria-hidden="true">↗</b>
         </a>
         <a class="intent-card intent-card--daily" data-track="intent_daily" href="{% url 'tienda:producto_list' %}">
           <span class="intent-card__number">02</span><span><strong>Movimiento diario</strong><small>Comodidad técnica para todo tu día.</small></span><b aria-hidden="true">↗</b>
@@ -108,11 +108,11 @@ ancho de pantalla, incluido el movil.
     <div class="store-story__content">
       <p class="store-eyebrow">GoToGym Technology</p>
       <h2 id="technology-title">Innovación que trabaja alrededor de ti.</h2>
-      <p>Exploramos materiales, construcción y diseño personalizado para crear prendas que respondan mejor al movimiento y se integren con naturalidad a tu día.</p>
+      <p>No es marketing. Son materiales de nueva generación, probados y certificados, que regulan tu temperatura, protegen tu piel y duran más que la ropa convencional. Tecnología que no se ve — pero cambia cómo te mueves.</p>
       <dl class="technology-list">
-        <div><dt>01</dt><dd><strong>Diseño funcional</strong><span>Cada detalle responde a una necesidad de movimiento.</span></dd></div>
-        <div><dt>02</dt><dd><strong>Personalización consciente</strong><span>Opciones más cercanas a tu contexto y estilo.</span></dd></div>
-        <div><dt>03</dt><dd><strong>Evolución continua</strong><span>Aprendemos del uso para diseñar mejores experiencias.</span></dd></div>
+        <div><dt>01</dt><dd><strong>Materiales de nueva generación</strong><span>Textiles con grafeno que regulan el calor, repelen el agua y resisten el desgaste. Ciencia aplicada a cada costura.</span></dd></div>
+        <div><dt>02</dt><dd><strong>Rendimiento medible</strong><span>Resultados certificados: mayor transpirabilidad, estabilidad UV y resistencia comprobada. No lo decimos nosotros — lo dicen las pruebas.</span></dd></div>
+        <div><dt>03</dt><dd><strong>Diseño que evoluciona contigo</strong><span>Cada prenda se desarrolla pensando en cómo se usa de verdad — en el gym, en la calle, en tu día completo.</span></dd></div>
       </dl>
     </div>
   </section>
@@ -121,8 +121,8 @@ ancho de pantalla, incluido el movil.
     <div class="store-shell store-wellness__grid">
       <div class="store-wellness__copy">
         <p class="store-eyebrow">Bienestar en movimiento</p>
-        <h2 id="wellness-title">Equipos que se mueven mejor, conectan mejor.</h2>
-        <p>Experiencias y prendas para organizaciones que entienden el bienestar como parte de su cultura.</p>
+        <h2 id="wellness-title">Cuando tu equipo se mueve bien, todo funciona mejor.</h2>
+        <p>Prendas y experiencias diseñadas para organizaciones que entienden el bienestar como parte de su cultura — no como un beneficio adicional, sino como una decisión estratégica.</p>
         <a class="store-button store-button--dark" href="{% url 'contacto' %}">Hablar con GoToGym</a>
       </div>
       {% imagen_editorial "bienestar_empresarial_3.jpeg" alt="Equipo usando prendas GoToGym en una experiencia de bienestar empresarial" sizes="(max-width: 980px) 100vw, 60vw" %}
@@ -131,7 +131,7 @@ ancho de pantalla, incluido el movil.
 
   <section class="store-closing" aria-labelledby="closing-title">
     {% imagen_editorial "WhatsApp Image 2026-07-21 at 6.53.19 PM (1).jpeg" alt="" sizes="100vw" %}
-    <div><p class="store-eyebrow">Tu próxima versión empieza en movimiento</p><h2 id="closing-title">Tu movimiento.<br>Tu diseño.<br><em>Tu GoToGym.</em></h2><a class="store-button store-button--primary" href="{% url 'tienda:producto_list' %}">Entrar a la tienda</a></div>
+    <div><p class="store-eyebrow">Inteligencia que llevas puesta.</p><h2 id="closing-title">Tu movimiento.<br>Tu diseño.<br><em>Tu GoToGym.</em></h2><a class="store-button store-button--primary" href="{% url 'tienda:producto_list' %}">Entrar a la tienda</a></div>
   </section>
 </div>
 {% endblock %}

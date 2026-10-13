@@ -126,7 +126,7 @@ class MetadatosTests(TestCase):
     def test_portada_con_descripcion_open_graph_canonica_y_datos_de_organizacion(self):
         html = self._html(reverse('home'))
         self.assertIn('Ropa deportiva con tecnología textil', _meta(html, 'description'))
-        self.assertEqual(_meta(html, 'og:title', 'property'), 'GoToGym: diseñada para tu forma de avanzar')
+        self.assertEqual(_meta(html, 'og:title', 'property'), 'GoToGym: Wear the intelligence')
         self.assertEqual(_meta(html, 'og:type', 'property'), 'website')
         self.assertEqual(_meta(html, 'twitter:card'), 'summary_large_image')
         self.assertIn('hero_gotogym', _meta(html, 'og:image', 'property'))
@@ -176,7 +176,7 @@ class MetadatosTests(TestCase):
         articulo = _json_ld(html)[0]
         self.assertEqual(articulo['@type'], 'Article')
         self.assertEqual(articulo['headline'], 'Un articulo')
-        self.assertEqual(articulo['author']['name'], 'Ana Soto')
+        self.assertEqual(articulo['author']['name'], 'Equipo de investigación GoToGym')
 
     def test_acerca_de_contacto_y_journal_tienen_su_propia_descripcion(self):
         descripciones = {
