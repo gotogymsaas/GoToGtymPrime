@@ -33,12 +33,13 @@
   </div>
 
   <div class="commercial-auth__field commercial-auth__password">
-    <input type="password" name="password1" id="password1" placeholder="{% trans 'Contraseña' %}" autocomplete="new-password" required>
+    <input type="password" name="password1" id="password1" placeholder="{% trans 'Contraseña' %}" autocomplete="new-password" minlength="8" aria-describedby="password-rules" required>
     <label for="password1">{% trans "Contraseña" %}</label>
     <button type="button" aria-label="{% trans 'Mostrar contraseña' %}" data-password-toggle>
       <span class="material-icons-outlined">visibility</span>
     </button>
   </div>
+  <p class="commercial-auth__hint" id="password-rules">{% trans "Mínimo 8 caracteres, con una mayúscula, una minúscula, un número y un carácter especial (por ejemplo ! ? # $ @)." %}</p>
 
   <label class="commercial-auth__checkbox">
     <input type="checkbox" name="accepted_terms" id="accepted_terms" required>

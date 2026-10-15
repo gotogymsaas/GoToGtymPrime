@@ -157,7 +157,9 @@ else:
     }
 
 
-AUTH_PASSWORD_VALIDATORS: list[dict] = []
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'accounts.validators.ContrasenaSegura'},
+]
 
 # Internacionalización. Import a mitad de archivo, a proposito: vive justo
 # junto a lo unico que lo usa (LANGUAGES, dos lineas abajo).
@@ -236,9 +238,15 @@ SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '0'))
 SECURE_HSTS_INCLUDE_SUBDOMAINS = _as_bool(os.environ.get('SECURE_HSTS_INCLUDE_SUBDOMAINS'), False)
 SECURE_HSTS_PRELOAD = _as_bool(os.environ.get('SECURE_HSTS_PRELOAD'), False)
 
-# Cache. Con REDIS_URL es compartida entre procesos (el limite de tasa solo es
-# fiable asi); sin ella, memoria local de cada proceso, suficiente en
-# desarrollo y con un solo proceso.
+# Cache. Tiene que ser compartida entre procesos: el limite de tasa solo es
+# fiable asi, y con varios workers de gunicorn una cache en memoria multiplica
+# el limite por el numero de workers.
+#
+# 1. REDIS_URL     -> Redis. Lo mejor cuando existe.
+# 2. DATABASE_URL  -> tabla en la misma base de datos (`django_cache`). No
+#    requiere infraestructura nueva; `migrate` la crea sola.
+# 3. Sin variables -> memoria local de cada proceso, suficiente en desarrollo
+#    y pruebas.
 REDIS_URL = os.environ.get('REDIS_URL', '')
 if REDIS_URL:
     CACHES = {
@@ -246,6 +254,13 @@ if REDIS_URL:
             'BACKEND': 'django.core.cache.backends.redis.RedisCache',
             'LOCATION': REDIS_URL,
             'KEY_PREFIX': 'gotogym',
+        },
+    }
+elif _db_url:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'django_cache',
         },
     }
 else:
@@ -263,6 +278,10 @@ TASK_BACKEND = os.environ.get('TASK_BACKEND', 'sync')
 # Panel de simulacion de pagos: visible en desarrollo (DEBUG) o si se activa
 # explicitamente. Nunca debe quedar accesible en produccion real.
 PAYMENTS_MOCK_UI_ENABLED = _as_bool(os.environ.get('PAYMENTS_MOCK_UI_ENABLED'), False)
+
+# Horas que un pedido puede seguir pendiente de pago antes de cancelarse solo
+# (ver orders.services.cancel_expired_orders). 48 cubre un pago en efectivo.
+ORDER_PAYMENT_WINDOW_HOURS = int(os.environ.get('ORDER_PAYMENT_WINDOW_HOURS', '48'))
 
 # Proveedor de pago activo en el checkout. "mock" (default, en todo entorno
 # que no declare esta variable) o "mercadopago". Cambiar esto no requiere
@@ -328,6 +347,9 @@ if EMAIL_HOST:
     EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
     EMAIL_USE_TLS = _as_bool(os.environ.get('EMAIL_USE_TLS'), True)
     EMAIL_USE_SSL = _as_bool(os.environ.get('EMAIL_USE_SSL'), False)
+    # Los correos se envian dentro de la peticion: un servidor que no responde
+    # no debe dejar colgado al worker.
+    EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', '10'))
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'GoToGym <no-reply@gotogym.store>')

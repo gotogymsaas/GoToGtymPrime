@@ -1,14 +1,25 @@
+from django.conf import settings
 from django.contrib.auth import views as auth_views
 from django.urls import path
 
 from . import views
+
+# El correo de recuperacion sale en espanol y con el enlace al sitio publico
+# (`SITIO_URL`), no con el dominio que traiga la peticion.
+recuperar_contrasena = auth_views.PasswordResetView.as_view(
+    template_name='accounts/password_reset_form.html',
+    email_template_name='accounts/password_reset_email.txt',
+    subject_template_name='accounts/password_reset_subject.txt',
+    extra_email_context={'sitio_url': settings.SITIO_URL},
+)
 
 urlpatterns = [
     path('acceso/', views.commercial_login_view, name='commercial_login'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register_view, name='register'),
-    path('password_reset/', auth_views.PasswordResetView.as_view(template_name='accounts/password_reset_form.html'), name='password_reset_form'),
+    path('password_reset/', recuperar_contrasena, name='password_reset_form'),
+    path('password_reset/', recuperar_contrasena, name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='accounts/password_reset_done.html'), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='accounts/password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='accounts/password_reset_complete.html'), name='password_reset_complete'),

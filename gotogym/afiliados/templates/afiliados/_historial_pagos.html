@@ -1,12 +1,27 @@
 {% load tienda_filters %}
-<div class="filter-tabs" aria-label="Año">
-  {% for a in anios %}<a href="?anio={{ a }}" class="{% if a == anio %}active{% endif %}">{{ a }}</a>{% endfor %}
-</div>
+<form class="period-filter" method="get" aria-label="Filtrar pagos por año y mes">
+  <label>Año
+    <select name="anio" onchange="this.form.submit()">
+      {% for a in anios %}<option value="{{ a }}"{% if a == anio %} selected{% endif %}>{{ a }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Mes
+    <select name="mes" onchange="this.form.submit()">
+      <option value=""{% if not mes %} selected{% endif %}>Todos los meses</option>
+      {% for fila in meses %}<option value="{{ fila.mes.month }}"{% if fila.mes.month == mes %} selected{% endif %}>{{ fila.mes|date:"F"|capfirst }}</option>{% endfor %}
+    </select>
+  </label>
+  <noscript><button type="submit" class="ghost">Filtrar</button></noscript>
+</form>
 
 <section class="stats">
+  {% if fila_mes %}
+  <article class="is-teal"><span>${{ fila_mes.neto|cop }} COP</span><p>Recibido en {{ periodo }}</p></article>
+  <article><span>{{ fila_mes.cantidad }}</span><p>Pago{{ fila_mes.cantidad|pluralize }} en {{ periodo }}</p></article>
+  {% else %}
   <article class="is-teal"><span>${{ total_del_anio|cop }} COP</span><p>Recibido en {{ anio }}</p></article>
   <article><span>{{ cantidad_del_anio }}</span><p>Pago{{ cantidad_del_anio|pluralize }} en {{ anio }}</p></article>
-  <article class="is-gold"><span>${{ gastos_del_anio|cop }} COP</span><p>Gastos de transacción en {{ anio }}</p></article>
+  {% endif %}
   <article><span>${{ total_historico|cop }} COP</span><p>Total pagado, todos los años</p></article>
 </section>
 
@@ -29,7 +44,7 @@
   <table>
     <thead><tr><th>Mes</th><th>Pagos</th><th>Monto</th><th>Gastos</th><th>Recibido</th></tr></thead>
     <tbody>
-      {% for fila in meses %}
+      {% for fila in meses_a_mostrar %}
       <tr{% if not fila.cantidad %} class="is-muted"{% endif %}>
         <td>{{ fila.mes|date:"F"|capfirst }}</td>
         <td>{{ fila.cantidad }}</td>
@@ -39,15 +54,17 @@
       </tr>
       {% endfor %}
     </tbody>
+    {% if not fila_mes %}
     <tfoot>
       <tr><th>Total {{ anio }}</th><th>{{ cantidad_del_anio }}</th><th class="nowrap">${{ bruto_del_anio|cop }} COP</th><th class="nowrap">${{ gastos_del_anio|cop }} COP</th><th class="nowrap">${{ total_del_anio|cop }} COP</th></tr>
     </tfoot>
+    {% endif %}
   </table>
   <p class="hint">Los pagos se cuentan por la fecha en que se pagaron. «Recibido» es el monto menos los gastos de transacción; el programa no aplica retenciones.</p>
 </div>
 
 <div class="panel">
-  <h2>Cada pago de {{ anio }}</h2>
+  <h2>Cada pago de {{ periodo }}</h2>
   {% if pagos %}
   <table>
     <thead><tr><th>Fecha de pago</th><th>Solicitada</th><th>Monto</th><th>Gastos</th><th>Recibido</th></tr></thead>
@@ -64,6 +81,6 @@
     </tbody>
   </table>
   {% else %}
-  <p>No hay pagos registrados en {{ anio }}.</p>
+  <p>No hay pagos registrados en {{ periodo }}.</p>
   {% endif %}
 </div>

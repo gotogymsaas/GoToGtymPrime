@@ -40,6 +40,7 @@ from .services import (
     deactivate_afiliado,
     fecha_limite_de_la_solicitud,
     historial_de_pagos,
+    mes_pedido,
     necesita_reaceptar_terminos,
     request_withdrawal,
     saldo_para_pago,
@@ -354,7 +355,7 @@ def pagos(request):
     profile = _perfil(request)
     if not _es_aprobado(profile):
         return redirect('afiliado_dashboard')
-    historial = historial_de_pagos(profile, anio_pedido(request.GET.get('anio')))
+    historial = historial_de_pagos(profile, anio_pedido(request.GET.get('anio')), mes_pedido(request.GET.get('mes')))
     return render(request, 'afiliados/pagos.html', {'profile': profile, **historial})
 
 

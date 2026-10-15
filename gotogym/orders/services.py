@@ -4,6 +4,7 @@ El pedido se crea antes de involucrar a ningun proveedor de pago, y todos
 los importes se recalculan aqui desde la base de datos: nunca se confia en
 un precio que venga de la sesion o del formulario.
 """
+from datetime import timedelta
 from decimal import Decimal
 
 from afiliados.services import (
@@ -13,13 +14,16 @@ from afiliados.services import (
     schedule_order_commission_validation,
 )
 from carrito.services import build_cart_context
+from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.db.models import F
 from django.utils import timezone
+from gotogym.tasks import enqueue
 from inventory.services import InsufficientStockError, decrement_stock, get_available_quantity
 from shipping.models import ShippingQuote
 from shipping.services import get_mock_quote
 
+from . import correos
 from .models import Address, Coupon, Order, OrderItem, OrderStatus, PaymentStatus
 
 # Intentos para resolver la colision de dos pedidos creados a la vez.
@@ -68,6 +72,21 @@ def es_cupon_propio(coupon_code, user):
     if not codigo or user is None or not getattr(user, 'is_authenticated', False):
         return False
     return Coupon.objects.filter(code=codigo, afiliado__user=user).exists()
+
+
+def _anotar(nota_actual, texto):
+    """Agrega `texto` a la nota interna sin pisar lo que ya tenia."""
+    return f'{nota_actual}\n{texto}' if nota_actual else texto
+
+
+def release_coupon(order):
+    """Devuelve el uso del cupon de un pedido que no se concreto.
+
+    Se llama una sola vez, al pasar el pedido a `cancelled` (un estado final:
+    no se vuelve a salir de el). Sin esto, los pedidos abandonados o con el
+    pago rechazado agotarian los cupones de uso limitado."""
+    if order.coupon_id:
+        Coupon.objects.filter(pk=order.coupon_id, times_used__gt=0).update(times_used=F('times_used') - 1)
 
 
 class CheckoutError(Exception):
@@ -183,6 +202,12 @@ def apply_order_status_transition(order, nuevo_estado):
         schedule_order_commission_validation(order)
     elif nuevo_estado in (OrderStatus.CANCELLED, OrderStatus.RETURNED):
         revert_order_commission(order)
+
+    if nuevo_estado == OrderStatus.SHIPPED:
+        enqueue(correos.pedido_enviado, order.pk)
+    elif nuevo_estado == OrderStatus.CANCELLED:
+        release_coupon(order)
+        enqueue(correos.pedido_cancelado, order.pk)
 
     return order
 
@@ -317,7 +342,9 @@ def confirm_payment(order, payment_transaction):
 
     Idempotente por `order_status`: si el pedido ya quedo `confirmed` o
     `cancelled`, no vuelve a tocar nada (evita que un doble aviso de pago
-    descuente stock dos veces).
+    descuente stock dos veces). El pedido se bloquea antes de leer su estado,
+    para que dos avisos simultaneos del proveedor no pasen la comprobacion a
+    la vez.
 
     Si no hay stock suficiente en este momento (alguien mas compro la
     ultima unidad entre el checkout y la aprobacion), o si una variante ya
@@ -328,7 +355,23 @@ def confirm_payment(order, payment_transaction):
     if payment_transaction.status != 'approved':
         raise PaymentNotApprovedError()
 
-    if order.order_status in (OrderStatus.CONFIRMED, OrderStatus.CANCELLED):
+    Order.objects.select_for_update().filter(pk=order.pk).first()
+    order.refresh_from_db(fields=['order_status', 'payment_status', 'internal_note'])
+
+    if order.order_status == OrderStatus.CONFIRMED:
+        return order
+
+    if order.order_status == OrderStatus.CANCELLED:
+        if order.payment_status != PaymentStatus.APPROVED:
+            # El pago llego despues de cancelar el pedido (por ejemplo, un
+            # pago en efectivo que se acredita pasado el plazo): no se
+            # reactiva, pero queda marcado para devolver el dinero.
+            order.payment_status = PaymentStatus.APPROVED
+            order.internal_note = _anotar(
+                order.internal_note, 'Pago aprobado despues de cancelar el pedido. Requiere reembolso manual.',
+            )
+            order.save(update_fields=['payment_status', 'internal_note', 'updated_at'])
+            enqueue(correos.pedido_cancelado, order.pk)
         return order
 
     order.payment_status = PaymentStatus.APPROVED
@@ -344,6 +387,8 @@ def confirm_payment(order, payment_transaction):
             f'existen en el catalogo ({skus}). Requiere revision manual.'
         )
         order.save(update_fields=['payment_status', 'order_status', 'internal_note', 'updated_at'])
+        release_coupon(order)
+        enqueue(correos.pedido_cancelado, order.pk)
         return order
 
     items = [(linea.variant, linea.quantity) for linea in lineas]
@@ -358,9 +403,55 @@ def confirm_payment(order, payment_transaction):
             f'Requiere reembolso manual.'
         )
         order.save(update_fields=['payment_status', 'order_status', 'internal_note', 'updated_at'])
+        release_coupon(order)
+        enqueue(correos.pedido_cancelado, order.pk)
         return order
 
     order.order_status = OrderStatus.CONFIRMED
     order.save(update_fields=['payment_status', 'order_status', 'updated_at'])
     register_order_commission(order)
+    enqueue(correos.pedido_confirmado, order.pk)
     return order
+
+
+def cancel_expired_orders(ahora=None, horas=None):
+    """Cancela los pedidos que siguen pendientes de pago pasado el plazo.
+
+    Un pedido pendiente no reserva stock, pero si consume un uso de su cupon
+    y queda abierto para siempre. Pasado el plazo (`ORDER_PAYMENT_WINDOW_HOURS`,
+    48 horas por defecto) se cancela, se devuelve el cupon y se avisa a la
+    persona. No se toca un pedido cuyo pago sigue en verificacion en el
+    proveedor (una transaccion pendiente con `payment_id`): puede aprobarse
+    todavia, por ejemplo un pago en efectivo.
+
+    Devuelve cuantos pedidos canceló. Es idempotente y se puede programar tan
+    seguido como se quiera; el checkout y el panel tambien la ejecutan, así
+    que no depende de que haya una tarea periodica."""
+    ahora = ahora or timezone.now()
+    horas = horas if horas is not None else settings.ORDER_PAYMENT_WINDOW_HOURS
+    limite = ahora - timedelta(hours=horas)
+
+    candidatos = Order.objects.filter(
+        order_status=OrderStatus.PENDING_PAYMENT, created_at__lt=limite,
+    ).values_list('pk', flat=True)
+
+    canceladas = 0
+    for pk in list(candidatos):
+        with transaction.atomic():
+            pedido = Order.objects.select_for_update().get(pk=pk)
+            if pedido.order_status != OrderStatus.PENDING_PAYMENT:
+                continue
+            if pedido.payment_transactions.filter(
+                status=PaymentStatus.PENDING,
+            ).exclude(payment_id='').exists():
+                continue
+            pedido.order_status = OrderStatus.CANCELLED
+            pedido.payment_status = PaymentStatus.CANCELLED
+            pedido.internal_note = _anotar(
+                pedido.internal_note, f'Cancelado automaticamente: sin pago tras {horas} horas.',
+            )
+            pedido.save(update_fields=['order_status', 'payment_status', 'internal_note', 'updated_at'])
+            release_coupon(pedido)
+            enqueue(correos.pedido_cancelado, pedido.pk)
+            canceladas += 1
+    return canceladas

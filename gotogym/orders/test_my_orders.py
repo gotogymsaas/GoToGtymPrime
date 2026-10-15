@@ -104,13 +104,28 @@ class PolicyPagesTestCase(TestCase):
             self.assertEqual(response.status_code, 200, url)
 
     def test_las_paginas_de_politicas_son_publicas(self):
-        # Contenido MOCK: no deben exigir sesion iniciada.
+        # No deben exigir sesion iniciada.
         response = self.client.get(reverse('politica_cambios'))
         self.assertEqual(response.status_code, 200)
 
-    def test_marca_el_contenido_como_provisional(self):
-        response = self.client.get(reverse('politica_cambios'))
-        self.assertContains(response, 'provisional')
+    def test_las_politicas_ya_no_son_provisionales_ni_simuladas(self):
+        for nombre in [
+            'politica_cambios', 'politica_devoluciones', 'politica_garantia',
+            'politica_tratamiento_datos', 'politica_envios', 'politica_pagos',
+            'politica_privacidad',
+        ]:
+            with self.subTest(politica=nombre):
+                html = self.client.get(reverse(nombre)).content.decode().lower()
+                for palabra in ('provisional', 'mock', 'simulado', 'texto de referencia'):
+                    self.assertNotIn(palabra, html)
+
+    def test_las_politicas_citan_los_plazos_de_ley(self):
+        devoluciones = self.client.get(reverse('politica_devoluciones')).content.decode()
+        self.assertIn('5 días hábiles', devoluciones)
+        self.assertIn('30 días calendario', devoluciones)
+        datos = self.client.get(reverse('politica_tratamiento_datos')).content.decode()
+        self.assertIn('10 días hábiles', datos)
+        self.assertIn('15 días hábiles', datos)
 
     def test_footer_enlaza_las_politicas(self):
         # home.html deja el bloque footer vacio (es la pagina hero sin

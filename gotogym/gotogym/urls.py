@@ -19,7 +19,6 @@ from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
 from django.contrib.sitemaps.views import sitemap
 from django.shortcuts import redirect
 from django.urls import include, path
@@ -71,11 +70,6 @@ urlpatterns += i18n_patterns(
     # para no romper enlaces guardados o enviados por correo.
     path('influencer/', views.ruta_antigua_de_afiliados, {'resto': ''}),
     path('influencer/<path:resto>', views.ruta_antigua_de_afiliados),
-    # Password reset URLs
-    path('accounts/password_reset/', auth_views.PasswordResetView.as_view(template_name='accounts/password_reset_form.html'), name='password_reset'),
-    path('accounts/password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='accounts/password_reset_done.html'), name='password_reset_done'),
-    path('accounts/reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='accounts/password_reset_confirm.html'), name='password_reset_confirm'),
-    path('accounts/reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='accounts/password_reset_complete.html'), name='password_reset_complete'),
     path('blog/', include('blog.urls', namespace='blog')),
     path('admin-panel/', include('administracion.urls')),
     path('contabilidad/', include('contabilidad.urls', namespace='contabilidad')),

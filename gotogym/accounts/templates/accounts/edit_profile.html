@@ -18,7 +18,7 @@
       </div></div>
       <aside class="account-panel"><p class="editorial-kicker">Protección</p><h2>Seguridad</h2><details class="account-security"><summary>Cambiar contraseña</summary><div class="account-fields">
         <div class="account-field account-field--full"><label for="id_current_password">{% trans "Contraseña actual" %}</label><input type="password" name="current_password" id="id_current_password" autocomplete="current-password"></div>
-        <div class="account-field account-field--full"><label for="id_password">{% trans "Nueva contraseña" %}</label><input type="password" name="password" id="id_password" autocomplete="new-password"></div>
+        <div class="account-field account-field--full"><label for="id_password">{% trans "Nueva contraseña" %}</label><input type="password" name="password" id="id_password" autocomplete="new-password" aria-describedby="password-rules"><small id="password-rules">{% trans "Mínimo 8 caracteres, con una mayúscula, una minúscula, un número y un carácter especial (por ejemplo ! ? # $ @)." %}</small></div>
         <div class="account-field account-field--full"><label for="id_password2">{% trans "Confirmar contraseña" %}</label><input type="password" name="password2" id="id_password2" autocomplete="new-password"></div>
       </div></details></aside>
       <div class="account-actions account-field--full"><a class="editorial-text-link" href="{% url 'home' %}">← Volver al Home</a><button type="submit" class="editorial-action">{% trans "Guardar cambios" %}</button></div>

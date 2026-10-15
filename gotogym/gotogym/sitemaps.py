@@ -4,7 +4,7 @@ Solo lo que tiene sentido indexar: portada, tienda, Journal, Acerca de,
 Contacto, cada producto y cada entrada publicada.
 
 Quedan fuera, a proposito:
-- las paginas de politicas, mientras su texto sea provisional;
+- las paginas de politicas, que son de consulta y no atraen busquedas propias;
 - todo lo privado (carrito, checkout, cuenta, paneles), que tambien se
   excluye en `robots.txt` y con `noindex`;
 - los idiomas ingles y portugues: gran parte del contenido sigue solo en

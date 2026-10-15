@@ -114,7 +114,7 @@ class LogoutRedirectTests(TestCase):
 class RegistroDuranteLaCompraTests(TestCase):
 	DATOS = {
 		'first_name': 'Ana', 'last_name': 'Prueba', 'age': '30',
-		'email': 'nueva@example.com', 'password1': 'secret12345', 'password2': 'secret12345',
+		'email': 'nueva@example.com', 'password1': 'Secret-12345', 'password2': 'Secret-12345',
 		'accepted_terms': 'on',
 	}
 

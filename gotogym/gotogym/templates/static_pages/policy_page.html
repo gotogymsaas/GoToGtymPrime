@@ -9,7 +9,6 @@
   <section class="editorial-section"><div class="editorial-shell legal-layout">
     {% include 'partials/_legal_nav.html' %}
     <article class="legal-document">
-      {% if provisional %}<p class="legal-document__status">Contenido provisional · sujeto a revisión</p>{% endif %}
       {% if summary %}<p class="legal-document__summary">{{ summary }}</p>{% endif %}
       {% for section in sections %}<section><h2>{{ section.title }}</h2>{% for paragraph in section.paragraphs %}<p>{{ paragraph }}</p>{% endfor %}</section>{% endfor %}
       <footer class="legal-document__footer"><a class="editorial-text-link" href="{{ back_url }}">← Volver</a><a class="editorial-text-link" href="{% url 'contacto' %}">¿Necesitas ayuda? →</a></footer>

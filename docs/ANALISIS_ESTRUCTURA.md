@@ -66,7 +66,8 @@ Todas las rutas públicas llevan prefijo de idioma (`/es/`, `/en/`, `/pt/`); el 
 2. **Checkout** exige sesión. Si la persona no la tiene, va al login con `?next=` y vuelve al checkout con el carrito intacto.
 3. **Pedido**: `orders.services.create_order_from_cart` crea el pedido, sus líneas (con precio congelado), la dirección y la cotización de envío en una transacción, y guarda el cupón usado. El servidor registra el evento `order_created` del embudo.
 4. **Pago**: `payments` crea el intento con el proveedor activo (`PAYMENT_PROVIDER`: `mock` por defecto, `mercadopago` para el real).
-5. **Confirmación**: al aprobarse el pago, `confirm_payment` descuenta el stock con bloqueo y confirma el pedido. Si ya no hay stock, el pedido queda cancelado con una nota para revisión y se reembolsa.
+5. **Confirmación**: al aprobarse el pago, `confirm_payment` descuenta el stock con bloqueo y confirma el pedido. Si ya no hay stock, el pedido queda cancelado con una nota para revisión y se avisa a la persona; el reembolso se hace a mano desde el panel (pedido → reembolsar). Cancelar un pedido devuelve el uso de su cupón.
+   Los pedidos que siguen pendientes de pago pasadas 48 horas (`ORDER_PAYMENT_WINDOW_HOURS`) se cancelan solos y devuelven el cupón; un pago que llega después de cancelar queda marcado para reembolso manual. La persona recibe correos al confirmarse el pago, al enviarse el pedido y al cancelarse.
 6. **Posventa**: cambio de estado, cancelación, devolución y reembolso desde el panel. Cancelar o devolver revierte la comisión del afiliado.
 
 ## Configuración
@@ -79,7 +80,7 @@ Hay tres módulos de configuración, todos heredan de `gotogym/settings.py`:
 | `gotogym.settings_local` | Desarrollo | SQLite `db_local.sqlite3`, `DEBUG` activo |
 | `gotogym.settings_test` | Pruebas y CI | SQLite, hash de contraseñas rápido, estáticos sin manifiesto |
 
-Variables de entorno que lee la configuración: `DJANGO_SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL`, `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `SECURE_PROXY_SSL_HEADER`, `SECURE_SSL_REDIRECT`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `PAYMENT_PROVIDER`, `PAYMENTS_MOCK_UI_ENABLED`, `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_WEBHOOK_SECRET`, `ALEGRA_API_TOKEN`, `HUBSPOT_PRIVATE_TOKEN`, `EMAIL_HOST` (con `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `EMAIL_USE_SSL`, `DEFAULT_FROM_EMAIL`) y `SENTRY_DSN` (con `SENTRY_ENVIRONMENT`, `SENTRY_TRACES_SAMPLE_RATE`).
+Variables de entorno que lee la configuración: `DJANGO_SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL`, `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `SECURE_PROXY_SSL_HEADER`, `SECURE_SSL_REDIRECT`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `PAYMENT_PROVIDER`, `PAYMENTS_MOCK_UI_ENABLED`, `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_WEBHOOK_SECRET`, `ALEGRA_API_TOKEN`, `HUBSPOT_PRIVATE_TOKEN`, `EMAIL_HOST` (con `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `EMAIL_USE_SSL`, `DEFAULT_FROM_EMAIL`) y `SENTRY_DSN` (con `SENTRY_ENVIRONMENT`, `SENTRY_TRACES_SAMPLE_RATE`), `REDIS_URL` y `ORDER_PAYMENT_WINDOW_HOURS`.
 
 ## Calidad y pruebas
 
@@ -99,6 +100,8 @@ Variables de entorno que lee la configuración: `DJANGO_SECRET_KEY`, `DEBUG`, `A
 | `audit_catalog` | Auditoría de solo lectura de catálogo, variantes e inventario |
 | `security_checklist` | Revisa variables sensibles del entorno donde se ejecuta |
 | `generar_derivados_imagen` | Regenera las imágenes AVIF/WebP y su manifiesto |
+| `cancelar_pedidos_vencidos` | Cancela los pedidos sin pagar pasado el plazo y devuelve sus cupones (el checkout y el panel también lo ejecutan; conviene programarlo cada hora) |
+| `probar_correo <destinatario>` | Envía un correo de prueba con el SMTP configurado |
 
 ## Integraciones
 
@@ -108,11 +111,12 @@ Variables de entorno que lee la configuración: `DJANGO_SECRET_KEY`, `DEBUG`, `A
 | Alegra | Funcional para consultar clientes y facturas desde el panel de contabilidad; requiere `ALEGRA_EMAIL` y `ALEGRA_API_TOKEN` |
 | HubSpot | Solo un esqueleto sin llamadas reales |
 | Sentry | Se activa al declarar `SENTRY_DSN` |
-| Correo (SMTP) | Se activa al declarar `EMAIL_HOST`; sin él, los correos salen por consola |
+| Correo (SMTP) | Se activa al declarar `EMAIL_HOST`; sin él, los correos salen por consola. Lo usan la recuperación de contraseña, los avisos del pedido y los del programa de afiliados |
+| Caché compartida | `REDIS_URL` si existe; si no, una tabla en la base de datos (`django_cache`, la crea `migrate`). Sin base declarada, memoria local |
 
 ## Despliegue
 
-Se despliega a Azure App Service con el flujo de `.github/workflows/main_gotogymweb.yml`, que valida, empaqueta y publica por Kudu. `environments/azure/startup.sh` migra, recolecta estáticos y arranca gunicorn. Los pasos y la bitácora del despliegue de marzo de 2026 están en `docs/DESPLIEGUE_LOCAL.md`.
+Se despliega a Azure App Service con el flujo de `.github/workflows/main_gotogymweb.yml`, que valida, empaqueta y publica por Kudu. El Startup Command del App Service (configurado en el Portal) migra, recolecta estáticos y arranca gunicorn con 2 workers; `environments/azure/startup.sh` es la versión de referencia versionada, que además carga las entradas del Journal. Los pasos y la bitácora del despliegue de marzo de 2026 están en `docs/DESPLIEGUE_LOCAL.md`.
 
 ## Otros documentos
 

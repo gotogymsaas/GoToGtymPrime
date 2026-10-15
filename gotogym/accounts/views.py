@@ -17,6 +17,8 @@ from django.contrib.auth import (
 )
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -63,6 +65,16 @@ def _safe_next_url(request, fallback):
     return fallback
 
 
+def _errores_de_contrasena(password):
+    """Mensajes de las reglas de contrasena que `password` no cumple (lista
+    vacia si las cumple)."""
+    try:
+        validate_password(password)
+    except ValidationError as error:
+        return list(error.messages)
+    return []
+
+
 def _resumen_carrito(request):
     """Lo que hay en el carrito, para mostrarlo junto al formulario de
     entrar o registrarse. Solo lee: no limpia ni reinicia el carrito de la
@@ -100,8 +112,11 @@ def register_view(request):
             messages.error(request, 'Las contraseñas no coinciden.')
         elif age and not age.isdigit():
             messages.error(request, 'La edad debe ser un número válido.')
-        elif User.objects.filter(email=email).exists():
+        elif User.objects.filter(email__iexact=email).exists():
             messages.error(request, 'El correo ya está registrado.')
+        elif (errores_clave := _errores_de_contrasena(password1)):
+            for error in errores_clave:
+                messages.error(request, error)
         else:
             terms_text = TERMS_PATH.read_text(encoding='utf-8')
             user = User.objects.create_user(
@@ -224,6 +239,13 @@ def edit_profile(request):
                 if is_ajax:
                     return JsonResponse({'ok': False, 'message': 'La contraseña actual no es correcta.'}, status=400)
                 messages.error(request, 'La contraseña actual no es correcta.')
+                return redirect('edit_profile')
+            errores_clave = _errores_de_contrasena(password)
+            if errores_clave:
+                if is_ajax:
+                    return JsonResponse({'ok': False, 'message': ' '.join(errores_clave)}, status=400)
+                for error in errores_clave:
+                    messages.error(request, error)
                 return redirect('edit_profile')
             user.set_password(password)
             update_session_auth_hash(request, user)

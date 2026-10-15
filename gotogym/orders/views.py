@@ -13,7 +13,13 @@ from tienda.catalog import curated_product_cards
 from .colombia_data import MUNICIPIOS_POR_DEPARTAMENTO
 from .forms import CheckoutForm
 from .models import Order, OrderItem, OrderStatus
-from .services import CheckoutError, create_order_from_cart, es_cupon_propio, get_usable_coupon
+from .services import (
+    CheckoutError,
+    cancel_expired_orders,
+    create_order_from_cart,
+    es_cupon_propio,
+    get_usable_coupon,
+)
 
 REVIEWABLE_ORDER_STATUSES = {
     OrderStatus.CONFIRMED,
@@ -26,6 +32,9 @@ REVIEWABLE_ORDER_STATUSES = {
 
 @login_required
 def checkout(request):
+    # Avanza lo que depende del tiempo (pedidos sin pagar que vencieron y sus
+    # cupones) sin requerir una tarea periodica programada.
+    cancel_expired_orders()
     cart, reiniciado = read_cart(request.session)
     if reiniciado:
         messages.warning(request, 'Tu carrito se reinicio por una actualizacion del sistema.')

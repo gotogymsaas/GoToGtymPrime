@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-CLAVE = 'clave-segura-123'
+CLAVE = 'Clave-Segura-123'
 
 
 def _usuario(email='cuenta@example.com', **extra):
@@ -157,10 +157,17 @@ class EditarPerfilTests(TestCase):
         self.assertEqual(self._refrescar().email, 'nuevo@example.com')
 
     def test_cambio_de_contrasena_exitoso_mantiene_la_sesion(self):
-        respuesta = self._ajax(current_password=CLAVE, password='otra-clave-456', password2='otra-clave-456')
+        respuesta = self._ajax(current_password=CLAVE, password='Otra-Clave-456', password2='Otra-Clave-456')
         self.assertTrue(respuesta.json()['ok'])
-        self.assertTrue(self._refrescar().check_password('otra-clave-456'))
+        self.assertTrue(self._refrescar().check_password('Otra-Clave-456'))
         self.assertEqual(self.client.get(self.url).status_code, 200)  # sigue con sesion
+
+    def test_rechaza_una_contrasena_que_no_cumple_las_reglas(self):
+        respuesta = self._ajax(current_password=CLAVE, password='sencilla1', password2='sencilla1')
+        self.assertEqual(respuesta.status_code, 400)
+        self.assertFalse(respuesta.json()['ok'])
+        self.assertIn('mayúscula', respuesta.json()['message'])
+        self.assertTrue(self._refrescar().check_password(CLAVE))
 
     def test_contrasenas_que_no_coinciden(self):
         respuesta = self._ajax(current_password=CLAVE, password='uno', password2='dos')

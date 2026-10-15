@@ -18,7 +18,7 @@ MAIN_CITIES = {'bogota', 'medellin', 'cali', 'barranquilla', 'bucaramanga'}
 FLAT_RATE_MAIN_CITY = Decimal('12000.00')
 FLAT_RATE_OTHER_CITY = Decimal('22000.00')
 
-CARRIER_NAME = 'GoToGym Envios (mock)'
+CARRIER_NAME = 'GoToGym Envios'
 
 
 def normalize_city(city):

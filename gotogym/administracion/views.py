@@ -27,6 +27,7 @@ from afiliados.services import (
     fecha_limite_de_la_solicitud,
     historial_de_pagos,
     liberar_revision,
+    mes_pedido,
     reject_afiliado,
     resolve_withdrawal,
     revert_order_commission,
@@ -52,6 +53,7 @@ from orders.models import Coupon, Order, OrderStatus
 from orders.services import (
     InvalidOrderTransitionError,
     apply_order_status_transition,
+    cancel_expired_orders,
     valid_next_statuses,
 )
 from payments.models import PaymentTransaction, Refund
@@ -609,6 +611,7 @@ def orders_list(request):
     Antes existia ademas una pantalla "Pagos" separada que mostraba la
     misma tabla de transacciones sin nada que Pedidos no tuviera ya --
     solo duplicaba la informacion en dos lugares."""
+    cancel_expired_orders()
     orders = (
         Order.objects
         .select_related("address")
@@ -1134,7 +1137,7 @@ def afiliado_pagos(request, pk):
     """Historial de pagos de un afiliado: totales por ano y desglose por mes.
     Vive en su propia pantalla para no cargar el listado con una columna."""
     profile = get_object_or_404(PerfilAfiliado.objects.select_related("user"), pk=pk)
-    historial = historial_de_pagos(profile, anio_pedido(request.GET.get("anio")))
+    historial = historial_de_pagos(profile, anio_pedido(request.GET.get("anio")), mes_pedido(request.GET.get("mes")))
     return render(request, "administracion/afiliado_pagos.html", {"profile": profile, **historial})
 
 

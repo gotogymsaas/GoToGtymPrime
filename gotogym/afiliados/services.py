@@ -22,6 +22,7 @@ from django.db import transaction
 from django.db.models import Count, DecimalField, ExpressionWrapper, F, Max, Sum
 from django.db.models.functions import TruncMonth, TruncYear
 from django.utils import timezone
+from django.utils.formats import date_format
 from gotogym.tasks import enqueue
 from orders.models import Coupon, CouponDiscountType, Order, OrderStatus, PaymentStatus
 
@@ -639,17 +640,33 @@ def pagos_por_mes(afiliado, anio):
     return meses
 
 
-def historial_de_pagos(afiliado, anio=None):
+def historial_de_pagos(afiliado, anio=None, mes=None):
     """Todo lo que las pantallas de pagos (la del afiliado y la del equipo)
     muestran: totales por ano, el desglose por mes del ano elegido, los pagos
-    de ese ano y las solicitudes que siguen en curso."""
+    de ese ano (o solo del mes elegido) y las solicitudes que siguen en curso.
+
+    Los anos del desplegable cubren desde el primero con actividad (alta del
+    afiliado o primer pago) hasta el actual, sin saltos, para poder consultar
+    tambien un ano en el que no hubo pagos."""
     hoy = timezone.localdate()
     anio = anio or hoy.year
     anios = totales_pagados_por_anio(afiliado)
-    anios_visibles = sorted({a for a, _, _ in anios} | {hoy.year, anio}, reverse=True)
+    anios_con_pagos = {a for a, _, _ in anios}
+    primero = min(anios_con_pagos | {timezone.localtime(afiliado.created_at).year, anio})
+    anios_visibles = sorted(set(range(primero, hoy.year + 1)) | anios_con_pagos | {anio}, reverse=True)
     meses = pagos_por_mes(afiliado, anio)
+    fila_mes = meses[mes - 1] if mes else None
+    pagos = WithdrawalRequest.objects.filter(
+        afiliado=afiliado, status=WithdrawalStatus.PAID, resolved_at__year=anio,
+    )
+    if mes:
+        pagos = pagos.filter(resolved_at__month=mes)
     return {
         'anio': anio,
+        'mes': mes,
+        'fila_mes': fila_mes,
+        'periodo': date_format(fila_mes['mes'], r'F \d\e Y').lower() if fila_mes else str(anio),
+        'meses_a_mostrar': [fila_mes] if fila_mes else meses,
         'anios': anios_visibles,
         'totales_por_anio': anios,
         'total_historico': sum((total for _, total, _ in anios), Decimal('0.00')),
@@ -658,9 +675,7 @@ def historial_de_pagos(afiliado, anio=None):
         'cantidad_del_anio': sum(m['cantidad'] for m in meses),
         'bruto_del_anio': sum((m['bruto'] for m in meses), Decimal('0.00')),
         'gastos_del_anio': sum((m['gastos'] for m in meses), Decimal('0.00')),
-        'pagos': WithdrawalRequest.objects.filter(
-            afiliado=afiliado, status=WithdrawalStatus.PAID, resolved_at__year=anio,
-        ).order_by('-resolved_at'),
+        'pagos': pagos.order_by('-resolved_at'),
         'solicitudes_en_curso': WithdrawalRequest.objects.filter(
             afiliado=afiliado, status=WithdrawalStatus.PENDING,
         ).order_by('-requested_at'),
@@ -675,6 +690,15 @@ def anio_pedido(valor, por_defecto=None):
     except (TypeError, ValueError):
         return por_defecto
     return anio if 2000 <= anio <= por_defecto + 1 else por_defecto
+
+
+def mes_pedido(valor):
+    """El mes (1-12) del filtro `?mes=`, o None (todo el ano) si falta o es invalido."""
+    try:
+        mes = int(valor)
+    except (TypeError, ValueError):
+        return None
+    return mes if 1 <= mes <= 12 else None
 
 
 def notify_commission_paid(solicitud_id):

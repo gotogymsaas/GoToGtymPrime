@@ -40,13 +40,13 @@ class RecuperarContrasenaTests(TestCase):
         self.assertEqual(formulario.status_code, 200)
 
         enviado = self.client.post(
-            formulario.redirect_chain[-1][0], {'new_password1': 'clave-nueva-456', 'new_password2': 'clave-nueva-456'},
+            formulario.redirect_chain[-1][0], {'new_password1': 'Clave-Nueva-456', 'new_password2': 'Clave-Nueva-456'},
         )
         self.assertRedirects(enviado, reverse('password_reset_complete'))
         self.assertEqual(self.client.get(reverse('password_reset_complete')).status_code, 200)
 
         self.usuario.refresh_from_db()
-        self.assertTrue(self.usuario.check_password('clave-nueva-456'))
+        self.assertTrue(self.usuario.check_password('Clave-Nueva-456'))
         self.assertFalse(self.usuario.check_password('clave-vieja-123'))
 
     def test_un_correo_desconocido_no_revela_si_existe_la_cuenta(self):

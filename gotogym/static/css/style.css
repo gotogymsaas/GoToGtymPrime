@@ -368,15 +368,15 @@ picture source {
    asi que ahi el brillo si se notaba). Con el pico dentro del keyframe,
    se ve igual en ambas plataformas sin depender de donde este el mouse. */
 @keyframes gtg-brand-breathe {
-  0%, 100% { box-shadow: 0 0 0 rgba(0, 212, 199, 0); }
-  30% { box-shadow: 0 0 14px rgba(0, 212, 199, 0.5), 0 0 30px rgba(0, 212, 199, 0.2); }
+  0%, 100% { box-shadow: 0 0 0 rgba(15, 191, 176, 0); }
+  30% { box-shadow: 0 0 14px rgba(15, 191, 176, 0.5), 0 0 30px rgba(15, 191, 176, 0.2); }
   50% {
     box-shadow:
-      0 0 24px rgba(0, 212, 199, 0.9),
-      0 0 54px rgba(0, 212, 199, 0.45),
+      0 0 24px rgba(15, 191, 176, 0.9),
+      0 0 54px rgba(15, 191, 176, 0.45),
       0 0 80px rgba(212, 180, 106, 0.22);
   }
-  70% { box-shadow: 0 0 14px rgba(0, 212, 199, 0.5), 0 0 30px rgba(0, 212, 199, 0.2); }
+  70% { box-shadow: 0 0 14px rgba(15, 191, 176, 0.5), 0 0 30px rgba(15, 191, 176, 0.2); }
 }
 
 /* --- Reaccion de la marca al puntero ----------------------------------
@@ -400,18 +400,18 @@ picture source {
 .gtg-brand:focus-visible .gtg-brand__mark,
 .gtg-footer-brand:hover .gtg-footer-brand__mark {
   transform: scale(1.09);
-  background: rgba(0, 212, 199, 0.12);
+  background: rgba(15, 191, 176, 0.12);
   animation: gtg-brand-flare 1.7s ease-in-out infinite;
 }
 
 @keyframes gtg-brand-flare {
   0%, 100% {
-    box-shadow: 0 0 14px rgba(0, 212, 199, 0.55), 0 0 32px rgba(0, 212, 199, 0.22);
+    box-shadow: 0 0 14px rgba(15, 191, 176, 0.55), 0 0 32px rgba(15, 191, 176, 0.22);
   }
   50% {
     box-shadow:
-      0 0 24px rgba(0, 212, 199, 0.9),
-      0 0 54px rgba(0, 212, 199, 0.45),
+      0 0 24px rgba(15, 191, 176, 0.9),
+      0 0 54px rgba(15, 191, 176, 0.45),
       0 0 80px rgba(212, 180, 106, 0.22);
   }
 }
@@ -427,7 +427,7 @@ picture source {
 
 .gtg-brand:hover .gtg-brand__word,
 .gtg-brand:focus-visible .gtg-brand__word {
-  text-shadow: 0 0 20px rgba(0, 212, 199, 0.45);
+  text-shadow: 0 0 20px rgba(15, 191, 176, 0.45);
 }
 
 @supports (background-clip: text) or (-webkit-background-clip: text) {

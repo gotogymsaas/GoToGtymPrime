@@ -10,7 +10,7 @@ from django.urls import reverse
 from inventory.models import Inventory
 from products.models import Brand, Product, ProductCategory, ProductVariant
 
-CLAVE = 'clave-segura-123'
+CLAVE = 'Clave-Segura-123'
 
 
 class ChromeDelSitioTests(TestCase):

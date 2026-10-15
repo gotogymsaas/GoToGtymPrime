@@ -109,6 +109,7 @@ ignore_imports = [
     "orders.tests -> payments.providers.mock",
     "orders.tests -> accounts.models",
     "orders.test_security_hardening -> payments.models",
+    "orders.test_correos_y_vencimiento -> payments.models",
     "afiliados.tests -> administracion.permissions",
     # Ciclos que ya existian al introducir la regla. Cada uno es deuda
     # conocida: la regla impide que aparezcan nuevos, y estos se quitan al

@@ -27,8 +27,10 @@ detrás de gunicorn, desplegado por el workflow de GitHub Actions
 (`.github/workflows/main_gotogymweb.yml`). La base de datos es PostgreSQL,
 resuelta desde la variable de entorno `DATABASE_URL` (ver `gotogym/gotogym/settings.py`).
 El comando de arranque real vive en la configuración del App Service
-(Azure Portal); `environments/azure/startup.sh` documenta la version de
-referencia versionada en el repo.
+(Azure Portal) y es: `python gotogym/manage.py migrate --noinput && python gotogym/manage.py
+collectstatic --noinput && gunicorn --chdir gotogym gotogym.wsgi:application --bind 0.0.0.0:8000
+--workers 2 --timeout 120`. Las migraciones se aplican ahí, una vez por arranque; `wsgi.py` no migra.
+`environments/azure/startup.sh` es una versión de referencia que además carga el Journal.
 
 **📖 Guía completa:** Ver [docs/DESPLIEGUE_LOCAL.md](docs/DESPLIEGUE_LOCAL.md)
 

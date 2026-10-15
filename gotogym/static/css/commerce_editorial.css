@@ -313,6 +313,7 @@
 .account-layout > * { min-width: 0; }
 .account-fields { min-width: 0; }
 .account-field { min-width: 0; }
+.account-field small { display: block; margin-top: 6px; font-size: 0.85rem; line-height: 1.45; color: inherit; opacity: 0.75; }
 /* Micro-rotulo igual al de los filtros de la tienda (.shop-field label).
  * editorial_pages.css lo define a .75rem y sin tracking para el formulario
  * de la cuenta; en uppercase y ExtraBold eso se lee apretado y distinto al

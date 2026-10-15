@@ -261,6 +261,14 @@
   margin-top: var(--space-6);
 }
 
+/* --- Ayuda bajo un campo (reglas de contrasena) ------------------------ */
+.commercial-auth__hint {
+  margin: calc(var(--space-2) * -1) 0 var(--space-4);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--auth-muted);
+}
+
 /* --- Enlaces auxiliares ---------------------------------------------- */
 .commercial-auth__aside,
 .commercial-auth__register {

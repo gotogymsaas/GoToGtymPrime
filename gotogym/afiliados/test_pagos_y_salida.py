@@ -309,6 +309,38 @@ class HistorialDePagosTests(AfiliadoTestBase):
             with self.subTest(valor=valor):
                 self.assertEqual(self.client.get(self.url_admin, {'anio': valor}).context['anio'], actual)
 
+    def test_el_filtro_de_mes_deja_solo_ese_mes_en_totales_y_pagos(self):
+        self.client.force_login(self.admin)
+        respuesta = self.client.get(self.url_admin, {'anio': '2026', 'mes': '2'})
+        self.assertEqual(respuesta.context['mes'], 2)
+        self.assertEqual([m['mes'].month for m in respuesta.context['meses_a_mostrar']], [2])
+        self.assertEqual([p.amount for p in respuesta.context['pagos']], [Decimal('50000.00'), Decimal('200000.00')])
+        self.assertContains(respuesta, 'Recibido en febrero de 2026')
+        self.assertContains(respuesta, '$249.000 COP')
+        self.assertNotContains(respuesta, '20/08/2026')
+        # Los doce meses siguen disponibles en el desplegable.
+        self.assertEqual(len(respuesta.context['meses']), 12)
+
+    def test_el_filtro_de_mes_tolera_valores_invalidos(self):
+        self.client.force_login(self.admin)
+        for valor in ('abc', '', '0', '13', '-1'):
+            with self.subTest(valor=valor):
+                respuesta = self.client.get(self.url_admin, {'anio': '2026', 'mes': valor})
+                self.assertIsNone(respuesta.context['mes'])
+                self.assertEqual(len(respuesta.context['meses_a_mostrar']), 12)
+
+    def test_un_mes_sin_pagos_sale_en_cero_sin_errores(self):
+        self.client.force_login(self.admin)
+        respuesta = self.client.get(self.url_admin, {'anio': '2026', 'mes': '5'})
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertContains(respuesta, 'No hay pagos registrados en mayo de 2026')
+
+    def test_el_desplegable_de_anos_no_tiene_saltos_hasta_el_actual(self):
+        PerfilAfiliado.objects.filter(pk=self.perfil.pk).update(created_at=datetime(2023, 6, 1, tzinfo=self.tz))
+        self.client.force_login(self.admin)
+        anios = self.client.get(self.url_admin).context['anios']
+        self.assertEqual(anios, list(range(timezone.localdate().year, 2022, -1)))
+
     def test_las_pestanas_incluyen_los_anos_con_pagos_y_el_actual(self):
         self.client.force_login(self.admin)
         anios = self.client.get(self.url_admin).context['anios']
