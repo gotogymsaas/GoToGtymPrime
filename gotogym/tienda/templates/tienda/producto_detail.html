@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+{% load idiomas %}
 {% load i18n static %}
-{% block title %}{{ producto.name }}{% endblock %}
+{% block title %}{{ producto.name|traducir }}{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260923-fringe-fix">
-<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20261002-importes">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20261015-chips">
 {% endblock %}
 
 {% block content %}
@@ -23,7 +24,7 @@
     <nav class="shop-pdp__breadcrumb">
       <a href="{% url 'tienda:producto_list' %}">{% trans "Tienda" %}</a>
       <span aria-hidden="true">/</span>
-      <a href="{% url 'tienda:producto_list' %}?categoria={{ producto.category.id }}">{{ producto.category.name }}</a>
+      <a href="{% url 'tienda:producto_list' %}?categoria={{ producto.category.id }}">{{ producto.category.name|traducir }}</a>
     </nav>
 
     <div class="shop-pdp__layout">
@@ -31,8 +32,8 @@
       {% include "tienda/partials/_media_gallery.html" %}
 
       <div class="shop-pdp__info">
-        <p class="shop-pdp__category">{{ producto.category.name }}</p>
-        <h1 class="shop-pdp__title">{{ producto.name }}</h1>
+        <p class="shop-pdp__category">{{ producto.category.name|traducir }}</p>
+        <h1 class="shop-pdp__title">{{ producto.name|traducir }}</h1>
         <div class="shop-pdp__review-note" aria-label="{% trans 'Reseñas del producto' %}">
           {% if review_count %}
           <span aria-hidden="true">{% for star in "12345" %}{% if forloop.counter <= review_average %}★{% else %}☆{% endif %}{% endfor %}</span>
@@ -53,7 +54,7 @@
           {% include "tienda/partials/_price.html" with price_min=price_min price_max=price_max has_range=has_price_range compare_price=compare_price discount_percent=discount_percent %}
         </span>
 
-        <p class="shop-pdp__description">{{ producto.description }}</p>
+        <p class="shop-pdp__description">{{ producto.description|traducir }}</p>
 
         {% comment %}
         Orden de la ficha: hasta aqui va lo que identifica el producto
@@ -72,12 +73,12 @@
         <form method="post" id="pdp-form" class="shop-pdp__form"
               data-add-url-template="{% url 'carrito:add_to_cart' 0 %}"
               data-add-to-cart
-              data-product-name="{{ producto.name }}"
+              data-product-name="{{ producto.name|traducir }}"
               data-product-id="{{ producto.pk }}"
               data-label-exito="{% trans 'Añadido al carrito' %}"
               data-label-error="{% trans 'No se pudo agregar' %}"
               {% if single_variant %}action="{% url 'carrito:add_to_cart' single_variant.id %}"
-              data-variant-label="{{ single_variant.size }} / {{ single_variant.color }}"
+              data-variant-label="{{ single_variant.size|traducir }} / {{ single_variant.color|traducir }}"
               data-variant-price="{{ single_variant.price|stringformat:'.0f' }}"{% endif %}>
           {% csrf_token %}
           <input type="hidden" name="variant_id" id="pdp-variant-id"
@@ -354,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var pocasUnidades = encontrada.stock <= umbralPocasUnidades;
     aviso.textContent = (pocasUnidades ? aviso.dataset.msgLowStock + ' ' : '')
-      + encontrada.sku + ' · ' + encontrada.stock + ' disponibles';
+      + encontrada.sku + ' · ' + encontrada.stock + ' {% trans "disponibles" %}';
     aviso.className = 'text-sm mb-3 min-h-[1.25rem] '
       + (pocasUnidades ? 'shop-pdp__low-stock' : 'text-[var(--color-accent)]');
 

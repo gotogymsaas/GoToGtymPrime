@@ -1,24 +1,25 @@
 {% extends "base.html" %}
+{% load idiomas %}
 {% load static i18n %}
 {% block title %}GoToGym Journal{% endblock %}
-{% block extra_head %}<link rel="alternate" type="application/rss+xml" title="GoToGym Journal" href="{% url 'blog:feed' %}"><link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">{% endblock %}
+{% block extra_head %}<link rel="alternate" type="application/rss+xml" title="GoToGym Journal" href="{% url 'blog:feed' %}"><link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261014-cookies">{% endblock %}
 {% block content %}
 <div class="editorial-page">
   <header class="editorial-hero editorial-hero--compact">
     <div class="editorial-shell">
       <p class="editorial-kicker">GoToGym Journal</p>
-      <h1 class="editorial-title">Historias para <em>avanzar.</em></h1>
-      <p class="editorial-lead">Movimiento, tecnología y cultura desde adentro. Lo que aprendemos, lo que probamos, lo que nos mueve.</p>
+      <h1 class="editorial-title">{% trans "Historias para" %} <em>{% trans "avanzar." %}</em></h1>
+      <p class="editorial-lead">{% trans "Movimiento, tecnología y cultura desde adentro. Lo que aprendemos, lo que probamos, lo que nos mueve." %}</p>
     </div>
   </header>
 
   {% if has_published_posts %}
-  <section class="editorial-section editorial-section--mist" aria-label="Explorar historias">
+  <section class="editorial-section editorial-section--mist" aria-label="{% trans 'Explorar historias' %}">
     <div class="editorial-shell">
       <form method="get" class="editorial-filters">
-        <div class="editorial-field"><label for="journal-search">Buscar</label><input id="journal-search" name="search" value="{{ request.GET.search }}" placeholder="Título o tema"></div>
-        <div class="editorial-field"><label for="journal-category">Categoría</label><select id="journal-category" name="category"><option value="">Todas</option>{% for category in categories %}<option value="{{ category.id }}"{% if request.GET.category == category.id|stringformat:'s' %} selected{% endif %}>{{ category.name }}</option>{% endfor %}</select></div>
-        <div class="editorial-filter-actions"><button type="submit">Explorar</button>{% if has_active_filters %}<a href="{% url 'blog:post_list' %}">Limpiar</a>{% endif %}</div>
+        <div class="editorial-field"><label for="journal-search">{% trans "Buscar" %}</label><input id="journal-search" name="search" value="{{ request.GET.search }}" placeholder="{% trans 'Título o tema' %}"></div>
+        <div class="editorial-field"><label for="journal-category">{% trans "Categoría" %}</label><select id="journal-category" name="category"><option value="">{% trans "Todas" %}</option>{% for category in categories %}<option value="{{ category.id }}"{% if request.GET.category == category.id|stringformat:'s' %} selected{% endif %}>{{ category.name|traducir }}</option>{% endfor %}</select></div>
+        <div class="editorial-filter-actions"><button type="submit">{% trans "Explorar" %}</button>{% if has_active_filters %}<a href="{% url 'blog:post_list' %}">{% trans "Limpiar" %}</a>{% endif %}</div>
       </form>
     </div>
   </section>
@@ -29,34 +30,34 @@
       <div class="editorial-grid">
         {% for post in posts %}
         <article class="editorial-card">
-          <a class="editorial-card__media" data-track="journal_post_click" data-track-entrada="{{ post.slug }}" href="{% url 'blog:post_detail' post.slug %}" aria-label="Leer {{ post.title }}">
+          <a class="editorial-card__media" data-track="journal_post_click" data-track-entrada="{{ post.slug }}" href="{% url 'blog:post_detail' post.slug %}" aria-label="{% blocktrans with titulo=post.titulo %}Leer {{ titulo }}{% endblocktrans %}">
             {% if post.featured %}<img src="{{ post.featured.url }}" alt="" loading="lazy">{% else %}<span class="editorial-card__lattice" aria-hidden="true"></span>{% endif %}
           </a>
           <div class="editorial-card__copy">
-            <span class="editorial-meta">{{ post.category.name|default:'GoToGym' }} · {{ post.reading_time }} min</span>
-            <h2><a data-track="journal_post_click" data-track-entrada="{{ post.slug }}" href="{% url 'blog:post_detail' post.slug %}">{{ post.title }}</a></h2>
-            <p>{{ post.excerpt|default:post.content|striptags|truncatewords:28 }}</p>
-            <a class="editorial-text-link" data-track="journal_post_click" data-track-entrada="{{ post.slug }}" href="{% url 'blog:post_detail' post.slug %}">Leer historia →</a>
+            <span class="editorial-meta">{{ post.category.name|default:'GoToGym'|traducir }} · {% blocktrans with n=post.reading_time %}{{ n }} min{% endblocktrans %}</span>
+            <h2><a data-track="journal_post_click" data-track-entrada="{{ post.slug }}" href="{% url 'blog:post_detail' post.slug %}">{{ post.titulo }}</a></h2>
+            <p>{{ post.resumen|default:post.cuerpo|striptags|truncatewords:28 }}</p>
+            <a class="editorial-text-link" data-track="journal_post_click" data-track-entrada="{{ post.slug }}" href="{% url 'blog:post_detail' post.slug %}">{% trans "Leer historia →" %}</a>
           </div>
         </article>
         {% endfor %}
       </div>
       {% else %}
-      <div class="editorial-empty"><p class="editorial-kicker">Sin coincidencias</p><h2>No encontramos historias con esos filtros.</h2><p>Prueba con otro tema o vuelve a explorar todas las publicaciones.</p><a class="editorial-action" href="{% url 'blog:post_list' %}">Ver todas las historias</a></div>
+      <div class="editorial-empty"><p class="editorial-kicker">{% trans "Sin coincidencias" %}</p><h2>{% trans "No encontramos historias con esos filtros." %}</h2><p>{% trans "Prueba con otro tema o vuelve a explorar todas las publicaciones." %}</p><a class="editorial-action" href="{% url 'blog:post_list' %}">{% trans "Ver todas las historias" %}</a></div>
       {% endif %}
 
       {% if is_paginated %}
-      <nav class="account-actions" aria-label="Paginación del Journal">
-        {% if page_obj.has_previous %}<a class="editorial-text-link" href="?page={{ page_obj.previous_page_number }}{% if params %}&{{ params }}{% endif %}">← Anterior</a>{% else %}<span></span>{% endif %}
+      <nav class="account-actions" aria-label="{% trans 'Paginación del Journal' %}">
+        {% if page_obj.has_previous %}<a class="editorial-text-link" href="?page={{ page_obj.previous_page_number }}{% if params %}&{{ params }}{% endif %}">{% trans "← Anterior" %}</a>{% else %}<span></span>{% endif %}
         <span>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
-        {% if page_obj.has_next %}<a class="editorial-text-link" href="?page={{ page_obj.next_page_number }}{% if params %}&{{ params }}{% endif %}">Siguiente →</a>{% endif %}
+        {% if page_obj.has_next %}<a class="editorial-text-link" href="?page={{ page_obj.next_page_number }}{% if params %}&{{ params }}{% endif %}">{% trans "Siguiente →" %}</a>{% endif %}
       </nav>
       {% endif %}
     </div>
   </section>
   {% else %}
   <section class="editorial-section editorial-section--mist">
-    <div class="editorial-shell"><div class="editorial-empty"><p class="editorial-kicker">Próximamente</p><h2>Estamos preparando historias para avanzar.</h2><p>Muy pronto encontrarás nuevas perspectivas sobre diseño, rendimiento, tecnología y bienestar.</p><a class="editorial-action" href="{% url 'tienda:producto_list' %}">Descubrir la colección</a></div></div>
+    <div class="editorial-shell"><div class="editorial-empty"><p class="editorial-kicker">{% trans "Próximamente" %}</p><h2>{% trans "Estamos preparando historias para avanzar." %}</h2><p>{% trans "Muy pronto encontrarás nuevas perspectivas sobre diseño, rendimiento, tecnología y bienestar." %}</p><a class="editorial-action" href="{% url 'tienda:producto_list' %}">{% trans "Descubrir la colección" %}</a></div></div>
   </section>
   {% endif %}
 </div>

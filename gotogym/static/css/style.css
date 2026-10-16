@@ -580,7 +580,7 @@ picture source {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(20px, 2.6vw, 38px);
+  gap: clamp(16px, 2vw, 30px);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -594,6 +594,7 @@ picture source {
 .gtg-nav-links a {
   display: inline-block;
   padding: 6px 2px;
+  white-space: nowrap;
   border-bottom: 1px solid transparent;
   transition: color 0.2s ease, border-color 0.2s ease;
 }
@@ -1190,7 +1191,7 @@ picture source {
 }
 
 .gtg-nav-search input {
-  width: clamp(110px, 13vw, 190px);
+  width: clamp(80px, 10vw, 170px);
   min-width: 0;
   border: 0;
   background: transparent;
@@ -1484,5 +1485,115 @@ picture source {
   footer a {
     display: inline-flex;
     align-items: center;
+  }
+}
+
+/* --- Selector de idioma ES / EN ----------------------------------------- */
+.gtg-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.gtg-lang form {
+  display: inline-flex;
+  margin: 0;
+}
+
+.gtg-lang button {
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.gtg-lang button:hover {
+  color: var(--color-accent);
+}
+
+.gtg-lang button[aria-current="true"] {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  cursor: default;
+}
+
+.gtg-lang button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.gtg-lang--menu {
+  margin-right: var(--space-1);
+}
+
+.gtg-lang--movil {
+  padding: var(--space-2) 0;
+}
+
+.gtg-lang--movil button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.gtg-lang--pie {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: var(--space-4) auto 0;
+}
+
+@media (max-width: 900px) {
+  .gtg-lang--menu {
+    display: none;
+  }
+}
+
+/* Anchos intermedios (entre el menu movil y el escritorio completo): con el
+   selector de idioma el menu no cabe a tamano normal, asi que se compacta. */
+@media (min-width: 901px) and (max-width: 1320px) {
+  .gtg-nav-wrap {
+    gap: var(--space-3);
+  }
+
+  .gtg-nav-links {
+    gap: 14px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  .gtg-nav-search input {
+    width: 64px;
+  }
+
+  .gtg-nav-search button {
+    display: none;
+  }
+
+  .gtg-nav-search {
+    padding-right: 14px;
+  }
+
+  .gtg-auth-links a {
+    padding: 0 var(--space-2);
+  }
+
+}
+
+/* Por debajo de 1180 px el selector no cabe junto a la busqueda: sigue en el
+   pie y en el menu movil. */
+@media (min-width: 901px) and (max-width: 1180px) {
+  .gtg-lang--menu {
+    display: none;
   }
 }

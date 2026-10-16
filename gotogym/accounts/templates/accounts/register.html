@@ -60,9 +60,9 @@
 {% block auth_after %}
 <div id="terms-modal" class="commercial-auth__modal" hidden>
   <div class="commercial-auth__modal-panel">
-    <button type="button" id="close-terms" class="commercial-auth__modal-close" aria-label="{% trans 'Cerrar' %}">&times;</button>
+    <button type="button" id="close-terms" class="commercial-auth__modal-close" aria-label="{% trans 'Cerrar' %}">×</button>
     <h2>{% trans "Términos y Condiciones de GoToGym para Usuarios (Clientes)" %}</h2>
-    {% include 'accounts/terms_and_conditions.html' %}
+    {% include 'accounts/_terminos.html' %}
   </div>
 </div>
 {% endblock %}

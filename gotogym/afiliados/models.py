@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy
 
 
 def generate_referral_code():
@@ -19,26 +20,26 @@ def generate_referral_code():
 
 
 class EstadoAfiliado(models.TextChoices):
-    PENDING = 'pending', 'Pendiente de revision'
-    APPROVED = 'approved', 'Aprobado'
-    REJECTED = 'rejected', 'Rechazado'
+    PENDING = 'pending', gettext_lazy('Pendiente de revision')
+    APPROVED = 'approved', gettext_lazy('Aprobado')
+    REJECTED = 'rejected', gettext_lazy('Rechazado')
 
 
 class DocumentType(models.TextChoices):
-    CC = 'CC', 'Cedula de ciudadania'
-    CE = 'CE', 'Cedula de extranjeria'
-    NIT = 'NIT', 'NIT'
-    PA = 'PA', 'Pasaporte'
-    PPT = 'PPT', 'Permiso por proteccion temporal (PPT)'
-    PEP = 'PEP', 'Permiso especial de permanencia (PEP)'
+    CC = 'CC', gettext_lazy('Cedula de ciudadania')
+    CE = 'CE', gettext_lazy('Cedula de extranjeria')
+    NIT = 'NIT', gettext_lazy('NIT')
+    PA = 'PA', gettext_lazy('Pasaporte')
+    PPT = 'PPT', gettext_lazy('Permiso por proteccion temporal (PPT)')
+    PEP = 'PEP', gettext_lazy('Permiso especial de permanencia (PEP)')
 
 
 class MotivoSalida(models.TextChoices):
-    VOLUNTARY = 'voluntary', 'Baja solicitada por el afiliado'
-    FRAUD = 'fraud', 'Fraude o uso indebido del codigo'
-    BREACH = 'breach', 'Incumplimiento de los terminos'
-    INACTIVITY = 'inactivity', 'Inactividad prolongada'
-    OTHER = 'other', 'Otro'
+    VOLUNTARY = 'voluntary', gettext_lazy('Baja solicitada por el afiliado')
+    FRAUD = 'fraud', gettext_lazy('Fraude o uso indebido del codigo')
+    BREACH = 'breach', gettext_lazy('Incumplimiento de los terminos')
+    INACTIVITY = 'inactivity', gettext_lazy('Inactividad prolongada')
+    OTHER = 'other', gettext_lazy('Otro')
 
 
 class PerfilAfiliado(models.Model):
@@ -124,15 +125,15 @@ class PerfilAfiliado(models.Model):
 
 
 class SocialPlatform(models.TextChoices):
-    INSTAGRAM = 'instagram', 'Instagram'
-    TIKTOK = 'tiktok', 'TikTok'
-    YOUTUBE = 'youtube', 'YouTube'
-    FACEBOOK = 'facebook', 'Facebook'
-    X = 'x', 'X (Twitter)'
-    TWITCH = 'twitch', 'Twitch'
-    LINKEDIN = 'linkedin', 'LinkedIn'
-    PINTEREST = 'pinterest', 'Pinterest'
-    OTHER = 'other', 'Otra'
+    INSTAGRAM = 'instagram', gettext_lazy('Instagram')
+    TIKTOK = 'tiktok', gettext_lazy('TikTok')
+    YOUTUBE = 'youtube', gettext_lazy('YouTube')
+    FACEBOOK = 'facebook', gettext_lazy('Facebook')
+    X = 'x', gettext_lazy('X (Twitter)')
+    TWITCH = 'twitch', gettext_lazy('Twitch')
+    LINKEDIN = 'linkedin', gettext_lazy('LinkedIn')
+    PINTEREST = 'pinterest', gettext_lazy('Pinterest')
+    OTHER = 'other', gettext_lazy('Otra')
 
 
 URL_DE_PERFIL = {
@@ -277,9 +278,9 @@ class ConfiguracionProgramaAfiliados(models.Model):
 
 
 class WithdrawalStatus(models.TextChoices):
-    PENDING = 'pending', 'Pendiente'
-    PAID = 'paid', 'Pagada'
-    REJECTED = 'rejected', 'Rechazada'
+    PENDING = 'pending', gettext_lazy('Pendiente')
+    PAID = 'paid', gettext_lazy('Pagada')
+    REJECTED = 'rejected', gettext_lazy('Rechazada')
 
 
 class WithdrawalRequest(models.Model):
@@ -319,15 +320,15 @@ class WithdrawalRequest(models.Model):
 
 
 class CommissionStatus(models.TextChoices):
-    PENDING = 'pending', 'Pendiente'
+    PENDING = 'pending', gettext_lazy('Pendiente')
     # Se conserva el valor `approved` en la base de datos; para el afiliado
     # es una comision "confirmada": termino su periodo de validacion.
-    APPROVED = 'approved', 'Confirmada'
-    PAID = 'paid', 'Pagada'
-    REVERTED = 'reverted', 'Revertida'
+    APPROVED = 'approved', gettext_lazy('Confirmada')
+    PAID = 'paid', gettext_lazy('Pagada')
+    REVERTED = 'reverted', gettext_lazy('Revertida')
     # Ya se pago y el pedido se devolvio o reembolso despues: se descuenta
     # del siguiente pago.
-    CLAWBACK = 'clawback', 'Por recuperar'
+    CLAWBACK = 'clawback', gettext_lazy('Por recuperar')
 
 
 class Commission(models.Model):

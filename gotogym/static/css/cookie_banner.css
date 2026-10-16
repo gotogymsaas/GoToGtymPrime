@@ -1,0 +1,371 @@
+/* Banner de cookies con el lenguaje Quantum: panel de vidrio oscuro, orbita
+ * turquesa con nucleo luminoso, acento dorado en el detalle. Usa los tokens de
+ * style.css (colores, espaciado, radios, tipografia), no define colores propios
+ * salvo transparencias de esos mismos tonos.
+ *
+ * Es una barra ancha y baja, fija abajo y centrada: texto a la izquierda y las
+ * tres acciones a la derecha. En pantallas estrechas se apila como una hoja
+ * inferior. Rechazar y Aceptar pesan lo mismo. El movimiento se anula si el
+ * sistema pide menos animacion.
+ */
+.gtg-cookies {
+  position: fixed;
+  z-index: 1200;
+  left: 50%;
+  bottom: var(--space-3);
+  width: min(100% - 24px, 1120px);
+  transform: translateX(-50%);
+  isolation: isolate;
+  overflow: hidden;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid rgba(15, 191, 176, 0.3);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 96% 0%, rgba(15, 191, 176, 0.14), transparent 40%),
+    radial-gradient(circle at 2% 100%, rgba(23, 55, 92, 0.3), transparent 46%),
+    rgba(13, 13, 15, 0.95);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-card), 0 0 0 1px rgba(0, 0, 0, 0.4);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  animation: gtg-cookies-entrada var(--motion-story, 480ms) var(--motion-easing, ease) both;
+}
+
+.gtg-cookies[hidden] {
+  display: none;
+}
+
+/* Orbita decorativa, discreta en el extremo derecho. */
+.gtg-cookies__orbita {
+  position: absolute;
+  z-index: -1;
+  top: -90px;
+  right: -40px;
+  width: 190px;
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+
+.gtg-cookies__orbita::before,
+.gtg-cookies__orbita::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(15, 191, 176, 0.26);
+  border-radius: 50%;
+  transform: rotate(12deg);
+  animation: gtg-cookies-orbita 28s linear infinite;
+}
+
+.gtg-cookies__orbita::after {
+  inset: 30px;
+  border-color: rgba(212, 180, 106, 0.24);
+  transform: rotate(-25deg) scaleY(0.5);
+  animation-direction: reverse;
+  animation-duration: 20s;
+}
+
+.gtg-cookies__orbita span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 16px rgba(15, 191, 176, 0.8);
+  animation: gtg-cookies-nucleo 4s ease-in-out infinite alternate;
+}
+
+/* --- Fila principal: texto + acciones ------------------------------------ */
+.gtg-cookies__principal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+}
+
+.gtg-cookies__cuerpo {
+  min-width: 0;
+}
+
+.gtg-cookies__titulo {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.gtg-cookies__texto {
+  margin: 0;
+  max-width: 78ch;
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.gtg-cookies__texto a {
+  color: var(--color-gold);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.gtg-cookies__texto a:hover {
+  color: var(--color-accent);
+}
+
+/* --- Preferencias --------------------------------------------------------- */
+.gtg-cookies__panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-3);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.gtg-cookies__panel[hidden] {
+  display: none;
+}
+
+.gtg-cookies__opcion {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+}
+
+.gtg-cookies__opcion strong {
+  font-size: 0.8125rem;
+  font-weight: 800;
+}
+
+.gtg-cookies__opcion small {
+  grid-column: 1;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.gtg-cookies__opcion--fija {
+  cursor: default;
+}
+
+.gtg-cookies__estado {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  color: var(--color-accent);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Interruptor: el input real queda accesible y visible al enfocarse. */
+.gtg-cookies__interruptor {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 40px;
+  height: 22px;
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-card);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition: background var(--motion-ui, 200ms) ease, border-color var(--motion-ui, 200ms) ease;
+}
+
+.gtg-cookies__interruptor::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-text-secondary);
+  transition: transform var(--motion-ui, 200ms) ease, background var(--motion-ui, 200ms) ease;
+}
+
+.gtg-cookies__interruptor:checked {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.gtg-cookies__interruptor:checked::after {
+  background: var(--color-accent);
+  transform: translateX(18px);
+  box-shadow: 0 0 10px rgba(15, 191, 176, 0.7);
+}
+
+/* --- Acciones ------------------------------------------------------------- */
+.gtg-cookies__acciones {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.gtg-cookies__boton {
+  min-height: 38px;
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--motion-ui, 200ms) ease, color var(--motion-ui, 200ms) ease,
+    border-color var(--motion-ui, 200ms) ease;
+}
+
+.gtg-cookies__boton--principal {
+  background: var(--color-accent);
+  color: var(--accent-contrast);
+}
+
+.gtg-cookies__boton--principal:hover {
+  background: var(--color-accent-hover);
+}
+
+/* Rechazar: mismo tamano y peso que Aceptar, solo cambia el relleno. */
+.gtg-cookies__boton--secundario {
+  border-color: rgba(255, 255, 255, 0.34);
+}
+
+.gtg-cookies__boton--secundario:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.gtg-cookies__boton--discreto {
+  padding: 0 var(--space-3);
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.gtg-cookies__boton--discreto:hover {
+  color: var(--color-accent);
+}
+
+.gtg-cookies__boton[hidden] {
+  display: none;
+}
+
+.gtg-cookies a:focus-visible,
+.gtg-cookies button:focus-visible,
+.gtg-cookies input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+/* Boton del pie para volver a abrir las preferencias: se ve como los enlaces
+   legales vecinos. */
+.gtg-footer-legal button[data-cookies-abrir] {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.gtg-footer-legal button[data-cookies-abrir]:hover {
+  background: rgba(15, 191, 176, 0.08);
+  color: var(--color-accent);
+}
+
+@keyframes gtg-cookies-entrada {
+  from { opacity: 0; transform: translate(-50%, 14px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes gtg-cookies-orbita {
+  to { transform: rotate(372deg); }
+}
+
+@keyframes gtg-cookies-nucleo {
+  from { opacity: 0.55; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1.15); }
+}
+
+/* Tablet: las acciones pasan debajo del texto, alineadas a la derecha. */
+@media (max-width: 860px) {
+  .gtg-cookies__principal {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .gtg-cookies__acciones {
+    justify-content: flex-end;
+  }
+}
+
+/* Hoja inferior en pantallas estrechas. */
+@media (max-width: 640px) {
+  .gtg-cookies {
+    bottom: 0;
+    width: 100%;
+    padding: var(--space-3) var(--space-3) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .gtg-cookies__acciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .gtg-cookies__boton--discreto {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-height: 34px;
+  }
+
+  .gtg-cookies__boton--principal[data-cookies-guardar] {
+    grid-column: 1 / -1;
+  }
+
+  .gtg-cookies__panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gtg-cookies,
+  .gtg-cookies__orbita::before,
+  .gtg-cookies__orbita::after,
+  .gtg-cookies__orbita span {
+    animation: none;
+  }
+
+  .gtg-cookies__interruptor,
+  .gtg-cookies__interruptor::after {
+    transition: none;
+  }
+}

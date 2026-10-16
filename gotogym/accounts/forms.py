@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy
 from orders.colombia_data import DEPARTAMENTOS, municipios_de
 
 from .models import CustomerAddress
@@ -8,9 +9,9 @@ class CustomerAddressForm(forms.ModelForm):
     # El catalogo de departamentos/ciudades es solo de Colombia (envios no
     # cubren otros paises todavia), asi que el desplegable de pais tiene una
     # sola opcion real en vez de dejarlo como texto libre.
-    country = forms.ChoiceField(label='Pais', choices=[('Colombia', 'Colombia')], initial='Colombia')
+    country = forms.ChoiceField(label=gettext_lazy('Pais'), choices=[('Colombia', 'Colombia')], initial='Colombia')
     department = forms.ChoiceField(
-        label='Departamento',
+        label=gettext_lazy('Departamento'),
         choices=[('', 'Selecciona un departamento')] + [(d, d) for d in DEPARTAMENTOS],
     )
 
@@ -27,12 +28,12 @@ class CustomerAddressForm(forms.ModelForm):
             'postal_code', 'address_line', 'address_complement', 'notes',
         ]
         labels = {
-            'country': 'Pais',
-            'city': 'Ciudad',
-            'postal_code': 'Codigo postal',
-            'address_line': 'Direccion',
-            'address_complement': 'Complemento (apto, torre, etc.)',
-            'notes': 'Notas de entrega',
+            'country': gettext_lazy('Pais'),
+            'city': gettext_lazy('Ciudad'),
+            'postal_code': gettext_lazy('Codigo postal'),
+            'address_line': gettext_lazy('Direccion'),
+            'address_complement': gettext_lazy('Complemento (apto, torre, etc.)'),
+            'notes': gettext_lazy('Notas de entrega'),
         }
 
     def clean(self):

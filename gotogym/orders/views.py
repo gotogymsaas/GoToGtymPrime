@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext
 from products.forms import ProductReviewForm
 from shipping.services import get_mock_quote
 from tienda.catalog import curated_product_cards
@@ -37,11 +38,11 @@ def checkout(request):
     cancel_expired_orders()
     cart, reiniciado = read_cart(request.session)
     if reiniciado:
-        messages.warning(request, 'Tu carrito se reinicio por una actualizacion del sistema.')
+        messages.warning(request, gettext('Tu carrito se reinicio por una actualizacion del sistema.'))
 
     resumen = build_cart_context(cart)
     if not resumen['items']:
-        messages.info(request, 'Tu carrito esta vacio.')
+        messages.info(request, gettext('Tu carrito esta vacio.'))
         return redirect('carrito:cart_detail')
 
     # float, no Decimal: es lo que necesita json_script para que el JS de
@@ -120,12 +121,12 @@ def cotizar_envio(request):
     """
     ciudad = (request.GET.get('city') or '').strip()
     if not ciudad:
-        return JsonResponse({'error': 'Falta la ciudad.'}, status=400)
+        return JsonResponse({'error': gettext('Falta la ciudad.')}, status=400)
 
     cart, _reiniciado = read_cart(request.session)
     resumen = build_cart_context(cart)
     if not resumen['items']:
-        return JsonResponse({'error': 'El carrito esta vacio.'}, status=400)
+        return JsonResponse({'error': gettext('El carrito esta vacio.')}, status=400)
 
     subtotal = Decimal(resumen['subtotal']).quantize(Decimal('0.01'))
     cotizacion = get_mock_quote(ciudad, subtotal)
@@ -154,7 +155,7 @@ def validar_cupon(request):
     cart, _reiniciado = read_cart(request.session)
     resumen = build_cart_context(cart)
     if not resumen['items']:
-        return JsonResponse({'error': 'El carrito esta vacio.'}, status=400)
+        return JsonResponse({'error': gettext('El carrito esta vacio.')}, status=400)
 
     subtotal = Decimal(resumen['subtotal']).quantize(Decimal('0.01'))
     cupon = get_usable_coupon(codigo, user=request.user)
@@ -207,10 +208,10 @@ def create_review(request, order_number, item_id):
         OrderItem.objects.select_related('variant__product'), id=item_id, order=pedido,
     )
     if pedido.order_status not in REVIEWABLE_ORDER_STATUSES or not item.variant_id:
-        messages.error(request, 'Solo puedes calificar productos de pedidos confirmados.')
+        messages.error(request, gettext('Solo puedes calificar productos de pedidos confirmados.'))
         return redirect('orders:order_detail', order_number=pedido.order_number)
     if hasattr(item, 'review'):
-        messages.info(request, 'Ya calificaste este producto.')
+        messages.info(request, gettext('Ya calificaste este producto.'))
         return redirect('orders:order_detail', order_number=pedido.order_number)
 
     if request.method != 'POST':
@@ -223,7 +224,7 @@ def create_review(request, order_number, item_id):
         review.order_item = item
         review.user = request.user
         review.save()
-        messages.success(request, 'Gracias por compartir tu opinión.')
+        messages.success(request, gettext('Gracias por compartir tu opinión.'))
     else:
-        messages.error(request, 'Revisa la calificación e inténtalo de nuevo.')
+        messages.error(request, gettext('Revisa la calificación e inténtalo de nuevo.'))
     return redirect('orders:order_detail', order_number=pedido.order_number)

@@ -27,8 +27,9 @@
   hay: al editar style.css o tokens.css hay que subirlo o el navegador
   seguira sirviendo la copia vieja.
   {% endcomment %}
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261014-turquesa">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261015-idioma7">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
+  <link rel="stylesheet" href="{% static 'css/cookie_banner.css' %}?v=20261015-compacto">
   {% block extra_head %}{% endblock %}
   {% comment %}
   Tailwind compilado. Sustituye a cdn.tailwindcss.com, que era el
@@ -55,6 +56,7 @@
 </head>
 <body class="gtg-theme{% if user.is_authenticated %} gtg-autenticado{% endif %}">
   <a class="gtg-skip-link" href="#main-content">{% trans "Saltar al contenido" %}</a>
+  {% include "partials/_cookie_banner.html" %}
   {% block navbar %}
 <nav class="gtg-navbar" aria-label="{% trans 'Navegación principal' %}">
   <div class="gtg-nav-wrap">
@@ -64,7 +66,7 @@
         <span class="material-icons-outlined" aria-hidden="true">menu</span>
       </button>
 
-      <a href="{% url 'home' %}" class="gtg-brand" aria-label="GoToGym inicio">
+      <a href="{% url 'home' %}" class="gtg-brand" aria-label="{% trans 'GoToGym inicio' %}">
         <img src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" aria-hidden="true" class="gtg-brand__mark">
         <span class="gtg-brand__word">GoToGym</span>
       </a>
@@ -94,6 +96,8 @@
         <input id="nav-search" type="search" name="filtro" value="{{ filtro|default:'' }}" placeholder="{% trans 'Buscar' %}">
         <button type="submit">{% trans "Buscar" %}</button>
       </form>
+
+      {% include "partials/_selector_idioma.html" with variante="menu" %}
 
       <a href="{% url 'carrito:cart_detail' %}" class="gtg-icon-button gtg-cart-link"
          aria-label="{% trans 'Carrito' %}">
@@ -136,7 +140,7 @@
           <a href="{% url 'admin_dashboard' %}">{% trans "Panel administrador" %}</a>
           {% endif %}
           {% if user.is_superuser %}
-          <a href="/admin/">{% trans "Admin" %}</a>
+          <a href="{% url 'admin:index' %}">{% trans "Admin" %}</a>
           {% endif %}
           <form action="{% url 'logout' %}" method="post">
             {% csrf_token %}
@@ -198,6 +202,8 @@
     <a href="{% url 'commercial_login' %}?next={{ request.get_full_path|urlencode }}">{% trans "Iniciar sesión" %}</a>
     <a href="{% url 'register' %}?next={{ request.get_full_path|urlencode }}">{% trans "Crear cuenta" %}</a>
     {% endif %}
+    <span class="gtg-mobile-menu__divider"></span>
+    {% include "partials/_selector_idioma.html" with variante="movil" %}
   </div>
 </nav>
 {% endblock %}
@@ -243,6 +249,8 @@
       </div>
     </div>
 
+    {% include "partials/_selector_idioma.html" with variante="pie" %}
+
     <nav class="gtg-footer-legal" aria-label="{% trans 'Políticas y condiciones' %}">
       <a href="{% url 'acerca_de' %}">{% trans "Acerca de" %}</a>
       <a href="{% url 'politica_privacidad' %}">{% trans "Privacidad" %}</a>
@@ -251,6 +259,8 @@
       <a href="{% url 'politica_devoluciones' %}">{% trans "Devoluciones" %}</a>
       <a href="{% url 'politica_garantia' %}">{% trans "Garantía" %}</a>
       <a href="{% url 'politica_tratamiento_datos' %}">{% trans "Tratamiento de datos" %}</a>
+      <a href="{% url 'politica_cookies' %}">{% trans "Cookies" %}</a>
+      <button type="button" data-cookies-abrir>{% trans "Preferencias de cookies" %}</button>
       <a href="{% url 'afiliado_terminos' %}">{% trans "Términos de afiliados" %}</a>
     </nav>
   </footer>
@@ -263,7 +273,8 @@
   {% endcomment %}
   <script id="gtg-analytics-config" type="application/json">{"endpoint": "{% url 'analitica:registrar_eventos' %}", "csrf": "{{ csrf_token }}"}</script>
   <script src="{% static 'js/commerce_header.js' %}" defer></script>
-  <script src="{% static 'js/analytics.js' %}" defer></script>
+  <script src="{% static 'js/cookies.js' %}?v=20261015-compacto" defer></script>
+  <script src="{% static 'js/analytics.js' %}?v=20261014-cookies" defer></script>
   {% block extra_scripts %}{% endblock %}
 </body>
 </html>

@@ -1539,3 +1539,105 @@ msgstr ""
 "Comece pela coleção ou aprofunde-se no Journal: ciência têxtil, tecnologia "
 "aplicada ao movimento e tudo o que há por trás de cada peça — com suas "
 "referências."
+
+msgid ""
+"Mínimo 8 caracteres, con una mayúscula, una minúscula, un número y un "
+"carácter especial (por ejemplo ! ? # $ @)."
+msgstr ""
+"Mínimo de 8 caracteres, com uma letra maiúscula, uma minúscula, um número e "
+"um caractere especial (por exemplo ! ? # $ @)."
+
+msgid "Última revisión"
+msgstr "Última revisão"
+
+msgid "Acerca de GoToGym"
+msgstr "Sobre a GoToGym"
+
+msgid "Cookies"
+msgstr "Cookies"
+
+msgid "Preferencias de cookies"
+msgstr "Preferências de cookies"
+
+msgid "Términos de afiliados"
+msgstr "Termos de afiliados"
+
+msgid "Tu privacidad"
+msgstr "Sua privacidade"
+
+msgid "Cookies en GoToGym"
+msgstr "Cookies na GoToGym"
+
+msgid "Necesarias"
+msgstr "Necessários"
+
+msgid "Siempre activas"
+msgstr "Sempre ativos"
+
+msgid ""
+"Sesión, carrito, seguridad de formularios, idioma y el registro de esta "
+"elección. Sin ellas la tienda no funciona."
+msgstr ""
+"Sessão, carrinho, segurança dos formulários, idioma e o registro desta "
+"escolha. Sem eles a loja não funciona."
+
+msgid "Analítica anónima"
+msgstr "Análise anônima"
+
+msgid ""
+"Cuenta visitas, clics, búsquedas y compras con un identificador aleatorio, "
+"sin nombre ni correo. Nos ayuda a mejorar la tienda."
+msgstr ""
+"Conta visitas, cliques, buscas e compras com um identificador aleatório, sem"
+" nome nem e-mail. Ajuda-nos a melhorar a loja."
+
+msgid "Configurar"
+msgstr "Configurar"
+
+msgid "Solo necesarias"
+msgstr "Somente necessários"
+
+msgid "Aceptar todas"
+msgstr "Aceitar todos"
+
+msgid "Guardar preferencias"
+msgstr "Salvar preferências"
+
+#, python-format
+msgid ""
+"Usamos cookies necesarias para que la tienda funcione: tu sesión, el "
+"carrito, la seguridad de los formularios y el idioma. Si lo aceptas, también"
+" medimos de forma anónima cómo se usa el sitio para mejorarlo. No usamos "
+"cookies de publicidad ni cargamos scripts de terceros. Más detalles en la <a"
+" href=\"%(url)s\">política de cookies</a>."
+msgstr ""
+"Usamos os cookies de que a loja precisa para funcionar: sua sessão, o "
+"carrinho, a segurança dos formulários e o idioma. Se você aceitar, também "
+"medimos de forma anônima como o site é usado para melhorá-lo. Não usamos "
+"cookies de publicidade nem carregamos scripts de terceiros. Mais detalhes na"
+" <a href=\"%(url)s\">política de cookies</a>."
+
+msgid "al menos 8 caracteres"
+msgstr "pelo menos 8 caracteres"
+
+msgid "una mayúscula"
+msgstr "uma letra maiúscula"
+
+msgid "una minúscula"
+msgstr "uma letra minúscula"
+
+msgid "un número"
+msgstr "um número"
+
+msgid "un carácter especial (por ejemplo ! ? # $ @)"
+msgstr "um caractere especial (por exemplo ! ? # $ @)"
+
+#, python-format
+msgid "La contraseña debe tener %(faltantes)s."
+msgstr "A senha deve ter %(faltantes)s."
+
+msgid "Rechazar"
+msgstr "Rejeitar"
+
+msgid "Idioma"
+msgstr "Idioma"

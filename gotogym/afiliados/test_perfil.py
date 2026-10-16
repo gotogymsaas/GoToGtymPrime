@@ -16,6 +16,11 @@ def _datos_perfil(**cambios):
 
 
 class RutaDeAfiliadosTests(AfiliadoTestBase):
+    def tearDown(self):
+        # LocaleMiddleware deja activo el idioma de la ultima peticion en el hilo.
+        translation.activate('es')
+        super().tearDown()
+
     def test_el_panel_vive_en_afiliados(self):
         # El idioma se fija: otra prueba puede haber dejado activo uno distinto.
         with translation.override('es'):
@@ -52,7 +57,7 @@ class InicioDelAfiliadoTests(AfiliadoTestBase):
         respuesta = self.client.get(reverse('afiliado_dashboard'))
         self.assertContains(respuesta, '2 redes')
         self.assertContains(respuesta, '1.500 seguidores en total')
-        self.assertContains(respuesta, '@anafit &middot; 1.200 seguidores', html=False)
+        self.assertContains(respuesta, '@anafit · 1.200 seguidores', html=False)
         self.assertContains(respuesta, 'Kwai')
         self.assertContains(respuesta, 'Editar redes')
 

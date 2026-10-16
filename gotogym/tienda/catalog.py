@@ -5,6 +5,7 @@ colores con stock, imagen principal) para que las vistas de listado y de
 detalle partan de la misma fuente y no diverjan.
 """
 from django.db.models import Prefetch
+from django.utils.translation import gettext
 from products.models import Product, ProductMedia, ProductVariant
 
 # Orden de talla para presentacion; cualquier valor desconocido va al final.
@@ -300,6 +301,6 @@ def product_features(producto):
             iconos_usados.add(icono)
 
     return [
-        {'icon': icono, 'label': etiqueta, 'text': detalle}
+        {'icon': icono, 'label': gettext(etiqueta), 'text': gettext(detalle)}
         for icono, etiqueta, detalle in features[:MAX_FEATURES]
     ]

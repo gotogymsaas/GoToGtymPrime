@@ -1,16 +1,20 @@
 from django.conf import settings
 from django.contrib.auth import views as auth_views
 from django.urls import path
+from gotogym.ratelimit import rate_limit
 
 from . import views
 
 # El correo de recuperacion sale en espanol y con el enlace al sitio publico
 # (`SITIO_URL`), no con el dominio que traiga la peticion.
-recuperar_contrasena = auth_views.PasswordResetView.as_view(
-    template_name='accounts/password_reset_form.html',
-    email_template_name='accounts/password_reset_email.txt',
-    subject_template_name='accounts/password_reset_subject.txt',
-    extra_email_context={'sitio_url': settings.SITIO_URL},
+# Cada envio manda un correo: 5 solicitudes cada 10 minutos por IP.
+recuperar_contrasena = rate_limit('password_reset', limit=5, period_seconds=600, metodos=('POST',))(
+    auth_views.PasswordResetView.as_view(
+        template_name='accounts/password_reset_form.html',
+        email_template_name='accounts/password_reset_email.txt',
+        subject_template_name='accounts/password_reset_subject.txt',
+        extra_email_context={'sitio_url': settings.SITIO_URL},
+    )
 )
 
 urlpatterns = [

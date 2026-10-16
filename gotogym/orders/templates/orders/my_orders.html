@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
+{% load idiomas %}
 {% load static i18n tienda_filters imagenes %}
 {% block title %}{% trans "Mis pedidos" %} | GoToGym{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261014-cookies">{% endblock %}
 {% block content %}
 <div class="editorial-page">
   <header class="editorial-hero editorial-hero--compact">
-    <div class="editorial-shell"><p class="editorial-kicker">Tu cuenta</p><h1 class="editorial-title">Tus pedidos,<br><em>bajo control.</em></h1><p class="editorial-lead">Consulta el estado, la entrega y el detalle de cada compra en un solo lugar.</p></div>
+    <div class="editorial-shell"><p class="editorial-kicker">{% trans "Tu cuenta" %}</p><h1 class="editorial-title">{% trans "Tus pedidos," %}<br><em>{% trans "bajo control." %}</em></h1><p class="editorial-lead">{% trans "Consulta el estado, la entrega y el detalle de cada compra en un solo lugar." %}</p></div>
   </header>
   <section class="editorial-section editorial-section--mist">
     <div class="editorial-shell">
@@ -20,14 +21,14 @@
         {% endfor %}
       </div>
       {% else %}
-      <div class="editorial-empty"><p class="editorial-kicker">Tu primera historia está por comenzar</p><h2>Todavía no tienes pedidos.</h2><p>Cuando hagas tu primera compra podrás seguir aquí su estado, envío y detalles.</p><a class="editorial-action" href="{% url 'tienda:producto_list' %}">Explorar la tienda</a></div>
+      <div class="editorial-empty"><p class="editorial-kicker">{% trans "Tu primera historia está por comenzar" %}</p><h2>{% trans "Todavía no tienes pedidos." %}</h2><p>{% trans "Cuando hagas tu primera compra podrás seguir aquí su estado, envío y detalles." %}</p><a class="editorial-action" href="{% url 'tienda:producto_list' %}">{% trans "Explorar la tienda" %}</a></div>
       {% endif %}
     </div>
   </section>
   {% if not orders and recommended_cards %}
   <section class="editorial-section">
-    <div class="editorial-shell"><p class="editorial-kicker">Selección GoToGym</p><h2>Un buen lugar para empezar.</h2><div class="recommendation-grid">
-      {% for card in recommended_cards %}<article class="recommendation-card"><a href="{% url 'tienda:producto_detail' card.product.pk %}"><img src="{% url_imagen_producto card.image.name %}" alt="{{ card.product.name }}" loading="lazy"></a><div><h3><a href="{% url 'tienda:producto_detail' card.product.pk %}">{{ card.product.name }}</a></h3><strong>{% include 'tienda/partials/_price.html' with price_min=card.price_min price_max=card.price_max has_range=card.has_price_range compare_price=card.compare_price discount_percent=card.discount_percent %}</strong></div></article>{% endfor %}
+    <div class="editorial-shell"><p class="editorial-kicker">{% trans "Selección GoToGym" %}</p><h2>{% trans "Un buen lugar para empezar." %}</h2><div class="recommendation-grid">
+      {% for card in recommended_cards %}<article class="recommendation-card"><a href="{% url 'tienda:producto_detail' card.product.pk %}"><img src="{% url_imagen_producto card.image.name %}" alt="{{ card.product.name|traducir }}" loading="lazy"></a><div><h3><a href="{% url 'tienda:producto_detail' card.product.pk %}">{{ card.product.name }}</a></h3><strong>{% include 'tienda/partials/_price.html' with price_min=card.price_min price_max=card.price_max has_range=card.has_price_range compare_price=card.compare_price discount_percent=card.discount_percent %}</strong></div></article>{% endfor %}
     </div></div>
   </section>
   {% endif %}

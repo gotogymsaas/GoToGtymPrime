@@ -39,7 +39,7 @@ bash environments/frontend/run_frontend_smoke.sh
 1. Ejecutar checks backend.
 2. Levantar app local (`python manage.py runserver --settings=gotogym.settings_local`).
 3. Ejecutar smoke frontend.
-4. Registrar resultados en `docs/DESPLIEGUE_LOCAL.md`.
+4. Anotar cualquier hallazgo operativo en `docs/DESPLIEGUE.md`.
 
 Atajo (todo en uno):
 

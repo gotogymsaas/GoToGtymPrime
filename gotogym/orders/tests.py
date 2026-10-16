@@ -652,6 +652,10 @@ class TotalUnicoDePuntaAPuntaTests(CheckoutBaseTestCase):
 class MedicionDelCheckoutTests(CheckoutBaseTestCase):
     """El pedido guarda el cupon y el servidor mide que se creo."""
 
+    def setUp(self):
+        super().setUp()
+        self.client.cookies['gtg_cookies'] = 'analitica'  # aceptó la analítica en el banner
+
     def test_el_pedido_guarda_el_cupon_usado(self):
         cupon = Coupon.objects.create(code='MIDE10', discount_type='percentage', value=10)
         self._poner_en_carrito({str(self.variante.pk): 1})

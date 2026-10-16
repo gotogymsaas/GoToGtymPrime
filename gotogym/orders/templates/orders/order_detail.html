@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load idiomas %}
 {% load i18n tienda_filters %}
 {% block title %}{% trans "Pedido" %} {{ pedido.order_number }}{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
@@ -67,8 +68,8 @@
         {% for item in pedido.items.all %}
         <li class="py-3 flex justify-between gap-4 text-sm">
           <div>
-            <p class="font-semibold text-[var(--color-ink)]">{{ item.product_name_snapshot }}</p>
-            <p class="text-gray-600">{{ item.size_snapshot }} / {{ item.color_snapshot }} &middot; x{{ item.quantity }}</p>
+            <p class="font-semibold text-[var(--color-ink)]">{{ item.product_name_snapshot|traducir }}</p>
+            <p class="text-gray-600">{{ item.size_snapshot|traducir }} / {{ item.color_snapshot|traducir }} · x{{ item.quantity }}</p>
             <p class="text-xs text-gray-500 font-mono">{{ item.sku_snapshot }}</p>
             {% if puede_resenar and item.variant_id %}
               {% if item.review %}
@@ -107,9 +108,9 @@
     </section>
 
     <section class="mb-6 text-sm">
-      {% include "partials/_price_row.html" with row_class="flex justify-between mb-1 text-[var(--color-ink)]" label="Subtotal" amount=pedido.subtotal %}
-      {% include "partials/_price_row.html" with row_class="flex justify-between mb-1 text-[var(--color-ink)]" label="Envío" amount=pedido.shipping_cost %}
-      {% include "partials/_price_row.html" with row_class="flex justify-between font-bold text-lg border-t border-gray-200 pt-2 mt-2 text-[var(--color-zafiro)]" label="Total" amount=pedido.total suffix=pedido.currency %}
+      {% include "partials/_price_row.html" with row_class="flex justify-between mb-1 text-[var(--color-ink)]" label=_("Subtotal") amount=pedido.subtotal %}
+      {% include "partials/_price_row.html" with row_class="flex justify-between mb-1 text-[var(--color-ink)]" label=_("Envío") amount=pedido.shipping_cost %}
+      {% include "partials/_price_row.html" with row_class="flex justify-between font-bold text-lg border-t border-gray-200 pt-2 mt-2 text-[var(--color-zafiro)]" label=_("Total") amount=pedido.total suffix=pedido.currency %}
     </section>
 
     <section class="mb-6 text-sm">
@@ -119,13 +120,13 @@
         {{ pedido.address.address_line }}{% if pedido.address.address_complement %}, {{ pedido.address.address_complement }}{% endif %}<br>
         {{ pedido.address.city }}, {{ pedido.address.department }}, {{ pedido.address.country }}
         {% if pedido.address.postal_code %}<br>{{ pedido.address.postal_code }}{% endif %}<br>
-        {{ pedido.address.phone }} &middot; {{ pedido.email }}
+        {{ pedido.address.phone }} · {{ pedido.email }}
         {% if pedido.address.notes %}<br><span class="text-gray-500">{{ pedido.address.notes }}</span>{% endif %}
       </address>
       {% if pedido.shipping_quote %}
       <p class="text-gray-500 mt-2">
-        {{ pedido.shipping_quote.carrier_name }} &middot; {{ pedido.shipping_quote.method_name }}
-        &middot; {% blocktrans count dias=pedido.shipping_quote.estimated_days %}{{ dias }} día hábil{% plural %}{{ dias }} días hábiles{% endblocktrans %}
+        {{ pedido.shipping_quote.carrier_name }} · {{ pedido.shipping_quote.method_name|traducir }}
+        · {% blocktrans count dias=pedido.shipping_quote.estimated_days %}{{ dias }} día hábil{% plural %}{{ dias }} días hábiles{% endblocktrans %}
       </p>
       {% endif %}
     </section>
@@ -138,7 +139,7 @@
     {% endif %}
 
     <div class="flex flex-wrap gap-4 mt-4 no-print">
-      <a href="{% url 'tienda:producto_list' %}" class="text-gray-600 hover:underline">&larr; {% trans "Volver a la tienda" %}</a>
+      <a href="{% url 'tienda:producto_list' %}" class="text-gray-600 hover:underline">← {% trans "Volver a la tienda" %}</a>
       {% if pedido.order_status == 'confirmed' %}
       <button type="button" onclick="window.print()" class="text-[var(--color-zafiro)] font-semibold hover:underline">
         {% trans "Imprimir recibo" %}

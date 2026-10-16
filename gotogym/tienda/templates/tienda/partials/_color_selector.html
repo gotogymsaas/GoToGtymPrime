@@ -1,3 +1,4 @@
+{% load idiomas %}
 {% load i18n %}{% comment %}
 Selector de color de la PDP (swatch + nombre). Parametros: colors (lista de
 dicts con name y swatch) y selected_color (color preseleccionado). Los botones .pdp-color y su atributo data-color
@@ -17,7 +18,7 @@ commerce_editorial.css.
             class="pdp-color inline-flex items-center gap-2 px-3 py-2 border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             aria-pressed="{% if color.name == selected_color %}true{% else %}false{% endif %}">
       <span class="w-4 h-4 rounded-full border border-[var(--color-border)]" style="background: {{ color.swatch }}"></span>
-      {{ color.name }}
+      {{ color.name|traducir }}
     </button>
     {% endfor %}
   </div>

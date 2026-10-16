@@ -1,13 +1,10 @@
-Django==5.2.17
+Django==5.2.18
 django-widget-tweaks==1.5.1
 Pillow==12.3.0
-djangorestframework==3.18.1
-djangorestframework-simplejwt==5.5.1
-django-cors-headers==4.9.0
 whitenoise==6.12.0
 psycopg2-binary==2.9.13
 requests==2.34.2
-cryptography==50.0.1
+cryptography==50.0.2
 mercadopago==3.6.0
-sentry-sdk==2.19.2
+sentry-sdk==2.72.0
 redis==5.2.1

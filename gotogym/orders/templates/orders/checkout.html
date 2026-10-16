@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
+{% load idiomas %}
 {% load static i18n tienda_filters imagenes %}
 {% block title %}{% trans "Checkout" %}{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">
-<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20261002-importes">
+<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261014-cookies">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20261015-chips">
 {% endblock %}
 
 {% block content %}
@@ -91,10 +92,10 @@
           {% for item in resumen.items %}
           <li>
             <img src="{% url_imagen_producto item.image.name %}"
-                 alt="{{ item.producto.name }}">
+                 alt="{{ item.producto.name|traducir }}">
             <div class="min-w-0">
-              <p class="checkout-item-name">{{ item.producto.name }}</p>
-              <p class="checkout-item-meta">{{ item.variant.size }} / {{ item.variant.color }} &middot; x{{ item.cantidad }}</p>
+              <p class="checkout-item-name">{{ item.producto.name|traducir }}</p>
+              <p class="checkout-item-meta">{{ item.variant.size|traducir }} / {{ item.variant.color|traducir }} · x{{ item.cantidad }}</p>
               <p class="checkout-item-sku">{{ item.variant.sku }}</p>
             </div>
             <span class="checkout-item-price">${{ item.subtotal|cop }} COP</span>
@@ -122,10 +123,10 @@
         carrito/services.py) -- el monto que el comprador veia aqui nunca
         coincidia con lo que create_order_from_cart terminaba cobrando.
         {% endcomment %}
-        {% include "partials/_price_row.html" with row_class="flex justify-between mb-2 text-sm" label="Subtotal" amount=resumen.subtotal %}
-        {% include "partials/_price_row.html" with row_class="flex justify-between mb-2 text-sm text-green-700" row_id="checkout-discount-row" label="Descuento" value_text="-$0 COP" %}
-        {% include "partials/_price_row.html" with row_class="flex justify-between mb-5 text-sm text-gray-600" row_id="checkout-shipping-row" label="Envío" value_text="Se calcula con tu ciudad" %}
-        {% include "partials/_price_row.html" with row_class="flex justify-between font-bold text-lg border-t pt-4 mb-6" row_id="checkout-total-row" label="Total" amount=resumen.subtotal %}
+        {% include "partials/_price_row.html" with row_class="flex justify-between mb-2 text-sm" label=_("Subtotal") amount=resumen.subtotal %}
+        {% include "partials/_price_row.html" with row_class="flex justify-between mb-2 text-sm text-green-700" row_id="checkout-discount-row" label=_("Descuento") value_text="-$0 COP" %}
+        {% include "partials/_price_row.html" with row_class="flex justify-between mb-5 text-sm text-gray-600" row_id="checkout-shipping-row" label=_("Envío") value_text=_("Se calcula con tu ciudad") %}
+        {% include "partials/_price_row.html" with row_class="flex justify-between font-bold text-lg border-t pt-4 mb-6" row_id="checkout-total-row" label=_("Total") amount=resumen.subtotal %}
 
         <button type="submit" class="editorial-action" style="width: 100%;">{% trans "Confirmar pedido" %}</button>
         <p class="text-xs text-gray-500 text-center mt-4">

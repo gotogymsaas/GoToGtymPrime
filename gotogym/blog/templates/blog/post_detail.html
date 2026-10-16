@@ -1,18 +1,19 @@
 {% extends 'base.html' %}
+{% load idiomas %}
 {% load i18n %}
 {% load static %}
 {% load blog_extras %}
 
-{% block title %}{{ post.title }}{% endblock %}
+{% block title %}{{ post.titulo }}{% endblock %}
 
-{% block extra_head %}<link rel="alternate" type="application/rss+xml" title="GoToGym Journal" href="{% url 'blog:feed' %}"><link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">{% endblock %}
+{% block extra_head %}<link rel="alternate" type="application/rss+xml" title="GoToGym Journal" href="{% url 'blog:feed' %}"><link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261014-cookies">{% endblock %}
 
 {% block content %}
 <div class="editorial-page">
   <header class="editorial-hero editorial-hero--compact">
     <div class="editorial-shell">
-      <p class="editorial-kicker">{{ post.category.name|default:"GoToGym Journal" }} · {{ post.published|date:"d M Y" }}</p>
-      <h1 class="editorial-title">{{ post.title }}</h1>
+      <p class="editorial-kicker">{{ post.category.name|default:"GoToGym Journal"|traducir }} · {{ post.published|date:"d M Y" }}</p>
+      <h1 class="editorial-title">{{ post.titulo }}</h1>
       <p class="editorial-lead">{{ post.firma }} · {{ post.reading_time }} {% trans "min de lectura" %} · {% trans "Última revisión" %}: {{ post.updated|date:"d M Y" }}</p>
     </div>
   </header>
@@ -23,7 +24,7 @@
         {% if post.featured %}
         <img src="{{ post.featured.url }}" alt="" loading="lazy" class="editorial-article__cover">
         {% endif %}
-        {{ post.content|post_body }}
+        {{ post.cuerpo|post_body }}
         <div data-track-read-end data-track-entrada="{{ post.slug }}" aria-hidden="true"></div>
         {% if post.reference_items %}
         <section class="editorial-references" aria-labelledby="referencias-titulo">
@@ -50,7 +51,7 @@
             {% if rel.featured %}<img src="{{ rel.featured.url }}" alt="" loading="lazy">{% endif %}
             <div>
               <span class="editorial-meta">{{ rel.published|date:"d M Y" }}</span>
-              <h3>{{ rel.title }}</h3>
+              <h3>{{ rel.titulo }}</h3>
             </div>
           </a>
         </article>

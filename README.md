@@ -32,13 +32,13 @@ collectstatic --noinput && gunicorn --chdir gotogym gotogym.wsgi:application --b
 --workers 2 --timeout 120`. Las migraciones se aplican ahí, una vez por arranque; `wsgi.py` no migra.
 `environments/azure/startup.sh` es una versión de referencia que además carga el Journal.
 
-**📖 Guía completa:** Ver [docs/DESPLIEGUE_LOCAL.md](docs/DESPLIEGUE_LOCAL.md)
+**📖 Guía completa:** Ver [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md)
 
 ---
 
 ## 📋 Documentación
 
-- **[docs/DESPLIEGUE_LOCAL.md](docs/DESPLIEGUE_LOCAL.md)** - Instrucciones detalladas de instalación local
+- **[docs/DESPLIEGUE.md](docs/DESPLIEGUE.md)** - Producción, variables de entorno, tareas periódicas y respaldos
 - **[docs/GUIA_ACCESO.md](docs/GUIA_ACCESO.md)** - Cómo ejecutar el proyecto y entrar a cada panel
 - **[docs/ANALISIS_ESTRUCTURA.md](docs/ANALISIS_ESTRUCTURA.md)** - Estructura, rutas, flujo de compra y configuración
 
@@ -59,7 +59,7 @@ collectstatic --noinput && gunicorn --chdir gotogym gotogym.wsgi:application --b
 - `shipping` - Cotización de envío
 - `blog` - Sistema de blog
 - `contabilidad` - Integración con Alegra
-- `afiliado` - Gestión de afiliados y referidos
+- `afiliados` - Gestión de afiliados y referidos
 - `administracion` - Panel administrativo interno
 - `analitica` - Analítica de producto sin PII
 
@@ -84,7 +84,8 @@ reales.
 `EMAIL_HOST` (con sus variables `EMAIL_*`), `PAYMENT_PROVIDER` (`mock` por defecto),
 `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_WEBHOOK_SECRET` y `SENTRY_DSN` activan,
 respectivamente, el envío real de correo, el proveedor de pago real y el monitoreo de
-errores. La lista completa está en `docs/ANALISIS_ESTRUCTURA.md`.
+errores. `SITIO_URL` fija la dirección pública que llevan los enlaces de los correos. La
+lista completa está en `docs/DESPLIEGUE.md`.
 
 ## 💳 Pagos con Mercado Pago
 
@@ -142,7 +143,17 @@ tipos, migraciones pendientes y pruebas). Detalles en
 El proyecto soporta 3 idiomas:
 - 🇪🇸 Español (por defecto)
 - 🇬🇧 English
-- 🇧🇷 Português
+- 🇧🇷 Português (catálogo parcial, sin selector)
+
+Con el selector en inglés, todo el sitio de cara al cliente sale en inglés: tienda, carrito, checkout, cuenta, área de afiliados, Journal, políticas, términos y correos. Los correos del pedido salen en el idioma en que se hizo la compra (`Order.language`).
+
+**Cómo agregar o cambiar un texto**
+1. Envuélvelo: `{% trans "..." %}` / `{% blocktrans %}` en plantillas; `gettext` / `gettext_lazy` en Python (no uses `_`, a veces es una variable descartable).
+2. Agrega su traducción en `gotogym/locale/en/LC_MESSAGES/django.po` y recompila `django.mo` (`python manage.py compilemessages`, o con `polib` si no tienes gettext, como en Windows).
+3. Los textos largos (políticas, términos, Journal) viven en módulos o plantillas por idioma: `politicas_contenido_en.py`, `terms_and_conditions_en.html`, `afiliados/terminos_en.html`, `blog/journal_en.py`.
+4. El contenido que viene de la base de datos (nombre y descripción de productos, categorías, colores, tallas) se traduce con el filtro `traducir`, que usa el `.po` como diccionario: un producto nuevo se ve en español hasta que su nombre se agregue al catálogo.
+
+`gotogym/test_ingles_completo.py` recorre las páginas de `/en/` y falla si encuentra texto en español.
 
 ---
 
@@ -151,7 +162,7 @@ El proyecto soporta 3 idiomas:
 - **Backend:** Django 5.2 + Django REST Framework
 - **Base de datos:** PostgreSQL (producción, Azure) / SQLite (desarrollo y tests)
 - **Frontend:** Django Templates + Tailwind (CSS compilado y versionado, sin build de Node en el despliegue)
-- **Autenticación:** Sesiones de Django (sitio) + JWT vía `djangorestframework-simplejwt` (`accounts/api_views.py`)
+- **Autenticación:** Sesiones de Django, con reglas de contraseña y límite de intentos de acceso
 - **Pagos:** Mercado Pago (proveedor real construido, apagado por defecto)
 - **Contabilidad:** Alegra API
 - **CRM:** HubSpot (solo un esqueleto)

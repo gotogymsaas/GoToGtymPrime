@@ -25,8 +25,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.translation import gettext
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect
+from gotogym.ratelimit import rate_limit
 
 from .forms import CustomerAddressForm
 from .models import CustomerAddress
@@ -89,6 +91,8 @@ def _resumen_carrito(request):
     return resumen if resumen['items'] else None
 
 
+# 10 registros por hora y por IP.
+@rate_limit('register', limit=10, period_seconds=3600, metodos=('POST',))
 @csrf_protect
 def register_view(request):
     valores = {}
@@ -107,13 +111,13 @@ def register_view(request):
         # Solo hacen falta nombre, correo, contrasena y los terminos; el
         # apellido y la edad se completan despues en "Editar perfil".
         if not all([first_name, email, password1, accepted_terms]):
-            messages.error(request, 'Completa tu nombre, correo y contraseña, y acepta los términos.')
+            messages.error(request, gettext('Completa tu nombre, correo y contraseña, y acepta los términos.'))
         elif password2 is not None and password1 != password2:
-            messages.error(request, 'Las contraseñas no coinciden.')
+            messages.error(request, gettext('Las contraseñas no coinciden.'))
         elif age and not age.isdigit():
-            messages.error(request, 'La edad debe ser un número válido.')
+            messages.error(request, gettext('La edad debe ser un número válido.'))
         elif User.objects.filter(email__iexact=email).exists():
-            messages.error(request, 'El correo ya está registrado.')
+            messages.error(request, gettext('El correo ya está registrado.'))
         elif (errores_clave := _errores_de_contrasena(password1)):
             for error in errores_clave:
                 messages.error(request, error)
@@ -133,7 +137,7 @@ def register_view(request):
             # Quien se registra durante una compra no debe volver a escribir
             # sus datos en el login: queda con sesion y sigue a donde iba.
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            messages.success(request, 'Registro exitoso. Ya iniciaste sesión.')
+            messages.success(request, gettext('Registro exitoso. Ya iniciaste sesión.'))
             return redirect(_safe_next_url(request, reverse('home')))
     return render(request, 'accounts/register.html', {
         'next': _safe_next_url(request, ''),
@@ -141,11 +145,15 @@ def register_view(request):
         'resumen_carrito': _resumen_carrito(request),
     })
 
+# 10 intentos de acceso cada 5 minutos por IP (el contador lo comparten ambas
+# rutas de acceso).
+@rate_limit('login', limit=10, period_seconds=300, metodos=('POST',))
 @csrf_protect
 def login_view(request):
     return _login_response(request, 'accounts/commercial_login.html')
 
 
+@rate_limit('login', limit=10, period_seconds=300, metodos=('POST',))
 @csrf_protect
 def commercial_login_view(request):
     return _login_response(request, 'accounts/commercial_login.html')
@@ -214,8 +222,8 @@ def edit_profile(request):
                 age_value = int(age)
             except ValueError:
                 if is_ajax:
-                    return JsonResponse({'ok': False, 'message': 'La edad debe ser un número válido.'}, status=400)
-                messages.error(request, 'La edad debe ser un número válido.')
+                    return JsonResponse({'ok': False, 'message': gettext('La edad debe ser un número válido.')}, status=400)
+                messages.error(request, gettext('La edad debe ser un número válido.'))
                 return redirect('edit_profile')
             if age_value != user.age:
                 user.age = age_value
@@ -224,26 +232,26 @@ def edit_profile(request):
             User = get_user_model()
             if User.objects.filter(email=email).exclude(pk=user.pk).exists():
                 if is_ajax:
-                    return JsonResponse({'ok': False, 'message': 'Este correo ya está registrado.'}, status=400)
-                messages.error(request, 'Este correo ya está registrado.')
+                    return JsonResponse({'ok': False, 'message': gettext('Este correo ya está registrado.')}, status=400)
+                messages.error(request, gettext('Este correo ya está registrado.'))
                 return redirect('edit_profile')
             user.email = email
             changed = True
         if password:
             if password != password2:
                 if is_ajax:
-                    return JsonResponse({'ok': False, 'message': 'Las contraseñas no coinciden.'}, status=400)
-                messages.error(request, 'Las contraseñas no coinciden.')
+                    return JsonResponse({'ok': False, 'message': gettext('Las contraseñas no coinciden.')}, status=400)
+                messages.error(request, gettext('Las contraseñas no coinciden.'))
                 return redirect('edit_profile')
             if not current_password or not check_password(current_password, user.password):
                 if is_ajax:
-                    return JsonResponse({'ok': False, 'message': 'La contraseña actual no es correcta.'}, status=400)
-                messages.error(request, 'La contraseña actual no es correcta.')
+                    return JsonResponse({'ok': False, 'message': gettext('La contraseña actual no es correcta.')}, status=400)
+                messages.error(request, gettext('La contraseña actual no es correcta.'))
                 return redirect('edit_profile')
             errores_clave = _errores_de_contrasena(password)
             if errores_clave:
                 if is_ajax:
-                    return JsonResponse({'ok': False, 'message': ' '.join(errores_clave)}, status=400)
+                    return JsonResponse({'ok': False, 'message': gettext(' ').join(errores_clave)}, status=400)
                 for error in errores_clave:
                     messages.error(request, error)
                 return redirect('edit_profile')
@@ -253,12 +261,12 @@ def edit_profile(request):
         if changed:
             user.save()
             if is_ajax:
-                return JsonResponse({'ok': True, 'message': 'Perfil actualizado correctamente.'})
-            messages.success(request, 'Perfil actualizado correctamente.')
+                return JsonResponse({'ok': True, 'message': gettext('Perfil actualizado correctamente.')})
+            messages.success(request, gettext('Perfil actualizado correctamente.'))
         else:
             if is_ajax:
-                return JsonResponse({'ok': True, 'message': 'No se realizaron cambios.'})
-            messages.info(request, 'No se realizaron cambios.')
+                return JsonResponse({'ok': True, 'message': gettext('No se realizaron cambios.')})
+            messages.info(request, gettext('No se realizaron cambios.'))
         return redirect('home')
     from orders.colombia_data import MUNICIPIOS_POR_DEPARTAMENTO
 
@@ -305,7 +313,7 @@ def address_edit(request, pk=None):
             if es_nueva and not request.user.addresses.exists():
                 nueva.is_default = True
             nueva.save()
-            messages.success(request, 'Direccion guardada.')
+            messages.success(request, gettext('Direccion guardada.'))
             return redirect('edit_profile')
     else:
         form = CustomerAddressForm(instance=direccion)
@@ -324,7 +332,7 @@ def address_delete(request, pk):
     direccion = get_object_or_404(CustomerAddress, pk=pk, user=request.user)
     if request.method == 'POST':
         direccion.delete()
-        messages.success(request, 'Direccion eliminada.')
+        messages.success(request, gettext('Direccion eliminada.'))
     return redirect('edit_profile')
 
 
@@ -335,5 +343,5 @@ def address_set_default(request, pk):
         request.user.addresses.exclude(pk=direccion.pk).update(is_default=False)
         direccion.is_default = True
         direccion.save(update_fields=['is_default'])
-        messages.success(request, 'Direccion marcada como predeterminada.')
+        messages.success(request, gettext('Direccion marcada como predeterminada.'))
     return redirect('edit_profile')

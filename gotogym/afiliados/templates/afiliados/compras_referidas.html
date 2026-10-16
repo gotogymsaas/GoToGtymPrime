@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load static tienda_filters %}
 
-{% block title %}Compras referidas{% endblock %}
+{% block title %}{% trans "Compras referidas" %}{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 
 {% block extra_head %}
@@ -16,25 +17,25 @@
         <span class="quantum-emblem"><span class="quantum-emblem__core"></span></span>
         <span class="quantum-signal-line"></span>
       </div>
-      <p class="eyebrow">Programa de afiliados</p>
-      <h1>Compras referidas</h1>
+      <p class="eyebrow">{% trans "Programa de afiliados" %}</p>
+      <h1>{% trans "Compras referidas" %}</h1>
     </div>
   </section>
 
   <div class="editorial-shell">
     <div class="actions" style="margin-bottom: 24px;">
-      <a href="{% url 'afiliado_dashboard' %}" class="ghost btn-sm">Resumen</a>
+      <a href="{% url 'afiliado_dashboard' %}" class="ghost btn-sm">{% trans "Resumen" %}</a>
     </div>
     <div class="panel">
       {% if compras %}
       <table>
         <thead>
           <tr>
-            <th>Pedido</th>
-            <th>Fecha</th>
-            <th>Venta</th>
-            <th>Comisi&oacute;n</th>
-            <th>Estado</th>
+            <th>{% trans "Pedido" %}</th>
+            <th>{% trans "Fecha" %}</th>
+            <th>{% trans "Venta" %}</th>
+            <th>{% trans "Comisión" %}</th>
+            <th>{% trans "Estado" %}</th>
           </tr>
         </thead>
         <tbody>
@@ -43,14 +44,14 @@
             <td>{{ order.order_number }}</td>
             <td>{{ order.created_at|date:'d/m/Y' }}</td>
             <td>${{ order.subtotal|cop }} COP</td>
-            <td>{% if order.commission %}${{ order.commission.amount|cop }} COP{% else %}&mdash;{% endif %}</td>
+            <td>{% if order.commission %}${{ order.commission.amount|cop }} COP{% else %}—{% endif %}</td>
             <td>{% include 'afiliados/_estado_comision.html' with comision=order.commission %}</td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
       {% else %}
-      <p>A&uacute;n no tienes compras referidas.</p>
+      <p>{% trans "Aún no tienes compras referidas." %}</p>
       {% endif %}
     </div>
   </div>

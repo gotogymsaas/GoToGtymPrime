@@ -75,8 +75,8 @@ class InscribirCuentaTests(AfiliadoTestBase):
         respuesta = self.client.get(self.url)
         self.assertNotContains(respuesta, 'breb_key_type')
         self.assertNotContains(respuesta, 'Tipo de llave')
-        self.assertNotContains(respuesta, 'Qu&eacute; es Bre-B')
-        self.assertContains(respuesta, 'aseg&uacute;rate de incluir el @')
+        self.assertNotContains(respuesta, 'Qué es Bre-B')
+        self.assertContains(respuesta, 'asegúrate de incluir el @')
 
     def test_ofrece_las_casillas_de_terminos_y_datos_antes_de_los_campos(self):
         html = self.client.get(self.url).content.decode()

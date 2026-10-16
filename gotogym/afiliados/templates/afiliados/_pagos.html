@@ -1,47 +1,48 @@
+{% load i18n %}
 {% load tienda_filters %}
 {% if titular_no_coincide %}
 <div class="panel panel-status" role="alert">
-  <h2>Revisa tu cuenta Bre-B</h2>
-  <p>El documento del titular de tu cuenta no coincide con el de tu perfil. Los términos piden que la cuenta sea tuya: el equipo la revisará antes de pagarte. Si te equivocaste al escribirlo, corrígelo.</p>
-  <a href="{% url 'afiliado_cuenta_pago' %}" class="ghost btn-sm">Editar cuenta</a>
+  <h2>{% trans "Revisa tu cuenta Bre-B" %}</h2>
+  <p>{% trans "El documento del titular de tu cuenta no coincide con el de tu perfil. Los términos piden que la cuenta sea tuya: el equipo la revisará antes de pagarte. Si te equivocaste al escribirlo, corrígelo." %}</p>
+  <a href="{% url 'afiliado_cuenta_pago' %}" class="ghost btn-sm">{% trans "Editar cuenta" %}</a>
 </div>
 {% endif %}
 
 {% if pending_withdrawal %}
 <div class="panel panel-status">
-  <h2>Solicitud de comision en curso</h2>
-  <p>Solicitaste ${{ pending_withdrawal.amount|cop }} COP el {{ pending_withdrawal.requested_at|date:"d/m/Y" }}. Las solicitudes de cada mes se pagan en los primeros 10 días hábiles del mes siguiente: la tuya se paga a más tardar el {{ fecha_limite_de_pago|date:"d/m/Y" }}. Te avisaremos por correo cuando se pague.</p>
+  <h2>{% trans "Solicitud de comision en curso" %}</h2>
+  <p>{% blocktrans with monto=pending_withdrawal.amount|cop fecha=pending_withdrawal.requested_at|date:"d/m/Y" limite=fecha_limite_de_pago|date:"d/m/Y" %}Solicitaste ${{ monto }} COP el {{ fecha }}. Las solicitudes de cada mes se pagan en los primeros 10 días hábiles del mes siguiente: la tuya se paga a más tardar el {{ limite }}. Te avisaremos por correo cuando se pague.{% endblocktrans %}</p>
 </div>
 {% endif %}
 
 <div class="panel panel-account" id="pagos">
-  <h2>Tus pagos</h2>
+  <h2>{% trans "Tus pagos" %}</h2>
   <dl class="payout-summary">
-    <dt>Comisión disponible</dt><dd>${{ saldo_neto|cop }} COP</dd>
-    {% if por_recuperar %}<dt>Por recuperar</dt><dd>${{ por_recuperar|cop }} COP (de pedidos devueltos o reembolsados, se descuenta de tu próximo pago)</dd>{% endif %}
-    <dt>En validación</dt><dd>${{ pending_commission_total|cop }} COP</dd>
-    <dt>Mínimo para solicitar</dt><dd>${{ minimo_de_pago|cop }} COP en comisiones confirmadas</dd>
-    <dt>Pagado en {{ anio_actual }}</dt><dd>${{ pagado_en_el_anio|cop }} COP</dd>
+    <dt>{% trans "Comisión disponible" %}</dt><dd>${{ saldo_neto|cop }} COP</dd>
+    {% if por_recuperar %}<dt>{% trans "Por recuperar" %}</dt><dd>{% blocktrans with monto=por_recuperar|cop %}${{ monto }} COP (de pedidos devueltos o reembolsados, se descuenta de tu próximo pago){% endblocktrans %}</dd>{% endif %}
+    <dt>{% trans "En validación" %}</dt><dd>${{ pending_commission_total|cop }} COP</dd>
+    <dt>{% trans "Mínimo para solicitar" %}</dt><dd>{% blocktrans with monto=minimo_de_pago|cop %}${{ monto }} COP en comisiones confirmadas{% endblocktrans %}</dd>
+    <dt>{% trans "Pagado en" %} {{ anio_actual }}</dt><dd>${{ pagado_en_el_anio|cop }} COP</dd>
   </dl>
-  <a href="{% url 'afiliado_pagos' %}" class="ghost btn-sm">Ver historial de pagos</a>
+  <a href="{% url 'afiliado_pagos' %}" class="ghost btn-sm">{% trans "Ver historial de pagos" %}</a>
   {% if not pending_withdrawal and not puede_solicitar and saldo_neto > 0 %}
-  <p class="hint">Te faltan ${{ falta_para_el_minimo|cop }} COP en comisiones confirmadas para poder solicitar un pago.</p>
+  <p class="hint">{% blocktrans with monto=falta_para_el_minimo|cop %}Te faltan ${{ monto }} COP en comisiones confirmadas para poder solicitar un pago.{% endblocktrans %}</p>
   {% endif %}
 </div>
 
 <div class="panel panel-account" id="cuenta-bre-b">
-  <h2>Cuenta Bre-B para tus pagos</h2>
+  <h2>{% trans "Cuenta Bre-B para tus pagos" %}</h2>
   {% if payout_account %}
-  <p>Tus comisiones se pagan a esta cuenta. Si cambias de banco o de llave, actualízala antes de solicitar tu próximo pago.</p>
+  <p>{% trans "Tus comisiones se pagan a esta cuenta. Si cambias de banco o de llave, actualízala antes de solicitar tu próximo pago." %}</p>
   <dl class="payout-summary">
-    <dt>Titular</dt><dd>{{ payout_account.full_name }}</dd>
-    <dt>Documento</dt><dd>{{ payout_account.get_document_type_display }} &middot; {{ payout_account.document_number }}</dd>
-    <dt>Llave Bre-B</dt><dd>{{ payout_account.breb_key }}</dd>
-    <dt>Contacto</dt><dd>{{ payout_account.phone }} &middot; {{ payout_account.address }}</dd>
+    <dt>{% trans "Titular" %}</dt><dd>{{ payout_account.full_name }}</dd>
+    <dt>{% trans "Documento" %}</dt><dd>{{ payout_account.get_document_type_display }} · {{ payout_account.document_number }}</dd>
+    <dt>{% trans "Llave Bre-B" %}</dt><dd>{{ payout_account.breb_key }}</dd>
+    <dt>{% trans "Contacto" %}</dt><dd>{{ payout_account.phone }} · {{ payout_account.address }}</dd>
   </dl>
-  <a href="{% url 'afiliado_cuenta_pago' %}" class="ghost btn-sm">Editar cuenta</a>
+  <a href="{% url 'afiliado_cuenta_pago' %}" class="ghost btn-sm">{% trans "Editar cuenta" %}</a>
   {% else %}
-  <p><strong>Bre-B</strong> es el sistema de pagos inmediatos del Banco de la República: el dinero llega en segundos, a cualquier banco o billetera, usando una «llave» (tu documento, celular, correo o un código alfanumérico) que registraste en tu entidad. Inscribe tu cuenta para que podamos pagarte tus comisiones.</p>
-  <a href="{% url 'afiliado_cuenta_pago' %}" class="button btn-sm">Inscribir cuenta Bre-B</a>
+  <p><strong>{% trans "Bre-B" %}</strong> {% trans "es el sistema de pagos inmediatos del Banco de la República: el dinero llega en segundos, a cualquier banco o billetera, usando una «llave» (tu documento, celular, correo o un código alfanumérico) que registraste en tu entidad. Inscribe tu cuenta para que podamos pagarte tus comisiones." %}</p>
+  <a href="{% url 'afiliado_cuenta_pago' %}" class="button btn-sm">{% trans "Inscribir cuenta Bre-B" %}</a>
   {% endif %}
 </div>

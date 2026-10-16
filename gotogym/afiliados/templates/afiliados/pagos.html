@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load static %}
 
-{% block title %}Mis pagos{% endblock %}
+{% block title %}{% trans "Mis pagos" %}{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 
 {% block extra_head %}
@@ -16,14 +17,14 @@
         <span class="quantum-emblem"><span class="quantum-emblem__core"></span></span>
         <span class="quantum-signal-line"></span>
       </div>
-      <p class="eyebrow">Programa de afiliados</p>
-      <h1>Mis pagos</h1>
+      <p class="eyebrow">{% trans "Programa de afiliados" %}</p>
+      <h1>{% trans "Mis pagos" %}</h1>
     </div>
   </section>
 
   <div class="editorial-shell">
     <div class="actions" style="margin-bottom: 24px;">
-      <a href="{% url 'afiliado_dashboard' %}" class="ghost btn-sm">Resumen</a>
+      <a href="{% url 'afiliado_dashboard' %}" class="ghost btn-sm">{% trans "Resumen" %}</a>
     </div>
     {% include 'afiliados/_historial_pagos.html' %}
   </div>

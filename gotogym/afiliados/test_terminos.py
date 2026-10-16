@@ -60,7 +60,9 @@ class VersionAceptadaTests(AfiliadoTestBase):
 
     def test_no_agrega_otras_casillas_de_aceptacion(self):
         respuesta = self.client.get(self.url)
-        self.assertEqual(respuesta.content.decode().count('type="checkbox"'), 1)
+        # El interruptor de analitica del banner de cookies no es una aceptacion del formulario.
+        html = respuesta.content.decode().replace('type="checkbox" role="switch"', '')
+        self.assertEqual(html.count('type="checkbox"'), 1)
 
     def test_la_postulacion_guarda_la_version_aceptada(self):
         self.client.post(self.url, datos_postulacion())

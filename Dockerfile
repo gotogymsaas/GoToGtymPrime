@@ -1,21 +1,11 @@
-# FROM python:3.11-slim
-# ENV PYTHONDONTWRITEBYTECODE=1
-# ENV PYTHONUNBUFFERED=1
-# WORKDIR /app
-# COPY requirements.txt /app/
-# RUN pip install --no-cache-dir -r requirements.txt
-# COPY . /app
-# CMD ["python", "gotogym/manage.py", "runserver", "0.0.0.0:8000"]
-
-FROM python:3.11-slim
+FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 WORKDIR /app
-# (Opcional) deps de sistema si usas psycopg2, pillow, etc.
-# RUN apt-get update && apt-get install -y --no-install-recommends build-essential libpq5 && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt gunicorn
 COPY . .
 EXPOSE 8000
-#CMD ["sh","-c","gunicorn --chdir gotogym gotogym.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers ${WORKERS:-3} --timeout 120 --access-logfile - --error-logfile -"]
-CMD ["gunicorn", "--chdir", "gotogym", "gotogym.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-"]
+# Mismo arranque que produccion (App Service): migrar, recolectar estaticos y
+# servir con 2 workers. Requiere DJANGO_SECRET_KEY y DATABASE_URL.
+CMD ["sh", "-c", "python gotogym/manage.py migrate --noinput && python gotogym/manage.py collectstatic --noinput && exec gunicorn --chdir gotogym gotogym.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120 --access-logfile - --error-logfile -"]

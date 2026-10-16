@@ -27,15 +27,7 @@ import tempfile  # noqa: E402
 
 RECURSOS_AFILIADOS_ROOT = str(Path(tempfile.gettempdir()) / 'gotogym_pruebas_recursos_afiliados')
 
-REST_FRAMEWORK = {
-    # Tupla vacia a proposito (sin auth/permission requeridos en tests);
-    # mypy infiere el literal `()` como tuple[()] y no como tuple[str, ...],
-    # que es lo que espera el stub de DRF para este valor -- no hay nada
-    # que corregir en el tipo, es una limitacion de inferencia con tuplas
-    # vacias.
-    'DEFAULT_AUTHENTICATION_CLASSES': (),  # type: ignore[dict-item]
-    'DEFAULT_PERMISSION_CLASSES': (),  # type: ignore[dict-item]
-}
+RATE_LIMIT_ENABLED = False
 
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',

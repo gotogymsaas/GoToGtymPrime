@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load idiomas %}
 {% load static i18n imagenes %}
 
 {% block title %}GoToGym — Wear the intelligence{% endblock %}
@@ -28,35 +29,35 @@ ancho de pantalla, incluido el movil.
     {% include "partials/_quantum_lens.html" %}
 
     <div class="store-shell store-hero__content">
-      <p class="store-eyebrow">Ropa deportiva con tecnología textil</p>
+      <p class="store-eyebrow">{% trans "Ropa deportiva con tecnología textil" %}</p>
       <h1 id="store-hero-title">Wear the <em>intelligence.</em></h1>
-      <p class="store-hero__lead">Prendas construidas con materiales de nueva generación que regulan, protegen y duran. Tecnología que no se ve — pero se siente cada vez que te mueves.</p>
+      <p class="store-hero__lead">{% trans "Prendas construidas con materiales de nueva generación que regulan, protegen y duran. Tecnología que no se ve — pero se siente cada vez que te mueves." %}</p>
       <div class="store-actions">
-        <a class="store-button store-button--primary" data-track="hero_collection" href="{% url 'tienda:producto_list' %}">Descubrir la colección</a>
-        <a class="store-link" data-track="hero_technology" href="#tecnologia">Conocer la tecnología <span aria-hidden="true">↗</span></a>
+        <a class="store-button store-button--primary" data-track="hero_collection" href="{% url 'tienda:producto_list' %}">{% trans "Descubrir la colección" %}</a>
+        <a class="store-link" data-track="hero_technology" href="#tecnologia">{% trans "Conocer la tecnología" %} <span aria-hidden="true">↗</span></a>
       </div>
-      <ul class="store-proof" aria-label="Beneficios de compra">
-        <li>Diseño colombiano</li>
+      <ul class="store-proof" aria-label="{% trans 'Beneficios de compra' %}">
+        <li>{% trans "Diseño colombiano" %}</li>
       </ul>
     </div>
   </section>
 
   <section class="store-section store-intents" aria-labelledby="intent-title">
     <div class="store-shell">
-      <p class="store-eyebrow">Elige tu intención</p>
+      <p class="store-eyebrow">{% trans "Elige tu intención" %}</p>
       <div class="store-heading-row">
-        <h2 id="intent-title">Encuentra tu próximo movimiento</h2>
-        <p>Prendas que van del entrenamiento al día a día sin perder un paso. La misma tecnología, en cada momento.</p>
+        <h2 id="intent-title">{% trans "Encuentra tu próximo movimiento" %}</h2>
+        <p>{% trans "Prendas que van del entrenamiento al día a día sin perder un paso. La misma tecnología, en cada momento." %}</p>
       </div>
       <div class="intent-grid">
         <a class="intent-card intent-card--performance" data-track="intent_performance" href="{% url 'tienda:producto_list' %}">
-          <span class="intent-card__number">01</span><span><strong>Rendimiento</strong><small>Intensidad y movilidad.</small></span><b aria-hidden="true">↗</b>
+          <span class="intent-card__number">01</span><span><strong>{% trans "Rendimiento" %}</strong><small>{% trans "Intensidad y movilidad." %}</small></span><b aria-hidden="true">↗</b>
         </a>
         <a class="intent-card intent-card--daily" data-track="intent_daily" href="{% url 'tienda:producto_list' %}">
-          <span class="intent-card__number">02</span><span><strong>Movimiento diario</strong><small>Comodidad técnica para todo tu día.</small></span><b aria-hidden="true">↗</b>
+          <span class="intent-card__number">02</span><span><strong>{% trans "Movimiento diario" %}</strong><small>{% trans "Comodidad técnica para todo tu día." %}</small></span><b aria-hidden="true">↗</b>
         </a>
         <a class="intent-card intent-card--custom" data-track="intent_custom" href="{% url 'contacto' %}">
-          <span class="intent-card__number">03</span><span><strong>Ediciones personalizadas</strong><small>Diseño y detalles verdaderamente propios.</small></span><b aria-hidden="true">↗</b>
+          <span class="intent-card__number">03</span><span><strong>{% trans "Ediciones personalizadas" %}</strong><small>{% trans "Diseño y detalles verdaderamente propios." %}</small></span><b aria-hidden="true">↗</b>
         </a>
       </div>
     </div>
@@ -64,10 +65,10 @@ ancho de pantalla, incluido el movil.
 
   <section class="store-section store-products" aria-labelledby="featured-title">
     <div class="store-shell">
-      <p class="store-eyebrow">Selección GoToGym</p>
+      <p class="store-eyebrow">{% trans "Selección GoToGym" %}</p>
       <div class="store-heading-row">
-        <h2 id="featured-title">Tecnología que se siente en movimiento</h2>
-        <a class="store-link" href="{% url 'tienda:producto_list' %}">Ver toda la tienda <span aria-hidden="true">→</span></a>
+        <h2 id="featured-title">{% trans "Tecnología que se siente en movimiento" %}</h2>
+        <a class="store-link" href="{% url 'tienda:producto_list' %}">{% trans "Ver toda la tienda" %} <span aria-hidden="true">→</span></a>
       </div>
       {% if featured_cards %}
       <div class="home-product-grid">
@@ -78,15 +79,15 @@ ancho de pantalla, incluido el movil.
                  data-track-lista="home_destacados"
                  data-track-posicion="{{ forloop.counter }}">
           <a class="home-product-card__image" href="{% url 'tienda:producto_detail' card.product.pk %}">
-            {% imagen_producto nombre=card.image.name alt=card.product.name sizes="(max-width: 420px) 100vw, (max-width: 980px) 50vw, 25vw" %}
-            {% if not card.in_stock %}<span>Agotado</span>{% endif %}
+            {% imagen_producto nombre=card.image.name alt=card.product.name|traducir sizes="(max-width: 420px) 100vw, (max-width: 980px) 50vw, 25vw" %}
+            {% if not card.in_stock %}<span>{% trans "Agotado" %}</span>{% endif %}
           </a>
           <div class="home-product-card__content">
-            <p>{{ card.product.category.name }}</p>
-            <h3><a href="{% url 'tienda:producto_detail' card.product.pk %}">{{ card.product.name }}</a></h3>
+            <p>{{ card.product.category.name|traducir }}</p>
+            <h3><a href="{% url 'tienda:producto_detail' card.product.pk %}">{{ card.product.name|traducir }}</a></h3>
             <div class="home-product-card__meta">
               <strong>{% include "tienda/partials/_price.html" with price_min=card.price_min price_max=card.price_max has_range=card.has_price_range compare_price=card.compare_price discount_percent=card.discount_percent %}</strong>
-              {% if card.sizes %}<small>{{ card.sizes|join:" · " }}</small>{% endif %}
+              {% if card.sizes %}<small>{% for talla in card.sizes %}{{ talla|traducir }}{% if not forloop.last %} · {% endif %}{% endfor %}</small>{% endif %}
             </div>
           </div>
         </article>
@@ -94,8 +95,8 @@ ancho de pantalla, incluido el movil.
       </div>
       {% else %}
       <div class="store-empty">
-        <p>Estamos preparando una selección extraordinaria.</p>
-        <a class="store-button store-button--dark" href="{% url 'tienda:producto_list' %}">Explorar la tienda</a>
+        <p>{% trans "Estamos preparando una selección extraordinaria." %}</p>
+        <a class="store-button store-button--dark" href="{% url 'tienda:producto_list' %}">{% trans "Explorar la tienda" %}</a>
       </div>
       {% endif %}
     </div>
@@ -103,16 +104,16 @@ ancho de pantalla, incluido el movil.
 
   <section class="store-story" id="tecnologia" aria-labelledby="technology-title">
     <div class="store-story__image">
-      {% imagen_editorial "WhatsApp Image 2026-07-21 at 6.53.19 PM (8).jpeg" alt="Detalle de una prenda técnica GoToGym" sizes="(max-width: 980px) 100vw, 55vw" %}
+      {% imagen_editorial "WhatsApp Image 2026-07-21 at 6.53.19 PM (8).jpeg" alt=_("Detalle de una prenda técnica GoToGym") sizes="(max-width: 980px) 100vw, 55vw" %}
     </div>
     <div class="store-story__content">
       <p class="store-eyebrow">GoToGym Technology</p>
-      <h2 id="technology-title">Innovación que trabaja alrededor de ti.</h2>
-      <p>No es marketing. Son materiales de nueva generación, probados y certificados, que regulan tu temperatura, protegen tu piel y duran más que la ropa convencional. Tecnología que no se ve — pero cambia cómo te mueves.</p>
+      <h2 id="technology-title">{% trans "Innovación que trabaja alrededor de ti." %}</h2>
+      <p>{% trans "No es marketing. Son materiales de nueva generación, probados y certificados, que regulan tu temperatura, protegen tu piel y duran más que la ropa convencional. Tecnología que no se ve — pero cambia cómo te mueves." %}</p>
       <dl class="technology-list">
-        <div><dt>01</dt><dd><strong>Materiales de nueva generación</strong><span>Textiles con grafeno que regulan el calor, repelen el agua y resisten el desgaste. Ciencia aplicada a cada costura.</span></dd></div>
-        <div><dt>02</dt><dd><strong>Rendimiento medible</strong><span>Resultados certificados: mayor transpirabilidad, estabilidad UV y resistencia comprobada. No lo decimos nosotros — lo dicen las pruebas.</span></dd></div>
-        <div><dt>03</dt><dd><strong>Diseño que evoluciona contigo</strong><span>Cada prenda se desarrolla pensando en cómo se usa de verdad — en el gym, en la calle, en tu día completo.</span></dd></div>
+        <div><dt>01</dt><dd><strong>{% trans "Materiales de nueva generación" %}</strong><span>{% trans "Textiles con grafeno que regulan el calor, repelen el agua y resisten el desgaste. Ciencia aplicada a cada costura." %}</span></dd></div>
+        <div><dt>02</dt><dd><strong>{% trans "Rendimiento medible" %}</strong><span>{% trans "Resultados certificados: mayor transpirabilidad, estabilidad UV y resistencia comprobada. No lo decimos nosotros — lo dicen las pruebas." %}</span></dd></div>
+        <div><dt>03</dt><dd><strong>{% trans "Diseño que evoluciona contigo" %}</strong><span>{% trans "Cada prenda se desarrolla pensando en cómo se usa de verdad — en el gym, en la calle, en tu día completo." %}</span></dd></div>
       </dl>
     </div>
   </section>
@@ -120,18 +121,18 @@ ancho de pantalla, incluido el movil.
   <section class="store-section store-wellness" aria-labelledby="wellness-title">
     <div class="store-shell store-wellness__grid">
       <div class="store-wellness__copy">
-        <p class="store-eyebrow">Bienestar en movimiento</p>
-        <h2 id="wellness-title">Cuando tu equipo se mueve bien, todo funciona mejor.</h2>
-        <p>Prendas y experiencias diseñadas para organizaciones que entienden el bienestar como parte de su cultura — no como un beneficio adicional, sino como una decisión estratégica.</p>
-        <a class="store-button store-button--dark" href="{% url 'contacto' %}">Hablar con GoToGym</a>
+        <p class="store-eyebrow">{% trans "Bienestar en movimiento" %}</p>
+        <h2 id="wellness-title">{% trans "Cuando tu equipo se mueve bien, todo funciona mejor." %}</h2>
+        <p>{% trans "Prendas y experiencias diseñadas para organizaciones que entienden el bienestar como parte de su cultura — no como un beneficio adicional, sino como una decisión estratégica." %}</p>
+        <a class="store-button store-button--dark" href="{% url 'contacto' %}">{% trans "Hablar con GoToGym" %}</a>
       </div>
-      {% imagen_editorial "bienestar_empresarial_3.jpeg" alt="Equipo usando prendas GoToGym en una experiencia de bienestar empresarial" sizes="(max-width: 980px) 100vw, 60vw" %}
+      {% imagen_editorial "bienestar_empresarial_3.jpeg" alt=_("Equipo usando prendas GoToGym en una experiencia de bienestar empresarial") sizes="(max-width: 980px) 100vw, 60vw" %}
     </div>
   </section>
 
   <section class="store-closing" aria-labelledby="closing-title">
     {% imagen_editorial "WhatsApp Image 2026-07-21 at 6.53.19 PM (1).jpeg" alt="" sizes="100vw" %}
-    <div><p class="store-eyebrow">Inteligencia que llevas puesta.</p><h2 id="closing-title">Tu movimiento.<br>Tu diseño.<br><em>Tu GoToGym.</em></h2><a class="store-button store-button--primary" href="{% url 'tienda:producto_list' %}">Entrar a la tienda</a></div>
+    <div><p class="store-eyebrow">{% trans "Inteligencia que llevas puesta." %}</p><h2 id="closing-title">{% trans "Tu movimiento." %}<br>{% trans "Tu diseño." %}<br><em>{% trans "Tu GoToGym." %}</em></h2><a class="store-button store-button--primary" href="{% url 'tienda:producto_list' %}">{% trans "Entrar a la tienda" %}</a></div>
   </section>
 </div>
 {% endblock %}

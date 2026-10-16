@@ -40,6 +40,18 @@
   }
   if (!ajustes || !ajustes.endpoint) return;
 
+  // Medicion solo con consentimiento (cookie `gtg_cookies=analitica`, ver
+  // cookies.js). Sin eleccion o con "solo necesarias" no se mide nada.
+  function consentimiento() {
+    return /(?:^|;\s*)gtg_cookies=analitica(?:;|$)/.test(document.cookie);
+  }
+
+  var iniciada = false;
+
+  function iniciar() {
+  if (iniciada) return;
+  iniciada = true;
+
   var TAMANO_LOTE = 8;
   var ESPERA_MS = 5000;
   var cola = [];
@@ -66,6 +78,11 @@
       temporizador = null;
     }
     if (!cola.length) return;
+    // Si la persona retiro el permiso despues de acumular eventos, se descartan.
+    if (!consentimiento()) {
+      cola = [];
+      return;
+    }
 
     var lote = cola;
     cola = [];
@@ -219,4 +236,14 @@
     if (document.visibilityState === 'hidden') enviar();
   });
   window.addEventListener('pagehide', enviar);
+  }
+
+  if (consentimiento()) {
+    iniciar();
+  } else {
+    // Aun sin decidir: si acepta en esta misma pagina, empieza a medir.
+    document.addEventListener('gtg:cookies', function (evento) {
+      if (evento.detail && evento.detail.analitica) iniciar();
+    });
+  }
 })();

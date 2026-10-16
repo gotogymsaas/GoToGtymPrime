@@ -2,31 +2,31 @@
 {% load static i18n %}
 {% block title %}{% trans "Mi cuenta" %} | GoToGym{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261014-cookies">{% endblock %}
 {% block content %}
 <div class="editorial-page">
-  <header class="editorial-hero editorial-hero--compact"><div class="editorial-shell"><p class="editorial-kicker">Tu cuenta</p><h1 class="editorial-title">Tu información,<br><em>a tu manera.</em></h1></div></header>
+  <header class="editorial-hero editorial-hero--compact"><div class="editorial-shell"><p class="editorial-kicker">{% trans "Tu cuenta" %}</p><h1 class="editorial-title">{% trans "Tu información," %}<br><em>{% trans "a tu manera." %}</em></h1></div></header>
   <section class="editorial-section editorial-section--mist">
     <form method="post" enctype="multipart/form-data" class="editorial-shell account-layout">
       {% csrf_token %}
-      <div class="account-panel"><p class="editorial-kicker">Identidad</p><h2>Datos personales</h2><div class="account-fields">
+      <div class="account-panel"><p class="editorial-kicker">{% trans "Identidad" %}</p><h2>{% trans "Datos personales" %}</h2><div class="account-fields">
         <div class="account-field"><label for="id_first_name">{% trans "Nombre" %}</label><input type="text" name="first_name" id="id_first_name" value="{{ user.first_name|default:'' }}" required></div>
         <div class="account-field"><label for="id_last_name">{% trans "Apellido" %}</label><input type="text" name="last_name" id="id_last_name" value="{{ user.last_name|default:'' }}" required></div>
-        <div class="account-field account-field--full"><label for="id_email">Email</label><input type="email" name="email" id="id_email" value="{{ user.email }}" required></div>
+        <div class="account-field account-field--full"><label for="id_email">{% trans "Email" %}</label><input type="email" name="email" id="id_email" value="{{ user.email }}" required></div>
         <div class="account-field"><label for="id_age">{% trans "Edad" %}</label><input type="number" name="age" id="id_age" value="{{ user.age|default:'' }}" min="10" max="120"></div>
         <div class="account-field"><label for="id_phone">{% trans "Telefono" %}</label><input type="tel" name="phone" id="id_phone" value="{{ user.phone|default:'' }}"></div>
       </div></div>
-      <aside class="account-panel"><p class="editorial-kicker">Protección</p><h2>Seguridad</h2><details class="account-security"><summary>Cambiar contraseña</summary><div class="account-fields">
+      <aside class="account-panel"><p class="editorial-kicker">{% trans "Protección" %}</p><h2>{% trans "Seguridad" %}</h2><details class="account-security"><summary>{% trans "Cambiar contraseña" %}</summary><div class="account-fields">
         <div class="account-field account-field--full"><label for="id_current_password">{% trans "Contraseña actual" %}</label><input type="password" name="current_password" id="id_current_password" autocomplete="current-password"></div>
         <div class="account-field account-field--full"><label for="id_password">{% trans "Nueva contraseña" %}</label><input type="password" name="password" id="id_password" autocomplete="new-password" aria-describedby="password-rules"><small id="password-rules">{% trans "Mínimo 8 caracteres, con una mayúscula, una minúscula, un número y un carácter especial (por ejemplo ! ? # $ @)." %}</small></div>
         <div class="account-field account-field--full"><label for="id_password2">{% trans "Confirmar contraseña" %}</label><input type="password" name="password2" id="id_password2" autocomplete="new-password"></div>
       </div></details></aside>
-      <div class="account-actions account-field--full"><a class="editorial-text-link" href="{% url 'home' %}">← Volver al Home</a><button type="submit" class="editorial-action">{% trans "Guardar cambios" %}</button></div>
+      <div class="account-actions account-field--full"><a class="editorial-text-link" href="{% url 'home' %}">{% trans "← Volver al Home" %}</a><button type="submit" class="editorial-action">{% trans "Guardar cambios" %}</button></div>
     </form>
 
     <div class="editorial-shell account-layout">
       <div class="account-panel account-field--full">
-        <p class="editorial-kicker">Entrega</p>
+        <p class="editorial-kicker">{% trans "Entrega" %}</p>
         <h2>{% trans "Mis direcciones" %}</h2>
 
         {% if direcciones_formularios %}
@@ -41,7 +41,7 @@
                      onchange="this.form.submit()">
               <span>
                 <strong>{{ item.direccion.address_line }}</strong>{% if item.direccion.address_complement %}, {{ item.direccion.address_complement }}{% endif %}
-                <small>{{ item.direccion.city }}, {{ item.direccion.department }}{% if item.direccion.is_default %} &middot; {% trans "Predeterminada" %}{% endif %}</small>
+                <small>{{ item.direccion.city }}, {{ item.direccion.department }}{% if item.direccion.is_default %} · {% trans "Predeterminada" %}{% endif %}</small>
               </span>
             </label>
             <form id="form-predeterminada-{{ item.direccion.pk }}" method="post" action="{% url 'address_set_default' item.direccion.pk %}">{% csrf_token %}</form>

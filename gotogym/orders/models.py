@@ -3,30 +3,31 @@ from decimal import Decimal
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy
 from products.models import ProductVariant
 
 
 class OrderStatus(models.TextChoices):
-    PENDING_PAYMENT = 'pending_payment', 'Pendiente de pago'
-    CONFIRMED = 'confirmed', 'Confirmado'
-    PREPARING = 'preparing', 'En preparacion'
-    SHIPPED = 'shipped', 'Enviado'
-    IN_TRANSIT = 'in_transit', 'En transito'
-    DELIVERED = 'delivered', 'Entregado'
-    CANCELLED = 'cancelled', 'Cancelado'
-    RETURNED = 'returned', 'Devolucion'
+    PENDING_PAYMENT = 'pending_payment', gettext_lazy('Pendiente de pago')
+    CONFIRMED = 'confirmed', gettext_lazy('Confirmado')
+    PREPARING = 'preparing', gettext_lazy('En preparacion')
+    SHIPPED = 'shipped', gettext_lazy('Enviado')
+    IN_TRANSIT = 'in_transit', gettext_lazy('En transito')
+    DELIVERED = 'delivered', gettext_lazy('Entregado')
+    CANCELLED = 'cancelled', gettext_lazy('Cancelado')
+    RETURNED = 'returned', gettext_lazy('Devolucion')
 
 
 class PaymentStatus(models.TextChoices):
-    PENDING = 'pending', 'Pendiente'
-    APPROVED = 'approved', 'Aprobado'
-    REJECTED = 'rejected', 'Rechazado'
-    CANCELLED = 'cancelled', 'Cancelado'
+    PENDING = 'pending', gettext_lazy('Pendiente')
+    APPROVED = 'approved', gettext_lazy('Aprobado')
+    REJECTED = 'rejected', gettext_lazy('Rechazado')
+    CANCELLED = 'cancelled', gettext_lazy('Cancelado')
 
 
 class CouponDiscountType(models.TextChoices):
-    PERCENTAGE = 'percentage', 'Porcentaje'
-    FIXED = 'fixed', 'Valor fijo'
+    PERCENTAGE = 'percentage', gettext_lazy('Porcentaje')
+    FIXED = 'fixed', gettext_lazy('Valor fijo')
 
 
 class Coupon(models.Model):
@@ -124,6 +125,8 @@ class Order(models.Model):
     # Nota operativa para casos que exigen revision humana, como un pago
     # aprobado sin stock suficiente para cumplirlo. No es visible al cliente.
     internal_note = models.TextField(blank=True)
+    # Idioma en que se hizo el pedido: los correos al cliente salen en ese idioma.
+    language = models.CharField(max_length=8, default='es', blank=True)
 
     # Afiliado cuyo cupon se uso en este pedido, si aplica. Se fija una sola
     # vez al crear el pedido (a partir de `Coupon.afiliado`) y no cambia

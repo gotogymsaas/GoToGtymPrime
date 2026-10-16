@@ -1,6 +1,6 @@
 # Guía de acceso: cómo ejecutar el proyecto y entrar a cada panel
 
-Vigente al 2 de octubre de 2026.
+Vigente al 14 de octubre de 2026.
 
 ## Ejecutarlo en tu equipo
 
@@ -33,16 +33,17 @@ Todas las rutas llevan prefijo de idioma; en español es `/es/`.
 | Portada y tienda | `http://localhost:8000/es/` y `/es/tienda/` |
 | Panel interno (ventas, analítica, productos, pedidos, cupones, usuarios, afiliados) | `/es/admin-panel/` |
 | Analítica de comportamiento | `/es/admin-panel/analitica/` |
-| Administración de Django | `/es/admin/` |
+| Administración de Django (solo superusuarios; la ruta se cambia con `ADMIN_URL`) | `/es/admin/` |
 | Contabilidad (Alegra) | `/es/contabilidad/clientes/` |
 | Panel de afiliados | `/es/afiliados/dashboard/` |
+| Políticas y cookies | `/es/politica-cookies/`, `/es/politica-privacidad/`, `/es/terminos/` |
 | Comprobación de salud | `/healthz` |
 
 El panel interno exige una cuenta con `is_staff`; la administración de Django, un superusuario.
 
 ## Cuentas
 
-El proyecto **no documenta credenciales**. Crea tu propio superusuario con `createsuperuser` (arriba) y úsalo para entrar a los paneles. Para probar el flujo de un cliente, regístrate desde `/es/accounts/register/`.
+El proyecto **no documenta credenciales**. Crea tu propio superusuario con `createsuperuser` (arriba) y úsalo para entrar a los paneles. Para probar el flujo de un cliente, regístrate desde `/es/accounts/register/`; la contraseña necesita 8 caracteres o más, con mayúscula, minúscula, número y un carácter especial. En desarrollo los correos (confirmación de pedido, recuperación de contraseña) salen por la consola del servidor.
 
 ## Bases de datos
 

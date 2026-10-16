@@ -119,6 +119,7 @@ class DobleSubmitDeConfirmacionTests(TestCase):
         self.assertEqual(PaymentTransaction.objects.filter(order=self.pedido).count(), 1)
 
 
+@override_settings(RATE_LIMIT_ENABLED=True)
 class RateLimitDeEndpointsSensiblesTests(TestCase):
     """add_to_cart y payments:simulate estan protegidos contra abuso trivial."""
 

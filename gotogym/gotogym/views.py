@@ -4,10 +4,12 @@ from django.http import HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import render
 from django.templatetags.static import static
 from django.urls import reverse
+from django.utils.translation import get_language, gettext
 from django.utils.translation import gettext as _
 from tienda.catalog import curated_product_cards
 
-from . import politicas_contenido as politicas
+from . import politicas_contenido as politicas_es
+from . import politicas_contenido_en as politicas_en
 from .seo import contexto_seo
 
 
@@ -24,8 +26,10 @@ def home(request):
     sitio = request.build_absolute_uri('/')
     context.update(contexto_seo(
         'GoToGym: Wear the intelligence',
-        'Ropa deportiva con tecnología textil. Explora la colección GoToGym, diseñada para entrenar, '
-        'moverte y avanzar a tu manera.',
+        gettext(
+            'Ropa deportiva con tecnología textil. Explora la colección GoToGym, diseñada para entrenar, '
+            'moverte y avanzar a tu manera.'
+        ),
         datos=[
             {
                 '@context': 'https://schema.org', '@type': 'Organization', 'name': 'GoToGym',
@@ -61,19 +65,20 @@ def acerca_de(request):
 def contacto(request):
     context = {'back_url': reverse('home')}
     context.update(contexto_seo(
-        'Contacto | GoToGym',
-        'Escríbenos o llámanos: atención sobre compras, productos, personalización y bienestar empresarial.',
+        gettext('Contacto | GoToGym'),
+        gettext('Escríbenos o llámanos: atención sobre compras, productos, personalización y bienestar empresarial.'),
     ))
     return render(request, 'static_pages/contacto.html', context)
 
 
 @login_required
 def politicas_privacidad_usuario(request):
-    return render(request, 'static_pages/politicas_privacidad_usuario.html')
+    plantilla = 'static_pages/politicas_privacidad_usuario_en.html' if get_language() == 'en' else 'static_pages/politicas_privacidad_usuario.html'
+    return render(request, plantilla)
 
 
 def politica_privacidad(request):
-    return _policy_page(request, 'privacy', politicas.PRIVACIDAD)
+    return _policy_page(request, 'privacy', 'PRIVACIDAD')
 
 
 def terminos(request):
@@ -83,9 +88,12 @@ def terminos(request):
     })
 
 
-def _policy_page(request, policy_key, politica):
+def _policy_page(request, policy_key, nombre):
     """Pagina de politica: misma plantilla para todas; el texto vive en
-    `politicas_contenido`."""
+    `politicas_contenido` (espanol, el original) y `politicas_contenido_en`
+    (traduccion de cortesia)."""
+    modulo = politicas_en if get_language() == 'en' else politicas_es
+    politica = getattr(modulo, nombre)
     return render(request, 'static_pages/policy_page.html', {
         'title': politica['title'],
         'policy_key': policy_key,
@@ -96,27 +104,31 @@ def _policy_page(request, policy_key, politica):
 
 
 def politica_cambios(request):
-    return _policy_page(request, 'changes', politicas.CAMBIOS)
+    return _policy_page(request, 'changes', 'CAMBIOS')
 
 
 def politica_devoluciones(request):
-    return _policy_page(request, 'returns', politicas.DEVOLUCIONES)
+    return _policy_page(request, 'returns', 'DEVOLUCIONES')
 
 
 def politica_garantia(request):
-    return _policy_page(request, 'warranty', politicas.GARANTIA)
+    return _policy_page(request, 'warranty', 'GARANTIA')
 
 
 def politica_tratamiento_datos(request):
-    return _policy_page(request, 'data', politicas.TRATAMIENTO_DATOS)
+    return _policy_page(request, 'data', 'TRATAMIENTO_DATOS')
+
+
+def politica_cookies(request):
+    return _policy_page(request, 'cookies', 'COOKIES')
 
 
 def politica_envios(request):
-    return _policy_page(request, 'shipping', politicas.ENVIOS)
+    return _policy_page(request, 'shipping', 'ENVIOS')
 
 
 def politica_pagos(request):
-    return _policy_page(request, 'payments', politicas.PAGOS)
+    return _policy_page(request, 'payments', 'PAGOS')
 
 
 # Rutas que no tiene sentido indexar: privadas o sin contenido propio.

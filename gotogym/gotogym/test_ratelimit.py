@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.test import RequestFactory, SimpleTestCase
 from django.test.utils import override_settings
 
-from .ratelimit import rate_limit
+from .ratelimit import ip_del_cliente, rate_limit
 
 
 class _AnonUser:
@@ -18,7 +18,10 @@ class _RealUser:
         self.pk = pk
 
 
-@override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}})
+@override_settings(
+    RATE_LIMIT_ENABLED=True,
+    CACHES={'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}},
+)
 class RateLimitTests(SimpleTestCase):
     def setUp(self):
         cache.clear()
@@ -93,3 +96,49 @@ class RateLimitTests(SimpleTestCase):
         vista = rate_limit('test-caduca', limit=1, period_seconds=60)(lambda r: HttpResponse('ok'))
         with patch.object(cache, 'incr', side_effect=ValueError('Key not found')):
             self.assertEqual(vista(self._request()).status_code, 200)
+
+
+    def test_solo_cuenta_los_metodos_indicados(self):
+        vista = rate_limit('test-metodos', limit=1, period_seconds=60, metodos=('POST',))(lambda r: HttpResponse('ok'))
+        consulta = self.factory.get('/formulario/')
+        consulta.user = _AnonUser()
+        consulta.META['REMOTE_ADDR'] = '10.0.0.1'
+        for _ in range(5):
+            self.assertEqual(vista(consulta).status_code, 200)
+        self.assertEqual(vista(self._request()).status_code, 200)
+        self.assertEqual(vista(self._request()).status_code, 429)
+
+    @override_settings(RATE_LIMIT_ENABLED=False)
+    def test_apagado_no_limita(self):
+        vista = rate_limit('test-apagado', limit=1, period_seconds=60)(lambda r: HttpResponse('ok'))
+        for _ in range(5):
+            self.assertEqual(vista(self._request()).status_code, 200)
+
+
+@override_settings(TRUSTED_PROXY_HOPS=1)
+class IpDelClienteTests(SimpleTestCase):
+    """Detras del proxy de Azure la conexion siempre llega desde el proxy: la
+    IP del cliente es la que el proxy agrego a X-Forwarded-For."""
+
+    def _peticion(self, reenviadas=None, remoto='169.254.130.1'):
+        peticion = RequestFactory().get('/')
+        peticion.META['REMOTE_ADDR'] = remoto
+        if reenviadas is not None:
+            peticion.META['HTTP_X_FORWARDED_FOR'] = reenviadas
+        return peticion
+
+    def test_usa_la_ip_que_agrego_el_proxy_y_quita_el_puerto(self):
+        self.assertEqual(ip_del_cliente(self._peticion('200.1.2.3:51234')), '200.1.2.3')
+
+    def test_ignora_lo_que_el_cliente_pudo_inventar_antes(self):
+        self.assertEqual(ip_del_cliente(self._peticion('9.9.9.9, 200.1.2.3:51234')), '200.1.2.3')
+
+    def test_ipv6_con_puerto(self):
+        self.assertEqual(ip_del_cliente(self._peticion('[2800:484::1]:443')), '2800:484::1')
+
+    def test_sin_cabecera_usa_la_conexion(self):
+        self.assertEqual(ip_del_cliente(self._peticion()), '169.254.130.1')
+
+    @override_settings(TRUSTED_PROXY_HOPS=0)
+    def test_sin_proxies_de_confianza_ignora_la_cabecera(self):
+        self.assertEqual(ip_del_cliente(self._peticion('9.9.9.9', remoto='10.0.0.7')), '10.0.0.7')

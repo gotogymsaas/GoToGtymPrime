@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load static %}
 
-{% block title %}Cuenta Bre-B{% endblock %}
+{% block title %}{% trans "Cuenta Bre-B" %}{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 
 {% block extra_head %}
@@ -16,8 +17,8 @@
         <span class="quantum-emblem"><span class="quantum-emblem__core"></span></span>
         <span class="quantum-signal-line"></span>
       </div>
-      <p class="eyebrow">Programa de afiliados</p>
-      <h1>{% if cuenta %}Editar cuenta Bre-B{% else %}Inscribe tu cuenta Bre-B{% endif %}</h1>
+      <p class="eyebrow">{% trans "Programa de afiliados" %}</p>
+      <h1>{% if cuenta %}{% trans "Editar cuenta Bre-B" %}{% else %}{% trans "Inscribe tu cuenta Bre-B" %}{% endif %}</h1>
     </div>
   </section>
 
@@ -29,12 +30,12 @@
       {% endif %}
 
       {% if form.ya_acepto %}
-      <p class="hint">Aceptaste los <a href="{% url 'afiliado_terminos' %}" target="_blank" rel="noopener">t&eacute;rminos del pago por Bre-B</a> y la autorizaci&oacute;n de tratamiento de datos (<a href="{% url 'politica_tratamiento_datos' %}" target="_blank" rel="noopener">pol&iacute;tica</a>) el {{ cuenta.terms_accepted_at|date:"d/m/Y" }}; no tienes que volver a hacerlo. Los cambios aplican a tus pr&oacute;ximas solicitudes de comisi&oacute;n: una solicitud en curso conserva los datos con los que se hizo.</p>
+      <p class="hint">{% trans "Aceptaste los" %} <a href="{% url 'afiliado_terminos' %}" target="_blank" rel="noopener">{% trans "términos del pago por Bre-B" %}</a> {% trans "y la autorización de tratamiento de datos (" %}<a href="{% url 'politica_tratamiento_datos' %}" target="_blank" rel="noopener">{% trans "política" %}</a>){% blocktrans trimmed with fecha=cuenta.terms_accepted_at|date:"d/m/Y" %} el {{ fecha }}; no tienes que volver a hacerlo. Los cambios aplican a tus próximas solicitudes de comisión: una solicitud en curso conserva los datos con los que se hizo.{% endblocktrans %}</p>
       {% else %}
-      <h2>T&eacute;rminos y autorizaci&oacute;n</h2>
+      <h2>{% trans "Términos y autorización" %}</h2>
       <div class="legal-text">
-        <p><strong>T&eacute;rminos del pago por Bre-B.</strong> Declaro que la cuenta y la llave Bre-B que inscribo son de mi titularidad y que los datos que entrego son ver&iacute;dicos y completos. Entiendo que GoToGym pagar&aacute; mis comisiones &uacute;nicamente a la llave inscrita, por lo que soy responsable de mantenerla vigente y escrita tal como la cre&eacute; en mi banco o billetera; un pago enviado a la llave registrada se considera bien hecho. Acepto que los pagos est&aacute;n sujetos a los <a href="{% url 'afiliado_terminos' %}" target="_blank" rel="noopener">t&eacute;rminos</a> del programa de afiliados, a que existan comisiones confirmadas y a la deducci&oacute;n de los gastos de transacci&oacute;n, si los hay. Puedo actualizar mis datos en cualquier momento; el cambio aplica a las solicitudes futuras.</p>
-        <p><strong>Autorizaci&oacute;n de tratamiento de datos personales.</strong> Autorizo de manera previa, expresa e informada a GoToGym para recolectar, almacenar, usar y consultar mis datos personales (nombre, documento de identidad, tel&eacute;fono, direcci&oacute;n y llave Bre-B) con el fin de identificarme como titular, asociar y ejecutar el pago de mis comisiones, cumplir obligaciones contables y tributarias y prevenir fraudes, conforme a la Ley 1581 de 2012 y a la <a href="{% url 'politica_tratamiento_datos' %}" target="_blank" rel="noopener">pol&iacute;tica de tratamiento de datos</a>. Como titular puedo conocer, actualizar y rectificar mis datos, solicitar su supresi&oacute;n y revocar esta autorizaci&oacute;n, salvo que la ley obligue a conservarlos. No se me solicitan datos sensibles.</p>
+        <p><strong>{% trans "Términos del pago por Bre-B." %}</strong> {% trans "Declaro que la cuenta y la llave Bre-B que inscribo son de mi titularidad y que los datos que entrego son verídicos y completos. Entiendo que GoToGym pagará mis comisiones únicamente a la llave inscrita, por lo que soy responsable de mantenerla vigente y escrita tal como la creé en mi banco o billetera; un pago enviado a la llave registrada se considera bien hecho. Acepto que los pagos están sujetos a los" %} <a href="{% url 'afiliado_terminos' %}" target="_blank" rel="noopener">{% trans "términos" %}</a> {% trans "del programa de afiliados, a que existan comisiones confirmadas y a la deducción de los gastos de transacción, si los hay. Puedo actualizar mis datos en cualquier momento; el cambio aplica a las solicitudes futuras." %}</p>
+        <p><strong>{% trans "Autorización de tratamiento de datos personales." %}</strong> {% trans "Autorizo de manera previa, expresa e informada a GoToGym para recolectar, almacenar, usar y consultar mis datos personales (nombre, documento de identidad, teléfono, dirección y llave Bre-B) con el fin de identificarme como titular, asociar y ejecutar el pago de mis comisiones, cumplir obligaciones contables y tributarias y prevenir fraudes, conforme a la Ley 1581 de 2012 y a la" %} <a href="{% url 'politica_tratamiento_datos' %}" target="_blank" rel="noopener">{% trans "política de tratamiento de datos" %}</a>{% trans ". Como titular puedo conocer, actualizar y rectificar mis datos, solicitar su supresión y revocar esta autorización, salvo que la ley obligue a conservarlos. No se me solicitan datos sensibles." %}</p>
       </div>
       {% endif %}
 
@@ -42,17 +43,17 @@
         {% if not form.ya_acepto %}
         <label class="check field-full" for="{{ form.accept_terms.id_for_label }}">
           <input type="checkbox" name="accept_terms" id="{{ form.accept_terms.id_for_label }}" required{% if form.accept_terms.value %} checked{% endif %}>
-          <span>Acepto los t&eacute;rminos del pago por Bre-B.</span>
+          <span>{% trans "Acepto los términos del pago por Bre-B." %}</span>
         </label>
         {% if form.accept_terms.errors %}<small class="field-error field-full" role="alert">{{ form.accept_terms.errors|join:" " }}</small>{% endif %}
         <label class="check field-full" for="{{ form.accept_data.id_for_label }}">
           <input type="checkbox" name="accept_data" id="{{ form.accept_data.id_for_label }}" required{% if form.accept_data.value %} checked{% endif %}>
-          <span>Autorizo el tratamiento de mis datos personales.</span>
+          <span>{% trans "Autorizo el tratamiento de mis datos personales." %}</span>
         </label>
         {% if form.accept_data.errors %}<small class="field-error field-full" role="alert">{{ form.accept_data.errors|join:" " }}</small>{% endif %}
         {% endif %}
 
-        <h2>Datos del titular y de la llave</h2>
+        <h2>{% trans "Datos del titular y de la llave" %}</h2>
         {% for campo in form %}
         {% if campo.field.widget.input_type != 'checkbox' %}
         <label class="{% if campo.name == 'address' or campo.name == 'breb_key' %}field-full{% endif %}" for="{{ campo.id_for_label }}">
@@ -62,10 +63,10 @@
         </label>
         {% endif %}
         {% endfor %}
-        <p class="hint field-full">Escribe tu llave exactamente como la creaste en tu banco o billetera: debe ser la misma. Si tu llave es un c&oacute;digo alfanum&eacute;rico que empieza por @, aseg&uacute;rate de incluir el @.</p>
+        <p class="hint field-full">{% trans "Escribe tu llave exactamente como la creaste en tu banco o billetera: debe ser la misma. Si tu llave es un código alfanumérico que empieza por @, asegúrate de incluir el @." %}</p>
         <div class="form-actions">
-          <a href="{% url 'afiliado_dashboard' %}" class="ghost">Cancelar</a>
-          <button type="submit" class="button">Guardar cuenta</button>
+          <a href="{% url 'afiliado_dashboard' %}" class="ghost">{% trans "Cancelar" %}</a>
+          <button type="submit" class="button">{% trans "Guardar cuenta" %}</button>
         </div>
       </div>
     </form>

@@ -24,9 +24,9 @@
     <h1 class="text-2xl font-bold text-[var(--color-zafiro)] mb-4">{{ order.order_number }}</h1>
 
     <div class="border-y border-gray-200 py-4 mb-4 text-sm">
-      {% include "partials/_price_row.html" with row_class="flex justify-between mb-1 text-gray-600" label="Subtotal" amount=order.subtotal %}
-      {% include "partials/_price_row.html" with row_class="flex justify-between mb-2 text-gray-600" label="Envío" amount=order.shipping_cost %}
-      {% include "partials/_price_row.html" with row_class="flex justify-between text-lg font-bold text-[var(--color-zafiro)]" label="Total a pagar" amount=transaction.amount suffix=transaction.currency %}
+      {% include "partials/_price_row.html" with row_class="flex justify-between mb-1 text-gray-600" label=_("Subtotal") amount=order.subtotal %}
+      {% include "partials/_price_row.html" with row_class="flex justify-between mb-2 text-gray-600" label=_("Envío") amount=order.shipping_cost %}
+      {% include "partials/_price_row.html" with row_class="flex justify-between text-lg font-bold text-[var(--color-zafiro)]" label=_("Total a pagar") amount=transaction.amount suffix=transaction.currency %}
     </div>
 
     <p class="text-sm text-gray-600 mb-1">
@@ -69,7 +69,7 @@
     {% endif %}
 
     <a href="{% url 'orders:order_detail' order.order_number %}" class="mt-6 inline-block text-sm text-gray-600 hover:underline">
-      &larr; {% trans "Ver detalle del pedido" %}
+      ← {% trans "Ver detalle del pedido" %}
     </a>
   </div>
 </div>

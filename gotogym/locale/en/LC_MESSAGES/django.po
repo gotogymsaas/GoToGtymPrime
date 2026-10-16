@@ -1560,3 +1560,1957 @@ msgstr ""
 "Start with the collection or go deeper in the Journal: textile science, "
 "technology applied to movement and everything behind each garment — with its"
 " references."
+
+msgid ""
+"Mínimo 8 caracteres, con una mayúscula, una minúscula, un número y un "
+"carácter especial (por ejemplo ! ? # $ @)."
+msgstr ""
+"Minimum 8 characters, with an uppercase letter, a lowercase letter, a number"
+" and a special character (for example ! ? # $ @)."
+
+msgid "Última revisión"
+msgstr "Last reviewed"
+
+msgid "Acerca de GoToGym"
+msgstr "About GoToGym"
+
+msgid "Cookies"
+msgstr "Cookies"
+
+msgid "Preferencias de cookies"
+msgstr "Cookie preferences"
+
+msgid "Términos de afiliados"
+msgstr "Affiliate terms"
+
+msgid "Tu privacidad"
+msgstr "Your privacy"
+
+msgid "Cookies en GoToGym"
+msgstr "Cookies at GoToGym"
+
+msgid "Necesarias"
+msgstr "Necessary"
+
+msgid "Siempre activas"
+msgstr "Always on"
+
+msgid ""
+"Sesión, carrito, seguridad de formularios, idioma y el registro de esta "
+"elección. Sin ellas la tienda no funciona."
+msgstr ""
+"Session, cart, form security, language and the record of this choice. The "
+"store does not work without them."
+
+msgid "Analítica anónima"
+msgstr "Anonymous analytics"
+
+msgid ""
+"Cuenta visitas, clics, búsquedas y compras con un identificador aleatorio, "
+"sin nombre ni correo. Nos ayuda a mejorar la tienda."
+msgstr ""
+"Counts visits, clicks, searches and purchases with a random identifier, with"
+" no name or email. It helps us improve the store."
+
+msgid "Configurar"
+msgstr "Customize"
+
+msgid "Solo necesarias"
+msgstr "Necessary only"
+
+msgid "Aceptar todas"
+msgstr "Accept all"
+
+msgid "Guardar preferencias"
+msgstr "Save preferences"
+
+#, python-format
+msgid ""
+"Usamos cookies necesarias para que la tienda funcione: tu sesión, el "
+"carrito, la seguridad de los formularios y el idioma. Si lo aceptas, también"
+" medimos de forma anónima cómo se usa el sitio para mejorarlo. No usamos "
+"cookies de publicidad ni cargamos scripts de terceros. Más detalles en la <a"
+" href=\"%(url)s\">política de cookies</a>."
+msgstr ""
+"We use the cookies the store needs to work: your session, the cart, form "
+"security and language. If you accept, we also anonymously measure how the "
+"site is used so we can improve it. We do not use advertising cookies or load"
+" third-party scripts. More details in the <a href=\"%(url)s\">cookie "
+"policy</a>."
+
+msgid "al menos 8 caracteres"
+msgstr "at least 8 characters"
+
+msgid "una mayúscula"
+msgstr "an uppercase letter"
+
+msgid "una minúscula"
+msgstr "a lowercase letter"
+
+msgid "un número"
+msgstr "a number"
+
+msgid "un carácter especial (por ejemplo ! ? # $ @)"
+msgstr "a special character (for example ! ? # $ @)"
+
+#, python-format
+msgid "La contraseña debe tener %(faltantes)s."
+msgstr "The password must have %(faltantes)s."
+
+msgid "Rechazar"
+msgstr "Reject"
+
+msgid "Idioma"
+msgstr "Language"
+
+msgid "Tu información,"
+msgstr "Your information,"
+
+msgid "a tu manera."
+msgstr "your way."
+
+msgid "Identidad"
+msgstr "Identity"
+
+msgid "Datos personales"
+msgstr "Personal details"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Protección"
+msgstr "Protection"
+
+msgid "Seguridad"
+msgstr "Security"
+
+msgid "Cambiar contraseña"
+msgstr "Change password"
+
+msgid "← Volver al Home"
+msgstr "← Back to Home"
+
+msgid "Términos del programa de afiliados"
+msgstr "Affiliate program terms"
+
+msgid "Actualizamos los términos del programa"
+msgstr "We have updated the program terms"
+
+msgid ""
+"Si no estás de acuerdo con los cambios, puedes darte de baja sin "
+"penalización desde tu panel; tus comisiones confirmadas se te pagan igual."
+msgstr ""
+"If you do not agree with the changes, you can leave the program without "
+"penalty from your dashboard; your confirmed commissions will still be paid "
+"to you."
+
+msgid "términos del programa de afiliados"
+msgstr "affiliate program terms"
+
+msgid "Aceptar y continuar"
+msgstr "Accept and continue"
+
+msgid "¿Prefieres no continuar? Avísanos con 15 días de antelación."
+msgstr "Prefer not to continue? Let us know 15 days in advance."
+
+msgid "Solicitar mi baja"
+msgstr "Request to leave"
+
+#, python-format
+msgid ""
+"Los términos del programa de afiliados cambiaron. La versión %(version)s "
+"está vigente desde el %(desde)s. Léelos y acéptalos para seguir usando tu "
+"panel."
+msgstr ""
+"The affiliate program terms have changed. Version %(version)s has been in "
+"force since %(desde)s. Read and accept them to keep using your dashboard."
+
+#, python-format
+msgid "(versión %(version)s)."
+msgstr "(version %(version)s)."
+
+#, python-format
+msgid "Tienes un aviso de baja que se hace efectiva el %(fecha)s."
+msgstr "You have a leave notice that takes effect on %(fecha)s."
+
+msgid "Compras referidas"
+msgstr "Referred purchases"
+
+msgid "Fecha"
+msgstr "Date"
+
+msgid "Venta"
+msgstr "Sale"
+
+msgid "Comisión"
+msgstr "Commission"
+
+msgid "Aún no tienes compras referidas."
+msgstr "You have no referred purchases yet."
+
+msgid "Cuenta Bre-B"
+msgstr "Bre-B account"
+
+msgid "Editar cuenta Bre-B"
+msgstr "Edit Bre-B account"
+
+msgid "Inscribe tu cuenta Bre-B"
+msgstr "Register your Bre-B account"
+
+msgid "Aceptaste los"
+msgstr "You accepted the"
+
+msgid "términos del pago por Bre-B"
+msgstr "Bre-B payment terms"
+
+msgid "y la autorización de tratamiento de datos ("
+msgstr "and the personal data processing authorization ("
+
+msgid "política"
+msgstr "policy"
+
+msgid "Términos y autorización"
+msgstr "Terms and authorization"
+
+msgid "Términos del pago por Bre-B."
+msgstr "Bre-B payment terms."
+
+msgid ""
+"Declaro que la cuenta y la llave Bre-B que inscribo son de mi titularidad y "
+"que los datos que entrego son verídicos y completos. Entiendo que GoToGym "
+"pagará mis comisiones únicamente a la llave inscrita, por lo que soy "
+"responsable de mantenerla vigente y escrita tal como la creé en mi banco o "
+"billetera; un pago enviado a la llave registrada se considera bien hecho. "
+"Acepto que los pagos están sujetos a los"
+msgstr ""
+"I declare that the Bre-B account and key I register belong to me and that "
+"the data I provide is true and complete. I understand that GoToGym will pay "
+"my commissions only to the registered key, so I am responsible for keeping "
+"it valid and written exactly as I created it in my bank or wallet; a payment"
+" sent to the registered key is considered properly made. I accept that "
+"payments are subject to the"
+
+msgid "términos"
+msgstr "terms"
+
+msgid ""
+"del programa de afiliados, a que existan comisiones confirmadas y a la "
+"deducción de los gastos de transacción, si los hay. Puedo actualizar mis "
+"datos en cualquier momento; el cambio aplica a las solicitudes futuras."
+msgstr ""
+"of the affiliate program, to the existence of confirmed commissions and to "
+"the deduction of transaction fees, if any. I can update my details at any "
+"time; the change applies to future requests."
+
+msgid "Autorización de tratamiento de datos personales."
+msgstr "Authorization to process personal data."
+
+msgid ""
+"Autorizo de manera previa, expresa e informada a GoToGym para recolectar, "
+"almacenar, usar y consultar mis datos personales (nombre, documento de "
+"identidad, teléfono, dirección y llave Bre-B) con el fin de identificarme "
+"como titular, asociar y ejecutar el pago de mis comisiones, cumplir "
+"obligaciones contables y tributarias y prevenir fraudes, conforme a la Ley "
+"1581 de 2012 y a la"
+msgstr ""
+"I authorize GoToGym, in a prior, express and informed manner, to collect, "
+"store, use and consult my personal data (name, ID number, phone, address and"
+" Bre-B key) in order to identify me as the account holder, link and execute "
+"the payment of my commissions, meet accounting and tax obligations and "
+"prevent fraud, in accordance with Law 1581 of 2012 and the"
+
+msgid "política de tratamiento de datos"
+msgstr "personal data processing policy"
+
+msgid ""
+". Como titular puedo conocer, actualizar y rectificar mis datos, solicitar "
+"su supresión y revocar esta autorización, salvo que la ley obligue a "
+"conservarlos. No se me solicitan datos sensibles."
+msgstr ""
+". As the data subject I can access, update and correct my data, request its "
+"deletion and revoke this authorization, unless the law requires it to be "
+"kept. No sensitive data is requested from me."
+
+msgid "Acepto los términos del pago por Bre-B."
+msgstr "I accept the Bre-B payment terms."
+
+msgid "Autorizo el tratamiento de mis datos personales."
+msgstr "I authorize the processing of my personal data."
+
+msgid "Datos del titular y de la llave"
+msgstr "Account holder and key details"
+
+msgid ""
+"Escribe tu llave exactamente como la creaste en tu banco o billetera: debe "
+"ser la misma. Si tu llave es un código alfanumérico que empieza por @, "
+"asegúrate de incluir el @."
+msgstr ""
+"Type your key exactly as you created it in your bank or wallet: it must be "
+"the same. If your key is an alphanumeric code that starts with @, make sure "
+"to include the @."
+
+msgid "Guardar cuenta"
+msgstr "Save account"
+
+#, python-format
+msgid ""
+"el %(fecha)s; no tienes que volver a hacerlo. Los cambios aplican a tus "
+"próximas solicitudes de comisión: una solicitud en curso conserva los datos "
+"con los que se hizo."
+msgstr ""
+"on %(fecha)s; you do not have to do it again. Changes apply to your future "
+"commission requests: a request in progress keeps the details it was made "
+"with."
+
+msgid "Tu codigo de referido"
+msgstr "Your referral code"
+
+msgid "Copiar codigo"
+msgstr "Copy code"
+
+msgid "Tu enlace para compartir"
+msgstr "Your link to share"
+
+msgid "Copiar enlace"
+msgstr "Copy link"
+
+msgid "Mi perfil"
+msgstr "My profile"
+
+msgid "Mis pagos"
+msgstr "My payments"
+
+msgid "Recursos"
+msgstr "Resources"
+
+msgid "Solicitar comision"
+msgstr "Request commission"
+
+msgid "Nota (opcional)"
+msgstr "Note (optional)"
+
+msgid "Enviar solicitud"
+msgstr "Send request"
+
+msgid "Inscribir cuenta para solicitar comision"
+msgstr "Register an account to request commission"
+
+msgid "Solicitar baja"
+msgstr "Request to leave"
+
+msgid "Tu baja esta programada"
+msgstr "Your exit is scheduled"
+
+msgid "Cancelar mi aviso de baja"
+msgstr "Cancel my leave notice"
+
+msgid "Ventas referidas"
+msgstr "Referred sales"
+
+msgid "Comision disponible"
+msgstr "Available commission"
+
+msgid "Comision pendiente"
+msgstr "Pending commission"
+
+msgid "Pagado en"
+msgstr "Paid in"
+
+msgid "Clics en tu enlace"
+msgstr "Clicks on your link"
+
+msgid "Tasa de conversion"
+msgstr "Conversion rate"
+
+msgid "Tus redes sociales"
+msgstr "Your social networks"
+
+msgid "Editar redes"
+msgstr "Edit networks"
+
+msgid ""
+"Aún no has registrado tus redes sociales. Agrégalas para que el equipo "
+"conozca tu audiencia."
+msgstr ""
+"You have not added your social networks yet. Add them so the team can get to"
+" know your audience."
+
+msgid "Agregar redes"
+msgstr "Add networks"
+
+msgid "Tu información personal"
+msgstr "Your personal information"
+
+msgid "Mantenla al día para que podamos contactarte."
+msgstr "Keep it up to date so we can contact you."
+
+msgid "Documento"
+msgstr "ID document"
+
+msgid "Editar mi perfil"
+msgstr "Edit my profile"
+
+msgid ""
+"Completa tus datos personales: los necesitamos para identificarte como "
+"afiliado."
+msgstr ""
+"Complete your personal details: we need them to identify you as an "
+"affiliate."
+
+msgid "Completar mi perfil"
+msgstr "Complete my profile"
+
+msgid "¡Comparte tu código y gana comisiones!"
+msgstr "Share your code and earn commissions!"
+
+msgid ""
+"Comparte tu código o enlace de referido. Cada compra que realicen usando tu "
+"código te sumará comisiones. Revisa la"
+msgstr ""
+"Share your code or referral link. Every purchase made with your code earns "
+"you commissions. Check the"
+
+msgid "guía de contenido"
+msgstr "content guide"
+
+msgid "y recuerda identificar tus publicaciones como publicidad."
+msgstr "and remember to label your posts as advertising."
+
+msgid "Ultimas compras referidas"
+msgstr "Latest referred purchases"
+
+msgid "Tu solicitud esta en revision"
+msgstr "Your application is under review"
+
+msgid ""
+"Un administrador va a revisar tu solicitud para unirte al programa de "
+"afiliados. Te avisaremos por correo cuando tengamos una respuesta."
+msgstr ""
+"An administrator will review your application to join the affiliate program."
+" We will email you when we have an answer."
+
+msgid "Cancelar solicitud"
+msgstr "Cancel application"
+
+msgid "Tu solicitud fue rechazada"
+msgstr "Your application was rejected"
+
+msgid "Motivo:"
+msgstr "Reason:"
+
+msgid "Puedes volver a postularte si crees que las condiciones cambiaron."
+msgstr "You can apply again if you think the conditions have changed."
+
+msgid "Volver a postularme"
+msgstr "Apply again"
+
+msgid "Tu suscripcion esta inactiva"
+msgstr "Your membership is inactive"
+
+msgid ""
+"Tu participacion en el programa de afiliados termino: tu codigo ya no genera"
+" comisiones. Las que ya tenias confirmadas, y las que aun estan en "
+"validacion, se te siguen pagando."
+msgstr ""
+"Your participation in the affiliate program has ended: your code no longer "
+"earns commissions. The ones already confirmed, and those still being "
+"validated, will still be paid to you."
+
+msgid "Cancelaste tu participacion en el programa de afiliados."
+msgstr "You canceled your participation in the affiliate program."
+
+msgid "Puedes volver a postularte cuando quieras."
+msgstr "You can apply again whenever you like."
+
+msgid "Te pagaremos a tu llave Bre-B"
+msgstr "We will pay you to your Bre-B key"
+
+#, python-format
+msgid ""
+"Te pagaremos a tu llave Bre-B <strong>%(llave)s</strong> $%(monto)s COP. Las"
+" solicitudes de cada mes se pagan en los primeros 10 dias habiles del mes "
+"siguiente. Si necesitas, agrega una indicacion."
+msgstr ""
+"We will pay $%(monto)s COP to your Bre-B key <strong>%(llave)s</strong>. "
+"Each month's requests are paid within the first 10 business days of the "
+"following month. If you need to, add a note."
+
+#, python-format
+msgid ""
+"Avisaste que quieres salir del programa. Tu baja sera efectiva el %(fecha)s;"
+" hasta entonces tu codigo y tu panel siguen activos. Tus comisiones "
+"confirmadas se te pagan igual despues de esa fecha."
+msgstr ""
+"You said you want to leave the program. Your exit takes effect on %(fecha)s;"
+" until then your code and your dashboard stay active. Your confirmed "
+"commissions will still be paid to you after that date."
+
+#, python-format
+msgid "%(n)s red · %(seguidores)s seguidores en total."
+msgid_plural "%(n)s redes · %(seguidores)s seguidores en total."
+msgstr[0] "%(n)s network · %(seguidores)s followers in total."
+msgstr[1] "%(n)s networks · %(seguidores)s followers in total."
+
+#, python-format
+msgid "%(n)s seguidores"
+msgstr "%(n)s followers"
+
+#, python-format
+msgid ""
+"Tu participacion en el programa de afiliados termino el %(fecha)s: tu codigo"
+" ya no genera comisiones. Las que ya tenias confirmadas, y las que aun estan"
+" en validacion, se te siguen pagando."
+msgstr ""
+"Your participation in the affiliate program ended on %(fecha)s: your code no"
+" longer earns commissions. The ones already confirmed, and those still being"
+" validated, will still be paid to you."
+
+msgid "Mi perfil de afiliado"
+msgstr "My affiliate profile"
+
+msgid ""
+"Estos son tus datos como afiliado. Los de tu cuenta Bre-B (el titular al que"
+" se paga) se editan aparte, en tu cuenta de pago."
+msgstr ""
+"These are your details as an affiliate. Those of your Bre-B account (the "
+"holder who gets paid) are edited separately, in your payment account."
+
+msgid ""
+"Mantén al día tus usuarios y seguidores. Puedes agregar o quitar redes."
+msgstr ""
+"Keep your usernames and followers up to date. You can add or remove "
+"networks."
+
+msgid "Cuenta Bre-B para tus pagos"
+msgstr "Bre-B account for your payments"
+
+msgid "Aún no has inscrito la cuenta donde te pagaremos tus comisiones."
+msgstr ""
+"You have not yet registered the account where we will pay your commissions."
+
+msgid "Inscribir cuenta Bre-B"
+msgstr "Register Bre-B account"
+
+#, python-format
+msgid ""
+"Tus comisiones se pagan a la llave <strong>%(llave)s</strong>, a nombre de "
+"%(nombre)s. Puedes actualizarla cuando cambies de banco o de llave."
+msgstr ""
+"Your commissions are paid to the key <strong>%(llave)s</strong>, in the name"
+" of %(nombre)s. You can update it when you change bank or key."
+
+msgid "Recursos para afiliados"
+msgstr "Resources for affiliates"
+
+msgid "Material de marca"
+msgstr "Brand material"
+
+msgid "Recurso"
+msgstr "Resource"
+
+msgid "Formato"
+msgstr "Format"
+
+msgid "Descargar"
+msgstr "Download"
+
+msgid ""
+"Todavía no hay material publicado. Si necesitas imágenes, logos o "
+"información de nuevos lanzamientos, escríbenos a"
+msgstr ""
+"No material has been published yet. If you need images, logos or information"
+" about new launches, write to us at"
+
+msgid "support@gotogym.store"
+msgstr "support@gotogym.store"
+
+msgid "Cómo promocionar GoToGym"
+msgstr "How to promote GoToGym"
+
+msgid "Sé auténtico."
+msgstr "Be authentic."
+
+msgid ""
+"Habla desde tu experiencia y sé fiel a la verdad sobre los productos. No "
+"hagas afirmaciones falsas, no prometas descuentos que no existen y no "
+"saturés de spam a tus seguidores."
+msgstr ""
+"Speak from your own experience and stay true to the facts about the "
+"products. Do not make false claims, do not promise discounts that do not "
+"exist and do not spam your followers."
+
+msgid "Etiqueta a la marca."
+msgstr "Tag the brand."
+
+msgid "Menciona a @GoToGym y usa los hashtags oficiales:"
+msgstr "Mention @GoToGym and use the official hashtags:"
+
+msgid "Indica que es publicidad."
+msgstr "Say it is advertising."
+
+msgid ""
+"La ley exige identificar claramente el contenido promocional. Usa de forma "
+"visible"
+msgstr ""
+"The law requires promotional content to be clearly identified. Use, visibly,"
+
+msgid ""
+"u otra mención equivalente, y deja claro que obtienes un beneficio si usan "
+"tu código."
+msgstr ""
+"or an equivalent mention, and make it clear that you get a benefit if people"
+" use your code."
+
+msgid "Comparte tu código con sentido."
+msgstr "Share your code wisely."
+
+msgid ""
+"No lo publiques en sitios masivos de cupones ni en páginas o comentarios "
+"donde no es relevante."
+msgstr ""
+"Do not post it on mass coupon sites or on pages or comments where it is not "
+"relevant."
+
+msgid "Ejemplo permitido:"
+msgstr "Allowed example:"
+
+msgid "Ejemplo no permitido:"
+msgstr "Not allowed:"
+
+msgid ""
+"repetir tu enlace en comentarios ajenos al tema, o publicar tu código como "
+"si fuera un cupón universal."
+msgstr ""
+"repeating your link in off-topic comments, or posting your code as if it "
+"were a universal coupon."
+
+msgid ""
+"GoToGym puede compartir en sus redes el contenido que publiques, siempre "
+"dándote crédito. Si hay una foto o un testimonio tuyo que no quieras que "
+"republiquemos, escríbenos a"
+msgstr ""
+"GoToGym may share on its social networks the content you post, always giving"
+" you credit. If there is a photo or testimonial of yours that you do not "
+"want us to repost, write to us at"
+
+msgid "y lo respetaremos."
+msgstr "and we will respect that."
+
+msgid "Ver los términos completos del programa"
+msgstr "View the full program terms"
+
+#, python-format
+msgid ""
+"«#Publicidad ¡Lista para mi rutina con mi nuevo outfit de @GoToGym! Usa mi "
+"código %(codigo)s y entra a %(enlace)s.»"
+msgstr ""
+"«#Ad Ready for my routine with my new @GoToGym outfit! Use my code "
+"%(codigo)s and visit %(enlace)s.»"
+
+msgid "Unete al programa de afiliados"
+msgstr "Join the affiliate program"
+
+msgid "Como funciona"
+msgstr "How it works"
+
+msgid ""
+"Tu solicitud sera revisada por un administrador, que verá tus datos y tus "
+"redes. Tu propio código (el que elijas abajo) se activa como cupón al "
+"aprobarse: cada compra hecha con él genera una comisión."
+msgstr ""
+"Your application will be reviewed by an administrator, who will see your "
+"details and your networks. Your own code (the one you choose below) is "
+"activated as a coupon once approved: each purchase made with it earns a "
+"commission."
+
+msgid ""
+"Para participar debes ser mayor de 18 años y tener al menos una cuenta "
+"activa en redes sociales orientada al fitness o al estilo de vida saludable."
+msgstr ""
+"To take part you must be over 18 and have at least one active social media "
+"account focused on fitness or a healthy lifestyle."
+
+msgid "Tus datos personales"
+msgstr "Your personal details"
+
+msgid ""
+"Indica el usuario y cuántos seguidores tienes en cada red donde publicas. "
+"Instagram aparece por defecto; agrega las demás que apliquen o elige «Otra»."
+msgstr ""
+"Enter your username and how many followers you have on each network where "
+"you post. Instagram appears by default; add any others that apply or choose "
+"\"Other\"."
+
+msgid "Tu código y los términos"
+msgstr "Your code and the terms"
+
+msgid "Ej: TUMARCA2026"
+msgstr "E.g. YOURBRAND2026"
+
+msgid "4 a 20 letras o numeros, sin espacios ni simbolos"
+msgstr "4 to 20 letters or numbers, no spaces or symbols"
+
+msgid ""
+"Elige un codigo de 4 a 20 letras o numeros que te represente a ti y a tu "
+"marca (sin espacios ni simbolos). Sera tu cupon de descuento una vez "
+"aprobado."
+msgstr ""
+"Choose a code of 4 to 20 letters or numbers that represents you and your "
+"brand (no spaces or symbols). It will be your discount coupon once approved."
+
+msgid ""
+"Al participar te comprometes a divulgar claramente a tu audiencia que usas "
+"un codigo o enlace de afiliado cuando lo promociones, conforme a la "
+"normativa de publicidad con influenciadores aplicable. El programa puede "
+"suspender el acceso de un afiliado que incumpla estas condiciones."
+msgstr ""
+"By taking part you agree to clearly disclose to your audience that you use "
+"an affiliate code or link when you promote it, in accordance with the "
+"applicable influencer advertising rules. The program may suspend the access "
+"of an affiliate who does not comply with these conditions."
+
+msgid "y la obligacion de divulgacion publicitaria."
+msgstr "and the advertising disclosure obligation."
+
+msgid "En revisión por el equipo"
+msgstr "Under review by the team"
+
+msgid "En validación hasta el"
+msgstr "Being validated until"
+
+msgid "Se valida 5 días hábiles después de la entrega"
+msgstr "Validated 5 business days after delivery"
+
+msgid "Filtrar pagos por año y mes"
+msgstr "Filter payments by year and month"
+
+msgid "Año"
+msgstr "Year"
+
+msgid "Mes"
+msgstr "Month"
+
+msgid "Todos los meses"
+msgstr "All months"
+
+msgid "Filtrar"
+msgstr "Filter"
+
+msgid "Recibido en"
+msgstr "Received in"
+
+msgid "Total pagado, todos los años"
+msgstr "Total paid, all years"
+
+msgid "Solicitudes en curso"
+msgstr "Requests in progress"
+
+msgid "Solicitada"
+msgstr "Requested"
+
+msgid "Monto"
+msgstr "Amount"
+
+msgid "Pagos por mes ·"
+msgstr "Payments by month ·"
+
+msgid "Pagos"
+msgstr "Payments"
+
+msgid "Gastos"
+msgstr "Fees"
+
+msgid "Recibido"
+msgstr "Received"
+
+msgid ""
+"Los pagos se cuentan por la fecha en que se pagaron. «Recibido» es el monto "
+"menos los gastos de transacción; el programa no aplica retenciones."
+msgstr ""
+"Payments are counted by the date they were paid. \"Received\" is the amount "
+"minus transaction fees; the program does not apply withholdings."
+
+msgid "Cada pago de"
+msgstr "Each payment in"
+
+msgid "Fecha de pago"
+msgstr "Payment date"
+
+#, python-format
+msgid "Pago en %(periodo)s"
+msgid_plural "Pagos en %(periodo)s"
+msgstr[0] "Payment in %(periodo)s"
+msgstr[1] "Payments in %(periodo)s"
+
+#, python-format
+msgid "Pago en %(anio)s"
+msgid_plural "Pagos en %(anio)s"
+msgstr[0] "Payment in %(anio)s"
+msgstr[1] "Payments in %(anio)s"
+
+#, python-format
+msgid "Incluye $%(monto)s descontados por devoluciones"
+msgstr "Includes $%(monto)s deducted for returns"
+
+#, python-format
+msgid "No hay pagos registrados en %(periodo)s."
+msgstr "There are no payments recorded in %(periodo)s."
+
+msgid "Revisa tu cuenta Bre-B"
+msgstr "Check your Bre-B account"
+
+msgid ""
+"El documento del titular de tu cuenta no coincide con el de tu perfil. Los "
+"términos piden que la cuenta sea tuya: el equipo la revisará antes de "
+"pagarte. Si te equivocaste al escribirlo, corrígelo."
+msgstr ""
+"The ID of your account holder does not match the one in your profile. The "
+"terms require the account to be yours: the team will review it before paying"
+" you. If you made a typo, correct it."
+
+msgid "Editar cuenta"
+msgstr "Edit account"
+
+msgid "Solicitud de comision en curso"
+msgstr "Commission request in progress"
+
+msgid "Tus pagos"
+msgstr "Your payments"
+
+msgid "Comisión disponible"
+msgstr "Available commission"
+
+msgid "Por recuperar"
+msgstr "To be recovered"
+
+msgid "En validación"
+msgstr "Being validated"
+
+msgid "Mínimo para solicitar"
+msgstr "Minimum to request"
+
+msgid "Ver historial de pagos"
+msgstr "View payment history"
+
+msgid ""
+"Tus comisiones se pagan a esta cuenta. Si cambias de banco o de llave, "
+"actualízala antes de solicitar tu próximo pago."
+msgstr ""
+"Your commissions are paid to this account. If you change bank or key, update"
+" it before requesting your next payment."
+
+msgid "Titular"
+msgstr "Account holder"
+
+msgid "Llave Bre-B"
+msgstr "Bre-B key"
+
+msgid "Bre-B"
+msgstr "Bre-B"
+
+msgid ""
+"es el sistema de pagos inmediatos del Banco de la República: el dinero llega"
+" en segundos, a cualquier banco o billetera, usando una «llave» (tu "
+"documento, celular, correo o un código alfanumérico) que registraste en tu "
+"entidad. Inscribe tu cuenta para que podamos pagarte tus comisiones."
+msgstr ""
+"is the instant payment system of Colombia's central bank (Banco de la "
+"República): money arrives in seconds, to any bank or wallet, using a \"key\""
+" (your ID number, mobile phone, email or an alphanumeric code) that you "
+"registered with your institution. Register your account so we can pay you "
+"your commissions."
+
+#, python-format
+msgid ""
+"Solicitaste $%(monto)s COP el %(fecha)s. Las solicitudes de cada mes se "
+"pagan en los primeros 10 días hábiles del mes siguiente: la tuya se paga a "
+"más tardar el %(limite)s. Te avisaremos por correo cuando se pague."
+msgstr ""
+"You requested $%(monto)s COP on %(fecha)s. Each month's requests are paid "
+"within the first 10 business days of the following month: yours will be paid"
+" by %(limite)s at the latest. We will email you when it is paid."
+
+#, python-format
+msgid ""
+"$%(monto)s COP (de pedidos devueltos o reembolsados, se descuenta de tu "
+"próximo pago)"
+msgstr ""
+"$%(monto)s COP (from returned or refunded orders; it is deducted from your "
+"next payment)"
+
+#, python-format
+msgid "$%(monto)s COP en comisiones confirmadas"
+msgstr "$%(monto)s COP in confirmed commissions"
+
+#, python-format
+msgid ""
+"Te faltan $%(monto)s COP en comisiones confirmadas para poder solicitar un "
+"pago."
+msgstr ""
+"You need $%(monto)s COP more in confirmed commissions to be able to request "
+"a payment."
+
+msgid "+ Agregar otra red"
+msgstr "+ Add another network"
+
+msgid "Red social"
+msgstr "Social network"
+
+msgid "Nombre de la red"
+msgstr "Network name"
+
+msgid "Usuario"
+msgstr "Username"
+
+msgid "Seguidores"
+msgstr "Followers"
+
+msgid "Quitar esta red"
+msgstr "Remove this network"
+
+msgid "Quitar"
+msgstr "Remove"
+
+msgid "Historias para"
+msgstr "Stories to"
+
+msgid "avanzar."
+msgstr "move forward."
+
+msgid ""
+"Movimiento, tecnología y cultura desde adentro. Lo que aprendemos, lo que "
+"probamos, lo que nos mueve."
+msgstr ""
+"Movement, technology and culture from the inside. What we learn, what we "
+"test, what moves us."
+
+msgid "Explorar historias"
+msgstr "Explore stories"
+
+msgid "Título o tema"
+msgstr "Title or topic"
+
+msgid "Explorar"
+msgstr "Explore"
+
+msgid "Leer historia →"
+msgstr "Read story →"
+
+msgid "Sin coincidencias"
+msgstr "No matches"
+
+msgid "No encontramos historias con esos filtros."
+msgstr "We found no stories with those filters."
+
+msgid "Prueba con otro tema o vuelve a explorar todas las publicaciones."
+msgstr "Try another topic or go back to exploring all the posts."
+
+msgid "Ver todas las historias"
+msgstr "See all stories"
+
+msgid "Paginación del Journal"
+msgstr "Journal pagination"
+
+msgid "← Anterior"
+msgstr "← Previous"
+
+msgid "Siguiente →"
+msgstr "Next →"
+
+msgid "Próximamente"
+msgstr "Coming soon"
+
+msgid "Estamos preparando historias para avanzar."
+msgstr "We are preparing stories to move forward."
+
+msgid ""
+"Muy pronto encontrarás nuevas perspectivas sobre diseño, rendimiento, "
+"tecnología y bienestar."
+msgstr ""
+"Very soon you will find new perspectives on design, performance, technology "
+"and wellbeing."
+
+#, python-format
+msgid "Leer %(titulo)s"
+msgstr "Read %(titulo)s"
+
+#, python-format
+msgid "%(n)s min"
+msgstr "%(n)s min"
+
+msgid "GoToGym inicio"
+msgstr "GoToGym home"
+
+msgid "Ropa deportiva con tecnología textil"
+msgstr "Sportswear with textile technology"
+
+msgid ""
+"Prendas construidas con materiales de nueva generación que regulan, protegen"
+" y duran. Tecnología que no se ve — pero se siente cada vez que te mueves."
+msgstr ""
+"Garments built with next-generation materials that regulate, protect and "
+"last. Technology you can't see — but feel every time you move."
+
+msgid "Conocer la tecnología"
+msgstr "Discover the technology"
+
+msgid "Beneficios de compra"
+msgstr "Shopping benefits"
+
+msgid "Diseño colombiano"
+msgstr "Colombian design"
+
+msgid "Elige tu intención"
+msgstr "Choose your intention"
+
+msgid ""
+"Prendas que van del entrenamiento al día a día sin perder un paso. La misma "
+"tecnología, en cada momento."
+msgstr ""
+"Garments that go from training to everyday life without missing a beat. The "
+"same technology, in every moment."
+
+msgid "Rendimiento"
+msgstr "Performance"
+
+msgid "Intensidad y movilidad."
+msgstr "Intensity and mobility."
+
+msgid "Movimiento diario"
+msgstr "Everyday movement"
+
+msgid "Comodidad técnica para todo tu día."
+msgstr "Technical comfort for your whole day."
+
+msgid "Ediciones personalizadas"
+msgstr "Custom editions"
+
+msgid "Diseño y detalles verdaderamente propios."
+msgstr "Design and details that are truly your own."
+
+msgid "Tecnología que se siente en movimiento"
+msgstr "Technology you feel in motion"
+
+msgid "Ver toda la tienda"
+msgstr "See the whole store"
+
+msgid "Estamos preparando una selección extraordinaria."
+msgstr "We are preparing an extraordinary selection."
+
+msgid "Explorar la tienda"
+msgstr "Explore the store"
+
+msgid "Innovación que trabaja alrededor de ti."
+msgstr "Innovation that works around you."
+
+msgid ""
+"No es marketing. Son materiales de nueva generación, probados y "
+"certificados, que regulan tu temperatura, protegen tu piel y duran más que "
+"la ropa convencional. Tecnología que no se ve — pero cambia cómo te mueves."
+msgstr ""
+"It is not marketing. They are next-generation materials, tested and "
+"certified, that regulate your temperature, protect your skin and last longer"
+" than conventional clothing. Technology you can't see — but it changes how "
+"you move."
+
+msgid "Materiales de nueva generación"
+msgstr "Next-generation materials"
+
+msgid ""
+"Textiles con grafeno que regulan el calor, repelen el agua y resisten el "
+"desgaste. Ciencia aplicada a cada costura."
+msgstr ""
+"Graphene textiles that regulate heat, repel water and resist wear. Science "
+"applied to every seam."
+
+msgid "Rendimiento medible"
+msgstr "Measurable performance"
+
+msgid ""
+"Resultados certificados: mayor transpirabilidad, estabilidad UV y "
+"resistencia comprobada. No lo decimos nosotros — lo dicen las pruebas."
+msgstr ""
+"Certified results: greater breathability, UV stability and proven strength. "
+"We are not the ones saying it — the tests are."
+
+msgid "Diseño que evoluciona contigo"
+msgstr "Design that evolves with you"
+
+msgid ""
+"Cada prenda se desarrolla pensando en cómo se usa de verdad — en el gym, en "
+"la calle, en tu día completo."
+msgstr ""
+"Every garment is developed with real use in mind — at the gym, on the "
+"street, throughout your whole day."
+
+msgid "Bienestar en movimiento"
+msgstr "Wellbeing in motion"
+
+msgid "Cuando tu equipo se mueve bien, todo funciona mejor."
+msgstr "When your team moves well, everything works better."
+
+msgid ""
+"Prendas y experiencias diseñadas para organizaciones que entienden el "
+"bienestar como parte de su cultura — no como un beneficio adicional, sino "
+"como una decisión estratégica."
+msgstr ""
+"Garments and experiences designed for organizations that see wellbeing as "
+"part of their culture — not as an extra perk, but as a strategic decision."
+
+msgid "Hablar con GoToGym"
+msgstr "Talk to GoToGym"
+
+msgid "Inteligencia que llevas puesta."
+msgstr "Intelligence you wear."
+
+msgid "Tu movimiento."
+msgstr "Your movement."
+
+msgid "Tu diseño."
+msgstr "Your design."
+
+msgid "Tu GoToGym."
+msgstr "Your GoToGym."
+
+msgid "Entrar a la tienda"
+msgstr "Enter the store"
+
+msgid "Documentos legales y políticas"
+msgstr "Legal documents and policies"
+
+msgid "Ayuda y transparencia"
+msgstr "Help and transparency"
+
+msgid "Afiliados"
+msgstr "Affiliates"
+
+msgid "Contacto | GoToGym"
+msgstr "Contact | GoToGym"
+
+msgid "Estamos para acompañarte"
+msgstr "We are here for you"
+
+msgid "Hablemos."
+msgstr "Let's talk."
+
+msgid ""
+"Compras, productos, personalización o bienestar empresarial: elige el canal "
+"y cuéntanos cómo podemos ayudarte."
+msgstr ""
+"Purchases, products, customization or corporate wellbeing: choose a channel "
+"and tell us how we can help."
+
+msgid "Atención y soporte"
+msgstr "Support"
+
+msgid "Aquí hay una persona al otro lado."
+msgstr "There is a real person on the other side."
+
+msgid ""
+"Escríbenos con tu número de pedido cuando la consulta sea sobre una compra. "
+"Te respondemos por el canal oficial."
+msgstr ""
+"Write to us with your order number when your question is about a purchase. "
+"We reply through the official channel."
+
+msgid "support@gotogym.store →"
+msgstr "support@gotogym.store →"
+
+msgid "Atención directa"
+msgstr "Direct line"
+
+msgid "Para orientación comercial y soporte durante el horario de atención."
+msgstr "For sales guidance and support during opening hours."
+
+msgid "Llamar ahora →"
+msgstr "Call now →"
+
+msgid "Comunidad"
+msgstr "Community"
+
+msgid "Sigue el movimiento"
+msgstr "Follow the movement"
+
+msgid "← Regresar"
+msgstr "← Go back"
+
+msgid "Privacidad y tratamiento de datos →"
+msgstr "Privacy and data processing →"
+
+msgid "GoToGym · Ayuda y transparencia"
+msgstr "GoToGym · Help and transparency"
+
+msgid ""
+"Información clara para que puedas comprar y usar GoToGym con confianza."
+msgstr "Clear information so you can shop and use GoToGym with confidence."
+
+msgid "← Volver"
+msgstr "← Back"
+
+msgid "¿Necesitas ayuda? →"
+msgstr "Need help? →"
+
+msgid "Términos y condiciones | GoToGym"
+msgstr "Terms and conditions | GoToGym"
+
+msgid "GoToGym · Marco de confianza"
+msgstr "GoToGym · Framework of trust"
+
+msgid "Términos y"
+msgstr "Terms and"
+
+msgid "condiciones."
+msgstr "conditions."
+
+msgid "Los acuerdos que hacen clara y segura nuestra relación contigo."
+msgstr "The agreements that make our relationship with you clear and safe."
+
+msgid "Resolver una duda →"
+msgstr "Ask a question →"
+
+msgid "Tus pedidos,"
+msgstr "Your orders,"
+
+msgid "bajo control."
+msgstr "under control."
+
+msgid ""
+"Consulta el estado, la entrega y el detalle de cada compra en un solo lugar."
+msgstr ""
+"Check the status, delivery and details of every purchase in one place."
+
+msgid "Tu primera historia está por comenzar"
+msgstr "Your first story is about to begin"
+
+msgid "Todavía no tienes pedidos."
+msgstr "You have no orders yet."
+
+msgid ""
+"Cuando hagas tu primera compra podrás seguir aquí su estado, envío y "
+"detalles."
+msgstr ""
+"When you make your first purchase you will be able to follow its status, "
+"shipping and details here."
+
+msgid "Un buen lugar para empezar."
+msgstr "A good place to start."
+
+msgid "Imagen anterior"
+msgstr "Previous image"
+
+msgid "Imagen siguiente"
+msgstr "Next image"
+
+msgid "Imagenes del producto"
+msgstr "Product images"
+
+#, python-format
+msgid "Ver imagen %(n)s"
+msgstr "View image %(n)s"
+
+msgid "Pais"
+msgstr "Country"
+
+msgid "Codigo postal"
+msgstr "Postal code"
+
+msgid "Direccion"
+msgstr "Address"
+
+msgid "Complemento (apto, torre, etc.)"
+msgstr "Address line 2 (apt, tower, etc.)"
+
+msgid "Notas de entrega"
+msgstr "Delivery notes"
+
+msgid "Direccion eliminada."
+msgstr "Address deleted."
+
+msgid "Direccion marcada como predeterminada."
+msgstr "Address set as default."
+
+msgid "Completa tu nombre, correo y contraseña, y acepta los términos."
+msgstr "Enter your name, email and password, and accept the terms."
+
+msgid "Perfil actualizado correctamente."
+msgstr "Profile updated successfully."
+
+msgid "No se realizaron cambios."
+msgstr "No changes were made."
+
+msgid "Direccion guardada."
+msgstr "Address saved."
+
+msgid "Las contraseñas no coinciden."
+msgstr "The passwords do not match."
+
+msgid "Este correo ya está registrado."
+msgstr "This email is already registered."
+
+msgid "La contraseña actual no es correcta."
+msgstr "The current password is not correct."
+
+msgid "La edad debe ser un número válido."
+msgstr "Age must be a valid number."
+
+msgid "El correo ya está registrado."
+msgstr "The email is already registered."
+
+msgid "Registro exitoso. Ya iniciaste sesión."
+msgstr "Registration successful. You are now logged in."
+
+msgid "Numero de documento"
+msgstr "ID number"
+
+msgid "Agrega al menos una red social."
+msgstr "Add at least one social network."
+
+msgid ""
+"Faltan datos del formulario de redes sociales. Recarga la pagina e intenta "
+"de nuevo."
+msgstr ""
+"Some social network form data is missing. Reload the page and try again."
+
+#, python-format
+msgid "Puedes agregar hasta %(max)s redes sociales."
+msgstr "You can add up to %(max)s social networks."
+
+msgid ""
+"Escribe tu llave tal como la creaste en tu banco: documento, celular, correo"
+" o codigo con @."
+msgstr ""
+"Type your key as you created it in your bank: ID number, mobile phone, email"
+" or code with @."
+
+msgid "Tipo de documento"
+msgstr "ID type"
+
+msgid "Tu codigo de afiliado"
+msgstr "Your affiliate code"
+
+msgid ""
+"Una llave que empieza por @ lleva despues de 4 a 20 letras o numeros, sin "
+"espacios."
+msgstr ""
+"A key that starts with @ must be followed by 4 to 20 letters or numbers, "
+"with no spaces."
+
+msgid ""
+"Escribe un telefono valido: entre 7 y 20 caracteres, solo numeros y + ( ) - "
+"espacios."
+msgstr ""
+"Enter a valid phone number: 7 to 20 characters, numbers and + ( ) - spaces "
+"only."
+
+msgid ""
+"Escribe el documento de 5 a 20 letras o numeros, sin puntos ni espacios."
+msgstr ""
+"Enter the ID number, 5 to 20 letters or numbers, with no dots or spaces."
+
+msgid "Debes aceptar los terminos para inscribir tu cuenta."
+msgstr "You must accept the terms to register your account."
+
+msgid "Debes autorizar el tratamiento de tus datos para inscribir tu cuenta."
+msgstr ""
+"You must authorize the processing of your data to register your account."
+
+msgid "Elige un codigo para tu marca."
+msgstr "Choose a code for your brand."
+
+msgid "Debes aceptar los terminos del programa para continuar."
+msgstr "You must accept the program terms to continue."
+
+msgid ""
+"Elige un codigo de 4 a 20 letras o numeros (sin espacios ni simbolos) que te"
+" represente a ti y a tu marca."
+msgstr ""
+"Choose a code of 4 to 20 letters or numbers (no spaces or symbols) that "
+"represents you and your brand."
+
+msgid "Ese codigo ya esta en uso. Elige otro."
+msgstr "That code is already in use. Choose another one."
+
+msgid "Indica cuantos seguidores tienes."
+msgstr "Enter how many followers you have."
+
+msgid ""
+"Escribe solo tu usuario (2 a 60 letras, numeros, punto, guion o guion bajo),"
+" sin enlaces ni espacios."
+msgstr ""
+"Enter only your username (2 to 60 letters, numbers, dot, hyphen or "
+"underscore), with no links or spaces."
+
+msgid ""
+"Hay una red repetida: la misma red con el mismo usuario solo se cuenta una "
+"vez."
+msgstr ""
+"A network is repeated: the same network with the same username is only "
+"counted once."
+
+msgid "Pendiente de revision"
+msgstr "Pending review"
+
+msgid "Aprobado"
+msgstr "Approved"
+
+msgid "Rechazado"
+msgstr "Rejected"
+
+msgid "Cedula de ciudadania"
+msgstr "National ID card (CC)"
+
+msgid "Cedula de extranjeria"
+msgstr "Foreigner ID card (CE)"
+
+msgid "Pasaporte"
+msgstr "Passport"
+
+msgid "Permiso por proteccion temporal (PPT)"
+msgstr "Temporary protection permit (PPT)"
+
+msgid "Permiso especial de permanencia (PEP)"
+msgstr "Special stay permit (PEP)"
+
+msgid "Baja solicitada por el afiliado"
+msgstr "Exit requested by the affiliate"
+
+msgid "Fraude o uso indebido del codigo"
+msgstr "Fraud or misuse of the code"
+
+msgid "Incumplimiento de los terminos"
+msgstr "Breach of the terms"
+
+msgid "Inactividad prolongada"
+msgstr "Prolonged inactivity"
+
+msgid "Otro"
+msgstr "Other"
+
+msgid "Otra"
+msgstr "Other"
+
+msgid "Pendiente"
+msgstr "Pending"
+
+msgid "Pagada"
+msgstr "Paid"
+
+msgid "Rechazada"
+msgstr "Rejected"
+
+msgid "Confirmada"
+msgstr "Confirmed"
+
+msgid "Revertida"
+msgstr "Reversed"
+
+msgid "Tu perfil quedo actualizado."
+msgstr "Your profile has been updated."
+
+msgid "Tu solicitud fue enviada de nuevo. Te avisaremos cuando sea revisada."
+msgstr ""
+"Your application was sent again. We will let you know once it has been "
+"reviewed."
+
+msgid "Tu solicitud fue enviada. Te avisaremos cuando sea aprobada."
+msgstr "Your application was sent. We will let you know once it is approved."
+
+msgid "Aceptaste los terminos vigentes del programa."
+msgstr "You accepted the current program terms."
+
+msgid "Ya tienes una solicitud de comision pendiente."
+msgstr "You already have a pending commission request."
+
+msgid "Inscribe tu cuenta Bre-B antes de solicitar tu comision."
+msgstr "Register your Bre-B account before requesting your commission."
+
+msgid "No tienes comisiones confirmadas disponibles para solicitar todavia."
+msgstr "You have no confirmed commissions available to request yet."
+
+msgid "Cancelaste tu aviso de baja: sigues en el programa."
+msgstr "You canceled your leave notice: you stay in the program."
+
+msgid "Tu solicitud ya esta en revision."
+msgstr "Your application is already under review."
+
+msgid "Ya eres afiliado."
+msgstr "You are already an affiliate."
+
+msgid "Hubo un problema al enviar tu solicitud. Intenta de nuevo."
+msgstr "There was a problem sending your application. Please try again."
+
+msgid "Debes aceptar los terminos para seguir usando el panel."
+msgstr "You must accept the terms to keep using the dashboard."
+
+msgid "Tu cuenta Bre-B quedo guardada. Ya puedes solicitar tu comision."
+msgstr "Your Bre-B account was saved. You can now request your commission."
+
+msgid ""
+"Guardamos tu cuenta Bre-B, pero el documento del titular no coincide con el "
+"de tu perfil. Los terminos piden que la cuenta sea tuya: el equipo la "
+"revisara antes de pagarte."
+msgstr ""
+"We saved your Bre-B account, but the holder's ID does not match the one in "
+"your profile. The terms require the account to be yours: the team will "
+"review it before paying you."
+
+#, python-format
+msgid "El mensaje es muy largo (maximo %(maximo)s caracteres)."
+msgstr "The message is too long (maximum %(maximo)s characters)."
+
+#, python-format
+msgid ""
+"Solicitud de comision por $%(monto)s enviada. Se paga a mas tardar el "
+"%(fecha)s (primeros 10 dias habiles del mes siguiente)."
+msgstr ""
+"Commission request for $%(monto)s sent. It will be paid by %(fecha)s at the "
+"latest (first 10 business days of the following month)."
+
+#, python-format
+msgid ""
+"Registramos tu aviso de baja. Sera efectiva el %(fecha)s; hasta entonces tu "
+"codigo y tu panel siguen activos."
+msgstr ""
+"We registered your leave notice. It takes effect on %(fecha)s; until then "
+"your code and your dashboard stay active."
+
+#, python-format
+msgid ""
+"Necesitas al menos $%(minimo)s COP en comisiones confirmadas para solicitar "
+"un pago; tienes $%(disponible)s COP."
+msgstr ""
+"You need at least $%(minimo)s COP in confirmed commissions to request a "
+"payment; you have $%(disponible)s COP."
+
+msgid "GoToGym Journal: historias para avanzar"
+msgstr "GoToGym Journal: stories to move forward"
+
+msgid ""
+"Diseño, rendimiento, tecnología textil y bienestar: ciencia de materiales y "
+"ropa deportiva explicadas con sus fuentes."
+msgstr ""
+"Design, performance, textile technology and wellbeing: materials science and"
+" sportswear explained with their sources."
+
+msgid ""
+"Tu carrito se reinicio por una actualizacion del sistema. Vuelve a agregar "
+"los productos que quieras comprar."
+msgstr ""
+"Your cart was reset by a system update. Add the products you want to buy "
+"again."
+
+#, python-format
+msgid "Solo quedan %(disponible)s unidades de %(sku)s."
+msgstr "Only %(disponible)s units of %(sku)s are left."
+
+#, python-format
+msgid "%(sku)s no tiene unidades disponibles."
+msgstr "%(sku)s has no units available."
+
+msgid ""
+"Ropa deportiva con tecnología textil. Explora la colección GoToGym, diseñada"
+" para entrenar, moverte y avanzar a tu manera."
+msgstr ""
+"Sportswear with textile technology. Explore the GoToGym collection, designed"
+" to train, move and advance your way."
+
+msgid ""
+"Escríbenos o llámanos: atención sobre compras, productos, personalización y "
+"bienestar empresarial."
+msgstr ""
+"Write or call us: help with purchases, products, customization and corporate"
+" wellbeing."
+
+msgid "La direccion es demasiado corta."
+msgstr "The address is too short."
+
+msgid "Pendiente de pago"
+msgstr "Pending payment"
+
+msgid "Confirmado"
+msgstr "Confirmed"
+
+msgid "En preparacion"
+msgstr "Preparing"
+
+msgid "Enviado"
+msgstr "Shipped"
+
+msgid "En transito"
+msgstr "In transit"
+
+msgid "Entregado"
+msgstr "Delivered"
+
+msgid "Cancelado"
+msgstr "Cancelled"
+
+msgid "Devolucion"
+msgstr "Returned"
+
+msgid "Porcentaje"
+msgstr "Percentage"
+
+msgid "Valor fijo"
+msgstr "Fixed amount"
+
+msgid "Tu carrito esta vacio."
+msgstr "Your cart is empty."
+
+msgid "El pago todavia no esta aprobado."
+msgstr "The payment has not been approved yet."
+
+#, python-format
+msgid "No hay unidades suficientes. %(detalle)s"
+msgstr "There are not enough units. %(detalle)s"
+
+#, python-format
+msgid "%(sku)s: pediste %(pedido)s, quedan %(disponible)s"
+msgstr "%(sku)s: you asked for %(pedido)s, %(disponible)s left"
+
+msgid "Tu carrito se reinicio por una actualizacion del sistema."
+msgstr "Your cart was reset by a system update."
+
+msgid "Solo puedes calificar productos de pedidos confirmados."
+msgstr "You can only rate products from confirmed orders."
+
+msgid "Ya calificaste este producto."
+msgstr "You have already rated this product."
+
+msgid "Gracias por compartir tu opinión."
+msgstr "Thank you for sharing your opinion."
+
+msgid "Revisa la calificación e inténtalo de nuevo."
+msgstr "Check your rating and try again."
+
+msgid "Falta la ciudad."
+msgstr "The city is missing."
+
+msgid "El carrito esta vacio."
+msgstr "The cart is empty."
+
+msgid "Fallido"
+msgstr "Failed"
+
+msgid "Cuéntanos tu experiencia (opcional)."
+msgstr "Tell us about your experience (optional)."
+
+msgid "Tienda GoToGym: ropa deportiva"
+msgstr "GoToGym Store: sportswear"
+
+msgid ""
+"Explora la colección de ropa deportiva GoToGym con tecnología textil: "
+"tallas, colores y precios."
+msgstr ""
+"Explore the GoToGym sportswear collection with textile technology: sizes, "
+"colors and prices."
+
+#, python-format
+msgid "%(nombre)s, de la colección GoToGym."
+msgstr "%(nombre)s, from the GoToGym collection."
+
+msgid "Leggins gris azulado para dama"
+msgstr "Blue-gray leggings for women"
+
+msgid "Pantalon verde"
+msgstr "Green pants"
+
+msgid "Chaqueta naranja + grafeno cremallera caballero"
+msgstr "Men's orange graphene zip jacket"
+
+msgid "Conjunto para dama en gris con negro"
+msgstr "Women's gray and black set"
+
+msgid "Conjunto gris azulado deportivo para dama"
+msgstr "Women's blue-gray sports set"
+
+msgid "Saco negro gris"
+msgstr "Black and gray sweater"
+
+msgid "Camiseta"
+msgstr "T-shirt"
+
+msgid ""
+"Leggins color gris, tallas S, M y L. Hecho en Microfibra. Uso deportivo y "
+"casual."
+msgstr ""
+"Gray leggings, sizes S, M and L. Made of microfiber. Sports and casual use."
+
+msgid "Pantalon verde para caballero, talla unica, en licra."
+msgstr "Men's green pants, one size, made of lycra."
+
+msgid ""
+"Chaqueta naranja con grafeno, para caballero, talla unica. Cierre de "
+"cremallera. Hecha en licra."
+msgstr ""
+"Men's orange jacket with graphene, one size. Zip closure. Made of lycra."
+
+msgid ""
+"Chaqueta de color gris con negro, con cierre de cremallera, mas leggins gris"
+" con franja negra. Hecho en Microfibra. Para dama. Tallas S, M y L."
+msgstr ""
+"Gray and black jacket with a zip closure, plus gray leggings with a black "
+"stripe. Made of microfiber. For women. Sizes S, M and L."
+
+msgid ""
+"Conjunto de chaqueta ombliguera manga larga con leggins, color gris azulado "
+"con franja negra. Para dama, hecho en Mirofibra. Tallas S, M y L"
+msgstr ""
+"Set with a long-sleeve cropped jacket and leggings, blue-gray with a black "
+"stripe. For women, made of microfiber. Sizes S, M and L"
+
+msgid "Saco negro con gris para dama, talla S, elaborado en Microfibra."
+msgstr "Women's black and gray sweater, size S, made of microfiber."
+
+msgid "Producto GoToGym de alta costura personalizada exclusiva."
+msgstr "GoToGym exclusive custom haute couture product."
+
+msgid "Semi Personalizada"
+msgstr "Semi-custom"
+
+msgid "Conjuntos"
+msgstr "Sets"
+
+msgid "Alta costura personalizada exclusiva"
+msgstr "Exclusive custom haute couture"
+
+msgid "Negro"
+msgstr "Black"
+
+msgid "negro"
+msgstr "Black"
+
+msgid "gris"
+msgstr "Gray"
+
+msgid "gris azulado"
+msgstr "Blue-gray"
+
+msgid "naranja"
+msgstr "Orange"
+
+msgid "verde"
+msgstr "Green"
+
+msgid "UNICO"
+msgstr "One color"
+
+msgid "UNICA"
+msgstr "One size"
+
+msgid "Destacado"
+msgstr "Featured"
+
+msgid "Nuevo"
+msgstr "New"
+
+msgid "Oferta"
+msgstr "Sale"
+
+msgid "Ciencia deportiva"
+msgstr "Sports science"
+
+msgid "Materiales"
+msgstr "Materials"
+
+msgid "Tecnología textil"
+msgstr "Textile technology"
+
+msgid "Estandar"
+msgstr "Standard"
+
+msgid "Estandar (nacional)"
+msgstr "Standard (nationwide)"
+
+msgid "GoToGym Envios"
+msgstr "GoToGym Shipping"
+
+msgid "Equipo de investigación GoToGym"
+msgstr "GoToGym Research Team"
+
+msgid "Microfibra"
+msgstr "Microfiber"
+
+msgid "Licra elástica"
+msgstr "Stretch lycra"
+
+msgid "Con grafeno"
+msgstr "With graphene"
+
+msgid "Manga larga"
+msgstr "Long sleeve"
+
+msgid "Corte cropped"
+msgstr "Cropped cut"
+
+msgid "Uso deportivo"
+msgstr "Sports use"
+
+msgid "Uso diario"
+msgstr "Everyday use"
+
+msgid "Edición exclusiva"
+msgstr "Exclusive edition"
+
+msgid "Línea premium"
+msgstr "Premium line"
+
+msgid "Semi personalizada"
+msgstr "Semi-custom"
+
+msgid "Conjunto completo"
+msgstr "Complete set"
+
+msgid "Tejido ligero, pensado para el movimiento."
+msgstr "Lightweight fabric, made for movement."
+
+msgid "Se ajusta al movimiento sin perder forma."
+msgstr "Adapts to your movement without losing its shape."
+
+msgid "Material técnico incorporado en la construcción de la prenda."
+msgstr "Technical material built into the garment."
+
+msgid "Cobertura adicional para días frescos o post-entreno."
+msgstr "Extra coverage for cool days or post-workout."
+
+msgid "Diseño corto, pensado para moverse con libertad."
+msgstr "Short design, made to move freely."
+
+msgid "Pensada para acompañar el entrenamiento."
+msgstr "Designed to go with your training."
+
+msgid "Tan cómoda para el gimnasio como para el resto del día."
+msgstr "As comfortable for the gym as for the rest of your day."
+
+msgid "Diseño personalizado, fuera de la producción regular."
+msgstr "Custom design, outside regular production."
+
+msgid "Selección superior de materiales y construcción."
+msgstr "Superior selection of materials and construction."
+
+msgid "Ajustes disponibles sobre el diseño base."
+msgstr "Adjustments available on the base design."
+
+msgid "Piezas pensadas para combinarse entre sí."
+msgstr "Pieces designed to be combined."
+
+msgid ""
+"Traducción de cortesía: si hay alguna diferencia, prevalece la versión en "
+"español."
+msgstr ""
+"Courtesy translation: in case of any difference, the Spanish version "
+"prevails."
+
+msgid "Restablece tu contraseña de GoToGym"
+msgstr "Reset your GoToGym password"
+
+msgid "Hola %(nombre)s,"
+msgstr "Hi %(nombre)s,"
+
+msgid "Hola,"
+msgstr "Hi,"
+
+msgid ""
+"Recibimos una solicitud para restablecer la contraseña de tu cuenta de "
+"GoToGym (%(email)s)."
+msgstr ""
+"We received a request to reset the password of your GoToGym account "
+"(%(email)s)."
+
+msgid "Para elegir una nueva, abre este enlace:"
+msgstr "To choose a new one, open this link:"
+
+msgid ""
+"El enlace vence pronto y solo se puede usar una vez. Si no pediste este "
+"cambio, ignora este correo: tu contraseña seguirá siendo la misma."
+msgstr ""
+"The link expires soon and can only be used once. If you did not request this"
+" change, ignore this email: your password will stay the same."
+
+msgid "Equipo GoToGym"
+msgstr "GoToGym Team"
+
+msgid "Detalle de una prenda técnica GoToGym"
+msgstr "Detail of a GoToGym technical garment"
+
+msgid ""
+"Equipo usando prendas GoToGym en una experiencia de bienestar empresarial"
+msgstr "Team wearing GoToGym garments in a corporate wellbeing experience"
+
+msgid "Total sin envío"
+msgstr "Total before shipping"
+
+msgid "Continuar"
+msgstr "Continue"
+
+msgid "Descuento"
+msgstr "Discount"
+
+msgid "Tiempo estimado de entrega: unos %(dias)s días hábiles."
+msgstr "Estimated delivery time: about %(dias)s business days."
+
+msgid "Confirmamos tu pedido %(numero)s"
+msgstr "We confirmed your order %(numero)s"
+
+msgid ""
+"Recibimos tu pago y confirmamos tu pedido %(numero)s. Ya estamos "
+"preparándolo."
+msgstr ""
+"We received your payment and confirmed your order %(numero)s. We are already"
+" preparing it."
+
+msgid "Se enviará a: %(direccion)s, %(ciudad)s, %(departamento)s."
+msgstr "It will be shipped to: %(direccion)s, %(ciudad)s, %(departamento)s."
+
+msgid "Puedes ver el estado de tu pedido aquí: %(enlace)s"
+msgstr "You can see the status of your order here: %(enlace)s"
+
+msgid "Te avisaremos por este medio cuando salga de nuestras manos."
+msgstr "We will let you know through this channel when it leaves our hands."
+
+msgid "Tu pedido %(numero)s va en camino"
+msgstr "Your order %(numero)s is on its way"
+
+msgid "Tu pedido %(numero)s salió y va en camino a %(ciudad)s."
+msgstr "Your order %(numero)s has shipped and is on its way to %(ciudad)s."
+
+msgid "Puedes seguir su estado aquí: %(enlace)s"
+msgstr "You can follow its status here: %(enlace)s"
+
+msgid ""
+"Al recibirlo, revisa que el empaque esté en buen estado. Si algo no está "
+"bien, escríbenos con tu número de pedido."
+msgstr ""
+"When you receive it, check that the packaging is in good condition. If "
+"anything is wrong, write to us with your order number."
+
+msgid ""
+"No pudimos completar tu pedido, y tu pago ya había sido recibido. Nos "
+"pondremos en contacto contigo para devolverte el dinero por el mismo medio "
+"de pago."
+msgstr ""
+"We could not complete your order, and your payment had already been "
+"received. We will contact you to refund your money through the same payment "
+"method."
+
+msgid ""
+"Tu pedido se canceló porque el pago no se completó a tiempo o porque lo "
+"cancelamos. No se hizo ningún cobro. Si quieres, puedes volver a hacer tu "
+"compra cuando quieras."
+msgstr ""
+"Your order was cancelled because the payment was not completed in time or "
+"because we cancelled it. No charge was made. If you like, you can place your"
+" order again whenever you want."
+
+msgid "Tu pedido %(numero)s fue cancelado"
+msgstr "Your order %(numero)s was cancelled"
+
+msgid ""
+"Si tienes dudas, responde a este correo o escríbenos con tu número de "
+"pedido."
+msgstr ""
+"If you have questions, reply to this email or write to us with your order "
+"number."
+
+msgid "disponibles"
+msgstr "available"

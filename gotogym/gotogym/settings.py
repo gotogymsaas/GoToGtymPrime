@@ -1,7 +1,6 @@
 import os
 import sys
 import urllib.parse
-from datetime import timedelta
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
@@ -49,16 +48,13 @@ DEFAULT_ALLOWED_HOSTS = (
 ALLOWED_HOSTS = _split_csv(os.environ.get('ALLOWED_HOSTS', DEFAULT_ALLOWED_HOSTS))
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'gotogym.apps.SitioAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
-    'corsheaders',
-    'rest_framework',
-    'rest_framework_simplejwt',
     'widget_tweaks',
     'accounts',
     'blog',
@@ -81,7 +77,6 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'gotogym.middleware.DefaultLanguageMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -206,15 +201,6 @@ if sys.argv[1:2] == ['test']:
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = _as_bool(os.environ.get('CORS_ALLOW_ALL_ORIGINS'), False)
-DEFAULT_CORS_ALLOWED_ORIGINS = (
-    'https://developers.gotogym.store,'
-    'https://api.gotogym.store,'
-    'https://gotogym.store,'
-    'https://www.gotogym.store'
-)
-CORS_ALLOWED_ORIGINS = _split_csv(os.environ.get('CORS_ALLOWED_ORIGINS', DEFAULT_CORS_ALLOWED_ORIGINS))
-
 CSRF_TRUSTED_ORIGINS = _split_csv(os.environ.get('CSRF_TRUSTED_ORIGINS', ''))
 
 # HTTPS. En produccion todo esto esta ACTIVO por defecto; en desarrollo y
@@ -232,9 +218,11 @@ SECURE_REDIRECT_EXEMPT = [r'^healthz$', r'^crm/healthz$']
 SESSION_COOKIE_SECURE = _as_bool(os.environ.get('SESSION_COOKIE_SECURE'), PRODUCCION)
 CSRF_COOKIE_SECURE = _as_bool(os.environ.get('CSRF_COOKIE_SECURE'), PRODUCCION)
 # HSTS le ordena al navegador no volver a usar HTTP con este dominio. Es
-# dificil de deshacer, asi que NO se activa solo: se declara por variable y se
-# sube por etapas (ver environments/azure/.env.release.example).
-SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '0'))
+# dificil de deshacer, asi que en produccion arranca en la primera etapa (una
+# hora) y se sube por variable, etapa a etapa, comprobando que todo el sitio
+# funciona por HTTPS (ver environments/azure/.env.release.example). Fuera de
+# produccion esta apagado.
+SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '3600' if PRODUCCION else '0'))
 SECURE_HSTS_INCLUDE_SUBDOMAINS = _as_bool(os.environ.get('SECURE_HSTS_INCLUDE_SUBDOMAINS'), False)
 SECURE_HSTS_PRELOAD = _as_bool(os.environ.get('SECURE_HSTS_PRELOAD'), False)
 
@@ -275,6 +263,22 @@ else:
 # proceso; cuando exista una cola, se cambia aqui sin tocar quien encola.
 TASK_BACKEND = os.environ.get('TASK_BACKEND', 'sync')
 
+# Limite de tasa (ver gotogym/ratelimit.py). Las pruebas lo apagan: comparten
+# la misma IP y la misma cache durante toda la suite.
+RATE_LIMIT_ENABLED = _as_bool(os.environ.get('RATE_LIMIT_ENABLED'), True)
+
+# Cuantos proxies de confianza hay delante de la aplicacion (en Azure App
+# Service, uno). Con 1, la IP real del cliente es la ultima de
+# X-Forwarded-For; con 0 se usa la conexion directa. Sin esto, detras del
+# proxy todos los visitantes compartirian la misma IP y el limite de tasa
+# bloquearia a todos a la vez.
+TRUSTED_PROXY_HOPS = int(os.environ.get('TRUSTED_PROXY_HOPS', '1' if PRODUCCION else '0'))
+
+# Ruta del administrador de Django. Cambiarla por una no obvia (variable
+# ADMIN_URL, por ejemplo `gestion-xxxx/`) la saca de los barridos automaticos.
+# Solo entran superusuarios (ver gotogym/admin_site.py).
+ADMIN_URL = os.environ.get('ADMIN_URL', 'admin/').strip('/') + '/'
+
 # Panel de simulacion de pagos: visible en desarrollo (DEBUG) o si se activa
 # explicitamente. Nunca debe quedar accesible en produccion real.
 PAYMENTS_MOCK_UI_ENABLED = _as_bool(os.environ.get('PAYMENTS_MOCK_UI_ENABLED'), False)
@@ -311,19 +315,6 @@ if SENTRY_DSN:
         traces_sample_rate=float(os.environ.get('SENTRY_TRACES_SAMPLE_RATE', '0.2')),
         send_default_pii=False,
     )
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-}
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-}
 
 AUTH_USER_MODEL = 'accounts.User'
 LOGIN_URL = 'commercial_login'

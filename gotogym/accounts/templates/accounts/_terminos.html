@@ -1,0 +1,1 @@
+{% load i18n %}{% get_current_language as LANGUAGE_CODE %}{% if LANGUAGE_CODE == 'en' %}{% include 'accounts/terms_and_conditions_en.html' %}{% else %}{% include 'accounts/terms_and_conditions.html' %}{% endif %}

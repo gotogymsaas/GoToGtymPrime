@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
+{% load idiomas %}
 {% load static i18n tienda_filters imagenes %}
 {% block title %}{% trans "Carrito" %}{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">
-<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20261002-importes">
+<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261014-cookies">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20261015-chips">
 {% endblock %}
 
 {% block content %}
@@ -36,13 +37,13 @@
           {% for item in items %}
           <li class="cart-row">
             <img src="{% url_imagen_producto item.image.name %}"
-                 alt="{{ item.producto.name }}">
+                 alt="{{ item.producto.name|traducir }}">
 
             <div class="cart-row__info">
-              <a href="{% url 'tienda:producto_detail' item.producto.id %}">{{ item.producto.name }}</a>
+              <a href="{% url 'tienda:producto_detail' item.producto.id %}">{{ item.producto.name|traducir }}</a>
               <dl class="cart-row__meta">
-                <div><dt>{% trans "Talla" %}:</dt> <dd>{{ item.variant.size }}</dd></div>
-                <div><dt>{% trans "Color" %}:</dt> <dd>{{ item.variant.color }}</dd></div>
+                <div><dt>{% trans "Talla" %}:</dt> <dd>{{ item.variant.size|traducir }}</dd></div>
+                <div><dt>{% trans "Color" %}:</dt> <dd>{{ item.variant.color|traducir }}</dd></div>
                 <div><dt>SKU:</dt> <dd class="font-mono">{{ item.variant.sku }}</dd></div>
               </dl>
               <p class="cart-row__price-each">{% if item.precio_lista %}<s class="price-compare">${{ item.precio_lista|cop }}</s> {% endif %}${{ item.precio|cop }} COP {% trans "c/u" %}{% if item.precio_lista %} <span class="price-badge">-{{ item.descuento_pct }}%</span>{% endif %}</p>
@@ -76,7 +77,7 @@
         <div class="cart-empty">
           <p>{% trans "Tu carrito está vacío." %}</p>
           {% url 'tienda:producto_list' as producto_list_url %}
-          {% include "partials/_cta_button.html" with tag="a" href=producto_list_url variant="pill" label="Ir a la tienda" %}
+          {% include "partials/_cta_button.html" with tag="a" href=producto_list_url variant="pill" label=_("Ir a la tienda") %}
         </div>
         {% endif %}
       </div>
@@ -86,7 +87,7 @@
         <p class="editorial-kicker">{% trans "Resumen" %}</p>
         <h2>{% trans "Total a pagar" %}</h2>
 
-        {% include "partials/_price_row.html" with row_class="flex justify-between mb-2" label="Subtotal" amount=subtotal %}
+        {% include "partials/_price_row.html" with row_class="flex justify-between mb-2" label=_("Subtotal") amount=subtotal %}
 
         <div class="flex justify-between mb-1 text-sm text-gray-600">
           <span>{% trans "Envío" %}</span>
@@ -97,11 +98,11 @@
         </div>
         <p class="text-xs text-gray-600 mb-4">{% trans "El costo exacto se confirma con tu dirección en el siguiente paso." %}</p>
 
-        {% include "partials/_price_row.html" with row_class="flex justify-between font-bold text-lg border-t pt-4 mb-1" label="Total sin envío" amount=total %}
+        {% include "partials/_price_row.html" with row_class="flex justify-between font-bold text-lg border-t pt-4 mb-1" label=_("Total sin envío") amount=total %}
         <p class="text-xs text-gray-600 mb-6">{% trans "El envío se suma en el checkout y ahí verás el total final a pagar." %}</p>
 
         {% url 'orders:checkout' as checkout_url %}
-        {% include "partials/_cta_button.html" with tag="a" href=checkout_url variant="primary" label="Continuar" %}
+        {% include "partials/_cta_button.html" with tag="a" href=checkout_url variant="primary" label=_("Continuar") %}
       </aside>
       {% endif %}
     </div>

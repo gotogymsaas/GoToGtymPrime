@@ -10,6 +10,7 @@ from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import get_language, gettext
 from gotogym.tasks import enqueue
 
 from . import correos
@@ -55,7 +56,8 @@ PREFIJO_REDES = 'redes'
 def terminos(request):
     """Texto vigente de los terminos del programa. Publico: se lee antes de
     postularse, y desde la cuenta de pago y el pie del sitio."""
-    return render(request, 'afiliados/terminos.html', {
+    plantilla = 'afiliados/terminos_en.html' if get_language() == 'en' else 'afiliados/terminos.html'
+    return render(request, plantilla, {
         'version': VERSION_TERMINOS_AFILIADOS,
         'vigente_desde': VIGENTE_DESDE,
         'back_url': reverse('home'),
@@ -198,9 +200,9 @@ def suscribete(request):
 
     if not necesita_postularse:
         if profile.status == EstadoAfiliado.PENDING:
-            messages.info(request, 'Tu solicitud ya esta en revision.')
+            messages.info(request, gettext('Tu solicitud ya esta en revision.'))
         else:
-            messages.info(request, 'Ya eres afiliado.')
+            messages.info(request, gettext('Ya eres afiliado.'))
         return redirect('afiliado_dashboard')
 
     formulario = PostulacionForm(request.POST, instance=profile)
@@ -213,19 +215,19 @@ def suscribete(request):
     try:
         _, re_postulacion = _guardar_postulacion(user, profile, formulario, redes)
     except IntegrityError:
-        messages.error(request, 'Hubo un problema al enviar tu solicitud. Intenta de nuevo.')
+        messages.error(request, gettext('Hubo un problema al enviar tu solicitud. Intenta de nuevo.'))
         return redirect('afiliado_suscribete')
     if re_postulacion:
-        messages.success(request, 'Tu solicitud fue enviada de nuevo. Te avisaremos cuando sea revisada.')
+        messages.success(request, gettext('Tu solicitud fue enviada de nuevo. Te avisaremos cuando sea revisada.'))
     else:
-        messages.success(request, 'Tu solicitud fue enviada. Te avisaremos cuando sea aprobada.')
+        messages.success(request, gettext('Tu solicitud fue enviada. Te avisaremos cuando sea aprobada.'))
     return redirect('afiliado_dashboard')
 
 
 class AceptarTerminosForm(forms.Form):
     accept_terms = forms.BooleanField(
         required=True,
-        error_messages={'required': 'Debes aceptar los terminos para seguir usando el panel.'},
+        error_messages={'required': gettext('Debes aceptar los terminos para seguir usando el panel.')},
     )
 
 
@@ -240,7 +242,7 @@ def aceptar_terminos(request):
     formulario = AceptarTerminosForm(request.POST or None)
     if request.method == 'POST' and formulario.is_valid():
         aceptar_terminos_vigentes(profile)
-        messages.success(request, 'Aceptaste los terminos vigentes del programa.')
+        messages.success(request, gettext('Aceptaste los terminos vigentes del programa.'))
         return redirect('afiliado_dashboard')
     return render(request, 'afiliados/aceptar_terminos.html', {
         'form': formulario, 'profile': profile,
@@ -332,7 +334,7 @@ def editar_perfil(request):
     with transaction.atomic():
         formulario.save()
         _reemplazar_redes(profile, redes)
-    messages.success(request, 'Tu perfil quedo actualizado.')
+    messages.success(request, gettext('Tu perfil quedo actualizado.'))
     return redirect('afiliado_dashboard')
 
 
@@ -388,12 +390,14 @@ def cuenta_de_pago(request):
         nueva.data_consent_at = nueva.data_consent_at or ahora
         nueva.save()
         if nueva.documento_coincide_con_el_perfil:
-            messages.success(request, 'Tu cuenta Bre-B quedo guardada. Ya puedes solicitar tu comision.')
+            messages.success(request, gettext('Tu cuenta Bre-B quedo guardada. Ya puedes solicitar tu comision.'))
         else:
             messages.warning(
                 request,
-                'Guardamos tu cuenta Bre-B, pero el documento del titular no coincide con el de tu perfil. '
-                'Los terminos piden que la cuenta sea tuya: el equipo la revisara antes de pagarte.',
+                gettext(
+                    'Guardamos tu cuenta Bre-B, pero el documento del titular no coincide con el de tu perfil. '
+                    'Los terminos piden que la cuenta sea tuya: el equipo la revisara antes de pagarte.'
+                ),
             )
         return redirect('afiliado_dashboard')
     return render(request, 'afiliados/cuenta_pago.html', {'form': formulario, 'cuenta': cuenta})
@@ -411,17 +415,17 @@ def solicitar_retiro(request):
     if request.method != 'POST':
         return redirect('afiliado_dashboard')
     if profile.withdrawal_requests.filter(status=WithdrawalStatus.PENDING).exists():
-        messages.info(request, 'Ya tienes una solicitud de comision pendiente.')
+        messages.info(request, gettext('Ya tienes una solicitud de comision pendiente.'))
         return redirect('afiliado_dashboard')
 
     cuenta = PayoutAccount.objects.filter(afiliado=profile).first()
     if cuenta is None:
-        messages.error(request, 'Inscribe tu cuenta Bre-B antes de solicitar tu comision.')
+        messages.error(request, gettext('Inscribe tu cuenta Bre-B antes de solicitar tu comision.'))
         return redirect('afiliado_dashboard')
 
     nota = request.POST.get('payment_details', '').strip()
     if len(nota) > MAX_NOTA_DE_PAGO:
-        messages.error(request, f'El mensaje es muy largo (maximo {MAX_NOTA_DE_PAGO} caracteres).')
+        messages.error(request, gettext('El mensaje es muy largo (maximo %(maximo)s caracteres).') % {'maximo': MAX_NOTA_DE_PAGO})
         return redirect('afiliado_dashboard')
 
     datos_de_pago = cuenta.as_payment_details()
@@ -432,18 +436,20 @@ def solicitar_retiro(request):
     except MontoMinimoError as error:
         messages.error(
             request,
-            f'Necesitas al menos ${error.minimo:,.0f} COP en comisiones confirmadas para solicitar un pago; '
-            f'tienes ${error.disponible:,.0f} COP.'.replace(',', '.'),
+            (gettext('Necesitas al menos $%(minimo)s COP en comisiones confirmadas para solicitar un pago; tienes $%(disponible)s COP.') % {
+                'minimo': f'{error.minimo:,.0f}', 'disponible': f'{error.disponible:,.0f}',
+            }).replace(',', '.'),
         )
         return redirect('afiliado_dashboard')
     if solicitud is None:
-        messages.error(request, 'No tienes comisiones confirmadas disponibles para solicitar todavia.')
+        messages.error(request, gettext('No tienes comisiones confirmadas disponibles para solicitar todavia.'))
     else:
         limite = fecha_limite_de_la_solicitud(solicitud)
         messages.success(
             request,
-            f'Solicitud de comision por ${solicitud.amount} enviada. '
-            f'Se paga a mas tardar el {limite:%d/%m/%Y} (primeros 10 dias habiles del mes siguiente).',
+            gettext('Solicitud de comision por $%(monto)s enviada. Se paga a mas tardar el %(fecha)s (primeros 10 dias habiles del mes siguiente).') % {
+                'monto': solicitud.amount, 'fecha': f'{limite:%d/%m/%Y}',
+            },
         )
     return redirect('afiliado_dashboard')
 
@@ -460,13 +466,14 @@ def quitar_suscripcion(request):
         solicitar_baja(profile)
         messages.success(
             request,
-            f'Registramos tu aviso de baja. Sera efectiva el {timezone.localtime(profile.exit_effective_at):%d/%m/%Y}; '
-            'hasta entonces tu codigo y tu panel siguen activos.',
+            gettext('Registramos tu aviso de baja. Sera efectiva el %(fecha)s; hasta entonces tu codigo y tu panel siguen activos.') % {
+                'fecha': f'{timezone.localtime(profile.exit_effective_at):%d/%m/%Y}',
+            },
         )
         return redirect('afiliado_dashboard')
     if profile.is_active:
         deactivate_afiliado(profile)
-        messages.success(request, 'Cancelaste tu participacion en el programa de afiliados.')
+        messages.success(request, gettext('Cancelaste tu participacion en el programa de afiliados.'))
     return redirect('/')
 
 
@@ -475,7 +482,7 @@ def cancelar_aviso_de_baja(request):
     profile = _perfil(request)
     if request.method == 'POST' and profile is not None and profile.baja_solicitada:
         cancelar_baja(profile)
-        messages.success(request, 'Cancelaste tu aviso de baja: sigues en el programa.')
+        messages.success(request, gettext('Cancelaste tu aviso de baja: sigues en el programa.'))
     return redirect('afiliado_dashboard')
 
 

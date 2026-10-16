@@ -1,3 +1,4 @@
+{% load idiomas %}
 {% load i18n %}{% comment %}
 Selector de talla de la PDP. Parametro: sizes (lista de tallas).
 Los botones .pdp-size y su atributo data-size son el gancho que usa el
@@ -17,7 +18,7 @@ seccion correspondiente en commerce_editorial.css.
     <button type="button" data-size="{{ size }}"
             class="pdp-size{% if size == 'UNICA' %} pdp-size--single{% endif %} inline-flex h-12 w-12 items-center justify-center border border-[var(--color-border)] p-0 font-semibold text-sm text-[var(--color-text-primary)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]{% if size == selected_size %} border-[var(--color-zafiro)] bg-[var(--color-zafiro)] text-white{% endif %}"
             aria-pressed="{% if size == selected_size %}true{% else %}false{% endif %}">
-      {{ size }}
+      {{ size|traducir }}
     </button>
     {% endfor %}
   </div>

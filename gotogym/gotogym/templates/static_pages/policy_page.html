@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
 {% load static i18n %}
 {% block title %}{{ title }} | GoToGym{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261003-ciencia">{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261014-cookies">{% endblock %}
 {% block content %}
 <div class="editorial-page editorial-quantum">
   <div class="editorial-quantum__background" aria-hidden="true"><span></span></div>
-  <header class="editorial-hero"><div class="editorial-shell"><p class="editorial-kicker">GoToGym · Ayuda y transparencia</p><h1 class="editorial-title">{{ title }}</h1><p class="editorial-lead">Información clara para que puedas comprar y usar GoToGym con confianza.</p></div></header>
+  <header class="editorial-hero"><div class="editorial-shell"><p class="editorial-kicker">{% trans "GoToGym · Ayuda y transparencia" %}</p><h1 class="editorial-title">{{ title }}</h1><p class="editorial-lead">{% trans "Información clara para que puedas comprar y usar GoToGym con confianza." %}</p></div></header>
   <section class="editorial-section"><div class="editorial-shell legal-layout">
     {% include 'partials/_legal_nav.html' %}
     <article class="legal-document">
+      {% get_current_language as LANG %}{% if LANG != 'es' %}<p class="legal-document__aviso">{% trans "Traducción de cortesía: si hay alguna diferencia, prevalece la versión en español." %}</p>{% endif %}
       {% if summary %}<p class="legal-document__summary">{{ summary }}</p>{% endif %}
-      {% for section in sections %}<section><h2>{{ section.title }}</h2>{% for paragraph in section.paragraphs %}<p>{{ paragraph }}</p>{% endfor %}</section>{% endfor %}
-      <footer class="legal-document__footer"><a class="editorial-text-link" href="{{ back_url }}">← Volver</a><a class="editorial-text-link" href="{% url 'contacto' %}">¿Necesitas ayuda? →</a></footer>
+      {% for section in sections %}<section><h2>{{ section.title }}</h2>{% for paragraph in section.paragraphs %}<p>{{ paragraph }}</p>{% endfor %}{% if section.table %}<div class="legal-table" role="region" aria-label="{{ section.title }}" tabindex="0"><table><thead><tr>{% for cabecera in section.table.headers %}<th scope="col">{{ cabecera }}</th>{% endfor %}</tr></thead><tbody>{% for fila in section.table.rows %}<tr>{% for celda in fila %}<td{% if forloop.first %} data-primera{% endif %}>{{ celda }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>{% endif %}{% if section.accion_cookies %}<p><button type="button" class="legal-action" data-cookies-abrir>{{ section.accion_cookies }}</button></p>{% endif %}</section>{% endfor %}
+      <footer class="legal-document__footer"><a class="editorial-text-link" href="{{ back_url }}">{% trans "← Volver" %}</a><a class="editorial-text-link" href="{% url 'contacto' %}">{% trans "¿Necesitas ayuda? →" %}</a></footer>
     </article>
   </div></section>
 </div>

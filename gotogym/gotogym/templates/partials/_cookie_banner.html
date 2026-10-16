@@ -1,0 +1,43 @@
+{% load i18n %}
+{% comment %}
+Banner de cookies. Lo muestra static/js/cookies.js solo si la persona aun no
+eligio (cookie `gtg_cookies`); va oculto por defecto y se abre de nuevo desde
+el pie ("Preferencias de cookies"). Hay dos categorias: necesarias (siempre
+activas) y analitica anonima (opt-in). Rechazar y Aceptar tienen el mismo
+peso visual. El detalle de cada cookie esta en la politica de cookies.
+{% endcomment %}
+{% url 'politica_cookies' as url_cookies %}
+<section id="gtg-cookies" class="gtg-cookies" role="dialog" aria-modal="false"
+         aria-labelledby="gtg-cookies-titulo" aria-describedby="gtg-cookies-texto" hidden>
+  <div class="gtg-cookies__orbita" aria-hidden="true"><span></span></div>
+  <div class="gtg-cookies__principal">
+    <div class="gtg-cookies__cuerpo">
+      <h2 class="gtg-cookies__titulo" id="gtg-cookies-titulo">{% trans "Cookies en GoToGym" %}</h2>
+      <p class="gtg-cookies__texto" id="gtg-cookies-texto">
+        {% blocktrans trimmed with url=url_cookies %}
+          Usamos cookies necesarias para que la tienda funcione: tu sesión, el carrito, la seguridad de los formularios y el idioma. Si lo aceptas, también medimos de forma anónima cómo se usa el sitio para mejorarlo. No usamos cookies de publicidad ni cargamos scripts de terceros. Más detalles en la <a href="{{ url }}">política de cookies</a>.
+        {% endblocktrans %}
+      </p>
+    </div>
+    <div class="gtg-cookies__acciones">
+      <button type="button" class="gtg-cookies__boton gtg-cookies__boton--discreto" data-cookies-configurar
+              aria-expanded="false" aria-controls="gtg-cookies-panel">{% trans "Configurar" %}</button>
+      <button type="button" class="gtg-cookies__boton gtg-cookies__boton--secundario" data-cookies-rechazar>{% trans "Rechazar" %}</button>
+      <button type="button" class="gtg-cookies__boton gtg-cookies__boton--principal" data-cookies-aceptar>{% trans "Aceptar todas" %}</button>
+      <button type="button" class="gtg-cookies__boton gtg-cookies__boton--principal" data-cookies-guardar hidden>{% trans "Guardar preferencias" %}</button>
+    </div>
+  </div>
+
+  <div class="gtg-cookies__panel" id="gtg-cookies-panel" hidden>
+    <div class="gtg-cookies__opcion gtg-cookies__opcion--fija">
+      <strong>{% trans "Necesarias" %}</strong>
+      <span class="gtg-cookies__estado">{% trans "Siempre activas" %}</span>
+      <small>{% trans "Sesión, carrito, seguridad de formularios, idioma y el registro de esta elección. Sin ellas la tienda no funciona." %}</small>
+    </div>
+    <label class="gtg-cookies__opcion" for="gtg-cookies-analitica">
+      <strong>{% trans "Analítica anónima" %}</strong>
+      <input type="checkbox" role="switch" class="gtg-cookies__interruptor" id="gtg-cookies-analitica" data-cookies-analitica>
+      <small>{% trans "Cuenta visitas, clics, búsquedas y compras con un identificador aleatorio, sin nombre ni correo. Nos ayuda a mejorar la tienda." %}</small>
+    </label>
+  </div>
+</section>

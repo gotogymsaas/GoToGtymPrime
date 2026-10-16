@@ -1,0 +1,24 @@
+{% load i18n idiomas %}{% get_current_language as LANGUAGE_CODE %}
+{% comment %}
+Selector de idioma ES / EN, como el de los sitios grandes: un par de botones
+en el menu, en el panel movil y en el pie. Cada boton es un formulario que
+envia `set_language` por POST con la direccion de la pagina actual YA
+traducida a su idioma (`url_en_idioma`): asi la persona aterriza en la misma
+pagina en el otro idioma y la eleccion queda en la cookie `django_language`,
+de modo que la proxima visita sin prefijo la respeta.
+
+Parametro: variante ("menu", "movil" o "pie"), solo para el estilo.
+{% endcomment %}
+<div class="gtg-lang gtg-lang--{{ variante|default:'menu' }}" role="group" aria-label="{% trans 'Idioma' %}">
+  <form action="{% url 'set_language' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{% url_en_idioma 'es' %}">
+    <button type="submit" name="language" value="es" lang="es" title="Español" aria-label="Español"{% if LANGUAGE_CODE == 'es' %} aria-current="true"{% endif %}>ES</button>
+  </form>
+  <span aria-hidden="true">/</span>
+  <form action="{% url 'set_language' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{% url_en_idioma 'en' %}">
+    <button type="submit" name="language" value="en" lang="en" title="English" aria-label="English"{% if LANGUAGE_CODE == 'en' %} aria-current="true"{% endif %}>EN</button>
+  </form>
+</div>

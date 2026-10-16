@@ -1,6 +1,7 @@
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
+from django.utils.translation import gettext
 from gotogym.seo import contexto_seo, url_absoluta
 
 from .models import Category, Post
@@ -37,9 +38,11 @@ def post_list(request):
         'has_active_filters': any([search, category]),
     }
     context.update(contexto_seo(
-        'GoToGym Journal: historias para avanzar',
-        'Diseño, rendimiento, tecnología textil y bienestar: ciencia de materiales y ropa deportiva '
-        'explicadas con sus fuentes.',
+        gettext('GoToGym Journal: historias para avanzar'),
+        gettext(
+            'Diseño, rendimiento, tecnología textil y bienestar: ciencia de materiales y ropa deportiva '
+            'explicadas con sus fuentes.'
+        ),
     ))
     return render(request, 'blog/post_list.html', context)
 
@@ -58,7 +61,7 @@ def post_detail(request, slug):
     datos = {
         '@context': 'https://schema.org',
         '@type': 'Article',
-        'headline': post.title,
+        'headline': post.titulo,
         'datePublished': post.published.isoformat(),
         'dateModified': post.updated.isoformat(),
         'author': {'@type': 'Organization', 'name': post.firma},
@@ -71,6 +74,6 @@ def post_detail(request, slug):
         datos['image'] = imagen
     context = {'post': post, 'related_posts': related_posts}
     context.update(contexto_seo(
-        f'{post.title} | GoToGym Journal', post.excerpt or post.content, tipo='article', imagen=imagen, datos=datos,
+        f'{post.titulo} | GoToGym Journal', post.resumen or post.cuerpo, tipo='article', imagen=imagen, datos=datos,
     ))
     return render(request, 'blog/post_detail.html', context)

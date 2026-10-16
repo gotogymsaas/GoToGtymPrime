@@ -2,6 +2,7 @@ from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Prefetch
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils.translation import gettext
 from gotogym.seo import contexto_seo, recortar, url_absoluta
 from products.models import Product, ProductCategory, ProductMedia, ProductVariant
 
@@ -109,8 +110,8 @@ def producto_list(request):
         'total_resultados': paginator.count,
     }
     context.update(contexto_seo(
-        'Tienda GoToGym: ropa deportiva',
-        'Explora la colección de ropa deportiva GoToGym con tecnología textil: tallas, colores y precios.',
+        gettext('Tienda GoToGym: ropa deportiva'),
+        gettext('Explora la colección de ropa deportiva GoToGym con tecnología textil: tallas, colores y precios.'),
     ))
     return render(request, 'tienda/producto_list.html', context)
 
@@ -258,8 +259,9 @@ def _seo_de_producto(request, producto, variantes, context):
             'ratingValue': round(float(context['review_average']), 1),
             'reviewCount': context['review_count'],
         }
-    descripcion = producto.description or f'{producto.name}, de la colección GoToGym.'
+    nombre = gettext(producto.name)
+    descripcion = gettext(producto.description) if producto.description else gettext('%(nombre)s, de la colección GoToGym.') % {'nombre': nombre}
     return contexto_seo(
-        f'{producto.name} | GoToGym', descripcion, tipo='product', imagen=imagenes[0] if imagenes else None,
+        f'{nombre} | GoToGym', descripcion, tipo='product', imagen=imagenes[0] if imagenes else None,
         datos=datos,
     )

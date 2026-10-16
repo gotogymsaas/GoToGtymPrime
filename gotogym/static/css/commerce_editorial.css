@@ -84,8 +84,8 @@
 .shop-field .shop-price-row { display: flex; gap: var(--space-2); }
 /* Cuadros iguales para todas las tallas: una grilla de columnas parejas
  * reparte el ancho sin importar si la etiqueta es "S" o "UNICA". */
-.shop-chip-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: var(--space-2); }
-.shop-chip { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 44px; padding: 0 6px; border: 1px solid #c8c8c5; color: var(--shop-ink); font-size: .74rem; font-weight: 800; letter-spacing: .04em; text-align: center; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; transition: background .18s ease, color .18s ease, border-color .18s ease; }
+.shop-chip-group { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.shop-chip { display: flex; align-items: center; justify-content: center; min-width: 56px; min-height: 44px; padding: 0 12px; border: 1px solid #c8c8c5; color: var(--shop-ink); font-size: .74rem; font-weight: 800; letter-spacing: .04em; text-align: center; text-transform: uppercase; white-space: nowrap; cursor: pointer; transition: background .18s ease, color .18s ease, border-color .18s ease; }
 .shop-chip:hover { border-color: var(--shop-ink); }
 .shop-chip input { position: absolute; opacity: 0; pointer-events: none; }
 .shop-chip:has(input:checked) { border-color: var(--shop-ink); background: var(--shop-ink); color: var(--shop-paper); }

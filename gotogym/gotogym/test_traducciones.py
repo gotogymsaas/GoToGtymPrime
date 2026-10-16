@@ -4,6 +4,10 @@ from django.utils import translation
 
 
 class TraduccionesTests(TestCase):
+    def tearDown(self):
+        # LocaleMiddleware deja activo el idioma de la ultima peticion en el hilo.
+        translation.activate('es')
+
     def _html(self, ruta):
         return self.client.get(ruta).content.decode()
 

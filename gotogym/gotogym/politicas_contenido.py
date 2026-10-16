@@ -174,6 +174,10 @@ PAGOS = {
             'por el mismo medio de pago utilizado; consulta la política de devoluciones para los plazos.',
             f'Ante cualquier cobro que no reconozcas o duda sobre un pago, escríbenos a {CORREO_SOPORTE}.',
         ]},
+        {'title': 'Quién te vende', 'paragraphs': [
+            f'Las prendas de gotogym.store las vende {RESPONSABLE}, sociedad domiciliada en Bogotá D.C., '
+            f'Colombia, titular de la marca GoToGym. Atención sobre tu compra: {CORREO_SOPORTE}.',
+        ]},
     ],
 }
 
@@ -223,6 +227,67 @@ TRATAMIENTO_DATOS = {
             'una relación con GoToGym y durante el tiempo que exijan las obligaciones legales.',
             'Actualizamos esta política cuando cambian nuestras prácticas o la ley; la versión vigente '
             f'es la publicada aquí. {ACTUALIZADO}',
+        ]},
+    ],
+}
+
+COOKIES = {
+    'title': 'Política de cookies',
+    'summary': 'Qué guarda GoToGym en tu navegador, para qué y cómo cambiar tu decisión cuando quieras.',
+    'sections': [
+        {'title': 'Qué son las cookies', 'paragraphs': [
+            'Las cookies son pequeños archivos que un sitio guarda en tu navegador para recordar información '
+            'entre una visita y otra. En GoToGym usamos solo las que necesita la tienda para funcionar y, si '
+            'lo aceptas, una medición anónima del uso del sitio.',
+            'No usamos cookies de publicidad ni de seguimiento entre sitios, no vendemos información sobre ti '
+            'y el sitio no carga scripts, tipografías ni imágenes de terceros.',
+        ]},
+        {'title': 'Qué guardamos', 'paragraphs': [
+            'Esta es la lista completa de lo que el sitio guarda en tu navegador.',
+        ], 'table': {
+            'headers': ['Nombre', 'Para qué sirve', 'Tipo', 'Duración'],
+            'rows': [
+                ['sessionid',
+                 'Mantiene tu sesión, el carrito de compras y el código del afiliado si llegaste por su enlace.',
+                 'Necesaria', '2 semanas'],
+                ['csrftoken',
+                 'Protege los formularios del sitio contra envíos falsificados.',
+                 'Necesaria', 'Hasta 1 año'],
+                ['django_language',
+                 'Recuerda el idioma que elegiste. Solo se crea si lo cambias.',
+                 'Necesaria', 'Hasta cerrar el navegador'],
+                ['gtg_cookies',
+                 'Guarda tu elección sobre las cookies para no preguntarte en cada visita.',
+                 'Necesaria', '12 meses'],
+                ['ARRAffinity, ARRAffinitySameSite',
+                 'Las coloca el servicio de alojamiento (Azure App Service) para dirigir tus peticiones al mismo servidor.',
+                 'Necesaria', 'Hasta cerrar el navegador'],
+                ['gtg_atribucion',
+                 'Almacenamiento de sesión del navegador. Solo si aceptas la analítica: recuerda que ya registramos de dónde llegaste en esta visita.',
+                 'Analítica', 'Hasta cerrar la pestaña'],
+            ],
+        }},
+        {'title': 'Medición anónima del uso del sitio', 'paragraphs': [
+            'Solo si la aceptas en el banner, medimos qué páginas se visitan, qué botones se pulsan, qué se '
+            'busca, qué productos se ven o se agregan al carrito y cuántos pedidos se crean. Cada visita lleva '
+            'un identificador aleatorio sin relación con tu nombre ni tu correo, y no cruzamos estos datos con '
+            'tu identidad. Los usamos únicamente para mejorar la tienda.',
+            'Si no la aceptas, o tu navegador envía la señal "No rastrear" o Global Privacy Control, no medimos '
+            'nada. Aceptar o rechazar la analítica no cambia en nada lo que puedes comprar ni cómo.',
+        ]},
+        {'title': 'Servicios de terceros', 'paragraphs': [
+            'Cuando pagas, te llevamos a Mercado Pago, que es quien procesa el pago y puede guardar sus propias '
+            'cookies en su plataforma, bajo su política. Los enlaces a nuestras redes sociales abren sus '
+            'sitios, que tienen sus propias políticas.',
+        ]},
+        {'title': 'Cómo cambiar tu decisión', 'paragraphs': [
+            'Puedes cambiarla cuando quieras con el botón de abajo o con "Preferencias de cookies" en el pie de '
+            'cualquier página. También puedes borrar o bloquear cookies desde la configuración de tu navegador; '
+            'ten en cuenta que, si bloqueas las necesarias, no podrás iniciar sesión ni usar el carrito.',
+        ], 'accion_cookies': 'Abrir preferencias de cookies'},
+        {'title': 'Contacto y actualizaciones', 'paragraphs': [
+            f'Si tienes preguntas sobre esta política, escribe a {CORREO_PRIVACIDAD}. Actualizamos esta política '
+            f'cuando cambian las cookies que usamos; la versión vigente es la publicada aquí. {ACTUALIZADO}',
         ]},
     ],
 }

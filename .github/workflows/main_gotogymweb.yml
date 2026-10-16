@@ -71,6 +71,18 @@ jobs:
     needs: build
     permissions:
       contents: read
+    # Un solo despliegue a la vez: dos pushes seguidos no se pisan, el segundo
+    # espera. Sin cancelar el que va en curso (cortar un zipdeploy a medias
+    # deja la aplicacion en un estado raro).
+    concurrency:
+      group: despliegue-produccion
+      cancel-in-progress: false
+    # Entorno `production` de GitHub: hoy sin reglas, pero permite exigir una
+    # aprobacion manual antes de desplegar (Settings > Environments >
+    # production > Required reviewers) sin tocar este archivo.
+    environment:
+      name: production
+      url: https://shop.gotogym.store
 
     steps:
       - name: Download artifact from build job

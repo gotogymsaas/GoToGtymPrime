@@ -49,9 +49,9 @@ class ClaveSecretaTests(SimpleTestCase):
 
 
 class HttpsPorDefectoTests(SimpleTestCase):
-    def test_en_produccion_todo_esta_activo_por_defecto_salvo_hsts(self):
+    def test_en_produccion_todo_esta_activo_y_hsts_arranca_en_una_hora(self):
         salida = _cargar(DJANGO_SECRET_KEY=CLAVE).stdout.strip().splitlines()[-1].split()
-        self.assertEqual(salida[:6], ['True', 'True', 'True', 'True', 'True', '0'])
+        self.assertEqual(salida[:6], ['True', 'True', 'True', 'True', 'True', '3600'])
 
     def test_se_puede_apagar_expresamente(self):
         salida = _cargar(
@@ -63,9 +63,13 @@ class HttpsPorDefectoTests(SimpleTestCase):
         salida = _cargar('gotogym.settings_local').stdout.strip().splitlines()[-1].split()
         self.assertEqual(salida[:5], ['False', 'False', 'False', 'False', 'False'])
 
-    def test_hsts_solo_se_activa_por_variable(self):
-        salida = _cargar(DJANGO_SECRET_KEY=CLAVE, SECURE_HSTS_SECONDS='3600').stdout.strip().splitlines()[-1].split()
-        self.assertEqual(salida[5], '3600')
+    def test_hsts_se_sube_por_variable(self):
+        salida = _cargar(DJANGO_SECRET_KEY=CLAVE, SECURE_HSTS_SECONDS='604800').stdout.strip().splitlines()[-1].split()
+        self.assertEqual(salida[5], '604800')
+
+    def test_hsts_esta_apagado_fuera_de_produccion(self):
+        salida = _cargar('gotogym.settings_local').stdout.strip().splitlines()[-1].split()
+        self.assertEqual(salida[5], '0')
 
 
 class CacheYTareasTests(SimpleTestCase):

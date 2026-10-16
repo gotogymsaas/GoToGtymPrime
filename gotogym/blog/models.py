@@ -2,6 +2,9 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
+from django.utils.translation import get_language, gettext
+
+from .journal_en import REFERENCIAS, TRADUCCIONES
 
 
 class Category(models.Model):
@@ -51,11 +54,30 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('blog:post_detail', args=[self.slug])
 
+    def _en_ingles(self, campo):
+        """Texto de la traduccion al ingles (journal_en.py) si el idioma activo es
+        el ingles y la entrada la tiene; si no, None."""
+        if get_language() == 'en':
+            return TRADUCCIONES.get(self.slug, {}).get(campo)
+        return None
+
+    @property
+    def titulo(self):
+        return self._en_ingles('title') or self.title
+
+    @property
+    def resumen(self):
+        return self._en_ingles('excerpt') or self.excerpt
+
+    @property
+    def cuerpo(self):
+        return self._en_ingles('content') or self.content
+
     @property
     def firma(self):
         """Las entradas las firma el equipo, no la cuenta que las carga: el
         usuario de esa cuenta suele ser un correo y no debe verse en publico."""
-        return self.FIRMA
+        return gettext(self.FIRMA)
 
     @property
     def reference_items(self):
@@ -66,5 +88,8 @@ class Post(models.Model):
             if not line:
                 continue
             text, _, url = line.partition('|')
-            items.append({'text': text.strip(), 'url': url.strip()})
+            texto = text.strip()
+            if get_language() == 'en':
+                texto = REFERENCIAS.get(texto, texto)
+            items.append({'text': texto, 'url': url.strip()})
         return items

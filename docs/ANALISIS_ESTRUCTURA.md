@@ -1,6 +1,6 @@
 # Estructura y arquitectura de GoToGymPrime
 
-Estado verificado contra el código el 2 de octubre de 2026. Describe lo que existe hoy; las decisiones pasadas y los pendientes viven en otros documentos (ver el final).
+Estado verificado contra el código el 14 de octubre de 2026. Describe lo que existe hoy; las decisiones pasadas y los pendientes viven en otros documentos (ver el final).
 
 ## En una frase
 
@@ -16,7 +16,7 @@ Un monolito Django (`gotogym/`) que sirve la tienda, el blog, el panel administr
 | `environments/` | Scripts de validación (backend, frontend, Azure) e instalación de hooks de git |
 | `.github/workflows/` | Pipeline de construcción y despliegue a Azure App Service |
 | `.githooks/` | Validación local antes de cada commit y cada push |
-| `docs/` | Documentación y los PDF de benchmarking del e-commerce |
+| `docs/` | Documentación, los textos legales en PDF y los PDF de benchmarking del e-commerce |
 | `design/` | Fuentes tipográficas de la marca |
 | `pyproject.toml` | Configuración de ruff, mypy y coverage |
 
@@ -35,7 +35,7 @@ Un monolito Django (`gotogym/`) que sirve la tienda, el blog, el panel administr
 | `blog` | Journal: entradas con referencias | `Post`, `Category` |
 | `afiliados` | Programa de afiliados: solicitud, comisiones, retiros, clics | `PerfilAfiliado`, `Commission`, `WithdrawalRequest`, `ReferralClick`, `ConfiguracionProgramaAfiliados` |
 | `administracion` | Panel interno: dashboard de ventas, analítica, productos, pedidos, cupones, usuarios, afiliados | `PanelSettings` |
-| `analitica` | Eventos de uso del sitio, sin datos personales | `EventoAnalitica` |
+| `analitica` | Eventos de uso del sitio, sin datos personales y solo con consentimiento de cookies | `EventoAnalitica` |
 | `contabilidad` | Consulta de clientes y facturas en Alegra (solo personal) | (sin modelos) |
 
 `gotogym/integrations/` contiene los clientes de proveedores externos: `mercadopago` (pagos y reembolsos), `alegra` (contabilidad) y `hubspot` (esqueleto sin integración real).
@@ -50,13 +50,14 @@ Todas las rutas públicas llevan prefijo de idioma (`/es/`, `/en/`, `/pt/`); el 
 | `/es/tienda/`, `/es/tienda/producto/<id>/` | Todos | Catálogo y ficha de producto |
 | `/es/carrito/` | Todos | Carrito (se conserva al iniciar sesión) |
 | `/es/blog/`, `/es/acerca-de/`, `/es/contacto/` | Todos | Journal, ciencia de materiales, contacto |
+| `/es/politica-*`, `/es/terminos/` | Todos | Políticas: privacidad, tratamiento de datos, cookies, cambios, devoluciones, garantía, envíos, pagos y términos |
 | `/es/accounts/acceso/`, `/es/accounts/register/` | Todos | Login y registro (aceptan `?next=`) |
 | `/es/pedidos-tienda/checkout/` | Con sesión | Checkout |
 | `/es/pedidos-tienda/mis-pedidos/`, `/es/accounts/editar-perfil/` | Con sesión | Cuenta del cliente |
 | `/es/afiliados/dashboard/` | Con sesión | Panel de afiliados |
 | `/es/admin-panel/` | Personal (`is_staff`) | Panel interno: ventas, analítica (`/analitica/`), productos, pedidos, cupones, usuarios, afiliados, catálogos |
 | `/es/contabilidad/` | Personal | Clientes y facturas de Alegra |
-| `/es/admin/` | Superusuario | Administración de Django |
+| `/es/admin/` (o la ruta de `ADMIN_URL`) | Superusuario | Administración de Django; solo superusuarios, con límite de intentos de acceso |
 | `/pagos/webhook/mercadopago/` | Mercado Pago | Webhook (sin prefijo de idioma, verifica firma) |
 | `/healthz` | Monitoreo | Comprobación de salud |
 
@@ -80,7 +81,7 @@ Hay tres módulos de configuración, todos heredan de `gotogym/settings.py`:
 | `gotogym.settings_local` | Desarrollo | SQLite `db_local.sqlite3`, `DEBUG` activo |
 | `gotogym.settings_test` | Pruebas y CI | SQLite, hash de contraseñas rápido, estáticos sin manifiesto |
 
-Variables de entorno que lee la configuración: `DJANGO_SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL`, `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `SECURE_PROXY_SSL_HEADER`, `SECURE_SSL_REDIRECT`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `PAYMENT_PROVIDER`, `PAYMENTS_MOCK_UI_ENABLED`, `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_WEBHOOK_SECRET`, `ALEGRA_API_TOKEN`, `HUBSPOT_PRIVATE_TOKEN`, `EMAIL_HOST` (con `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `EMAIL_USE_SSL`, `DEFAULT_FROM_EMAIL`) y `SENTRY_DSN` (con `SENTRY_ENVIRONMENT`, `SENTRY_TRACES_SAMPLE_RATE`), `REDIS_URL` y `ORDER_PAYMENT_WINDOW_HOURS`.
+Variables de entorno que lee la configuración: `DJANGO_SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL`, `CSRF_TRUSTED_ORIGINS`, `SITIO_URL`, `ADMIN_URL`, `TRUSTED_PROXY_HOPS`, `RATE_LIMIT_ENABLED`, `SECURE_HSTS_SECONDS`, `SECURE_PROXY_SSL_HEADER`, `SECURE_SSL_REDIRECT`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `PAYMENT_PROVIDER`, `PAYMENTS_MOCK_UI_ENABLED`, `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_WEBHOOK_SECRET`, `ALEGRA_API_TOKEN`, `HUBSPOT_PRIVATE_TOKEN`, `EMAIL_HOST` (con `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `EMAIL_USE_SSL`, `DEFAULT_FROM_EMAIL`) y `SENTRY_DSN` (con `SENTRY_ENVIRONMENT`, `SENTRY_TRACES_SAMPLE_RATE`), `REDIS_URL` y `ORDER_PAYMENT_WINDOW_HOURS`.
 
 ## Calidad y pruebas
 
@@ -102,6 +103,8 @@ Variables de entorno que lee la configuración: `DJANGO_SECRET_KEY`, `DEBUG`, `A
 | `generar_derivados_imagen` | Regenera las imágenes AVIF/WebP y su manifiesto |
 | `cancelar_pedidos_vencidos` | Cancela los pedidos sin pagar pasado el plazo y devuelve sus cupones (el checkout y el panel también lo ejecutan; conviene programarlo cada hora) |
 | `probar_correo <destinatario>` | Envía un correo de prueba con el SMTP configurado |
+| `revisar_claves_heredadas [--rotar]` | Detecta (y con `--rotar` corrige) cuentas que aceptan una contraseña que estuvo publicada en el código |
+| `confirmar_comisiones`, `aplicar_bajas` | Avanzan lo que depende del tiempo en el programa de afiliados (también corren al abrir sus paneles) |
 
 ## Integraciones
 
@@ -112,15 +115,18 @@ Variables de entorno que lee la configuración: `DJANGO_SECRET_KEY`, `DEBUG`, `A
 | HubSpot | Solo un esqueleto sin llamadas reales |
 | Sentry | Se activa al declarar `SENTRY_DSN` |
 | Correo (SMTP) | Se activa al declarar `EMAIL_HOST`; sin él, los correos salen por consola. Lo usan la recuperación de contraseña, los avisos del pedido y los del programa de afiliados |
+| Idiomas | Selector ES / EN en el menú, el panel móvil y el pie; las rutas llevan `/es/` o `/en/` y la elección se guarda en la cookie `django_language`. Todo el sitio de cara al cliente está traducido al inglés (portada, tienda, carrito, checkout, cuenta, afiliados, Journal, políticas, términos y correos del pedido). Las políticas y los términos en inglés son una traducción de cortesía; prevalece el español. El contenido de la base de datos se traduce con el filtro `traducir` (el `.po` hace de diccionario). El portugués existe en los catálogos pero no tiene selector ni las traducciones nuevas. El panel de administración y los correos internos siguen en español. Regresión: `gotogym/test_ingles_completo.py` |
+| Cookies y medición | Banner de cookies propio (`static/js/cookies.js`); la medición del uso del sitio es opt-in y se registra en la cookie `gtg_cookies` |
 | Caché compartida | `REDIS_URL` si existe; si no, una tabla en la base de datos (`django_cache`, la crea `migrate`). Sin base declarada, memoria local |
 
 ## Despliegue
 
-Se despliega a Azure App Service con el flujo de `.github/workflows/main_gotogymweb.yml`, que valida, empaqueta y publica por Kudu. El Startup Command del App Service (configurado en el Portal) migra, recolecta estáticos y arranca gunicorn con 2 workers; `environments/azure/startup.sh` es la versión de referencia versionada, que además carga las entradas del Journal. Los pasos y la bitácora del despliegue de marzo de 2026 están en `docs/DESPLIEGUE_LOCAL.md`.
+Se despliega a Azure App Service con el flujo de `.github/workflows/main_gotogymweb.yml`, que valida, empaqueta y publica por Kudu. El Startup Command del App Service (configurado en el Portal) migra, recolecta estáticos y arranca gunicorn con 2 workers; `environments/azure/startup.sh` es la versión de referencia versionada, que además carga las entradas del Journal. Los datos reales del entorno, las variables, las tareas periódicas, los respaldos y la lista previa a abrir al público están en `docs/DESPLIEGUE.md`.
 
 ## Otros documentos
 
 - `docs/GUIA_ACCESO.md`: cómo ejecutar el proyecto y entrar a cada panel.
-- `docs/CORRECCIONES.md`: registro histórico de las primeras correcciones (febrero de 2026).
-- `docs/Informe_Comparativo_Original_vs_Actual.md`: comparación entre el proyecto original y la versión de comercio electrónico.
-- `docs/verificacion_funcional.md`: lista de funcionalidades planteadas; varias aún no existen en el código.
+- `docs/DESPLIEGUE.md`: producción, variables de entorno, tareas periódicas, respaldos y lista previa a abrir.
+- `docs/Politicas y Textos Legales GoToGym.pdf`: compilación de los textos legales del sitio; se genera desde el código.
+- `docs/Terminos y Condiciones del Programa de Afiliados GoToGym.pdf`: términos del programa de afiliados.
+- `docs/ecomerce/PDFs/`: benchmarking y dirección de diseño del e-commerce.

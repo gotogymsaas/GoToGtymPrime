@@ -46,12 +46,21 @@ def hash_visitante(request):
     return hashlib.sha256(semilla).hexdigest()[:32]
 
 
-def no_medir(request):
-    """True si el visitante pidio no ser medido (Do Not Track o GPC).
+COOKIE_CONSENTIMIENTO = 'gtg_cookies'
+VALOR_ACEPTA_ANALITICA = 'analitica'
 
-    El script del navegador ya lo respeta; el servidor lo comprueba tambien
-    para sus propios eventos.
+
+def no_medir(request):
+    """True si no se debe medir a este visitante.
+
+    La medicion es opt-in: solo ocurre si aceptó la analitica en el banner de
+    cookies (cookie `gtg_cookies=analitica`), y se respeta ademas Do Not Track
+    y Global Privacy Control. El script del navegador ya hace las mismas
+    comprobaciones; el servidor las repite para sus propios eventos y porque la
+    peticion puede venir de otro cliente.
     """
+    if request.COOKIES.get(COOKIE_CONSENTIMIENTO) != VALOR_ACEPTA_ANALITICA:
+        return True
     return request.headers.get('DNT') == '1' or request.headers.get('Sec-GPC') == '1'
 
 

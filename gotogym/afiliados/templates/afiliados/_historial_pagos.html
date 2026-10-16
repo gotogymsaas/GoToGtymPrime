@@ -1,35 +1,36 @@
+{% load i18n %}
 {% load tienda_filters %}
-<form class="period-filter" method="get" aria-label="Filtrar pagos por año y mes">
-  <label>Año
+<form class="period-filter" method="get" aria-label="{% trans 'Filtrar pagos por año y mes' %}">
+  <label>{% trans "Año" %}
     <select name="anio" onchange="this.form.submit()">
       {% for a in anios %}<option value="{{ a }}"{% if a == anio %} selected{% endif %}>{{ a }}</option>{% endfor %}
     </select>
   </label>
-  <label>Mes
+  <label>{% trans "Mes" %}
     <select name="mes" onchange="this.form.submit()">
-      <option value=""{% if not mes %} selected{% endif %}>Todos los meses</option>
+      <option value=""{% if not mes %} selected{% endif %}>{% trans "Todos los meses" %}</option>
       {% for fila in meses %}<option value="{{ fila.mes.month }}"{% if fila.mes.month == mes %} selected{% endif %}>{{ fila.mes|date:"F"|capfirst }}</option>{% endfor %}
     </select>
   </label>
-  <noscript><button type="submit" class="ghost">Filtrar</button></noscript>
+  <noscript><button type="submit" class="ghost">{% trans "Filtrar" %}</button></noscript>
 </form>
 
 <section class="stats">
   {% if fila_mes %}
-  <article class="is-teal"><span>${{ fila_mes.neto|cop }} COP</span><p>Recibido en {{ periodo }}</p></article>
-  <article><span>{{ fila_mes.cantidad }}</span><p>Pago{{ fila_mes.cantidad|pluralize }} en {{ periodo }}</p></article>
+  <article class="is-teal"><span>${{ fila_mes.neto|cop }} COP</span><p>{% trans "Recibido en" %} {{ periodo }}</p></article>
+  <article><span>{{ fila_mes.cantidad }}</span><p>{% blocktrans count n=fila_mes.cantidad %}Pago en {{ periodo }}{% plural %}Pagos en {{ periodo }}{% endblocktrans %}</p></article>
   {% else %}
-  <article class="is-teal"><span>${{ total_del_anio|cop }} COP</span><p>Recibido en {{ anio }}</p></article>
-  <article><span>{{ cantidad_del_anio }}</span><p>Pago{{ cantidad_del_anio|pluralize }} en {{ anio }}</p></article>
+  <article class="is-teal"><span>${{ total_del_anio|cop }} COP</span><p>{% trans "Recibido en" %} {{ anio }}</p></article>
+  <article><span>{{ cantidad_del_anio }}</span><p>{% blocktrans count n=cantidad_del_anio %}Pago en {{ anio }}{% plural %}Pagos en {{ anio }}{% endblocktrans %}</p></article>
   {% endif %}
-  <article><span>${{ total_historico|cop }} COP</span><p>Total pagado, todos los años</p></article>
+  <article><span>${{ total_historico|cop }} COP</span><p>{% trans "Total pagado, todos los años" %}</p></article>
 </section>
 
 {% if solicitudes_en_curso %}
 <div class="panel panel-status">
-  <h2>Solicitudes en curso</h2>
+  <h2>{% trans "Solicitudes en curso" %}</h2>
   <table>
-    <thead><tr><th>Solicitada</th><th>Monto</th></tr></thead>
+    <thead><tr><th>{% trans "Solicitada" %}</th><th>{% trans "Monto" %}</th></tr></thead>
     <tbody>
       {% for solicitud in solicitudes_en_curso %}
       <tr><td>{{ solicitud.requested_at|date:"d/m/Y" }}</td><td class="nowrap">${{ solicitud.amount|cop }} COP</td></tr>
@@ -40,40 +41,40 @@
 {% endif %}
 
 <div class="panel">
-  <h2>Pagos por mes · {{ anio }}</h2>
+  <h2>{% trans "Pagos por mes ·" %} {{ anio }}</h2>
   <table>
-    <thead><tr><th>Mes</th><th>Pagos</th><th>Monto</th><th>Gastos</th><th>Recibido</th></tr></thead>
+    <thead><tr><th>{% trans "Mes" %}</th><th>{% trans "Pagos" %}</th><th>{% trans "Monto" %}</th><th>{% trans "Gastos" %}</th><th>{% trans "Recibido" %}</th></tr></thead>
     <tbody>
       {% for fila in meses_a_mostrar %}
       <tr{% if not fila.cantidad %} class="is-muted"{% endif %}>
         <td>{{ fila.mes|date:"F"|capfirst }}</td>
         <td>{{ fila.cantidad }}</td>
-        <td class="nowrap">{% if fila.cantidad %}${{ fila.bruto|cop }} COP{% else %}&mdash;{% endif %}</td>
-        <td class="nowrap">{% if fila.cantidad %}${{ fila.gastos|cop }} COP{% else %}&mdash;{% endif %}</td>
-        <td class="nowrap">{% if fila.cantidad %}<strong>${{ fila.neto|cop }} COP</strong>{% else %}&mdash;{% endif %}</td>
+        <td class="nowrap">{% if fila.cantidad %}${{ fila.bruto|cop }} COP{% else %}—{% endif %}</td>
+        <td class="nowrap">{% if fila.cantidad %}${{ fila.gastos|cop }} COP{% else %}—{% endif %}</td>
+        <td class="nowrap">{% if fila.cantidad %}<strong>${{ fila.neto|cop }} COP</strong>{% else %}—{% endif %}</td>
       </tr>
       {% endfor %}
     </tbody>
     {% if not fila_mes %}
     <tfoot>
-      <tr><th>Total {{ anio }}</th><th>{{ cantidad_del_anio }}</th><th class="nowrap">${{ bruto_del_anio|cop }} COP</th><th class="nowrap">${{ gastos_del_anio|cop }} COP</th><th class="nowrap">${{ total_del_anio|cop }} COP</th></tr>
+      <tr><th>{% trans "Total" %} {{ anio }}</th><th>{{ cantidad_del_anio }}</th><th class="nowrap">${{ bruto_del_anio|cop }} COP</th><th class="nowrap">${{ gastos_del_anio|cop }} COP</th><th class="nowrap">${{ total_del_anio|cop }} COP</th></tr>
     </tfoot>
     {% endif %}
   </table>
-  <p class="hint">Los pagos se cuentan por la fecha en que se pagaron. «Recibido» es el monto menos los gastos de transacción; el programa no aplica retenciones.</p>
+  <p class="hint">{% trans "Los pagos se cuentan por la fecha en que se pagaron. «Recibido» es el monto menos los gastos de transacción; el programa no aplica retenciones." %}</p>
 </div>
 
 <div class="panel">
-  <h2>Cada pago de {{ periodo }}</h2>
+  <h2>{% trans "Cada pago de" %} {{ periodo }}</h2>
   {% if pagos %}
   <table>
-    <thead><tr><th>Fecha de pago</th><th>Solicitada</th><th>Monto</th><th>Gastos</th><th>Recibido</th></tr></thead>
+    <thead><tr><th>{% trans "Fecha de pago" %}</th><th>{% trans "Solicitada" %}</th><th>{% trans "Monto" %}</th><th>{% trans "Gastos" %}</th><th>{% trans "Recibido" %}</th></tr></thead>
     <tbody>
       {% for pago in pagos %}
       <tr>
         <td>{{ pago.resolved_at|date:"d/m/Y" }}</td>
         <td><small>{{ pago.requested_at|date:"d/m/Y" }}</small></td>
-        <td class="nowrap">${{ pago.amount|cop }} COP{% if pago.recovery_amount %}<br><small>Incluye ${{ pago.recovery_amount|cop }} descontados por devoluciones</small>{% endif %}</td>
+        <td class="nowrap">${{ pago.amount|cop }} COP{% if pago.recovery_amount %}<br><small>{% blocktrans with monto=pago.recovery_amount|cop %}Incluye ${{ monto }} descontados por devoluciones{% endblocktrans %}</small>{% endif %}</td>
         <td class="nowrap">${{ pago.transaction_fee|cop }} COP</td>
         <td class="nowrap"><strong>${{ pago.net_paid|cop }} COP</strong></td>
       </tr>
@@ -81,6 +82,6 @@
     </tbody>
   </table>
   {% else %}
-  <p>No hay pagos registrados en {{ periodo }}.</p>
+  <p>{% blocktrans %}No hay pagos registrados en {{ periodo }}.{% endblocktrans %}</p>
   {% endif %}
 </div>

@@ -1,8 +1,9 @@
+{% load i18n %}
 {% if comision %}
 {{ comision.get_status_display }}
 {% if comision.status == 'pending' %}
-  {% if comision.needs_review %}<br><small>En revisión por el equipo</small>
-  {% elif comision.validation_last_day %}<br><small>En validación hasta el {{ comision.validation_last_day|date:"d/m/Y" }}</small>
-  {% else %}<br><small>Se valida 5 días hábiles después de la entrega</small>{% endif %}
+  {% if comision.needs_review %}<br><small>{% trans "En revisión por el equipo" %}</small>
+  {% elif comision.validation_last_day %}<br><small>{% trans "En validación hasta el" %} {{ comision.validation_last_day|date:"d/m/Y" }}</small>
+  {% else %}<br><small>{% trans "Se valida 5 días hábiles después de la entrega" %}</small>{% endif %}
 {% endif %}
-{% else %}&mdash;{% endif %}
+{% else %}—{% endif %}

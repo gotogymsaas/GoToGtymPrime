@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load static tienda_filters %}
 
-{% block title %}Panel de afiliados{% endblock %}
+{% block title %}{% trans "Panel de afiliados" %}{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 
 {% block extra_head %}
@@ -16,23 +17,23 @@
         <span class="quantum-emblem"><span class="quantum-emblem__core"></span></span>
         <span class="quantum-signal-line"></span>
       </div>
-      <p class="eyebrow">Programa de afiliados</p>
-      <h1>Panel de afiliados</h1>
+      <p class="eyebrow">{% trans "Programa de afiliados" %}</p>
+      <h1>{% trans "Panel de afiliados" %}</h1>
 
       {% if profile.status == 'approved' and profile.is_active %}
       <div class="panel-referral">
         <div>
-          <small>Tu codigo de referido</small><br>
+          <small>{% trans "Tu codigo de referido" %}</small><br>
           <code>{{ profile.referral_code }}</code>
         </div>
-        <button type="button" class="ghost btn-sm" data-copy-code="{{ profile.referral_code }}">Copiar codigo</button>
+        <button type="button" class="ghost btn-sm" data-copy-code="{{ profile.referral_code }}">{% trans "Copiar codigo" %}</button>
       </div>
       <div class="panel-referral">
         <div>
-          <small>Tu enlace para compartir</small><br>
+          <small>{% trans "Tu enlace para compartir" %}</small><br>
           <code id="afiliado-referral-link">{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}?ref={{ profile.referral_code }}</code>
         </div>
-        <button type="button" class="ghost btn-sm" data-copy-target="afiliado-referral-link">Copiar enlace</button>
+        <button type="button" class="ghost btn-sm" data-copy-target="afiliado-referral-link">{% trans "Copiar enlace" %}</button>
       </div>
       {% endif %}
     </div>
@@ -41,55 +42,55 @@
   <div class="editorial-shell">
     {% if profile.status == 'approved' and profile.is_active %}
     <div class="actions" style="margin-bottom: 24px;">
-      <a href="{% url 'afiliado_dashboard' %}" class="ghost btn-sm">Resumen</a>
-      <a href="{% url 'afiliado_compras_referidas' %}" class="ghost btn-sm">Compras referidas</a>
-      <a href="{% url 'afiliado_editar_perfil' %}" class="ghost btn-sm">Mi perfil</a>
-      <a href="{% url 'afiliado_pagos' %}" class="ghost btn-sm">Mis pagos</a>
-      <a href="{% url 'afiliado_recursos' %}" class="ghost btn-sm">Recursos</a>
+      <a href="{% url 'afiliado_dashboard' %}" class="ghost btn-sm">{% trans "Resumen" %}</a>
+      <a href="{% url 'afiliado_compras_referidas' %}" class="ghost btn-sm">{% trans "Compras referidas" %}</a>
+      <a href="{% url 'afiliado_editar_perfil' %}" class="ghost btn-sm">{% trans "Mi perfil" %}</a>
+      <a href="{% url 'afiliado_pagos' %}" class="ghost btn-sm">{% trans "Mis pagos" %}</a>
+      <a href="{% url 'afiliado_recursos' %}" class="ghost btn-sm">{% trans "Recursos" %}</a>
       {% if puede_solicitar %}
       {% if payout_account %}
       <details class="request-commission">
-        <summary class="button btn-sm">Solicitar comision</summary>
+        <summary class="button btn-sm">{% trans "Solicitar comision" %}</summary>
         <form method="post" action="{% url 'afiliado_solicitar_retiro' %}" class="request-commission__form">
           {% csrf_token %}
-          <p>Te pagaremos a tu llave Bre-B <strong>{{ payout_account.breb_key }}</strong> ${{ saldo_neto|cop }} COP. Las solicitudes de cada mes se pagan en los primeros 10 dias habiles del mes siguiente. Si necesitas, agrega una indicacion.</p>
-          <label for="payment_details">Nota (opcional)</label>
+          <p>{% blocktrans with llave=payout_account.breb_key monto=saldo_neto|cop %}Te pagaremos a tu llave Bre-B <strong>{{ llave }}</strong> ${{ monto }} COP. Las solicitudes de cada mes se pagan en los primeros 10 dias habiles del mes siguiente. Si necesitas, agrega una indicacion.{% endblocktrans %}</p>
+          <label for="payment_details">{% trans "Nota (opcional)" %}</label>
           <textarea id="payment_details" name="payment_details" rows="3" maxlength="1000"></textarea>
-          <button type="submit" class="button btn-sm">Enviar solicitud</button>
+          <button type="submit" class="button btn-sm">{% trans "Enviar solicitud" %}</button>
         </form>
       </details>
       {% else %}
-      <a href="{% url 'afiliado_cuenta_pago' %}" class="button btn-sm">Inscribir cuenta para solicitar comision</a>
+      <a href="{% url 'afiliado_cuenta_pago' %}" class="button btn-sm">{% trans "Inscribir cuenta para solicitar comision" %}</a>
       {% endif %}
       {% endif %}
       {% if not profile.baja_solicitada %}
       <form method="post" action="{% url 'afiliado_quitar_suscripcion' %}" onsubmit="return confirm('Tu baja se hara efectiva 15 dias despues del aviso. Hasta entonces tu codigo sigue activo. ¿Continuar?');">
         {% csrf_token %}
-        <button type="submit" class="danger btn-sm">Solicitar baja</button>
+        <button type="submit" class="danger btn-sm">{% trans "Solicitar baja" %}</button>
       </form>
       {% endif %}
     </div>
 
     {% if profile.baja_solicitada %}
     <div class="panel panel-status">
-      <h2>Tu baja esta programada</h2>
-      <p>Avisaste que quieres salir del programa. Tu baja sera efectiva el {{ profile.exit_effective_at|date:"d/m/Y" }}; hasta entonces tu codigo y tu panel siguen activos. Tus comisiones confirmadas se te pagan igual despues de esa fecha.</p>
+      <h2>{% trans "Tu baja esta programada" %}</h2>
+      <p>{% blocktrans with fecha=profile.exit_effective_at|date:"d/m/Y" %}Avisaste que quieres salir del programa. Tu baja sera efectiva el {{ fecha }}; hasta entonces tu codigo y tu panel siguen activos. Tus comisiones confirmadas se te pagan igual despues de esa fecha.{% endblocktrans %}</p>
       <form method="post" action="{% url 'afiliado_cancelar_baja' %}">
         {% csrf_token %}
-        <button type="submit" class="ghost btn-sm">Cancelar mi aviso de baja</button>
+        <button type="submit" class="ghost btn-sm">{% trans "Cancelar mi aviso de baja" %}</button>
       </form>
     </div>
     {% endif %}
 
     <section class="stats">
-      <article class="is-violet"><span>{{ profile.total_referred }}</span><p>Ventas referidas</p></article>
-      <article class="is-teal"><span>${{ profile.commission_balance|cop }} COP</span><p>Comision disponible</p></article>
-      <article class="is-gold"><span>${{ pending_commission_total|cop }} COP</span><p>Comision pendiente</p></article>
-      <article><span>${{ pagado_en_el_anio|cop }} COP</span><p>Pagado en {{ anio_actual }}</p></article>
-      <article><span>{{ click_count }}</span><p>Clics en tu enlace</p></article>
+      <article class="is-violet"><span>{{ profile.total_referred }}</span><p>{% trans "Ventas referidas" %}</p></article>
+      <article class="is-teal"><span>${{ profile.commission_balance|cop }} COP</span><p>{% trans "Comision disponible" %}</p></article>
+      <article class="is-gold"><span>${{ pending_commission_total|cop }} COP</span><p>{% trans "Comision pendiente" %}</p></article>
+      <article><span>${{ pagado_en_el_anio|cop }} COP</span><p>{% trans "Pagado en" %} {{ anio_actual }}</p></article>
+      <article><span>{{ click_count }}</span><p>{% trans "Clics en tu enlace" %}</p></article>
       <article class="is-green">
-        <span>{% if conversion_rate %}{{ conversion_rate }}%{% else %}&mdash;{% endif %}</span>
-        <p>Tasa de conversion</p>
+        <span>{% if conversion_rate %}{{ conversion_rate }}%{% else %}—{% endif %}</span>
+        <p>{% trans "Tasa de conversion" %}</p>
         {% if conversion_rate %}
         <div class="pq-progress" style="margin-top:10px;">
           <div class="pq-progress__track"><div class="pq-progress__fill" style="width:{{ conversion_rate }}%;"></div></div>
@@ -102,56 +103,56 @@
 
     <div class="grid-two">
       <div class="panel panel-account" id="mis-redes">
-        <h2>Tus redes sociales</h2>
+        <h2>{% trans "Tus redes sociales" %}</h2>
         {% if redes %}
-        <p>{{ redes|length }} red{{ redes|length|pluralize:"es" }} &middot; {{ total_seguidores|cop }} seguidores en total.</p>
+        <p>{% blocktrans count n=redes|length with seguidores=total_seguidores|cop %}{{ n }} red · {{ seguidores }} seguidores en total.{% plural %}{{ n }} redes · {{ seguidores }} seguidores en total.{% endblocktrans %}</p>
         <dl class="payout-summary">
           {% for red in redes %}
-          <dt>{{ red.platform_label }}</dt><dd>@{{ red.username }} &middot; {{ red.followers|cop }} seguidores</dd>
+          <dt>{{ red.platform_label }}</dt><dd>@{{ red.username }} · {% blocktrans with n=red.followers|cop %}{{ n }} seguidores{% endblocktrans %}</dd>
           {% endfor %}
         </dl>
-        <a href="{% url 'afiliado_editar_perfil' %}#redes" class="ghost btn-sm">Editar redes</a>
+        <a href="{% url 'afiliado_editar_perfil' %}#redes" class="ghost btn-sm">{% trans "Editar redes" %}</a>
         {% else %}
-        <p>A&uacute;n no has registrado tus redes sociales. Agr&eacute;galas para que el equipo conozca tu audiencia.</p>
-        <a href="{% url 'afiliado_editar_perfil' %}#redes" class="button btn-sm">Agregar redes</a>
+        <p>{% trans "Aún no has registrado tus redes sociales. Agrégalas para que el equipo conozca tu audiencia." %}</p>
+        <a href="{% url 'afiliado_editar_perfil' %}#redes" class="button btn-sm">{% trans "Agregar redes" %}</a>
         {% endif %}
       </div>
 
       <div class="panel panel-account" id="mis-datos">
-        <h2>Tu informaci&oacute;n personal</h2>
+        <h2>{% trans "Tu información personal" %}</h2>
         {% if profile.first_name %}
-        <p>Mantenla al d&iacute;a para que podamos contactarte.</p>
+        <p>{% trans "Mantenla al día para que podamos contactarte." %}</p>
         <dl class="payout-summary">
-          <dt>Nombre</dt><dd>{{ profile.full_name }}</dd>
-          <dt>Documento</dt><dd>{{ profile.get_document_type_display }} &middot; {{ profile.document_number }}</dd>
-          <dt>Tel&eacute;fono</dt><dd>{{ profile.phone }}</dd>
-          <dt>Direcci&oacute;n</dt><dd>{{ profile.address }}</dd>
+          <dt>{% trans "Nombre" %}</dt><dd>{{ profile.full_name }}</dd>
+          <dt>{% trans "Documento" %}</dt><dd>{{ profile.get_document_type_display }} · {{ profile.document_number }}</dd>
+          <dt>{% trans "Teléfono" %}</dt><dd>{{ profile.phone }}</dd>
+          <dt>{% trans "Dirección" %}</dt><dd>{{ profile.address }}</dd>
         </dl>
-        <a href="{% url 'afiliado_editar_perfil' %}" class="ghost btn-sm">Editar mi perfil</a>
+        <a href="{% url 'afiliado_editar_perfil' %}" class="ghost btn-sm">{% trans "Editar mi perfil" %}</a>
         {% else %}
-        <p>Completa tus datos personales: los necesitamos para identificarte como afiliado.</p>
-        <a href="{% url 'afiliado_editar_perfil' %}" class="button btn-sm">Completar mi perfil</a>
+        <p>{% trans "Completa tus datos personales: los necesitamos para identificarte como afiliado." %}</p>
+        <a href="{% url 'afiliado_editar_perfil' %}" class="button btn-sm">{% trans "Completar mi perfil" %}</a>
         {% endif %}
       </div>
     </div>
 
     <div class="panel panel-status">
-      <h2>&iexcl;Comparte tu c&oacute;digo y gana comisiones!</h2>
-      <p>Comparte tu c&oacute;digo o enlace de referido. Cada compra que realicen usando tu c&oacute;digo te sumar&aacute; comisiones. Revisa la <a href="{% url 'afiliado_recursos' %}">gu&iacute;a de contenido</a> y recuerda identificar tus publicaciones como publicidad.</p>
+      <h2>{% trans "¡Comparte tu código y gana comisiones!" %}</h2>
+      <p>{% trans "Comparte tu código o enlace de referido. Cada compra que realicen usando tu código te sumará comisiones. Revisa la" %} <a href="{% url 'afiliado_recursos' %}">{% trans "guía de contenido" %}</a> {% trans "y recuerda identificar tus publicaciones como publicidad." %}</p>
     </div>
 
     {% if compras %}
     <div class="panel">
-      <h2>Ultimas compras referidas</h2>
+      <h2>{% trans "Ultimas compras referidas" %}</h2>
       <table>
-        <thead><tr><th>Pedido</th><th>Fecha</th><th>Venta</th><th>Comisi&oacute;n</th><th>Estado</th></tr></thead>
+        <thead><tr><th>{% trans "Pedido" %}</th><th>{% trans "Fecha" %}</th><th>{% trans "Venta" %}</th><th>{% trans "Comisión" %}</th><th>{% trans "Estado" %}</th></tr></thead>
         <tbody>
           {% for order in compras %}
           <tr>
             <td>{{ order.order_number }}</td>
             <td>{{ order.created_at|date:'d/m/Y' }}</td>
             <td>${{ order.subtotal|cop }} COP</td>
-            <td>{% if order.commission %}${{ order.commission.amount|cop }} COP{% else %}&mdash;{% endif %}</td>
+            <td>{% if order.commission %}${{ order.commission.amount|cop }} COP{% else %}—{% endif %}</td>
             <td>{% include 'afiliados/_estado_comision.html' with comision=order.commission %}</td>
           </tr>
           {% endfor %}
@@ -162,38 +163,38 @@
 
     {% elif profile.status == 'pending' %}
     <div class="panel panel-status">
-      <h2>Tu solicitud esta en revision</h2>
-      <p>Un administrador va a revisar tu solicitud para unirte al programa de afiliados. Te avisaremos por correo cuando tengamos una respuesta.</p>
+      <h2>{% trans "Tu solicitud esta en revision" %}</h2>
+      <p>{% trans "Un administrador va a revisar tu solicitud para unirte al programa de afiliados. Te avisaremos por correo cuando tengamos una respuesta." %}</p>
       <div class="actions">
-        <a href="{% url 'afiliado_editar_perfil' %}" class="ghost btn-sm">Editar mi perfil</a>
+        <a href="{% url 'afiliado_editar_perfil' %}" class="ghost btn-sm">{% trans "Editar mi perfil" %}</a>
         <form method="post" action="{% url 'afiliado_quitar_suscripcion' %}">
           {% csrf_token %}
-          <button type="submit" class="danger btn-sm">Cancelar solicitud</button>
+          <button type="submit" class="danger btn-sm">{% trans "Cancelar solicitud" %}</button>
         </form>
       </div>
     </div>
     {% elif profile.status == 'rejected' %}
     <div class="panel panel-status">
-      <h2>Tu solicitud fue rechazada</h2>
-      {% if profile.rejection_reason %}<p><strong>Motivo:</strong> {{ profile.rejection_reason }}</p>{% endif %}
-      <p>Puedes volver a postularte si crees que las condiciones cambiaron.</p>
-      <a href="{% url 'afiliado_suscribete' %}" class="button btn-sm">Volver a postularme</a>
+      <h2>{% trans "Tu solicitud fue rechazada" %}</h2>
+      {% if profile.rejection_reason %}<p><strong>{% trans "Motivo:" %}</strong> {{ profile.rejection_reason }}</p>{% endif %}
+      <p>{% trans "Puedes volver a postularte si crees que las condiciones cambiaron." %}</p>
+      <a href="{% url 'afiliado_suscribete' %}" class="button btn-sm">{% trans "Volver a postularme" %}</a>
     </div>
     {% else %}
     <div class="panel panel-status">
-      <h2>Tu suscripcion esta inactiva</h2>
-      <p>{% if ex_afiliado %}Tu participacion en el programa de afiliados termino{% if profile.exited_at %} el {{ profile.exited_at|date:"d/m/Y" }}{% endif %}: tu codigo ya no genera comisiones. Las que ya tenias confirmadas, y las que aun estan en validacion, se te siguen pagando.{% else %}Cancelaste tu participacion en el programa de afiliados.{% endif %} Puedes volver a postularte cuando quieras.</p>
-      <a href="{% url 'afiliado_suscribete' %}" class="button btn-sm">Volver a postularme</a>
+      <h2>{% trans "Tu suscripcion esta inactiva" %}</h2>
+      <p>{% if ex_afiliado %}{% if profile.exited_at %}{% blocktrans with fecha=profile.exited_at|date:"d/m/Y" %}Tu participacion en el programa de afiliados termino el {{ fecha }}: tu codigo ya no genera comisiones. Las que ya tenias confirmadas, y las que aun estan en validacion, se te siguen pagando.{% endblocktrans %}{% else %}{% trans "Tu participacion en el programa de afiliados termino: tu codigo ya no genera comisiones. Las que ya tenias confirmadas, y las que aun estan en validacion, se te siguen pagando." %}{% endif %}{% else %}{% trans "Cancelaste tu participacion en el programa de afiliados." %}{% endif %} {% trans "Puedes volver a postularte cuando quieras." %}</p>
+      <a href="{% url 'afiliado_suscribete' %}" class="button btn-sm">{% trans "Volver a postularme" %}</a>
     </div>
     {% if ex_afiliado %}
     {% if puede_solicitar and payout_account %}
     <div class="panel">
       <form method="post" action="{% url 'afiliado_solicitar_retiro' %}" class="request-commission__form">
         {% csrf_token %}
-        <p>Te pagaremos a tu llave Bre-B <strong>{{ payout_account.breb_key }}</strong> ${{ saldo_neto|cop }} COP.</p>
-        <label for="payment_details">Nota (opcional)</label>
+        <p>{% trans "Te pagaremos a tu llave Bre-B" %} <strong>{{ payout_account.breb_key }}</strong> ${{ saldo_neto|cop }} COP.</p>
+        <label for="payment_details">{% trans "Nota (opcional)" %}</label>
         <textarea id="payment_details" name="payment_details" rows="3" maxlength="1000"></textarea>
-        <button type="submit" class="button btn-sm">Solicitar comision</button>
+        <button type="submit" class="button btn-sm">{% trans "Solicitar comision" %}</button>
       </form>
     </div>
     {% endif %}

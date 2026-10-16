@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy
 from orders.models import Order
 
 
@@ -13,10 +14,10 @@ class PaymentTransaction(models.Model):
     """
 
     class Status(models.TextChoices):
-        PENDING = 'pending', 'Pendiente'
-        APPROVED = 'approved', 'Aprobado'
-        REJECTED = 'rejected', 'Rechazado'
-        CANCELLED = 'cancelled', 'Cancelado'
+        PENDING = 'pending', gettext_lazy('Pendiente')
+        APPROVED = 'approved', gettext_lazy('Aprobado')
+        REJECTED = 'rejected', gettext_lazy('Rechazado')
+        CANCELLED = 'cancelled', gettext_lazy('Cancelado')
 
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payment_transactions')
 
@@ -52,9 +53,9 @@ class Refund(models.Model):
     devolviendo el dinero de verdad a traves del proveedor de pago."""
 
     class Status(models.TextChoices):
-        PENDING = 'pending', 'Pendiente'
-        APPROVED = 'approved', 'Aprobado'
-        FAILED = 'failed', 'Fallido'
+        PENDING = 'pending', gettext_lazy('Pendiente')
+        APPROVED = 'approved', gettext_lazy('Aprobado')
+        FAILED = 'failed', gettext_lazy('Fallido')
 
     payment_transaction = models.ForeignKey(
         PaymentTransaction, on_delete=models.CASCADE, related_name='refunds',

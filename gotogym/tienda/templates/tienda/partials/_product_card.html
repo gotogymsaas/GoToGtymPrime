@@ -1,3 +1,4 @@
+{% load idiomas %}
 {% load static i18n imagenes %}{% comment %}
 Tarjeta de producto, homologada con el sistema editorial de Home
 (store_home.css). Parametros:
@@ -26,15 +27,15 @@ seccion 4.4).
          data-track-lista="{{ track_list|default:'catalogo' }}"
          data-track-posicion="{{ track_pos|default:0 }}">
   <a class="gtg-product-card__image" href="{{ detail_url }}">
-    {% imagen_producto nombre=card.image.name alt=card.product.name sizes="(max-width: 560px) 100vw, (max-width: 980px) 50vw, 25vw" %}
+    {% imagen_producto nombre=card.image.name alt=card.product.name|traducir sizes="(max-width: 560px) 100vw, (max-width: 980px) 50vw, 25vw" %}
     {% if not card.in_stock %}<span class="gtg-product-card__badge">{% trans "Agotado" %}</span>{% endif %}
   </a>
   <div class="gtg-product-card__body">
-    <p class="gtg-product-card__category">{{ card.product.category.name }}</p>
-    <h3 class="gtg-product-card__name"><a href="{{ detail_url }}">{{ card.product.name }}</a></h3>
+    <p class="gtg-product-card__category">{{ card.product.category.name|traducir }}</p>
+    <h3 class="gtg-product-card__name"><a href="{{ detail_url }}">{{ card.product.name|traducir }}</a></h3>
     <div class="gtg-product-card__meta">
       <strong class="gtg-product-card__price">{% include "tienda/partials/_price.html" with price_min=card.price_min price_max=card.price_max has_range=card.has_price_range compare_price=card.compare_price discount_percent=card.discount_percent %}</strong>
-      {% if card.sizes %}<small class="gtg-product-card__sizes">{{ card.sizes|join:" · " }}</small>{% endif %}
+      {% if card.sizes %}<small class="gtg-product-card__sizes">{% for talla in card.sizes %}{{ talla|traducir }}{% if not forloop.last %} · {% endif %}{% endfor %}</small>{% endif %}
     </div>
   </div>
 </article>

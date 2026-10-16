@@ -16,6 +16,7 @@ from .models import EventoAnalitica
 
 class RegistrarEventosTests(TestCase):
     def setUp(self):
+        self.client.cookies['gtg_cookies'] = 'analitica'  # aceptó la analítica en el banner
         self.url = reverse('analitica:registrar_eventos')
 
     def _enviar(self, eventos):
@@ -123,6 +124,7 @@ class VisitanteEstableTests(TestCase):
     la compra: Django rota la clave de sesion, pero el visitante es el mismo."""
 
     def setUp(self):
+        self.client.cookies['gtg_cookies'] = 'analitica'  # aceptó la analítica en el banner
         self.url = reverse('analitica:registrar_eventos')
 
     def _enviar(self, nombre='page_view', **extra):
@@ -146,6 +148,7 @@ class VisitanteEstableTests(TestCase):
     def test_dos_visitantes_distintos_tienen_identificadores_distintos(self):
         self._enviar()
         otro = self.client_class()
+        otro.cookies['gtg_cookies'] = 'analitica'
         otro.post(self.url, {'eventos': json.dumps([{'nombre': 'page_view'}])})
         sesiones = set(EventoAnalitica.objects.values_list('sesion', flat=True))
         self.assertEqual(len(sesiones), 2)
@@ -169,6 +172,7 @@ class VisitanteEstableTests(TestCase):
 
 class EventosDeServidorTests(TestCase):
     def setUp(self):
+        self.client.cookies['gtg_cookies'] = 'analitica'  # aceptó la analítica en el banner
         self.url = reverse('analitica:registrar_eventos')
 
     def test_el_cliente_no_puede_fabricar_un_pedido_en_el_embudo(self):
@@ -210,3 +214,36 @@ class EventosDelJournalTests(SimpleTestCase):
         from .views import EVENTOS_PERMITIDOS
         for evento in ('journal_post_click', 'journal_read_complete', 'reference_click'):
             self.assertIn(evento, EVENTOS_PERMITIDOS)
+
+
+class ConsentimientoDeCookiesTests(TestCase):
+    """La medicion es opt-in: sin aceptar la analitica en el banner no se guarda nada."""
+
+    def setUp(self):
+        self.url = reverse('analitica:registrar_eventos')
+        self.lote = {'eventos': json.dumps([{'nombre': 'page_view', 'ruta': '/es/'}])}
+
+    def test_sin_eleccion_no_se_guarda_nada(self):
+        respuesta = self.client.post(self.url, self.lote)
+        self.assertEqual(respuesta.json(), {'ok': True, 'guardados': 0})
+        self.assertFalse(EventoAnalitica.objects.exists())
+
+    def test_con_solo_necesarias_no_se_guarda_nada(self):
+        self.client.cookies['gtg_cookies'] = 'necesarias'
+        self.client.post(self.url, self.lote)
+        self.assertFalse(EventoAnalitica.objects.exists())
+
+    def test_aceptando_la_analitica_se_guarda(self):
+        self.client.cookies['gtg_cookies'] = 'analitica'
+        self.client.post(self.url, self.lote)
+        self.assertEqual(EventoAnalitica.objects.count(), 1)
+
+    def test_el_servidor_tampoco_mide_sin_consentimiento(self):
+        from analitica.services import registrar_evento
+        peticion = self.client.get(reverse('home')).wsgi_request
+        self.assertIsNone(registrar_evento(peticion, 'order_created', valor=1))
+        self.assertFalse(EventoAnalitica.objects.exists())
+
+    def test_no_se_crea_el_identificador_de_visitante_sin_consentimiento(self):
+        self.client.post(self.url, self.lote)
+        self.assertNotIn('analitica_vid', self.client.session)

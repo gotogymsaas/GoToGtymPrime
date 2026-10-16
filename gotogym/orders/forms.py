@@ -6,6 +6,7 @@ saltarselos y la peticion puede llegar sin pasar por el formulario.
 import re
 
 from django import forms
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from .colombia_data import DEPARTAMENTOS, municipios_de
@@ -52,7 +53,7 @@ class CheckoutForm(forms.Form):
         phone = self.cleaned_data['phone'].strip()
         if not TELEFONO_VALIDO.match(phone):
             raise forms.ValidationError(
-                'Escribe un telefono valido: entre 7 y 20 caracteres, solo numeros y + ( ) - espacios.'
+                gettext('Escribe un telefono valido: entre 7 y 20 caracteres, solo numeros y + ( ) - espacios.')
             )
         return phone
 
@@ -65,7 +66,7 @@ class CheckoutForm(forms.Form):
     def clean_address_line(self):
         direccion = self.cleaned_data['address_line'].strip()
         if len(direccion) < 5:
-            raise forms.ValidationError('La direccion es demasiado corta.')
+            raise forms.ValidationError(gettext('La direccion es demasiado corta.'))
         return direccion
 
     def clean(self):

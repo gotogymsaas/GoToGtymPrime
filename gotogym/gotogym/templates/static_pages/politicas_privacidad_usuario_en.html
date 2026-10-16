@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Privacy Policy{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/home_figma.css' %}?v=20260930-token-unify">
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<section class="quantum-privacy" aria-labelledby="privacy-title">
+  <div class="quantum-privacy__background" aria-hidden="true">
+    <div class="quantum-field">
+      <span class="quantum-watermark"></span>
+      <span class="quantum-orbit quantum-orbit--outer"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--one"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--two"><i></i></span>
+      <span class="quantum-orbit quantum-orbit--three"><i></i></span>
+      <span class="quantum-core"></span>
+    </div>
+  </div>
+
+  <div class="quantum-privacy__container">
+    <a id="resumen"></a>
+    <header class="quantum-privacy__header">
+      <a href="{% url 'home' %}" class="quantum-privacy__back" aria-label="Back to the personal page">←</a>
+      <h1 id="privacy-title">Privacy Policy</h1>
+    </header>
+
+    <article class="quantum-privacy__section">
+      <h2>PRIVACY POLICY</h2>
+      <p>GoToGym Quantum Coach</p>
+      <p>Domain: https://www.gotogym.store</p>
+      <p class="quantum-privacy__note">Last updated: August 30, 2026</p>
+    </article>
+
+    <p class="quantum-privacy__note">Courtesy translation: in case of any difference, the Spanish version prevails.</p>
+    <article class="quantum-privacy__highlight">
+      <h2>Quick summary</h2>
+      <ul>
+        <li>We do not sell your data.</li>
+        <li>We use information to provide and improve the service.</li>
+        <li>You can revoke your consent whenever you want.</li>
+      </ul>
+    </article>
+
+    <nav class="quantum-privacy__toc" aria-label="Policy index">
+      <h2>Go to section</h2>
+      <div>
+        <a href="#intro">1. Introduction</a>
+        <a href="#responsable">2. Controller</a>
+        <a href="#definiciones">3. Definitions</a>
+        <a href="#datos">4. Data processed</a>
+        <a href="#sensibles">5. Sensitive data</a>
+        <a href="#finalidades">6. Purposes</a>
+        <a href="#consentimiento">7. Consent</a>
+        <a href="#comparticion">8. Sharing</a>
+        <a href="#transferencias">9. Transfers</a>
+        <a href="#retencion">10. Retention</a>
+        <a href="#seguridad">11. Security</a>
+        <a href="#derechos">12. Rights</a>
+        <a href="#procedimiento">13. Procedure</a>
+        <a href="#menores">14. Minors</a>
+        <a href="#cookies">15. Cookies</a>
+        <a href="#incidentes">16. Incidents</a>
+        <a href="#cambios">17. Changes</a>
+        <a href="#contacto">18. Contact</a>
+      </div>
+    </nav>
+
+    <article class="quantum-privacy__section" id="intro">
+      <h2>1. Introduction</h2>
+      <p>GoToGym respects the privacy and protection of its users' personal data.</p>
+      <p>This Privacy Policy describes how we collect, use, store, protect and process personal data when you access or use GoToGym Quantum Coach.</p>
+      <p>Personal data is processed in accordance with Law 1581 of 2012, Decree 1377 of 2013, the guidelines of the Superintendence of Industry and Commerce and current Colombian data protection regulations.</p>
+      <p>Our commitment is to ensure transparency, security and responsible use of artificial intelligence technologies.</p>
+      <p>GoToGym Quantum Coach does not replace professional medical care. It does not make clinical diagnoses or prescribe treatments.</p>
+    </article>
+
+    <article class="quantum-privacy__section" id="responsable">
+      <h2>2. Data Controller</h2>
+      <ul>
+        <li>Controller: Friends N Gifts S.A.S.</li>
+        <li>Privacy email: privacy@gotogym.store</li>
+        <li>Support email: support@gotogym.store</li>
+        <li>Address: Bogotá D.C., Colombia</li>
+        <li>Website: https://www.gotogym.store</li>
+      </ul>
+    </article>
+
+    <article class="quantum-privacy__section" id="definiciones">
+      <h2>3. Relevant Definitions</h2>
+      <ul>
+        <li>Personal data: information that identifies or can identify a natural person.</li>
+        <li>Sensitive data: information that affects the privacy of the data subject or whose misuse can lead to discrimination, including health-related data.</li>
+        <li>Processing: collection, storage, use, circulation or deletion of data.</li>
+      </ul>
+    </article>
+
+    <article class="quantum-privacy__section" id="datos">
+      <h2>4. Personal Data We Process</h2>
+      <h3>4.1 Identification and account data</h3>
+      <ul>
+        <li>Name, email and username.</li>
+        <li>Password stored in encrypted or hashed form.</li>
+        <li>Plan or subscription status.</li>
+      </ul>
+      <h3>4.1.1 Contact data and digital channels</h3>
+      <p>We may process data voluntarily provided by the user, including phone number, instant messaging, email, contact preferences, notifications and the authorization status of digital channels.</p>
+      <p>This data is used exclusively for the purposes authorized in this Policy and to enable communication features associated with the Service.</p>
+      <h3>4.2 Technical and security data</h3>
+      <ul>
+        <li>IP address, device type and browser.</li>
+        <li>Session and authentication records and push notification tokens.</li>
+      </ul>
+      <h3>4.3 Profile and wellbeing data</h3>
+      <ul>
+        <li>Age, height, weight, sex and profession.</li>
+        <li>Goals, preferences, training indicators and progress.</li>
+      </ul>
+      <h3>4.4 Optional external integrations</h3>
+      <p>If you authorize the connection with external devices or platforms, we may receive data such as heart rate, physical activity, sleep or other wellbeing metrics. This data may be sensitive under Colombian law.</p>
+      <h3>4.5 Documents and files</h3>
+      <p>We may process profile pictures, voluntarily uploaded files and information contained in documents for analysis.</p>
+    </article>
+
+    <article class="quantum-privacy__section" id="sensibles">
+      <h2>5. Nature of Sensitive Data</h2>
+      <p>Some of the data processed may be considered sensitive, especially that related to health or physiological metrics.</p>
+      <ul>
+        <li>Providing it is voluntary.</li>
+        <li>It is not required to access basic features.</li>
+        <li>It requires express and informed authorization.</li>
+      </ul>
+    </article>
+
+    <article class="quantum-privacy__section" id="finalidades">
+      <h2>6. Purposes of Processing</h2>
+      <p>We process your data to create and manage your account, provide training, tracking and wellbeing services, personalize informational recommendations, manage payments and subscriptions, send operational notifications, provide support, ensure security, prevent fraud and meet legal obligations.</p>
+      <p>Where you have authorized a specific channel, GoToGym may use email, push notifications, SMS and instant messaging services, including WhatsApp, for communications related to providing the Service.</p>
+      <p>GoToGym will not use this data to make medical diagnoses or automated clinical decisions.</p>
+    </article>
+
+    <article class="quantum-privacy__section" id="consentimiento">
+      <h2>7. Authorization, Consent and Communication Channels</h2>
+      <p>By registering and using the Service you give prior, express and informed authorization for the processing of your personal data in accordance with the purposes described.</p>
+      <p>You also authorize communications necessary for the proper provision, security and administration of the Service, and the specific processing of data shared by external providers when you connect external services.</p>
+      <h3>7.1 WhatsApp and instant messaging authorization</h3>
+      <p>Using WhatsApp as a communication channel may require specific authorization from the User, for example when activating WhatsApp, registering or confirming the number, ticking an authorization box, requesting a conversation or voluntarily starting a conversation through that channel.</p>
+      <p>GoToGym may keep evidence of the authorization, such as date, time, Policy version, channel of collection, account identifier, authorized number and IP address where applicable.</p>
+      <h3>7.2 Revocation</h3>
+      <p>The User may withdraw the authorization for a specific channel at any time from the Platform or by writing to privacy@gotogym.store.</p>
+    </article>
+
+    <article class="quantum-privacy__section" id="comparticion">
+      <h2>8. Data Sharing</h2>
+      <p>We do not sell or trade personal data.</p>
+      <p>We may share information with providers of cloud infrastructure, storage, payment gateways, transactional email, authentication or automation. All act as data processors under confidentiality agreements.</p>
+      <p>We may also disclose information when required by law or a competent authority.</p>
+    </article>
+
+    <article class="quantum-privacy__section" id="transferencias">
+      <h2>9. International Transfers</h2>
+      <p>By using cloud infrastructure or international providers, data may be stored or processed outside Colombia. In these cases we adopt adequate contractual safeguards, providers with recognized standards and technical protection measures.</p>
+    </article>
+
+    <article class="quantum-privacy__section" id="retencion">
+      <h2>10. Information Retention</h2>
+      <p>Data will be kept while there is an active contractual relationship, for the time needed to fulfill the purpose of processing and according to applicable legal obligations. Once the purpose is fulfilled, it will be securely deleted or anonymized.</p>
+    </article>
+
+    <article class="quantum-privacy__section" id="seguridad">
+      <h2>11. Information Security</h2>
+      <p>GoToGym implements reasonable technical and organizational measures, including encryption in transit, authenticated access control, storage on managed cloud infrastructure, security monitoring and vulnerability management.</p>
+      <p>No system is completely infallible, but we work continuously to minimize risks.</p>
+    </article>
+
+    <article class="quantum-privacy__section" id="derechos">
+      <h2>12. Rights of the Data Subject</h2>
+      <p>As a data subject, you can know the data we process, update or correct information, request deletion where appropriate, revoke authorization, request proof of consent and file a complaint with the Superintendence of Industry and Commerce.</p>
+      <p>To exercise these rights, write to privacy@gotogym.store. The maximum response time will be in accordance with Colombian law.</p>
+    </article>
+
+    <article class="quantum-privacy__section" id="procedimiento">
+      <h2>13. Procedure for Exercising Rights</h2>
+      <p>Requests must include full name, the email associated with the account and a clear description of the request. We will respond within the legal deadlines.</p>
+    </article>
+
+    <article class="quantum-privacy__section" id="menores">
+      <h2>14. Minors</h2>
+      <p>If the Service is offered to minors, authorization from the legal representative will be required and sensitive data will not be collected without enhanced consent. If we identify unauthorized processing of minors' data, we will delete it.</p>
+    </article>
+
+    <article class="quantum-privacy__section" id="cookies">
+      <h2>15. Cookies and Similar Technologies</h2>
+      <p>We use cookies for session authentication, performance measurement and improving the user experience. You can disable them from your browser, although some features may be affected.</p>
+    </article>
+
+    <article class="quantum-privacy__section" id="incidentes">
+      <h2>16. Security Incidents</h2>
+      <p>In the event of incidents affecting personal data, an internal response protocol will be activated and the obligation to notify authorities and data subjects will be assessed in accordance with the law.</p>
+    </article>
+
+    <article class="quantum-privacy__section" id="cambios">
+      <h2>17. Changes to the Policy</h2>
+      <p>We may update this Policy in response to regulatory changes, new features or changes to the technology architecture. The current version will always be available on this page.</p>
+      <p>When a change adds new communication channels or new purposes that require specific authorization, GoToGym may request a new acceptance or consent.</p>
+    </article>
+
+    <article class="quantum-privacy__section" id="contacto">
+      <h2>18. Contact</h2>
+      <p>Privacy email: privacy@gotogym.store</p>
+      <p>Site: https://www.gotogym.store</p>
+      <p>© 2026 GoToGym</p>
+      <p>Wear the Intelligence</p>
+    </article>
+
+    <a class="quantum-privacy__top" href="#resumen">↑ Back to top</a>
+  </div>
+</section>
+{% endblock %}

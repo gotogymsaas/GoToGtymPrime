@@ -1,3 +1,5 @@
+{% load idiomas %}
+{% load i18n %}
 {% load static imagenes %}{% comment %}
 Galeria de medios de la PDP: siempre muestra exactamente las fotos reales
 del producto (`gallery`, ver tienda.catalog.product_gallery), nunca
@@ -15,20 +17,20 @@ misma resolucion que usa la tarjeta de catalogo.
       <figure class="pdp-gallery__slide{% if forloop.first %} is-active{% endif %}" data-gallery-slide data-gallery-index="{{ forloop.counter0 }}"{% if not forloop.first %} hidden style="display: none;"{% endif %}>
         <img{% if forloop.first %} id="pdp-main-image"{% endif %}
              src="{% url_imagen_producto media.image.name %}"
-             alt="{{ media.alt_text|default:producto.name }}" class="object-contain max-h-full max-w-full">
+             alt="{{ media.alt_text|default:producto.name|traducir }}" class="object-contain max-h-full max-w-full">
       </figure>
       {% empty %}
       <figure class="pdp-gallery__slide is-active" data-gallery-slide data-gallery-index="0">
-        <img id="pdp-main-image" src="{% url_imagen_producto '' %}" alt="{{ producto.name }}" class="object-contain max-h-full max-w-full">
+        <img id="pdp-main-image" src="{% url_imagen_producto '' %}" alt="{{ producto.name|traducir }}" class="object-contain max-h-full max-w-full">
       </figure>
       {% endfor %}
     </div>
 
     {% if gallery|length > 1 %}
-    <button type="button" class="pdp-gallery__control pdp-gallery__control--prev" data-gallery-prev aria-label="Imagen anterior" style="position: absolute; top: 50%; left: 14px; z-index: 2;">
+    <button type="button" class="pdp-gallery__control pdp-gallery__control--prev" data-gallery-prev aria-label="{% trans 'Imagen anterior' %}" style="position: absolute; top: 50%; left: 14px; z-index: 2;">
       <span class="material-icons-outlined" aria-hidden="true">chevron_left</span>
     </button>
-    <button type="button" class="pdp-gallery__control pdp-gallery__control--next" data-gallery-next aria-label="Imagen siguiente" style="position: absolute; top: 50%; right: 14px; z-index: 2;">
+    <button type="button" class="pdp-gallery__control pdp-gallery__control--next" data-gallery-next aria-label="{% trans 'Imagen siguiente' %}" style="position: absolute; top: 50%; right: 14px; z-index: 2;">
       <span class="material-icons-outlined" aria-hidden="true">chevron_right</span>
     </button>
     <div class="pdp-gallery__counter" aria-live="polite">
@@ -38,10 +40,10 @@ misma resolucion que usa la tarjeta de catalogo.
   </div>
 
   {% if gallery|length > 1 %}
-  <div class="pdp-gallery__thumbs" data-gallery-thumbs role="tablist" aria-label="Imagenes del producto">
+  <div class="pdp-gallery__thumbs" data-gallery-thumbs role="tablist" aria-label="{% trans 'Imagenes del producto' %}">
     {% for media in gallery %}
-    <button type="button" class="pdp-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-gallery-thumb data-gallery-index="{{ forloop.counter0 }}" role="tab" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="Ver imagen {{ forloop.counter }}">
-      <img src="{% url_imagen_producto media.image.name %}" alt="{{ media.alt_text|default:producto.name }}" class="object-contain w-full h-full">
+    <button type="button" class="pdp-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-gallery-thumb data-gallery-index="{{ forloop.counter0 }}" role="tab" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="{% blocktrans with n=forloop.counter %}Ver imagen {{ n }}{% endblocktrans %}">
+      <img src="{% url_imagen_producto media.image.name %}" alt="{{ media.alt_text|default:producto.name|traducir }}" class="object-contain w-full h-full">
     </button>
     {% endfor %}
   </div>

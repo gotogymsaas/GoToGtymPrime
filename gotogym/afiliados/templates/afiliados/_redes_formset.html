@@ -1,3 +1,4 @@
+{% load i18n %}
 {% comment %}
 Filas de redes sociales del afiliado. Lo usan la postulacion y la edicion del
 perfil; el comportamiento vive en static/js/afiliado_redes.js. Va dentro de
@@ -11,6 +12,6 @@ un .form-grid.
   {% endfor %}
 </div>
 <div class="field-full">
-  <button type="button" class="ghost btn-sm" id="agregar-red">+ Agregar otra red</button>
+  <button type="button" class="ghost btn-sm" id="agregar-red">{% trans "+ Agregar otra red" %}</button>
 </div>
 <template id="red-vacia">{% include 'afiliados/_red_social.html' with f=redes.empty_form removible=True %}</template>

@@ -11,17 +11,16 @@ Class-based views
     1. Add an import:  from other_app.views import Home
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
-    1. Import the include() function: from django.urls import include, path
+    1. Import the include() function: from django.urls import URLPattern, URLResolver, include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from accounts import api_views as accounts_api_views
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.shortcuts import redirect
-from django.urls import include, path
+from django.urls import URLPattern, URLResolver, include, path
 from django.views.generic import RedirectView
 from django.views.i18n import set_language
 from django.views.static import serve
@@ -30,7 +29,7 @@ from payments import views as payments_views
 from . import views
 from .sitemaps import SITEMAPS
 
-urlpatterns = [
+urlpatterns: list[URLPattern | URLResolver] = [
     path('accounts', lambda request: redirect('commercial_login', permanent=False)),
     path('setlang/', set_language, name='set_language'),
     path('healthz', views.healthz, name='healthz'),
@@ -38,9 +37,6 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {'sitemaps': SITEMAPS}, name='sitemap'),
     path('crm/healthz', views.healthz, name='legacy_crm_healthz'),
     path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
-    path('api/v1/auth/login', accounts_api_views.developer_login, name='developer_auth_login'),
-    path('api/login/', accounts_api_views.developer_login, name='developer_login'),
-    path('api/users/', accounts_api_views.developer_users, name='developer_users'),
     path('products/products/', RedirectView.as_view(pattern_name='tienda:producto_list', permanent=False), name='legacy_products_products'),
     # Fuera de i18n_patterns a proposito: un webhook real no antepone un
     # prefijo de idioma a la URL.
@@ -61,9 +57,10 @@ urlpatterns += i18n_patterns(
     path('politica-devoluciones/', views.politica_devoluciones, name='politica_devoluciones'),
     path('politica-garantia/', views.politica_garantia, name='politica_garantia'),
     path('politica-tratamiento-datos/', views.politica_tratamiento_datos, name='politica_tratamiento_datos'),
+    path('politica-cookies/', views.politica_cookies, name='politica_cookies'),
     path('politica-envios/', views.politica_envios, name='politica_envios'),
     path('politica-pagos/', views.politica_pagos, name='politica_pagos'),
-    path('admin/', admin.site.urls),
+    path(settings.ADMIN_URL, admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('afiliados/', include('afiliados.urls')),
     # Ruta anterior del programa (antes se llamaba "influencer"): se redirige

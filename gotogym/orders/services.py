@@ -18,6 +18,7 @@ from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.db.models import F
 from django.utils import timezone
+from django.utils.translation import get_language, gettext
 from gotogym.tasks import enqueue
 from inventory.services import InsufficientStockError, decrement_stock, get_available_quantity
 from shipping.models import ShippingQuote
@@ -95,22 +96,24 @@ class CheckoutError(Exception):
 
 class EmptyCartError(CheckoutError):
     def __init__(self):
-        super().__init__('Tu carrito esta vacio.')
+        super().__init__(gettext('Tu carrito esta vacio.'))
 
 
 class OutOfStockError(CheckoutError):
     def __init__(self, faltantes):
         self.faltantes = faltantes
         detalle = '; '.join(
-            f"{sku}: pediste {pedido}, quedan {disponible}"
+            gettext('%(sku)s: pediste %(pedido)s, quedan %(disponible)s') % {
+                'sku': sku, 'pedido': pedido, 'disponible': disponible,
+            }
             for sku, pedido, disponible in faltantes
         )
-        super().__init__(f'No hay unidades suficientes. {detalle}')
+        super().__init__(gettext('No hay unidades suficientes. %(detalle)s') % {'detalle': detalle})
 
 
 class PaymentNotApprovedError(CheckoutError):
     def __init__(self):
-        super().__init__('El pago todavia no esta aprobado.')
+        super().__init__(gettext('El pago todavia no esta aprobado.'))
 
 
 class InvalidOrderTransitionError(CheckoutError):
@@ -276,6 +279,7 @@ def create_order_from_cart(user, cart, datos):
                 pedido = Order.objects.create(
                     user=user if getattr(user, 'is_authenticated', False) else None,
                     order_number=generate_order_number(),
+                    language=get_language() or 'es',
                     email=datos['email'],
                     phone=datos['phone'],
                     subtotal=subtotal,

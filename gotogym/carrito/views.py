@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext, gettext_lazy
 from django.views.decorators.http import require_POST
 from gotogym.ratelimit import rate_limit
 from inventory.services import get_available_quantity
@@ -8,7 +9,7 @@ from products.models import ProductVariant
 
 from .services import build_cart_context, read_cart, write_cart
 
-CARRITO_REINICIADO = (
+CARRITO_REINICIADO = gettext_lazy(
     'Tu carrito se reinicio por una actualizacion del sistema. '
     'Vuelve a agregar los productos que quieras comprar.'
 )
@@ -48,8 +49,8 @@ def add_to_cart(request, variant_id):
     if solicitado > disponible:
         return _responder(
             request,
-            error=f'Solo quedan {disponible} unidades de {variante.sku}.' if disponible
-            else f'{variante.sku} no tiene unidades disponibles.',
+            error=gettext('Solo quedan %(disponible)s unidades de %(sku)s.') % {'disponible': disponible, 'sku': variante.sku}
+            if disponible else gettext('%(sku)s no tiene unidades disponibles.') % {'sku': variante.sku},
         )
 
     cart[str(variante.id)] = solicitado
