@@ -3514,3 +3514,9 @@ msgstr ""
 
 msgid "disponibles"
 msgstr "available"
+
+msgid "Guía de envío"
+msgstr "Tracking number"
+
+msgid "Transportadora: %(transportadora)s · Guía: %(guia)s"
+msgstr "Carrier: %(transportadora)s · Tracking number: %(guia)s"

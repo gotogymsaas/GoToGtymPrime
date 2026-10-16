@@ -149,6 +149,11 @@ def restore_stock(items):
     if not normalized:
         return
 
+    # Una variante sin fila de inventario (p. ej. creada fuera del panel) no
+    # puede quedarse sin recibir las unidades que se le devuelven.
+    for variant, _ in normalized:
+        Inventory.objects.get_or_create(variant_id=variant.id)
+
     _lock_rows([variant.id for variant, _ in normalized])
 
     now = timezone.now()
@@ -157,6 +162,7 @@ def restore_stock(items):
             quantity_available=F('quantity_available') + quantity,
             updated_at=now,
         )
+        inventario = Inventory.objects.get(variant_id=variant.id)
         record_adjustment(
-            variant.inventory, delta=quantity, reason=InventoryAdjustmentReason.RESTOCK,
+            inventario, delta=quantity, reason=InventoryAdjustmentReason.RESTOCK,
         )

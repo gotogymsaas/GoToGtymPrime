@@ -281,8 +281,8 @@ COOKIES = {
             'sitios, que tienen sus propias políticas.',
         ]},
         {'title': 'Cómo cambiar tu decisión', 'paragraphs': [
-            'Puedes cambiarla cuando quieras con el botón de abajo o con "Preferencias de cookies" en el pie de '
-            'cualquier página. También puedes borrar o bloquear cookies desde la configuración de tu navegador; '
+            'Puedes cambiarla cuando quieras con el botón de abajo. '
+            'También puedes borrar o bloquear cookies desde la configuración de tu navegador; '
             'ten en cuenta que, si bloqueas las necesarias, no podrás iniciar sesión ni usar el carrito.',
         ], 'accion_cookies': 'Abrir preferencias de cookies'},
         {'title': 'Contacto y actualizaciones', 'paragraphs': [

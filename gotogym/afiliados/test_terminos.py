@@ -40,11 +40,11 @@ class PaginaDeTerminosTests(AfiliadoTestBase):
     def test_pide_ser_mayor_de_edad(self):
         self.assertContains(self.respuesta, 'mayor de edad (18 años o más)')
 
-    def test_aparece_en_la_navegacion_legal_y_en_el_pie(self):
+    def test_aparece_en_la_navegacion_legal_y_no_en_el_pie(self):
         url = reverse('afiliado_terminos')
         self.assertContains(self.respuesta, f'href="{url}" aria-current="page"')
-        pie = self.client.get(reverse('home')).content.decode()
-        self.assertIn(f'href="{url}"', pie)
+        pie = self.client.get(reverse('home')).content.decode().split('class="gtg-footer-legal"')[1]
+        self.assertNotIn(f'href="{url}"', pie.split('</footer>')[0])
 
 
 class VersionAceptadaTests(AfiliadoTestBase):
@@ -92,8 +92,8 @@ class EnlacesAlTextoDeTerminosTests(AfiliadoTestBase):
 
     def test_la_cuenta_de_pago_apunta_a_los_terminos_del_programa(self):
         html = self.client.get(reverse('afiliado_cuenta_pago')).content.decode()
-        # El pie del sitio conserva el enlace a los terminos de la tienda: lo
-        # que importa es que el texto legal de la cuenta ya no lo use.
+        # Lo que importa es que el texto legal de la cuenta ya no use los
+        # terminos de la tienda.
         self.assertIn(f'href="{self.url_terminos}" target="_blank"', html)
         self.assertNotIn(f'href="{reverse("terminos")}" target="_blank"', html)
 

@@ -277,8 +277,8 @@ COOKIES = {
             'sites, which have their own policies.',
         ]},
         {'title': 'How to change your decision', 'paragraphs': [
-            'You can change it whenever you want with the button below or with "Cookie preferences" in the footer of '
-            'any page. You can also delete or block cookies from your browser settings; '
+            'You can change it whenever you want with the button below. '
+            'You can also delete or block cookies from your browser settings; '
             'note that if you block the necessary ones, you will not be able to log in or use the cart.',
         ], 'accion_cookies': 'Open cookie preferences'},
         {'title': 'Contact and updates', 'paragraphs': [

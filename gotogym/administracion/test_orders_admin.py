@@ -358,3 +358,75 @@ class OrderRefundAdminTests(TestCase):
 
         from payments.models import Refund
         self.assertFalse(Refund.objects.filter(payment_transaction__order=self.pedido).exists())
+
+
+class AdminGuiaDeEnvioTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        categoria = ProductCategory.objects.create(name='Categoria guia')
+        marca = Brand.objects.create(name='Marca guia')
+        producto = Product.objects.create(
+            name='Producto guia', category=categoria, brand=marca,
+            base_price=Decimal('60000.0000'), stock=0,
+        )
+        variante = _crear_variante(producto, 'ADM-004-S-NEG', 'S', 'negro', 5)
+        User = get_user_model()
+        cliente = User.objects.create_user(
+            email='cliente-guia@example.com', username='cliente-guia@example.com', password='secret123',
+        )
+        cls.cliente = cliente
+        cls.staff = User.objects.create_user(
+            email='staff-guia@example.com', username='staff-guia@example.com', password='secret123',
+            is_staff=True,
+        )
+        cls.pedido = create_order_from_cart(cliente, {str(variante.pk): 1}, DATOS)
+        cls.pedido.payment_status = PaymentStatus.APPROVED
+        cls.pedido.order_status = OrderStatus.PREPARING
+        cls.pedido.save(update_fields=['payment_status', 'order_status'])
+
+    def _guia(self):
+        self.pedido.shipping_quote.refresh_from_db()
+        return self.pedido.shipping_quote.tracking_code
+
+    def test_marcar_enviado_con_guia_la_guarda(self):
+        self.client.force_login(self.staff)
+        self.client.post(
+            reverse('admin_order_update_status', args=[self.pedido.order_number]),
+            {'order_status': OrderStatus.SHIPPED, 'tracking_code': 'ABC123'},
+        )
+        self.pedido.refresh_from_db()
+        self.assertEqual(self.pedido.order_status, OrderStatus.SHIPPED)
+        self.assertEqual(self._guia(), 'ABC123')
+
+    def test_la_guia_se_puede_corregir_despues_de_enviado(self):
+        self.pedido.order_status = OrderStatus.SHIPPED
+        self.pedido.save(update_fields=['order_status'])
+        self.client.force_login(self.staff)
+        url = reverse('admin_order_update_tracking', args=[self.pedido.order_number])
+        self.client.post(url, {'tracking_code': 'MAL'})
+        self.client.post(url, {'tracking_code': 'BIEN-1'})
+        self.assertEqual(self._guia(), 'BIEN-1')
+
+    def test_no_se_registra_guia_si_el_pedido_no_ha_salido(self):
+        self.client.force_login(self.staff)
+        self.client.post(
+            reverse('admin_order_update_tracking', args=[self.pedido.order_number]), {'tracking_code': 'TEMPRANO'},
+        )
+        self.assertEqual(self._guia(), '')
+
+    def test_el_panel_de_guia_solo_aparece_cuando_el_pedido_salio(self):
+        self.client.force_login(self.staff)
+        url = reverse('admin_order_detail', args=[self.pedido.order_number])
+        self.assertNotContains(self.client.get(url), 'name="tracking_code" maxlength="64" value')
+        self.pedido.order_status = OrderStatus.SHIPPED
+        self.pedido.save(update_fields=['order_status'])
+        self.assertContains(self.client.get(url), 'Número de guía')
+
+    def test_actualizar_guia_exige_staff(self):
+        self.pedido.order_status = OrderStatus.SHIPPED
+        self.pedido.save(update_fields=['order_status'])
+        self.client.force_login(self.cliente)
+        self.client.post(
+            reverse('admin_order_update_tracking', args=[self.pedido.order_number]), {'tracking_code': 'HACK'},
+        )
+        self.assertEqual(self._guia(), '')

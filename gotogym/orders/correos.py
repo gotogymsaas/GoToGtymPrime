@@ -98,6 +98,14 @@ def pedido_confirmado(order_id):
         )
 
 
+def _linea_de_guia(pedido):
+    envio = getattr(pedido, 'shipping_quote', None)
+    if not envio or not envio.tracking_code:
+        return ''
+    return gettext('Transportadora: %(transportadora)s · Guía: %(guia)s') % {
+        'transportadora': envio.carrier_name, 'guia': envio.tracking_code} + '\n\n'
+
+
 def pedido_enviado(order_id):
     pedido = _pedido(order_id)
     with _en_el_idioma_del_pedido(pedido):
@@ -106,6 +114,7 @@ def pedido_enviado(order_id):
             f'{_saludo(pedido)}'
             + gettext('Tu pedido %(numero)s salió y va en camino a %(ciudad)s.') % {
                 'numero': pedido.order_number, 'ciudad': pedido.address.city} + '\n\n'
+            f'{_linea_de_guia(pedido)}'
             + gettext('Puedes seguir su estado aquí: %(enlace)s') % {'enlace': _enlace_del_pedido(pedido)} + '\n\n'
             + gettext(
                 'Al recibirlo, revisa que el empaque esté en buen estado. Si algo no está bien, '

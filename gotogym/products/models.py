@@ -49,7 +49,9 @@ class Product(models.Model):
     """
 
     name = models.CharField(max_length=150)
-    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, related_name='products')
+    # PROTECT: borrar una categoria no debe arrastrar productos, variantes,
+    # inventario ni kardex. Se vacia primero, a proposito.
+    category = models.ForeignKey(ProductCategory, on_delete=models.PROTECT, related_name='products')
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
     description = models.TextField(blank=True)
     base_price = models.DecimalField(max_digits=12, decimal_places=4)
@@ -172,6 +174,12 @@ class ProductReview(models.Model):
 
     class Meta:
         ordering = ['-created_at', '-id']
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(rating__gte=1, rating__lte=5),
+                name='productreview_rating_entre_1_y_5',
+            ),
+        ]
 
     def __str__(self):
         return f'{self.product.name} - {self.rating}/5'

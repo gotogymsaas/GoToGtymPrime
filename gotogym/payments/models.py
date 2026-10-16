@@ -38,6 +38,16 @@ class PaymentTransaction(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        # Los avisos del proveedor llegan con `payment_id` o `external_reference`
+        # y hay que encontrar la transaccion por ellos.
+        indexes = [
+            models.Index(fields=['payment_id'], name='paytx_payment_id_idx'),
+            models.Index(fields=['external_reference'], name='paytx_external_ref_idx'),
+            models.Index(fields=['status'], name='paytx_status_idx'),
+        ]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(amount__gte=0), name='paytx_importe_no_negativo'),
+        ]
 
     def __str__(self):
         return f"{self.order.order_number} · {self.provider} · {self.status}"
@@ -71,6 +81,9 @@ class Refund(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        constraints = [
+            models.CheckConstraint(condition=models.Q(amount__gte=0), name='refund_importe_no_negativo'),
+        ]
 
     def __str__(self):
         return f"Reembolso {self.payment_transaction.order.order_number}: ${self.amount} ({self.status})"

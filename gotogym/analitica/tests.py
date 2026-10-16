@@ -247,3 +247,20 @@ class ConsentimientoDeCookiesTests(TestCase):
     def test_no_se_crea_el_identificador_de_visitante_sin_consentimiento(self):
         self.client.post(self.url, self.lote)
         self.assertNotIn('analitica_vid', self.client.session)
+
+
+class PurgarAnaliticaTests(TestCase):
+    def test_borra_solo_los_eventos_fuera_del_plazo(self):
+        from datetime import timedelta
+        from io import StringIO
+
+        from django.core.management import call_command
+        from django.utils import timezone
+
+        viejo = EventoAnalitica.objects.create(nombre='viejo')
+        reciente = EventoAnalitica.objects.create(nombre='reciente')
+        EventoAnalitica.objects.filter(pk=viejo.pk).update(creado=timezone.now() - timedelta(days=200))
+
+        call_command('purgar_analitica', dias=180, stdout=StringIO())
+
+        self.assertEqual(list(EventoAnalitica.objects.values_list('pk', flat=True)), [reciente.pk])

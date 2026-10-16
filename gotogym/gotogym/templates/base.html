@@ -27,7 +27,7 @@
   hay: al editar style.css o tokens.css hay que subirlo o el navegador
   seguira sirviendo la copia vieja.
   {% endcomment %}
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261015-idioma7">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261016-menu-limpio9">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
   <link rel="stylesheet" href="{% static 'css/cookie_banner.css' %}?v=20261015-compacto">
   {% block extra_head %}{% endblock %}
@@ -90,11 +90,18 @@
       PLP, asi que no necesita vista propia y cae en la misma pagina de
       resultados que el resto de los filtros.
       {% endcomment %}
+      {% comment %}
+      Campo siempre visible. Enter envia el formulario; el boton visible sobraba.
+      {% endcomment %}
       <form class="gtg-nav-search" role="search" method="get" action="{% url 'tienda:producto_list' %}">
-        <span class="material-icons-outlined" aria-hidden="true">search</span>
-        <label class="sr-only" for="nav-search">{% trans "Buscar productos" %}</label>
-        <input id="nav-search" type="search" name="filtro" value="{{ filtro|default:'' }}" placeholder="{% trans 'Buscar' %}">
-        <button type="submit">{% trans "Buscar" %}</button>
+        <div class="gtg-nav-search__field">
+          <label class="gtg-nav-search__icon" for="nav-search">
+            <span class="material-icons-outlined" aria-hidden="true">search</span>
+            <span class="sr-only">{% trans "Buscar productos" %}</span>
+          </label>
+          <input id="nav-search" type="search" name="filtro" value="{{ filtro|default:'' }}" placeholder="{% trans 'Buscar' %}">
+        </div>
+        <button type="submit" class="sr-only">{% trans "Buscar" %}</button>
       </form>
 
       {% include "partials/_selector_idioma.html" with variante="menu" %}
@@ -249,8 +256,6 @@
       </div>
     </div>
 
-    {% include "partials/_selector_idioma.html" with variante="pie" %}
-
     <nav class="gtg-footer-legal" aria-label="{% trans 'Políticas y condiciones' %}">
       <a href="{% url 'acerca_de' %}">{% trans "Acerca de" %}</a>
       <a href="{% url 'politica_privacidad' %}">{% trans "Privacidad" %}</a>
@@ -259,9 +264,6 @@
       <a href="{% url 'politica_devoluciones' %}">{% trans "Devoluciones" %}</a>
       <a href="{% url 'politica_garantia' %}">{% trans "Garantía" %}</a>
       <a href="{% url 'politica_tratamiento_datos' %}">{% trans "Tratamiento de datos" %}</a>
-      <a href="{% url 'politica_cookies' %}">{% trans "Cookies" %}</a>
-      <button type="button" data-cookies-abrir>{% trans "Preferencias de cookies" %}</button>
-      <a href="{% url 'afiliado_terminos' %}">{% trans "Términos de afiliados" %}</a>
     </nav>
   </footer>
   {% endblock %}

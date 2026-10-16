@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy
+from afiliados.models import DocumentType
 from products.models import ProductVariant
 
 
@@ -63,9 +64,25 @@ class Coupon(models.Model):
 
     class Meta:
         ordering = ['-created_at', '-id']
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(value__gte=0),
+                name='coupon_valor_no_negativo',
+            ),
+            models.CheckConstraint(
+                condition=~models.Q(discount_type='percentage') | models.Q(value__lte=100),
+                name='coupon_porcentaje_hasta_100',
+            ),
+        ]
 
     def __str__(self):
         return self.code
+
+    def save(self, *args, **kwargs):
+        # Los codigos se buscan en mayusculas (ver `get_usable_coupon`): uno
+        # guardado en minusculas nunca coincidiria.
+        self.code = (self.code or '').strip().upper()
+        super().save(*args, **kwargs)
 
     def is_usable(self, momento=None):
         momento = momento or timezone.now()
@@ -148,12 +165,36 @@ class Order(models.Model):
     # afiliado. Los pedidos entregados antes de este campo quedan con la fecha
     # de su ultima actualizacion.
     delivered_at = models.DateTimeField(null=True, blank=True)
+    # Hitos del pedido. Los anteriores a estos campos quedan sin dato (null):
+    # el detalle de cada cambio esta en `OrderStatusHistory` desde que existe.
+    paid_at = models.DateTimeField(null=True, blank=True)
+    shipped_at = models.DateTimeField(null=True, blank=True)
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+
+    # Identificacion del comprador para la factura electronica. Opcionales:
+    # no todas las compras la piden.
+    customer_document_type = models.CharField(max_length=3, choices=DocumentType.choices, blank=True)
+    customer_document_number = models.CharField(max_length=20, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-created_at', '-id']
+        indexes = [
+            models.Index(fields=['created_at'], name='order_created_at_idx'),
+            models.Index(fields=['order_status', 'created_at'], name='order_status_created_idx'),
+            models.Index(fields=['payment_status'], name='order_payment_status_idx'),
+            models.Index(fields=['email'], name='order_email_idx'),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(
+                    subtotal__gte=0, shipping_cost__gte=0, discount_total__gte=0, total__gte=0,
+                ),
+                name='order_importes_no_negativos',
+            ),
+        ]
 
     def __str__(self):
         return self.order_number
@@ -182,9 +223,40 @@ class OrderItem(models.Model):
 
     class Meta:
         ordering = ['id']
+        constraints = [
+            models.CheckConstraint(condition=models.Q(quantity__gte=1), name='orderitem_cantidad_positiva'),
+            models.CheckConstraint(
+                condition=models.Q(unit_price_snapshot__gte=0, line_total__gte=0),
+                name='orderitem_importes_no_negativos',
+            ),
+        ]
 
     def __str__(self):
         return f"{self.sku_snapshot} x{self.quantity}"
+
+
+class OrderStatusHistory(models.Model):
+    """Registro de cada cambio de estado del pedido: quien lo hizo y cuando.
+
+    `Order.order_status` solo guarda el estado actual; sin esta tabla no hay
+    forma de reconstruir el recorrido de un pedido ante un reclamo."""
+
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='status_history')
+    from_status = models.CharField(max_length=20, choices=OrderStatus.choices, blank=True)
+    to_status = models.CharField(max_length=20, choices=OrderStatus.choices)
+    # Vacio si lo hizo el sistema (pago, vencimiento) y no una persona.
+    changed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='+',
+    )
+    note = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at', 'id']
+        verbose_name_plural = 'order status history'
+
+    def __str__(self):
+        return f"{self.order.order_number}: {self.from_status or '-'} -> {self.to_status}"
 
 
 class Address(models.Model):

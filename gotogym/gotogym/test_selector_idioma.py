@@ -11,10 +11,18 @@ class SelectorDeIdiomaTests(TestCase):
         # LocaleMiddleware deja activo el idioma de la ultima peticion en el hilo.
         translation.activate('es')
 
-    def test_aparece_en_el_menu_el_panel_movil_y_el_pie(self):
+    def test_aparece_en_el_menu_y_el_panel_movil_pero_no_en_el_pie(self):
         html = self.client.get(reverse('home')).content.decode()
-        for variante in ('menu', 'movil', 'pie'):
+        for variante in ('menu', 'movil'):
             self.assertIn(f'gtg-lang--{variante}', html)
+        self.assertNotIn('gtg-lang--pie', html)
+
+    def test_el_buscador_va_con_las_acciones_antes_del_selector_de_idioma(self):
+        html = self.client.get(reverse('home')).content.decode()
+        enlaces, acciones = html.split('class="gtg-nav-actions"')[0], html.split('class="gtg-nav-actions"')[1]
+        self.assertNotIn('gtg-nav-search', enlaces.split('class="gtg-nav-links"')[1])
+        acciones = acciones.split('</nav>')[0]
+        self.assertLess(acciones.index('gtg-nav-search'), acciones.index('gtg-lang--menu'))
 
     def test_ofrece_espanol_e_ingles_y_marca_el_actual(self):
         html = self.client.get('/es/').content.decode()

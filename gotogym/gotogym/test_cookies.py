@@ -32,9 +32,15 @@ class BannerDeCookiesTests(TestCase):
         html = self.client.get(reverse('home')).content.decode()
         self.assertIn(f'href="{reverse("politica_cookies")}"', html)
 
-    def test_el_pie_permite_reabrir_las_preferencias(self):
-        html = self.client.get(reverse('acerca_de')).content.decode()
+    def test_la_politica_de_cookies_permite_reabrir_las_preferencias(self):
+        html = self.client.get(reverse('politica_cookies')).content.decode()
         self.assertIn('data-cookies-abrir', html)
+
+    def test_el_pie_no_lleva_enlaces_de_cookies(self):
+        pie = self.client.get(reverse('acerca_de')).content.decode().split('class="gtg-footer-legal"')[1]
+        pie = pie.split('</footer>')[0]
+        self.assertNotIn(reverse('politica_cookies'), pie)
+        self.assertNotIn('data-cookies-abrir', pie)
 
 
 class PoliticaDeCookiesTests(TestCase):

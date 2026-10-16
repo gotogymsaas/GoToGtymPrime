@@ -128,6 +128,9 @@
         {{ pedido.shipping_quote.carrier_name }} · {{ pedido.shipping_quote.method_name|traducir }}
         · {% blocktrans count dias=pedido.shipping_quote.estimated_days %}{{ dias }} día hábil{% plural %}{{ dias }} días hábiles{% endblocktrans %}
       </p>
+      {% if pedido.shipping_quote.tracking_code %}
+      <p class="mt-1 text-[var(--color-ink)]"><span class="text-gray-500">{% trans "Guía de envío" %}:</span> <strong>{{ pedido.shipping_quote.tracking_code }}</strong></p>
+      {% endif %}
       {% endif %}
     </section>
 

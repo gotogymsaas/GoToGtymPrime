@@ -256,6 +256,18 @@ class RefundServiceTests(TestCase):
         with self.assertRaises(RefundError):
             refund_order_payment(self.pedido, self.admin)
 
+    def test_no_se_puede_reembolsar_mas_de_lo_pagado(self):
+        from decimal import Decimal
+
+        from .services import RefundError, refund_order_payment
+
+        transaccion = self._transaccion_aprobada()
+        with self.assertRaises(RefundError):
+            refund_order_payment(self.pedido, self.admin, amount=transaccion.amount + Decimal('1'))
+        with self.assertRaises(RefundError):
+            refund_order_payment(self.pedido, self.admin, amount=Decimal('0'))
+        self.assertFalse(Refund.objects.exists())
+
     def test_proveedor_desconocido_no_revienta_sino_que_levanta_refund_error(self):
         from .services import RefundError, refund_order_payment
 

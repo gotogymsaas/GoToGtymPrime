@@ -49,11 +49,12 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 from inventory.models import Inventory, InventoryAdjustment, InventoryAdjustmentReason
 from inventory.services import record_adjustment
-from orders.models import Coupon, Order, OrderStatus
+from orders.models import Coupon, Order, OrderItem, OrderStatus
 from orders.services import (
     InvalidOrderTransitionError,
     apply_order_status_transition,
     cancel_expired_orders,
+    set_tracking_code,
     valid_next_statuses,
 )
 from payments.models import PaymentTransaction, Refund
@@ -451,6 +452,16 @@ def product_media_add(request, pk):
 @require_POST
 def product_delete(request, pk):
     product = get_object_or_404(Product, pk=pk)
+    # Un producto que ya se vendio no se borra: sus variantes desaparecerian
+    # de los pedidos (quedan sin enlace), los pedidos pagados en curso se
+    # cancelarian al confirmar y se perderia el kardex. Se retira del catalogo.
+    if OrderItem.objects.filter(variant__product=product).exists():
+        product.variants.update(is_active=False)
+        messages.warning(
+            request,
+            "El producto ya tiene ventas: no se elimina, se desactivaron sus variantes y dejo de mostrarse en la tienda.",
+        )
+        return redirect("admin_products")
     product.delete()
     messages.success(request, "Producto eliminado del catalogo comercial.")
     return redirect("admin_products")
@@ -692,7 +703,10 @@ def order_detail(request, order_number):
             "order": order,
             "next_statuses": siguientes,
             "puede_reembolsar": puede_reembolsar,
+            "puede_editar_guia": hasattr(order, "shipping_quote") and order.order_status in (
+                OrderStatus.SHIPPED, OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED),
             "refunds": Refund.objects.filter(payment_transaction__order=order).select_related("requested_by"),
+            "history": order.status_history.select_related("changed_by"),
         },
     )
 
@@ -708,11 +722,27 @@ def order_update_status(request, order_number):
     # manipulara el POST para incluirlo, se ignora en silencio (no se lee
     # en ningun momento de aqui en adelante).
     try:
-        apply_order_status_transition(order, nuevo_estado)
+        apply_order_status_transition(
+            order, nuevo_estado,
+            tracking_code=request.POST.get("tracking_code", ""), changed_by=request.user,
+        )
     except InvalidOrderTransitionError as error:
         messages.error(request, str(error))
     else:
         messages.success(request, "Estado del pedido actualizado.")
+    return redirect("admin_order_detail", order_number=order_number)
+
+
+@staff_required
+@require_POST
+def order_update_tracking(request, order_number):
+    order = get_object_or_404(Order, order_number=order_number)
+    if order.order_status not in (OrderStatus.SHIPPED, OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED):
+        messages.error(request, "La guía se registra cuando el pedido ya salió.")
+    elif set_tracking_code(order, request.POST.get("tracking_code", "")):
+        messages.success(request, "Guía de envío actualizada.")
+    else:
+        messages.error(request, "Este pedido no tiene cotización de envío donde guardar la guía.")
     return redirect("admin_order_detail", order_number=order_number)
 
 

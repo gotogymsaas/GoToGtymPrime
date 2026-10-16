@@ -6,6 +6,7 @@ from io import StringIO
 from django.core import mail
 from django.core.management import call_command
 from django.test import override_settings
+from django.urls import reverse
 from django.utils import timezone
 from payments.models import PaymentTransaction
 
@@ -15,6 +16,7 @@ from .services import (
     cancel_expired_orders,
     confirm_payment,
     create_order_from_cart,
+    set_tracking_code,
 )
 from .test_confirm_payment import DATOS, ConfirmPaymentBaseTestCase, _FakeTransaction
 
@@ -203,3 +205,53 @@ class VencimientoDePedidosTests(ConfirmPaymentBaseTestCase):
         salida = StringIO()
         call_command('cancelar_pedidos_vencidos', stdout=salida)
         self.assertIn('Pedidos cancelados: 1', salida.getvalue())
+
+
+class GuiaDeEnvioTests(ConfirmPaymentBaseTestCase):
+    def _pedido_listo_para_enviar(self):
+        pedido = self._crear_pedido(1)
+        with self.captureOnCommitCallbacks(execute=True):
+            confirm_payment(pedido, _FakeTransaction('approved'))
+        mail.outbox.clear()
+        return pedido
+
+    def test_al_enviar_con_guia_se_guarda_y_va_en_el_correo(self):
+        pedido = self._pedido_listo_para_enviar()
+        with self.captureOnCommitCallbacks(execute=True):
+            apply_order_status_transition(pedido, OrderStatus.SHIPPED, tracking_code='  SER 12345 678 ')
+        pedido.shipping_quote.refresh_from_db()
+        self.assertEqual(pedido.shipping_quote.tracking_code, 'SER 12345 678')
+        self.assertIn('SER 12345 678', mail.outbox[0].body)
+        self.assertIn(pedido.shipping_quote.carrier_name, mail.outbox[0].body)
+
+    def test_sin_guia_el_correo_sale_sin_linea_de_guia(self):
+        pedido = self._pedido_listo_para_enviar()
+        with self.captureOnCommitCallbacks(execute=True):
+            apply_order_status_transition(pedido, OrderStatus.SHIPPED)
+        self.assertNotIn('Guía:', mail.outbox[0].body)
+
+    def test_la_guia_se_ignora_en_estados_que_no_son_de_envio(self):
+        pedido = self._pedido_listo_para_enviar()
+        apply_order_status_transition(pedido, OrderStatus.PREPARING, tracking_code='NO-DEBERIA')
+        pedido.shipping_quote.refresh_from_db()
+        self.assertEqual(pedido.shipping_quote.tracking_code, '')
+
+    def test_la_guia_se_recorta_al_largo_del_campo(self):
+        pedido = self._pedido_listo_para_enviar()
+        self.assertTrue(set_tracking_code(pedido, 'X' * 200))
+        pedido.shipping_quote.refresh_from_db()
+        self.assertEqual(len(pedido.shipping_quote.tracking_code), 64)
+
+    def test_el_cliente_ve_la_guia_en_su_pedido(self):
+        pedido = self._pedido_listo_para_enviar()
+        apply_order_status_transition(pedido, OrderStatus.SHIPPED, tracking_code='GUIA-9876')
+        self.client.force_login(self.usuario)
+        respuesta = self.client.get(reverse('orders:order_detail', args=[pedido.order_number]))
+        self.assertContains(respuesta, 'GUIA-9876')
+
+    def test_sin_guia_la_pagina_del_pedido_no_muestra_la_etiqueta(self):
+        pedido = self._pedido_listo_para_enviar()
+        apply_order_status_transition(pedido, OrderStatus.SHIPPED)
+        self.client.force_login(self.usuario)
+        respuesta = self.client.get(reverse('orders:order_detail', args=[pedido.order_number]))
+        self.assertNotContains(respuesta, 'Guía de envío')

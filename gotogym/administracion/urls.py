@@ -22,6 +22,7 @@ urlpatterns = [
     path("pedidos/", views.orders_list, name="admin_orders"),
     path("pedidos/<str:order_number>/", views.order_detail, name="admin_order_detail"),
     path("pedidos/<str:order_number>/estado/", views.order_update_status, name="admin_order_update_status"),
+    path("pedidos/<str:order_number>/guia/", views.order_update_tracking, name="admin_order_update_tracking"),
     path("pedidos/<str:order_number>/reembolsar/", views.order_refund, name="admin_order_refund"),
     path("usuarios/", views.users_list, name="admin_users"),
     path("usuarios/<int:pk>/rol/", views.user_role_update, name="admin_user_role_update"),

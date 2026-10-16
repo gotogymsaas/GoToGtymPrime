@@ -20,12 +20,12 @@ from django.db.models import F
 from django.utils import timezone
 from django.utils.translation import get_language, gettext
 from gotogym.tasks import enqueue
-from inventory.services import InsufficientStockError, decrement_stock, get_available_quantity
-from shipping.models import ShippingQuote
+from inventory.services import InsufficientStockError, decrement_stock, get_available_quantity, restore_stock
+from shipping.models import ShippingQuote, ShippingStatus
 from shipping.services import get_mock_quote
 
 from . import correos
-from .models import Address, Coupon, Order, OrderItem, OrderStatus, PaymentStatus
+from .models import Address, Coupon, Order, OrderItem, OrderStatus, OrderStatusHistory, PaymentStatus
 
 # Intentos para resolver la colision de dos pedidos creados a la vez.
 MAX_INTENTOS_NUMERO = 5
@@ -88,6 +88,41 @@ def release_coupon(order):
     pago rechazado agotarian los cupones de uso limitado."""
     if order.coupon_id:
         Coupon.objects.filter(pk=order.coupon_id, times_used__gt=0).update(times_used=F('times_used') - 1)
+
+
+# Estado del envio que corresponde a cada estado logistico del pedido.
+_ESTADO_DE_ENVIO = {
+    OrderStatus.SHIPPED: ShippingStatus.SHIPPED,
+    OrderStatus.IN_TRANSIT: ShippingStatus.IN_TRANSIT,
+    OrderStatus.DELIVERED: ShippingStatus.DELIVERED,
+    OrderStatus.RETURNED: ShippingStatus.RETURNED,
+    OrderStatus.CANCELLED: ShippingStatus.CANCELLED,
+}
+
+
+def _registrar_estado(order, desde, hasta, changed_by=None, nota=''):
+    """Deja constancia de un cambio de estado y mantiene al dia lo que
+    depende de el: el estado de la cotizacion de envio."""
+    OrderStatusHistory.objects.create(
+        order=order, from_status=desde or '', to_status=hasta,
+        changed_by=changed_by if getattr(changed_by, 'is_authenticated', False) else None,
+        note=nota[:255],
+    )
+    estado_envio = _ESTADO_DE_ENVIO.get(hasta)
+    if estado_envio:
+        ShippingQuote.objects.filter(order=order).update(shipping_status=estado_envio)
+
+
+def _reponer_stock(order):
+    """Devuelve al inventario las unidades de un pedido cuyo stock ya se
+    descontó. Las lineas cuya variante ya no existe se omiten: no hay donde
+    reponerlas."""
+    items = [
+        (linea.variant, linea.quantity)
+        for linea in order.items.select_related('variant').all()
+        if linea.variant_id is not None
+    ]
+    restore_stock(items)
 
 
 class CheckoutError(Exception):
@@ -180,22 +215,54 @@ def valid_next_statuses(order):
     return siguientes
 
 
+def set_tracking_code(order, codigo):
+    """Guarda la guia de envio del pedido (vacia la borra).
+
+    Devuelve False si el pedido no tiene cotizacion de envio donde guardarla.
+    """
+    longitud = ShippingQuote._meta.get_field('tracking_code').max_length
+    codigo = ' '.join((codigo or '').split())[:longitud]
+    actualizadas = ShippingQuote.objects.filter(order=order).update(tracking_code=codigo)
+    return bool(actualizadas)
+
+
 @transaction.atomic
-def apply_order_status_transition(order, nuevo_estado):
+def apply_order_status_transition(order, nuevo_estado, tracking_code=None, changed_by=None):
     """Mueve `order_status` un paso valido hacia adelante (o a cancelado).
 
     Nunca toca `payment_status`: ese campo lo controla exclusivamente el
     proveedor de pago via `confirm_payment`, nunca una accion de admin.
+
+    `tracking_code` se guarda en la misma operacion, de modo que el correo de
+    envio, que se arma despues de confirmar la transaccion, ya la incluya.
     """
     if nuevo_estado not in valid_next_statuses(order):
         raise InvalidOrderTransitionError(order, nuevo_estado)
 
+    if tracking_code and nuevo_estado in (OrderStatus.SHIPPED, OrderStatus.IN_TRANSIT):
+        set_tracking_code(order, tracking_code)
+
+    estado_anterior = order.order_status
     order.order_status = nuevo_estado
     campos = ['order_status', 'updated_at']
+    ahora = timezone.now()
     if nuevo_estado == OrderStatus.DELIVERED:
-        order.delivered_at = timezone.now()
+        order.delivered_at = ahora
         campos.append('delivered_at')
+    if nuevo_estado in (OrderStatus.SHIPPED, OrderStatus.IN_TRANSIT) and order.shipped_at is None:
+        order.shipped_at = ahora
+        campos.append('shipped_at')
+    if nuevo_estado == OrderStatus.CANCELLED:
+        order.cancelled_at = ahora
+        campos.append('cancelled_at')
     order.save(update_fields=campos)
+    _registrar_estado(order, estado_anterior, nuevo_estado, changed_by=changed_by)
+
+    # El stock se descuenta al confirmar el pago: un pedido que ya paso por
+    # `confirmed` lo tiene descontado y debe devolverlo al cancelarse o
+    # devolverse. Uno cancelado desde `pending_payment` nunca lo descontó.
+    if nuevo_estado in (OrderStatus.CANCELLED, OrderStatus.RETURNED) and estado_anterior != OrderStatus.PENDING_PAYMENT:
+        _reponer_stock(order)
 
     # Efecto sobre la comision del afiliado, si el pedido tiene una: al
     # entregarse empieza su periodo de validacion (el plazo de devolucion del
@@ -315,6 +382,8 @@ def create_order_from_cart(user, cart, datos):
             line_total=(precio * item['cantidad']).quantize(Decimal('0.01')),
         )
 
+    _registrar_estado(pedido, '', OrderStatus.PENDING_PAYMENT)
+
     Address.objects.create(
         order=pedido,
         full_name=f"{datos['first_name']} {datos['last_name']}".strip(),
@@ -361,6 +430,7 @@ def confirm_payment(order, payment_transaction):
 
     Order.objects.select_for_update().filter(pk=order.pk).first()
     order.refresh_from_db(fields=['order_status', 'payment_status', 'internal_note'])
+    ahora = timezone.now()
 
     if order.order_status == OrderStatus.CONFIRMED:
         return order
@@ -371,14 +441,17 @@ def confirm_payment(order, payment_transaction):
             # pago en efectivo que se acredita pasado el plazo): no se
             # reactiva, pero queda marcado para devolver el dinero.
             order.payment_status = PaymentStatus.APPROVED
+            order.paid_at = ahora
             order.internal_note = _anotar(
                 order.internal_note, 'Pago aprobado despues de cancelar el pedido. Requiere reembolso manual.',
             )
-            order.save(update_fields=['payment_status', 'internal_note', 'updated_at'])
+            order.save(update_fields=['payment_status', 'paid_at', 'internal_note', 'updated_at'])
             enqueue(correos.pedido_cancelado, order.pk)
         return order
 
+    estado_previo = order.order_status
     order.payment_status = PaymentStatus.APPROVED
+    order.paid_at = ahora
 
     lineas = list(order.items.select_related('variant').all())
     lineas_sin_variante = [linea for linea in lineas if linea.variant_id is None]
@@ -386,11 +459,15 @@ def confirm_payment(order, payment_transaction):
     if lineas_sin_variante:
         skus = ', '.join(linea.sku_snapshot for linea in lineas_sin_variante)
         order.order_status = OrderStatus.CANCELLED
+        order.cancelled_at = ahora
         order.internal_note = (
             f'Pago aprobado pero no se pudo descontar stock: variante(s) ya no '
             f'existen en el catalogo ({skus}). Requiere revision manual.'
         )
-        order.save(update_fields=['payment_status', 'order_status', 'internal_note', 'updated_at'])
+        order.save(update_fields=[
+            'payment_status', 'paid_at', 'order_status', 'cancelled_at', 'internal_note', 'updated_at',
+        ])
+        _registrar_estado(order, estado_previo, OrderStatus.CANCELLED, nota='Pago aprobado sin variante en el catalogo.')
         release_coupon(order)
         enqueue(correos.pedido_cancelado, order.pk)
         return order
@@ -401,18 +478,23 @@ def confirm_payment(order, payment_transaction):
         decrement_stock(items)
     except InsufficientStockError as error:
         order.order_status = OrderStatus.CANCELLED
+        order.cancelled_at = ahora
         order.internal_note = (
             f'Pago aprobado pero sin stock suficiente para {error.variant.sku} '
             f'(pedidas {error.requested}, disponibles {error.available}). '
             f'Requiere reembolso manual.'
         )
-        order.save(update_fields=['payment_status', 'order_status', 'internal_note', 'updated_at'])
+        order.save(update_fields=[
+            'payment_status', 'paid_at', 'order_status', 'cancelled_at', 'internal_note', 'updated_at',
+        ])
+        _registrar_estado(order, estado_previo, OrderStatus.CANCELLED, nota='Pago aprobado sin stock suficiente.')
         release_coupon(order)
         enqueue(correos.pedido_cancelado, order.pk)
         return order
 
     order.order_status = OrderStatus.CONFIRMED
-    order.save(update_fields=['payment_status', 'order_status', 'updated_at'])
+    order.save(update_fields=['payment_status', 'paid_at', 'order_status', 'updated_at'])
+    _registrar_estado(order, estado_previo, OrderStatus.CONFIRMED, nota='Pago aprobado.')
     register_order_commission(order)
     enqueue(correos.pedido_confirmado, order.pk)
     return order
@@ -451,10 +533,15 @@ def cancel_expired_orders(ahora=None, horas=None):
                 continue
             pedido.order_status = OrderStatus.CANCELLED
             pedido.payment_status = PaymentStatus.CANCELLED
+            pedido.cancelled_at = ahora
             pedido.internal_note = _anotar(
                 pedido.internal_note, f'Cancelado automaticamente: sin pago tras {horas} horas.',
             )
-            pedido.save(update_fields=['order_status', 'payment_status', 'internal_note', 'updated_at'])
+            pedido.save(update_fields=['order_status', 'payment_status', 'cancelled_at', 'internal_note', 'updated_at'])
+            _registrar_estado(
+                pedido, OrderStatus.PENDING_PAYMENT, OrderStatus.CANCELLED,
+                nota=f'Sin pago tras {horas} horas.',
+            )
             release_coupon(pedido)
             enqueue(correos.pedido_cancelado, pedido.pk)
             canceladas += 1

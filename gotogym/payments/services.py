@@ -56,7 +56,9 @@ def refund_order_payment(order, requested_by, amount=None):
         raise RefundError('Este pago ya fue reembolsado.')
 
     monto = Decimal(amount) if amount is not None else transaccion.amount
-    provider = get_provider_for_transaction(transaccion)
+    if monto <= 0 or monto > transaccion.amount:
+        raise RefundError('El monto a reembolsar debe ser mayor que cero y no superar el pago.')
+    provider =get_provider_for_transaction(transaccion)
 
     try:
         resultado = provider.refund_payment(transaccion, amount=amount)

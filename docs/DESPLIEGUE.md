@@ -10,7 +10,7 @@ Verificado contra Azure y el código el 14 de octubre de 2026. Para ejecutar el 
 | Dirección pública | `https://shop.gotogym.store` (y `gotogym-prime.azurewebsites.net`) |
 | Base de datos | PostgreSQL, por la variable `DATABASE_URL` |
 | Respaldos | El servidor flexible `psql-gotogym-prod` (grupo `rg-gotogym-data`) conserva respaldos automáticos 7 días, sin redundancia geográfica |
-| Slots | No hay slot de staging: cada despliegue va directo a producción |
+| Slots | Slot `staging` (`gotogym-prime-staging.azurewebsites.net`) con configuración propia, SQLite y pagos simulados. El flujo de CI sigue desplegando directo a producción; el slot se actualiza a mano (ver más abajo) |
 | HTTPS | `httpsOnly` está apagado en la aplicación; la redirección la hace Django con `SECURE_SSL_REDIRECT` |
 
 ## Cómo se despliega
@@ -25,6 +25,8 @@ Verificado contra Azure y el código el 14 de octubre de 2026. Para ejecutar el 
    ```
 
    El `migrate` es el del proyecto: adapta una base antigua del programa "influencer" y crea la tabla de caché (`django_cache`) si la caché vive en la base. `wsgi.py` no migra.
+
+   **Antes de desplegar migraciones que agregan restricciones** (`CheckConstraint`), ejecutar contra la base real `python gotogym/manage.py verificar_restricciones`. Solo lee: lista las filas existentes que las violarían. PostgreSQL valida los datos al crear la restricción y, si alguna fila no cumple, `migrate` falla y la aplicación no arranca con el Startup Command de arriba.
 5. `environments/azure/startup.sh` es una versión de referencia del mismo arranque que además carga el Journal (`seed_journal --solo-faltantes`). Producción **no** la usa; si hace falta cargar entradas del Journal, ejecutar ese comando por SSH.
 
 ## Variables de entorno
@@ -63,9 +65,15 @@ No hay un programador desplegado. Cada una se ejecuta también al abrir la panta
 
 ## Respaldos, restauración y reversión
 
-- **Base de datos.** Restauración a un punto en el tiempo de los últimos 7 días: crea un servidor nuevo, no pisa el actual (`az postgres flexible-server restore --resource-group rg-gotogym-data --name <servidor-nuevo> --source-server psql-gotogym-prod --restore-time <fecha-hora-UTC>`). Conviene ensayarla antes de abrir al público y valorar subir la retención.
+- **Base de datos.** Restauración a un punto en el tiempo de los últimos 7 días: crea un servidor nuevo, no pisa el actual (`az postgres flexible-server restore --resource-group rg-gotogym-data --name <servidor-nuevo> --source-server psql-gotogym-prod --restore-time <fecha-hora-UTC>`). Ensayada el 15 de octubre de 2026: el servidor restaurado quedó listo con todos los datos (44 tablas, pedidos, catálogo y Journal) y tarda unos 30 minutos; se borró al terminar. Valorar subir la retención de 7 días.
 - **Código.** Para volver a una versión anterior, ejecutar el workflow sobre el commit anterior o revertir el commit en `main`. Sin slot de staging no hay intercambio instantáneo.
 - **Archivos subidos.** Las imágenes que se suban desde el panel quedan en `gotogym/media/` dentro de la aplicación desplegada; verificar que ese almacenamiento persista entre despliegues (pendiente de resolver).
+
+## Slot de staging
+
+Sirve para ensayar una versión antes de publicarla. Se creó **sin copiar** la configuración de producción (no hereda `DATABASE_URL` ni la clave secreta) y todos sus ajustes son de slot, así que un intercambio no los mueve. Usa SQLite y el proveedor de pago simulado; su arranque carga el catálogo y crea el usuario de panel `staff-staging@example.com` con la clave del ajuste `DJANGO_SUPERUSER_PASSWORD`.
+
+Para probar el árbol de trabajo actual: empaquetarlo como lo hace el flujo de CI (sin `.git`, `.venv`, `docs`, `node_modules`, `*.sqlite3` ni `*.bat`) y ejecutar `az webapp deploy -g rg-gotogym-prime -n gotogym-prime --slot staging --src-path <zip> --type zip`. Un intercambio (`slot swap`) mueve solo el código: los ajustes de slot se quedan donde están. Aun así, el slot no ejercita PostgreSQL; para un ensayo fiel, darle una base propia.
 
 ## Antes de abrir al público
 

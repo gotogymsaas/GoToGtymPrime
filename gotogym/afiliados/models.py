@@ -49,9 +49,11 @@ class PerfilAfiliado(models.Model):
         max_digits=5, decimal_places=2, null=True, blank=True,
         help_text="Tasa propia de este afiliado. Vacio usa la tasa global del programa.",
     )
-    commission_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    # 12 digitos como el resto de importes: con 10 el tope era ~100 millones de
+    # COP en ventas acumuladas, que un afiliado exitoso supera.
+    commission_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total_referred = models.PositiveIntegerField(default=0)
-    total_sales = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_sales = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     # `is_active=True` de fabrica preserva el comportamiento de los perfiles
     # que ya existian antes de introducir el flujo de aprobacion (ver
@@ -105,6 +107,12 @@ class PerfilAfiliado(models.Model):
     class Meta:
         verbose_name = "Perfil de afiliado"
         verbose_name_plural = "Perfiles de afiliado"
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(commission_rate__isnull=True) | models.Q(commission_rate__gte=0, commission_rate__lte=100),
+                name='perfilafiliado_tasa_entre_0_y_100',
+            ),
+        ]
 
     def __str__(self):
         return f"Afiliado: {self.user.email} ({self.referral_code})"
@@ -309,6 +317,12 @@ class WithdrawalRequest(models.Model):
 
     class Meta:
         ordering = ['-requested_at']
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(amount__gte=0, recovery_amount__gte=0, transaction_fee__gte=0),
+                name='withdrawal_importes_no_negativos',
+            ),
+        ]
 
     def __str__(self):
         return f"Retiro {self.afiliado.user.email}: ${self.amount}"
