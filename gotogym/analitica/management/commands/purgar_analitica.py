@@ -7,9 +7,10 @@ programar a diario.
 """
 from datetime import timedelta
 
-from analitica.models import EventoAnalitica
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+
+from analitica.models import EventoAnalitica
 
 
 class Command(BaseCommand):

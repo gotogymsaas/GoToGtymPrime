@@ -20,12 +20,25 @@ from django.db.models import F
 from django.utils import timezone
 from django.utils.translation import get_language, gettext
 from gotogym.tasks import enqueue
-from inventory.services import InsufficientStockError, decrement_stock, get_available_quantity, restore_stock
+from inventory.services import (
+    InsufficientStockError,
+    decrement_stock,
+    get_available_quantity,
+    restore_stock,
+)
 from shipping.models import ShippingQuote, ShippingStatus
 from shipping.services import get_mock_quote
 
 from . import correos
-from .models import Address, Coupon, Order, OrderItem, OrderStatus, OrderStatusHistory, PaymentStatus
+from .models import (
+    Address,
+    Coupon,
+    Order,
+    OrderItem,
+    OrderStatus,
+    OrderStatusHistory,
+    PaymentStatus,
+)
 
 # Intentos para resolver la colision de dos pedidos creados a la vez.
 MAX_INTENTOS_NUMERO = 5

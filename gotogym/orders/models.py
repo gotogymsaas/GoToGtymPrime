@@ -4,7 +4,6 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy
-from afiliados.models import DocumentType
 from products.models import ProductVariant
 
 
@@ -24,6 +23,18 @@ class PaymentStatus(models.TextChoices):
     APPROVED = 'approved', gettext_lazy('Aprobado')
     REJECTED = 'rejected', gettext_lazy('Rechazado')
     CANCELLED = 'cancelled', gettext_lazy('Cancelado')
+
+
+class DocumentType(models.TextChoices):
+    # Mismos valores que `afiliados.models.DocumentType`. Se repiten aqui
+    # porque `orders` esta por debajo de `afiliados` en la regla de capas y
+    # no puede importarlo.
+    CC = 'CC', gettext_lazy('Cedula de ciudadania')
+    CE = 'CE', gettext_lazy('Cedula de extranjeria')
+    NIT = 'NIT', gettext_lazy('NIT')
+    PA = 'PA', gettext_lazy('Pasaporte')
+    PPT = 'PPT', gettext_lazy('Permiso por proteccion temporal (PPT)')
+    PEP = 'PEP', gettext_lazy('Permiso especial de permanencia (PEP)')
 
 
 class CouponDiscountType(models.TextChoices):

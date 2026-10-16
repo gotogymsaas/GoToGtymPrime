@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 
-from .models import Coupon, Order, OrderItem, OrderStatus, OrderStatusHistory
+from .models import Coupon, Order, OrderItem, OrderStatus
 from .services import apply_order_status_transition, cancel_expired_orders, confirm_payment
 from .test_confirm_payment import ConfirmPaymentBaseTestCase, _FakeTransaction
 
