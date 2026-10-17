@@ -483,7 +483,7 @@ class AvisoDePagoPorCorreoTests(AfiliadoTestBase):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_si_el_correo_falla_el_pago_queda_registrado(self):
-        with patch('afiliados.services.send_mail', side_effect=OSError('smtp caido')):
+        with patch('afiliados.services.enviar_correo', side_effect=OSError('smtp caido')):
             with self.assertLogs('afiliados.services', level='ERROR'):
                 self._resolver('pay')
         self.solicitud.refresh_from_db()

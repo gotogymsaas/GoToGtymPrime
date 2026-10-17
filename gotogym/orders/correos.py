@@ -8,24 +8,34 @@ deja en el log.
 El correo sale en el idioma en que la persona hizo el pedido (`Order.language`),
 no en el de quien dispare la tarea: un pago confirmado por el webhook de
 Mercado Pago no tiene idioma de navegacion.
+
+Cada correo se escribe como contenido (`gotogym.correo`) y sale como HTML de
+marca con su version de texto.
 """
 import logging
 from contextlib import contextmanager
 from decimal import Decimal
 
 from django.conf import settings
-from django.core.mail import send_mail
 from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext
+from gotogym.correo import (
+    Correo,
+    aviso,
+    boton,
+    datos,
+    enviar_correo,
+    parrafo,
+    productos,
+    totales,
+    url_absoluta,
+)
+from tienda.templatetags.imagenes import url_imagen_producto
 
 from .models import Order, PaymentStatus
 
 logger = logging.getLogger(__name__)
-
-
-def _firma():
-    return gettext('Equipo GoToGym') + '\nsupport@gotogym.store\n'
 
 
 def _pesos(valor):
@@ -35,7 +45,11 @@ def _pesos(valor):
 
 
 def _pedido(order_id):
-    return Order.objects.select_related('address', 'shipping_quote').prefetch_related('items').get(pk=order_id)
+    return (
+        Order.objects.select_related('address', 'shipping_quote')
+        .prefetch_related('items__variant__product__media')
+        .get(pk=order_id)
+    )
 
 
 @contextmanager
@@ -51,30 +65,66 @@ def _enlace_del_pedido(pedido):
 def _saludo(pedido):
     nombre = pedido.address.full_name.split(' ')[0] if hasattr(pedido, 'address') and pedido.address.full_name else ''
     if nombre:
-        return gettext('Hola %(nombre)s,') % {'nombre': nombre} + '\n\n'
-    return gettext('Hola,') + '\n\n'
+        return gettext('Hola %(nombre)s,') % {'nombre': nombre}
+    return gettext('Hola,')
 
 
-def _enviar(pedido, asunto, cuerpo):
+def _correo(pedido, asunto, titulo, bloques):
+    return Correo(
+        asunto=asunto, titulo=titulo, bloques=bloques,
+        kicker=f'{gettext("Pedido")} {pedido.order_number}',
+        saludo=_saludo(pedido),
+        pie=gettext('Recibes este correo porque hiciste un pedido en GoToGym.'),
+    )
+
+
+def _enviar(pedido, correo):
     try:
-        send_mail(subject=asunto, message=cuerpo, from_email=None, recipient_list=[pedido.email])
+        enviar_correo(pedido.email, correo)
     except Exception:
-        logger.exception('No se pudo enviar el correo "%s" del pedido %s', asunto, pedido.order_number)
+        logger.exception('No se pudo enviar el correo "%s" del pedido %s', correo.asunto, pedido.order_number)
+
+
+def _imagen_del_producto(item):
+    """Direccion publica de la foto del producto; vacia si no la tiene, si el
+    producto ya no existe o si no se puede resolver (el correo sale igual)."""
+    variante = item.variant
+    if variante is None:
+        return ''
+    try:
+        imagen = variante.product.primary_image
+        if not imagen:
+            return ''
+        return url_absoluta(url_imagen_producto(imagen.name))
+    except Exception:
+        logger.warning('No se pudo resolver la foto de %s para el correo', item.sku_snapshot, exc_info=True)
+        return ''
 
 
 def _resumen(pedido):
     lineas = [
-        f'- {gettext(item.product_name_snapshot)} ({gettext(item.size_snapshot)}/{gettext(item.color_snapshot)}) '
-        f'x{item.quantity}: {_pesos(item.line_total)}'
+        {
+            'nombre': gettext(item.product_name_snapshot),
+            'detalle': f'{gettext(item.size_snapshot)} / {gettext(item.color_snapshot)}',
+            'cantidad': item.quantity,
+            'total': _pesos(item.line_total),
+            'imagen': _imagen_del_producto(item),
+        }
         for item in pedido.items.all()
     ]
-    lineas.append('')
-    lineas.append(f'{gettext("Subtotal")}: {_pesos(pedido.subtotal)}')
+    filas = [(gettext('Subtotal'), _pesos(pedido.subtotal))]
     if pedido.discount_total:
-        lineas.append(f'{gettext("Descuento")}: -{_pesos(pedido.discount_total)}')
-    lineas.append(f'{gettext("Envío")}: {_pesos(pedido.shipping_cost)}')
-    lineas.append(f'{gettext("Total")}: {_pesos(pedido.total)}')
-    return '\n'.join(lineas)
+        filas.append((gettext('Descuento'), f'-{_pesos(pedido.discount_total)}'))
+    filas.append((gettext('Envío'), _pesos(pedido.shipping_cost)))
+    filas.append((gettext('Total'), _pesos(pedido.total)))
+    return [productos(lineas), totales(filas)]
+
+
+def _boton_del_pedido(pedido, frase_con_enlace):
+    """Boton "Ver mi pedido"; `frase_con_enlace` es la frase de la version de
+    texto, que ya trae el enlace."""
+    enlace = _enlace_del_pedido(pedido)
+    return boton(gettext('Ver mi pedido'), enlace, texto_plano=frase_con_enlace % {'enlace': enlace})
 
 
 def pedido_recibido(order_id):
@@ -82,20 +132,21 @@ def pedido_recibido(order_id):
     esta pendiente y cuanto tiempo hay para pagarlo."""
     pedido = _pedido(order_id)
     with _en_el_idioma_del_pedido(pedido):
-        _enviar(
-            pedido, gettext('Recibimos tu pedido %(numero)s') % {'numero': pedido.order_number},
-            f'{_saludo(pedido)}'
-            + gettext('Recibimos tu pedido %(numero)s y está pendiente de pago.') % {
-                'numero': pedido.order_number} + '\n\n'
-            f'{_resumen(pedido)}\n\n'
-            + gettext('Si ya pagaste, te enviaremos la confirmación en cuanto se acredite el pago.') + '\n'
-            + gettext(
+        bloques = [
+            parrafo(gettext('Recibimos tu pedido %(numero)s y está pendiente de pago.') % {
+                'numero': pedido.order_number}),
+            *_resumen(pedido),
+            parrafo(gettext('Si ya pagaste, te enviaremos la confirmación en cuanto se acredite el pago.')),
+            aviso(gettext(
                 'Si el pago no se completa en %(horas)s horas, el pedido se cancelará automáticamente '
                 'y no se hará ningún cobro.'
-            ) % {'horas': settings.ORDER_PAYMENT_WINDOW_HOURS} + '\n\n'
-            + gettext('Puedes ver el estado de tu pedido aquí: %(enlace)s') % {'enlace': _enlace_del_pedido(pedido)} + '\n\n'
-            f'{_firma()}',
-        )
+            ) % {'horas': settings.ORDER_PAYMENT_WINDOW_HOURS}),
+            _boton_del_pedido(pedido, gettext('Puedes ver el estado de tu pedido aquí: %(enlace)s')),
+        ]
+        _enviar(pedido, _correo(
+            pedido, gettext('Recibimos tu pedido %(numero)s') % {'numero': pedido.order_number},
+            gettext('Recibimos tu pedido'), bloques,
+        ))
 
 
 def pedido_confirmado(order_id):
@@ -103,46 +154,52 @@ def pedido_confirmado(order_id):
     with _en_el_idioma_del_pedido(pedido):
         direccion = pedido.address
         dias = getattr(getattr(pedido, 'shipping_quote', None), 'estimated_days', None)
-        entrega = gettext('Tiempo estimado de entrega: unos %(dias)s días hábiles.') % {'dias': dias} + '\n' if dias else ''
-        _enviar(
+        bloques = [
+            parrafo(gettext('Recibimos tu pago y confirmamos tu pedido %(numero)s. Ya estamos preparándolo.') % {
+                'numero': pedido.order_number}),
+            *_resumen(pedido),
+            parrafo(gettext('Se enviará a: %(direccion)s, %(ciudad)s, %(departamento)s.') % {
+                'direccion': direccion.address_line, 'ciudad': direccion.city, 'departamento': direccion.department}),
+        ]
+        if dias:
+            bloques.append(parrafo(gettext('Tiempo estimado de entrega: unos %(dias)s días hábiles.') % {'dias': dias}))
+        bloques += [
+            parrafo(gettext('Te avisaremos por este medio cuando salga de nuestras manos.')),
+            _boton_del_pedido(pedido, gettext('Puedes ver el estado de tu pedido aquí: %(enlace)s')),
+        ]
+        _enviar(pedido, _correo(
             pedido, gettext('Confirmamos tu pedido %(numero)s') % {'numero': pedido.order_number},
-            f'{_saludo(pedido)}'
-            + gettext('Recibimos tu pago y confirmamos tu pedido %(numero)s. Ya estamos preparándolo.') % {
-                'numero': pedido.order_number} + '\n\n'
-            f'{_resumen(pedido)}\n\n'
-            + gettext('Se enviará a: %(direccion)s, %(ciudad)s, %(departamento)s.') % {
-                'direccion': direccion.address_line, 'ciudad': direccion.city, 'departamento': direccion.department} + '\n'
-            f'{entrega}\n'
-            + gettext('Puedes ver el estado de tu pedido aquí: %(enlace)s') % {'enlace': _enlace_del_pedido(pedido)} + '\n\n'
-            + gettext('Te avisaremos por este medio cuando salga de nuestras manos.') + '\n\n'
-            f'{_firma()}',
-        )
+            gettext('Tu pedido está confirmado'), bloques,
+        ))
 
 
-def _linea_de_guia(pedido):
+def _datos_de_la_guia(pedido):
     envio = getattr(pedido, 'shipping_quote', None)
     if not envio or not envio.tracking_code:
-        return ''
-    return gettext('Transportadora: %(transportadora)s · Guía: %(guia)s') % {
-        'transportadora': envio.carrier_name, 'guia': envio.tracking_code} + '\n\n'
+        return []
+    return [datos([
+        (gettext('Transportadora'), envio.carrier_name),
+        (gettext('Guía de envío'), envio.tracking_code),
+    ])]
 
 
 def pedido_enviado(order_id):
     pedido = _pedido(order_id)
     with _en_el_idioma_del_pedido(pedido):
-        _enviar(
-            pedido, gettext('Tu pedido %(numero)s va en camino') % {'numero': pedido.order_number},
-            f'{_saludo(pedido)}'
-            + gettext('Tu pedido %(numero)s salió y va en camino a %(ciudad)s.') % {
-                'numero': pedido.order_number, 'ciudad': pedido.address.city} + '\n\n'
-            f'{_linea_de_guia(pedido)}'
-            + gettext('Puedes seguir su estado aquí: %(enlace)s') % {'enlace': _enlace_del_pedido(pedido)} + '\n\n'
-            + gettext(
+        bloques = [
+            parrafo(gettext('Tu pedido %(numero)s salió y va en camino a %(ciudad)s.') % {
+                'numero': pedido.order_number, 'ciudad': pedido.address.city}),
+            *_datos_de_la_guia(pedido),
+            parrafo(gettext(
                 'Al recibirlo, revisa que el empaque esté en buen estado. Si algo no está bien, '
                 'escríbenos con tu número de pedido.'
-            ) + '\n\n'
-            f'{_firma()}',
-        )
+            )),
+            _boton_del_pedido(pedido, gettext('Puedes seguir su estado aquí: %(enlace)s')),
+        ]
+        _enviar(pedido, _correo(
+            pedido, gettext('Tu pedido %(numero)s va en camino') % {'numero': pedido.order_number},
+            gettext('Tu pedido va en camino'), bloques,
+        ))
 
 
 def pedido_cancelado(order_id):
@@ -158,10 +215,11 @@ def pedido_cancelado(order_id):
                 'Tu pedido se canceló porque el pago no se completó a tiempo o porque lo cancelamos. '
                 'No se hizo ningún cobro. Si quieres, puedes volver a hacer tu compra cuando quieras.'
             )
-        _enviar(
+        bloques = [
+            parrafo(explicacion),
+            parrafo(gettext('Si tienes dudas, escríbenos a support@gotogym.store con tu número de pedido.')),
+        ]
+        _enviar(pedido, _correo(
             pedido, gettext('Tu pedido %(numero)s fue cancelado') % {'numero': pedido.order_number},
-            f'{_saludo(pedido)}'
-            f'{explicacion}\n\n'
-            + gettext('Si tienes dudas, responde a este correo o escríbenos con tu número de pedido.') + '\n\n'
-            f'{_firma()}',
-        )
+            gettext('Tu pedido fue cancelado'), bloques,
+        ))

@@ -1,6 +1,7 @@
 """Ciclo de vida del afiliado: revision, correos, baja con preaviso,
 terminacion, inactividad, nueva version de los terminos y avisos."""
 from datetime import timedelta
+from decimal import Decimal
 
 from django.core import mail
 from django.core.management import call_command
@@ -12,6 +13,7 @@ from . import terminos as modulo_terminos
 from .models import (
     Commission,
     CommissionStatus,
+    ConfiguracionProgramaAfiliados,
     EstadoAfiliado,
     MotivoSalida,
     PerfilAfiliado,
@@ -61,9 +63,46 @@ class RevisionDeLaPostulacionTests(AfiliadoTestBase):
         with self.captureOnCommitCallbacks(execute=True):
             self.client.post(reverse('admin_afiliado_approve', args=[perfil.pk]))
         correo = mail.outbox[0]
-        self.assertIn('Ya eres afiliado', correo.subject)
+        self.assertEqual(correo.to, [self.afiliado_user.email])
+        self.assertIn('bienvenida', correo.subject)
         self.assertIn(f'?ref={perfil.referral_code}', correo.body)
         self.assertIn('publicidad', correo.body)
+
+    def test_la_bienvenida_explica_el_descuento_la_comision_y_como_empezar(self):
+        ConfiguracionProgramaAfiliados.objects.update_or_create(pk=1, defaults={
+            'default_customer_discount': Decimal('12.50'), 'default_commission_rate': Decimal('18.00'),
+            'minimum_payout': Decimal('150000'),
+        })
+        perfil = self._postular()
+        mail.outbox.clear()
+        self.client.force_login(self.admin)
+        with self.captureOnCommitCallbacks(execute=True):
+            self.client.post(reverse('admin_afiliado_approve', args=[perfil.pk]))
+        correo = mail.outbox[0]
+        (html, tipo), = correo.alternatives
+        self.assertEqual(tipo, 'text/html')
+        for texto in (
+            perfil.referral_code,
+            'Descuento para quien compra: 12.5 % de descuento',
+            'Comisión por venta: 18 % del subtotal del pedido',
+            'Mínimo para cobrar: $150.000 COP',
+            '5 días hábiles después de la entrega',
+            'Inscribe tu cuenta Bre-B',
+        ):
+            with self.subTest(texto=texto):
+                self.assertIn(texto, correo.body)
+        self.assertIn('Te damos la bienvenida', html)
+        self.assertIn('12.5 % de descuento', html)
+        self.assertIn('Ir a mi panel', html)
+
+    def test_la_bienvenida_usa_la_tasa_propia_del_afiliado_si_la_tiene(self):
+        perfil = self._postular()
+        PerfilAfiliado.objects.filter(pk=perfil.pk).update(commission_rate=Decimal('25.00'))
+        mail.outbox.clear()
+        self.client.force_login(self.admin)
+        with self.captureOnCommitCallbacks(execute=True):
+            self.client.post(reverse('admin_afiliado_approve', args=[perfil.pk]))
+        self.assertIn('Comisión por venta: 25 % del subtotal del pedido', mail.outbox[0].body)
 
     def test_rechazar_exige_motivo_lo_guarda_y_lo_envia(self):
         perfil = self._postular()
@@ -132,7 +171,7 @@ class BajaConPreavisoTests(AfiliadoTestBase):
         self.assertEqual(self.perfil.exit_effective_at - self.perfil.exit_requested_at, timedelta(days=15))
         self.assertTrue(get_usable_coupon(self.perfil.referral_code, user=self.comprador))
         self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('15 dias', mail.outbox[0].body)
+        self.assertIn('15 días', mail.outbox[0].body)
 
     def test_el_panel_muestra_la_baja_programada_y_deja_cancelarla(self):
         self.client.post(reverse('afiliado_quitar_suscripcion'))
@@ -272,7 +311,7 @@ class TerminacionPorGoToGymTests(AfiliadoTestBase):
         self.assertEqual(self.perfil.exit_notes, 'Uso del codigo en sitios de cupones')
         self.assertFalse(self.perfil.coupons.first().is_active)
         correo = mail.outbox[0]
-        self.assertIn('Terminamos tu participacion', correo.subject)
+        self.assertIn('Terminamos tu participación', correo.subject)
         self.assertIn('sitios de cupones', correo.body)
 
     def test_puede_anular_las_comisiones_sin_pagar_pero_no_las_pagadas(self):

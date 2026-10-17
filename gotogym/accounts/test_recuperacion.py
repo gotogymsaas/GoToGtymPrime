@@ -51,6 +51,17 @@ class RecuperarContrasenaTests(TestCase):
         self.assertTrue(self.usuario.check_password('Clave-Nueva-456'))
         self.assertFalse(self.usuario.check_password('clave-vieja-123'))
 
+    def test_el_correo_de_recuperacion_sale_con_diseno_y_el_mismo_enlace_que_el_texto(self):
+        self.client.post(reverse('password_reset'), {'email': 'olvido@example.com'})
+        correo = mail.outbox[0]
+        (html, tipo), = correo.alternatives
+        self.assertEqual(tipo, 'text/html')
+        self.assertIn('<!DOCTYPE html>', html)
+        self.assertIn('Restablece tu contraseña de GoToGym', html)
+        enlace = re.search(r'https?://[^\s]+/accounts/reset/[^\s]+', correo.body).group(0)
+        self.assertIn(f'href="{enlace}"', html)
+        self.assertIn('https://gotogym.store/static/', html)  # el logo lleva direccion absoluta
+
     def test_un_correo_desconocido_no_revela_si_existe_la_cuenta(self):
         respuesta = self.client.post(reverse('password_reset'), {'email': 'nadie@example.com'})
         self.assertRedirects(respuesta, reverse('password_reset_done'))

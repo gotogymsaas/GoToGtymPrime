@@ -1,0 +1,50 @@
+{% load i18n static %}{% get_current_language as LANGUAGE_CODE %}{% static 'images/logo-gotogym-symbol-transparent.png' as logo_ruta %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>{% block titulo_documento %}GoToGym{% endblock %}</title>
+<style>
+  /* El diseño completo va en linea (los clientes de correo ignoran casi toda
+     hoja de estilos). Esto solo ajusta pantallas estrechas. */
+  @media only screen and (max-width: 620px) {
+    .gtg-contenedor { width: 100% !important; }
+    .gtg-pad { padding-left: 20px !important; padding-right: 20px !important; }
+    .gtg-foto { width: 64px !important; height: auto !important; }
+    .gtg-titulo { font-size: 22px !important; }
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background-color:#f8f9fa;-webkit-text-size-adjust:100%;">
+{% block previa %}{% endblock %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f8f9fa" style="background-color:#f8f9fa;">
+<tr><td align="center" style="padding:24px 12px;">
+  <table role="presentation" class="gtg-contenedor" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;">
+
+    <tr><td class="gtg-pad" bgcolor="#101012" style="background-color:#101012;padding:20px 32px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+        <td style="vertical-align:middle;"><img src="{% if logo_ruta|slice:':4' == 'http' %}{{ logo_ruta }}{% else %}{{ sitio_url }}{{ logo_ruta }}{% endif %}" width="44" alt="GoToGym" style="display:block;width:44px;height:auto;border:0;outline:none;"></td>
+        <td style="vertical-align:middle;padding-left:14px;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:bold;letter-spacing:1px;color:#ffffff;">GoToGym</td>
+      </tr></table>
+    </td></tr>
+    <tr><td height="3" bgcolor="#0fbfb0" style="height:3px;line-height:3px;font-size:3px;background-color:#0fbfb0;">&nbsp;</td></tr>
+
+    <tr><td class="gtg-pad" bgcolor="#ffffff" style="background-color:#ffffff;padding:36px 32px 24px;font-family:Helvetica,Arial,sans-serif;color:#404045;">
+      {% block cuerpo %}{% endblock %}
+    </td></tr>
+
+    <tr><td class="gtg-pad" style="padding:22px 32px 8px;font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;color:#686870;">
+      <strong style="color:#101012;">{% trans "Equipo GoToGym" %}</strong><br>
+      <a href="mailto:support@gotogym.store" style="color:#00706a;text-decoration:none;">support@gotogym.store</a><br>
+      <a href="{{ sitio_url }}" style="color:#00706a;text-decoration:none;">{{ sitio_url|cut:"https://"|cut:"http://" }}</a>
+      {% block pie %}{% endblock %}
+    </td></tr>
+
+  </table>
+</td></tr>
+</table>
+</body>
+</html>

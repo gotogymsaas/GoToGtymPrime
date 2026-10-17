@@ -154,7 +154,7 @@ class GastosDeTransaccionTests(AfiliadoTestBase):
             )
         self.solicitud.refresh_from_db()
         self.assertEqual(self.solicitud.transaction_fee, Decimal('2000.00'))
-        self.assertIn('Gastos de transaccion: $2.000 COP', mail.outbox[0].body)
+        self.assertIn('Gastos de transacción: $2.000 COP', mail.outbox[0].body)
         self.assertIn('Total recibido', mail.outbox[0].body)
 
     def test_un_valor_de_gastos_invalido_no_paga(self):

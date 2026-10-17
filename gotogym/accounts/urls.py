@@ -12,6 +12,7 @@ recuperar_contrasena = rate_limit('password_reset', limit=5, period_seconds=600,
     auth_views.PasswordResetView.as_view(
         template_name='accounts/password_reset_form.html',
         email_template_name='accounts/password_reset_email.txt',
+        html_email_template_name='accounts/password_reset_email.html',
         subject_template_name='accounts/password_reset_subject.txt',
         extra_email_context={'sitio_url': settings.SITIO_URL},
     )

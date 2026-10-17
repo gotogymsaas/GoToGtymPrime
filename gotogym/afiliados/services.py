@@ -17,12 +17,12 @@ import re
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 
-from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import Count, DecimalField, ExpressionWrapper, F, Max, Sum
 from django.db.models.functions import TruncMonth, TruncYear
 from django.utils import timezone
 from django.utils.formats import date_format
+from gotogym.correo import Correo, datos, enviar_correo, parrafo
 from gotogym.tasks import enqueue
 from orders.models import Coupon, CouponDiscountType, Order, OrderStatus, PaymentStatus
 
@@ -713,31 +713,32 @@ def notify_commission_paid(solicitud_id):
     solicitud = WithdrawalRequest.objects.select_related('afiliado__user').get(pk=solicitud_id)
     usuario = solicitud.afiliado.user
     nombre = usuario.first_name or usuario.email
-    desglose = ''
+    bloques = [parrafo(
+        f'Te confirmamos que pagamos tu solicitud de comisión por ${cop(solicitud.amount)} COP, '
+        f'solicitada el {timezone.localtime(solicitud.requested_at):%d/%m/%Y}.'
+    )]
     if solicitud.recovery_amount or solicitud.transaction_fee:
-        lineas = []
+        filas = []
         if solicitud.recovery_amount:
-            lineas.append(f'Descontado por pedidos devueltos o reembolsados: ${cop(solicitud.recovery_amount)} COP (ya incluido en el monto).')
+            filas.append((
+                'Descontado por pedidos devueltos o reembolsados (ya incluido en el monto)',
+                f'${cop(solicitud.recovery_amount)} COP',
+            ))
         if solicitud.transaction_fee:
-            lineas.append(f'Gastos de transaccion: ${cop(solicitud.transaction_fee)} COP.')
-        lineas.append(f'Total recibido: ${cop(solicitud.net_paid)} COP.')
-        desglose = '\n'.join(lineas) + '\n\n'
-    cuerpo = (
-        f'Hola {nombre},\n\n'
-        f'Te confirmamos que pagamos tu solicitud de comision por ${cop(solicitud.amount)} COP, '
-        f'solicitada el {timezone.localtime(solicitud.requested_at):%d/%m/%Y}.\n\n'
-        f'{desglose}'
-        'Si tienes alguna duda sobre el pago, escribenos a support@gotogym.store.\n\n'
-        'Gracias por hacer parte del programa de afiliados de GoToGym.\n'
-        'Equipo GoToGym\n'
+            filas.append(('Gastos de transacción', f'${cop(solicitud.transaction_fee)} COP'))
+        filas.append(('Total recibido', f'${cop(solicitud.net_paid)} COP'))
+        bloques.append(datos(filas))
+    bloques += [
+        parrafo('Si tienes alguna duda sobre el pago, escríbenos a support@gotogym.store.'),
+        parrafo('Gracias por hacer parte del programa de afiliados de GoToGym.'),
+    ]
+    correo = Correo(
+        asunto='Tu comisión de GoToGym fue pagada', titulo='Tu comisión fue pagada', bloques=bloques,
+        kicker='Programa de afiliados', saludo=f'Hola {nombre},',
+        pie='Recibes este correo porque participas en el programa de afiliados de GoToGym.',
     )
     try:
-        send_mail(
-            subject='Tu comision de GoToGym fue pagada',
-            message=cuerpo,
-            from_email=None,
-            recipient_list=[usuario.email],
-        )
+        enviar_correo(usuario.email, correo)
     except Exception:
         logger.exception('No se pudo enviar el aviso de pago de comision (solicitud %s)', solicitud.pk)
 

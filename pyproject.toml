@@ -95,7 +95,7 @@ layers = [
     "tienda | inventory | analitica | blog",
     "products",
     # Utilidades compartidas: no pueden conocer ninguna app.
-    "gotogym.seo | gotogym.ratelimit | gotogym.tasks",
+    "gotogym.seo | gotogym.ratelimit | gotogym.tasks | gotogym.correo",
 ]
 ignore_imports = [
     # Pruebas que preparan datos de otra app. Son lecturas de apoyo, no una
@@ -127,7 +127,7 @@ ignore_imports = [
 [[tool.importlinter.contracts]]
 name = "Las utilidades compartidas de gotogym no conocen ninguna app"
 type = "forbidden"
-source_modules = ["gotogym.seo", "gotogym.ratelimit", "gotogym.tasks"]
+source_modules = ["gotogym.seo", "gotogym.ratelimit", "gotogym.tasks", "gotogym.correo"]
 forbidden_modules = [
     "accounts", "administracion", "analitica", "blog", "carrito", "contabilidad",
     "afiliados", "inventory", "orders", "payments", "products", "shipping", "tienda",

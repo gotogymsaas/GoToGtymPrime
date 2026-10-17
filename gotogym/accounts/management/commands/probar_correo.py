@@ -1,10 +1,12 @@
 """Envia un correo de prueba para comprobar que el SMTP configurado entrega.
 
 Uso: `python manage.py probar_correo tucorreo@dominio.com`. Si el backend
-activo es el de consola (no hay `EMAIL_HOST`), lo dice: el correo no sale."""
+activo es el de consola (no hay `EMAIL_HOST`), lo dice: el correo no sale.
+Sale con el diseño de marca de los correos reales, asi que sirve tambien para
+ver como se ve en la bandeja."""
 from django.conf import settings
-from django.core.mail import send_mail
 from django.core.management.base import BaseCommand, CommandError
+from gotogym.correo import Correo, aviso, boton, datos, enviar_correo, parrafo
 
 
 class Command(BaseCommand):
@@ -18,12 +20,22 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING(
                 f'Backend activo: {settings.EMAIL_BACKEND}. Sin EMAIL_HOST el correo no sale de este equipo.'
             ))
+        correo = Correo(
+            asunto='Prueba de correo de GoToGym', titulo='El correo de GoToGym funciona',
+            kicker='Prueba de correo', saludo='Hola,',
+            bloques=[
+                parrafo('Si lees esto, el correo de GoToGym está bien configurado.'),
+                datos([
+                    ('Remitente', settings.DEFAULT_FROM_EMAIL),
+                    ('Servidor', getattr(settings, 'EMAIL_HOST', '') or 'consola (no sale)'),
+                ]),
+                aviso('Los correos de pedidos y de la cuenta salen con este mismo diseño.'),
+                boton('Ir a la tienda', settings.SITIO_URL),
+            ],
+            pie='Recibes este correo porque pediste una prueba de envío.',
+        )
         try:
-            enviados = send_mail(
-                'Prueba de correo de GoToGym',
-                'Si lees esto, el correo de GoToGym está bien configurado.',
-                None, [options['destinatario']],
-            )
+            enviados = enviar_correo(options['destinatario'], correo)
         except Exception as error:
             raise CommandError(f'No se pudo enviar el correo: {error}') from error
         self.stdout.write(self.style.SUCCESS(f'Correos enviados: {enviados} (remitente {settings.DEFAULT_FROM_EMAIL})'))

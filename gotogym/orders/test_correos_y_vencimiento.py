@@ -9,6 +9,7 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone, translation
 from payments.models import PaymentTransaction
+from products.models import Product
 
 from .models import Coupon, Order, OrderStatus, PaymentStatus
 from .services import (
@@ -47,6 +48,69 @@ class CorreosDelPedidoTests(ConfirmPaymentBaseTestCase):
         self.assertEqual(mail.outbox[0].subject, f'We received your order {pedido.order_number}')
         self.assertIn('pending payment', mail.outbox[0].body)
         self.assertIn('within 48 hours', mail.outbox[0].body)
+
+    def _html_del_correo(self, correo):
+        (contenido, tipo), = correo.alternatives
+        self.assertEqual(tipo, 'text/html')
+        return contenido
+
+    def test_el_correo_de_pedido_sale_con_diseno_y_la_foto_del_producto(self):
+        Product.objects.filter(pk=self.producto.pk).update(image='products/foto-de-prueba.png')
+        with self.captureOnCommitCallbacks(execute=True):
+            pedido = create_order_from_cart(self.usuario, {str(self.variante.pk): 1}, DATOS)
+        html = self._html_del_correo(mail.outbox[0])
+        self.assertIn(pedido.order_number, html)
+        self.assertIn('Producto confirm', html)
+        self.assertIn('src="https://gotogym.store/media/products/foto-de-prueba.png"', html)
+        self.assertIn('Ver mi pedido', html)
+        self.assertIn('lang="es"', html)
+
+    def test_sin_foto_el_correo_sale_igual_y_sin_imagen_rota(self):
+        with self.captureOnCommitCallbacks(execute=True):
+            create_order_from_cart(self.usuario, {str(self.variante.pk): 1}, DATOS)
+        html = self._html_del_correo(mail.outbox[0])
+        self.assertNotIn('class="gtg-foto"', html)
+        self.assertIn('Producto confirm', html)
+
+    def test_si_la_foto_no_se_puede_resolver_el_correo_sale_igual(self):
+        from unittest.mock import patch
+
+        with patch('orders.correos.url_imagen_producto', side_effect=RuntimeError('almacenamiento caido')):
+            with self.captureOnCommitCallbacks(execute=True):
+                create_order_from_cart(self.usuario, {str(self.variante.pk): 1}, DATOS)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_el_correo_en_ingles_traduce_el_diseno(self):
+        with translation.override('en'):
+            with self.captureOnCommitCallbacks(execute=True):
+                create_order_from_cart(self.usuario, {str(self.variante.pk): 1}, DATOS)
+        html = self._html_del_correo(mail.outbox[0])
+        self.assertIn('lang="en"', html)
+        self.assertIn('We received your order', html)
+        self.assertIn('View my order', html)
+        self.assertIn('You are receiving this email because you placed an order at GoToGym.', html)
+        self.assertNotIn('Recibimos', html)
+
+    def test_el_correo_de_envio_muestra_transportadora_y_guia(self):
+        pedido = self._crear_pedido(1)
+        with self.captureOnCommitCallbacks(execute=True):
+            confirm_payment(pedido, _FakeTransaction('approved'))
+        set_tracking_code(pedido, 'GUIA12345')
+        mail.outbox.clear()
+        with self.captureOnCommitCallbacks(execute=True):
+            apply_order_status_transition(pedido, OrderStatus.SHIPPED)
+        html = self._html_del_correo(mail.outbox[0])
+        self.assertIn('GUIA12345', html)
+        self.assertIn('Transportadora', mail.outbox[0].body)
+        self.assertIn('GUIA12345', mail.outbox[0].body)
+
+    def test_la_cancelacion_remite_a_soporte_y_no_a_responder(self):
+        pedido = self._crear_pedido(1)
+        with self.captureOnCommitCallbacks(execute=True):
+            apply_order_status_transition(pedido, OrderStatus.CANCELLED)
+        cuerpo = mail.outbox[-1].body
+        self.assertIn('support@gotogym.store', cuerpo)
+        self.assertNotIn('responde a este correo', cuerpo)
 
     def test_un_pedido_que_no_se_crea_no_envia_aviso(self):
         with self.captureOnCommitCallbacks(execute=True):
@@ -108,7 +172,7 @@ class CorreosDelPedidoTests(ConfirmPaymentBaseTestCase):
         from unittest.mock import patch
 
         pedido = self._crear_pedido(1)
-        with patch('orders.correos.send_mail', side_effect=OSError('smtp caido')):
+        with patch('orders.correos.enviar_correo', side_effect=OSError('smtp caido')):
             with self.captureOnCommitCallbacks(execute=True):
                 confirm_payment(pedido, _FakeTransaction('approved'))
         pedido.refresh_from_db()

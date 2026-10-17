@@ -1,0 +1,69 @@
+{% extends "correo/base.html" %}
+{% block titulo_documento %}{{ correo.asunto }}{% endblock %}
+
+{% block previa %}{% if previa %}<div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;font-size:1px;line-height:1px;color:#f8f9fa;">{{ previa }}</div>{% endif %}{% endblock %}
+
+{% block cuerpo %}
+{% include "correo/_titulo.html" with kicker=correo.kicker titulo=correo.titulo %}
+{% if correo.saludo %}<p style="margin:0 0 16px;font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:26px;color:#101012;">{{ correo.saludo }}</p>{% endif %}
+
+{% for bloque in correo.bloques %}{% if bloque.tipo == 'parrafo' %}
+<p style="margin:0 0 16px;font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:26px;color:#404045;">{{ bloque.texto|linebreaksbr }}</p>
+
+{% elif bloque.tipo == 'aviso' %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 20px;"><tr>
+  <td width="4" bgcolor="#0fbfb0" style="width:4px;background-color:#0fbfb0;">&nbsp;</td>
+  <td bgcolor="#f8f9fa" style="background-color:#f8f9fa;padding:14px 18px;font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:24px;color:#101012;">{{ bloque.texto|linebreaksbr }}</td>
+</tr></table>
+
+{% elif bloque.tipo == 'productos' %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 8px;">
+{% for linea in bloque.lineas %}
+  <tr>
+    {% if linea.imagen %}<td width="84" valign="top" style="width:84px;padding:14px 16px 14px 0;border-top:1px solid #e0e3e6;"><img class="gtg-foto" src="{{ linea.imagen }}" width="72" alt="{{ linea.nombre }}" style="display:block;width:72px;height:auto;border:0;background-color:#f8f9fa;"></td>{% endif %}
+    <td valign="top" style="padding:14px 0;border-top:1px solid #e0e3e6;font-family:Helvetica,Arial,sans-serif;">
+      <p style="margin:0 0 4px;font-size:16px;line-height:22px;font-weight:bold;color:#101012;">{{ linea.nombre }}</p>
+      <p style="margin:0;font-size:14px;line-height:20px;color:#686870;">{{ linea.detalle }} &middot; x{{ linea.cantidad }}</p>
+    </td>
+    <td valign="top" align="right" style="padding:14px 0 14px 12px;border-top:1px solid #e0e3e6;font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:22px;font-weight:bold;color:#101012;white-space:nowrap;">{{ linea.total }}</td>
+  </tr>
+{% endfor %}
+</table>
+
+{% elif bloque.tipo == 'totales' %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px;border-top:1px solid #e0e3e6;">
+{% for fila in bloque.filas %}
+  <tr>
+    <td style="padding:{% if fila.destacada %}14px 0 0{% else %}10px 0 0{% endif %};font-family:Helvetica,Arial,sans-serif;font-size:{% if fila.destacada %}18px{% else %}15px{% endif %};line-height:24px;{% if fila.destacada %}font-weight:bold;color:#17375c;{% else %}color:#686870;{% endif %}">{{ fila.etiqueta }}</td>
+    <td align="right" style="padding:{% if fila.destacada %}14px 0 0{% else %}10px 0 0{% endif %};font-family:Helvetica,Arial,sans-serif;font-size:{% if fila.destacada %}18px{% else %}15px{% endif %};line-height:24px;white-space:nowrap;{% if fila.destacada %}font-weight:bold;color:#17375c;{% else %}color:#404045;{% endif %}">{{ fila.valor }}</td>
+  </tr>
+{% endfor %}
+</table>
+
+{% elif bloque.tipo == 'datos' %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f8f9fa" style="margin:4px 0 20px;background-color:#f8f9fa;"><tr><td style="padding:6px 18px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+  {% for fila in bloque.filas %}
+    {% if fila.valor|length < 26 %}
+    <tr>
+      <td valign="top" style="padding:10px 12px 10px 0;{% if not forloop.first %}border-top:1px solid #e0e3e6;{% endif %}font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;letter-spacing:1px;text-transform:uppercase;color:#686870;">{{ fila.etiqueta }}</td>
+      <td valign="top" align="right" style="padding:10px 0;{% if not forloop.first %}border-top:1px solid #e0e3e6;{% endif %}font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:20px;font-weight:bold;color:#101012;white-space:nowrap;">{{ fila.valor }}</td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="2" valign="top" style="padding:10px 0;{% if not forloop.first %}border-top:1px solid #e0e3e6;{% endif %}font-family:Helvetica,Arial,sans-serif;">
+        <span style="display:block;font-size:13px;line-height:20px;letter-spacing:1px;text-transform:uppercase;color:#686870;">{{ fila.etiqueta }}</span>
+        <span style="display:block;padding-top:2px;font-size:15px;line-height:22px;font-weight:bold;color:#101012;word-wrap:break-word;overflow-wrap:anywhere;">{{ fila.valor }}</span>
+      </td>
+    </tr>
+    {% endif %}
+  {% endfor %}
+  </table>
+</td></tr></table>
+
+{% elif bloque.tipo == 'boton' %}
+{% include "correo/_boton.html" with texto=bloque.texto url=bloque.url %}
+{% endif %}{% endfor %}
+{% endblock %}
+
+{% block pie %}{% if correo.pie %}<br><br><span style="font-size:12px;line-height:18px;">{{ correo.pie }}</span>{% endif %}{% endblock %}
