@@ -64,7 +64,7 @@ class MontoMinimoError(Exception):
     def __init__(self, minimo, disponible):
         self.minimo = minimo
         self.disponible = disponible
-        super().__init__(f'El minimo para solicitar un pago es ${minimo}; tienes ${disponible}.')
+        super().__init__(f'El mínimo para solicitar un pago es ${minimo}; tienes ${disponible}.')
 
 
 def get_commission_rate(profile):
@@ -141,12 +141,12 @@ def razon_de_revision(order, profile):
     telefono = _digitos(order.phone)[-10:]
     telefonos = {_digitos(profile.phone)[-10:], _digitos(getattr(usuario, 'phone', ''))[-10:]} - {''}
     if len(telefono) >= 7 and telefono in telefonos:
-        razones.append('el telefono del pedido es el del afiliado')
+        razones.append('el teléfono del pedido es el del afiliado')
 
     direccion = getattr(order, 'address', None)
     linea = _normalizado(getattr(direccion, 'address_line', ''))
     if len(linea) >= 8 and linea in _normalizado(profile.address):
-        razones.append('la direccion de entrega es la del afiliado')
+        razones.append('la dirección de entrega es la del afiliado')
     return '; '.join(razones).capitalize() if razones else ''
 
 
@@ -216,7 +216,7 @@ def confirmar_comisiones_vencidas(afiliado=None, ahora=None):
     confirmadas = 0
     for comision in vencidas:
         if comision.order.order_status in ESTADOS_DE_PEDIDO_NO_VALIDOS or pedido_reembolsado(comision.order):
-            _anular(comision, 'El pedido se cancelo, devolvio o reembolso.')
+            _anular(comision, 'El pedido se canceló, devolvió o reembolso.')
         else:
             comision.status = CommissionStatus.APPROVED
             comision.save(update_fields=['status', 'updated_at'])
@@ -255,7 +255,7 @@ def _anular(comision, motivo='', usuario=None):
     return True
 
 
-def revert_order_commission(order, motivo='El pedido se cancelo, devolvio o reembolso.'):
+def revert_order_commission(order, motivo='El pedido se canceló, devolvió o reembolso.'):
     """Revierte la comision si el pedido se cancela, se devuelve o se
     reembolsa."""
     try:
@@ -271,7 +271,7 @@ def anular_comision(comision, motivo, usuario):
     """Anulacion manual (fraude, error de seguimiento). Exige motivo."""
     motivo = (motivo or '').strip()
     if not motivo:
-        raise ValueError('Indica el motivo de la anulacion.')
+        raise ValueError('Indica el motivo de la anulación.')
     anulada = _anular(comision, motivo, usuario)
     if anulada:
         recompute_profile_totals(comision.afiliado)
@@ -281,7 +281,7 @@ def anular_comision(comision, motivo, usuario):
 def liberar_revision(comision, usuario, nota=''):
     """El equipo reviso la comision marcada y la deja seguir su curso."""
     comision.needs_review = False
-    comision.adjustment_reason = (nota or 'Revision resuelta.')[:255]
+    comision.adjustment_reason = (nota or 'Revisión resuelta.')[:255]
     comision.adjusted_by = usuario
     comision.adjusted_at = timezone.now()
     comision.save(update_fields=['needs_review', 'adjustment_reason', 'adjusted_by', 'adjusted_at', 'updated_at'])
@@ -292,13 +292,13 @@ def extender_validacion(comision, hasta, motivo, usuario):
     `hasta` y avisa al afiliado."""
     motivo = (motivo or '').strip()
     if not motivo:
-        raise ValueError('Indica el motivo de la extension.')
+        raise ValueError('Indica el motivo de la extensión.')
     if comision.status != CommissionStatus.PENDING:
-        raise ValueError('Solo se puede extender una comision pendiente.')
+        raise ValueError('Solo se puede extender una comisión pendiente.')
     limite = timezone.make_aware(datetime.combine(hasta + timedelta(days=1), time.min))
     actual = comision.confirmation_date
     if actual is not None and limite <= actual:
-        raise ValueError('La nueva fecha debe ser posterior a la fecha de confirmacion actual.')
+        raise ValueError('La nueva fecha debe ser posterior a la fecha de confirmación actual.')
     comision.extended_until = limite
     comision.extension_reason = motivo[:255]
     comision.adjusted_by = usuario
@@ -405,7 +405,7 @@ def deactivate_afiliado(profile, motivo='', notas='', anular_comisiones=False, u
     profile.user.save(update_fields=['es_afiliado'])
 
     if anular_comisiones:
-        texto = f'Anulada por la terminacion del afiliado: {profile.exit_notes or profile.get_exit_reason_display()}'
+        texto = f'Anulada por la terminación del afiliado: {profile.exit_notes or profile.get_exit_reason_display()}'
         for comision in profile.commissions.filter(
             status__in=(CommissionStatus.PENDING, CommissionStatus.APPROVED),
         ).select_related('withdrawal_request'):
@@ -566,7 +566,7 @@ def resolve_withdrawal(solicitud, aprobar, resolver, transaction_fee=Decimal('0.
     if aprobar:
         transaction_fee = Decimal(transaction_fee or 0).quantize(Decimal('0.01'))
         if transaction_fee < 0 or transaction_fee > solicitud.amount:
-            raise ValueError('Los gastos de transaccion deben estar entre 0 y el monto de la solicitud.')
+            raise ValueError('Los gastos de transacción deben estar entre 0 y el monto de la solicitud.')
         solicitud.status = WithdrawalStatus.PAID
         solicitud.transaction_fee = transaction_fee
         solicitud.commissions.filter(status=CommissionStatus.APPROVED).update(status=CommissionStatus.PAID)
@@ -740,7 +740,7 @@ def notify_commission_paid(solicitud_id):
     try:
         enviar_correo(usuario.email, correo)
     except Exception:
-        logger.exception('No se pudo enviar el aviso de pago de comision (solicitud %s)', solicitud.pk)
+        logger.exception('No se pudo enviar el aviso de pago de comisión (solicitud %s)', solicitud.pk)
 
 
 # --- Avisos a los afiliados ---------------------------------------------------

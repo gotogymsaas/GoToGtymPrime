@@ -22,7 +22,7 @@ from products.models import Brand, Product, ProductCategory, ProductVariant
 
 PERMITIDO = re.compile(
     r'Español|Bogotá|Medellín|Atlántico|Bolívar|Boyacá|Caquetá|Chocó|Córdoba|Guainía|Nariño|Quindío|Vaupés|'
-    r'San Andrés y Providencia|Guatapé|Inírida|Maní|Bogota D\.C\.|Friends N Gifts|Banco de la República'
+    r'San Andrés y Providencia|Guatapé|Inírida|Maní|Bogota D\.C\.|Friends N Gifts|Banco de la República|GoToGym Envíos'
 )
 ACENTOS = re.compile(r'[áéíóúñ¿¡ÁÉÍÓÚÑ]')
 # Palabras que en ingles no existen: dos o mas en un mismo texto delatan espanol.

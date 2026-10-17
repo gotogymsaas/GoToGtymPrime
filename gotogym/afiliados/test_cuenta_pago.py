@@ -50,7 +50,7 @@ class InscribirCuentaTests(AfiliadoTestBase):
     def test_el_formulario_trae_el_desplegable_de_tipos_de_documento(self):
         respuesta = self.client.get(self.url)
         self.assertContains(respuesta, '<select name="document_type"')
-        for etiqueta in ('Cedula de ciudadania', 'Cedula de extranjeria', 'NIT', 'Pasaporte'):
+        for etiqueta in ('Cédula de ciudadanía', 'Cédula de extranjería', 'NIT', 'Pasaporte'):
             self.assertContains(respuesta, etiqueta)
         self.assertContains(respuesta, 'name="document_number"')
 
@@ -180,13 +180,13 @@ class VistaAdminCuentaTests(AfiliadoTestBase):
         self.url = reverse('admin_afiliado_detail', args=[self.perfil.pk])
 
     def test_sin_cuenta_el_admin_lo_ve_indicado(self):
-        self.assertContains(self.client.get(self.url), 'todavia no inscribe su cuenta Bre-B')
+        self.assertContains(self.client.get(self.url), 'todavía no inscribe su cuenta Bre-B')
 
     def test_con_cuenta_el_admin_ve_titular_documento_y_llave(self):
         self._inscribir_cuenta(self.perfil)
         respuesta = self.client.get(self.url)
         self.assertContains(respuesta, 'Ana Perez')
-        self.assertContains(respuesta, 'Cedula de ciudadania')
+        self.assertContains(respuesta, 'Cédula de ciudadanía')
         self.assertContains(respuesta, '1020304050')
         self.assertContains(respuesta, '3001234567')
 

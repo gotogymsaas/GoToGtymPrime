@@ -28,5 +28,5 @@ class Command(BaseCommand):
                         f'{modelo._meta.label}.{restriccion.name}: {filas} fila(s) no cumplen'
                     ))
         if incumplimientos:
-            raise CommandError(f'{incumplimientos} fila(s) incumplen restricciones. Corrigelas antes de migrar.')
+            raise CommandError(f'{incumplimientos} fila(s) incumplen restricciones. Corrígelas antes de migrar.')
         self.stdout.write(self.style.SUCCESS(f'{revisadas} restricciones revisadas: todas las filas las cumplen.'))

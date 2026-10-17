@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" href="{% static 'images/logo-gotogym-symbol-transparent.png' %}">
   <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261014-turquesa">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
-  <link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261014-periodo">
+  <link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261017-responsive">
 </head>
 <body class="panel-shell">
   <aside class="sidebar">
@@ -20,17 +20,17 @@
       </a>
       <button class="sidebar-toggle" type="button" aria-expanded="false" aria-controls="panel-nav">
         <span class="sidebar-toggle__bars" aria-hidden="true"></span>
-        <span class="sidebar-toggle__label">Menu</span>
+        <span class="sidebar-toggle__label">Menú</span>
       </button>
     </div>
     <nav id="panel-nav" aria-label="Secciones del panel">
       <a class="panel-nav__link" href="{% url 'admin_dashboard' %}">{% include "administracion/_nav_icon.html" with name="panel" %}<span>Panel</span></a>
-      <a class="panel-nav__link" href="{% url 'admin_analytics' %}">{% include "administracion/_nav_icon.html" with name="analitica" %}<span>Analitica</span></a>
+      <a class="panel-nav__link" href="{% url 'admin_analytics' %}">{% include "administracion/_nav_icon.html" with name="analitica" %}<span>Analítica</span></a>
       <a class="panel-nav__link" href="{% url 'admin_products' %}">{% include "administracion/_nav_icon.html" with name="productos" %}<span>Productos</span></a>
       <a class="panel-nav__link" href="{% url 'admin_coupons' %}">{% include "administracion/_nav_icon.html" with name="cupones" %}<span>Cupones y descuentos</span></a>
       <a class="panel-nav__link" href="{% url 'admin_orders' %}">{% include "administracion/_nav_icon.html" with name="pedidos" %}<span>Pedidos y pagos</span></a>
       <a class="panel-nav__link" href="{% url 'admin_afiliados' %}">{% include "administracion/_nav_icon.html" with name="afiliados" %}<span>Afiliados</span></a>
-      <a class="panel-nav__link" href="{% url 'admin_catalogs' %}">{% include "administracion/_nav_icon.html" with name="catalogos" %}<span>Catalogos y etiquetas</span></a>
+      <a class="panel-nav__link" href="{% url 'admin_catalogs' %}">{% include "administracion/_nav_icon.html" with name="catalogos" %}<span>Catálogos y etiquetas</span></a>
       <a class="panel-nav__link" href="{% url 'admin_users' %}">{% include "administracion/_nav_icon.html" with name="usuarios" %}<span>Usuarios y roles</span></a>
     </nav>
   </aside>
@@ -44,7 +44,7 @@
         <a class="ghost btn-sm" href="{% url 'tienda:producto_list' %}">Salir del panel</a>
         <form method="post" action="{% url 'logout' %}">
           {% csrf_token %}
-          <button class="ghost btn-sm" type="submit">Cerrar sesion</button>
+          <button class="ghost btn-sm" type="submit">Cerrar sesión</button>
         </form>
       </div>
     </header>

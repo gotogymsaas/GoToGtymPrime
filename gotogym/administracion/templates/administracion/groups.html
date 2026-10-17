@@ -9,7 +9,7 @@
   <a class="button" href="{% url 'admin_group_new' %}">Crear grupo</a>
   {% endif %}
 </section>
-<p class="hint">Un Grupo le da a un usuario staff acceso solo a las secciones cubiertas por sus permisos, sin necesidad de hacerlo Administrador. Asignalo desde "Usuarios y roles".</p>
+<p class="hint">Un Grupo le da a un usuario staff acceso solo a las secciones cubiertas por sus permisos, sin necesidad de hacerlo Administrador. Asígnalo desde "Usuarios y roles".</p>
 <div class="panel">
   <table>
     <thead><tr><th>Nombre</th><th>Permisos</th><th><span class="sr-only">Acciones</span></th></tr></thead>
@@ -25,14 +25,14 @@
         <td class="actions">
           {% if perms.auth.change_group %}<a class="ghost btn-sm" href="{% url 'admin_group_edit' group.pk %}">Editar</a>{% endif %}
           {% if perms.auth.delete_group %}
-          <form method="post" action="{% url 'admin_group_delete' group.pk %}" onsubmit="return confirm('¿Eliminar el grupo {{ group.name|escapejs }}? Los usuarios asignados perderan estos permisos.');">
+          <form method="post" action="{% url 'admin_group_delete' group.pk %}" onsubmit="return confirm('¿Eliminar el grupo {{ group.name|escapejs }}? Los usuarios asignados perderán estos permisos.');">
             {% csrf_token %}
             <button class="button btn-sm product-delete-button" type="submit">Eliminar</button>
           </form>
           {% endif %}
         </td>
       </tr>
-      {% empty %}<tr><td colspan="3">No hay grupos creados todavia.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="3">No hay grupos creados todavía.</td></tr>{% endfor %}
     </tbody>
   </table>
 </div>

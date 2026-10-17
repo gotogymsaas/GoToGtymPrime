@@ -6,9 +6,9 @@ from orders.models import Order
 class ShippingStatus(models.TextChoices):
     PENDING = 'pending', gettext_lazy('Pendiente')
     SHIPPED = 'shipped', gettext_lazy('Enviado')
-    IN_TRANSIT = 'in_transit', gettext_lazy('En transito')
+    IN_TRANSIT = 'in_transit', gettext_lazy('En tránsito')
     DELIVERED = 'delivered', gettext_lazy('Entregado')
-    RETURNED = 'returned', gettext_lazy('Devolucion')
+    RETURNED = 'returned', gettext_lazy('Devolución')
     CANCELLED = 'cancelled', gettext_lazy('Cancelado')
 
 

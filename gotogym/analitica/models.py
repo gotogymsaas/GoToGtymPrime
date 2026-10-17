@@ -22,8 +22,8 @@ class EventoAnalitica(models.Model):
     creado = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:
-        verbose_name = 'evento de analitica'
-        verbose_name_plural = 'eventos de analitica'
+        verbose_name = 'evento de analítica'
+        verbose_name_plural = 'eventos de analítica'
         ordering = ('-creado',)
         indexes = [
             models.Index(fields=['nombre', 'creado']),

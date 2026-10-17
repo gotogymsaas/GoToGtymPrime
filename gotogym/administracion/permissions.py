@@ -143,7 +143,7 @@ def require_perms(*perms):
         @wraps(view_func)
         def wrapped(request, *args, **kwargs):
             if not any(request.user.has_perm(perm) for perm in perms):
-                messages.error(request, "No tienes permisos para esta accion.")
+                messages.error(request, "No tienes permisos para esta acción.")
                 return redirect('admin_dashboard')
             return view_func(request, *args, **kwargs)
         return wrapped

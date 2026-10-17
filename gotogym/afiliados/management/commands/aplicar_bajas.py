@@ -9,7 +9,7 @@ from afiliados.services import aplicar_bajas_vencidas
 
 
 class Command(BaseCommand):
-    help = 'Aplica las bajas de afiliados cuyo preaviso vencio.'
+    help = 'Aplica las bajas de afiliados cuyo preaviso venció.'
 
     def handle(self, *args, **options):
         self.stdout.write(f'Bajas aplicadas: {aplicar_bajas_vencidas()}')

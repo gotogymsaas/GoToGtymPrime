@@ -2,7 +2,7 @@
 {% load static i18n %}
 {% block title %}{% trans "Mi cuenta" %} | GoToGym{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261014-cookies">{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261017-responsive">{% endblock %}
 {% block content %}
 <div class="editorial-page">
   <header class="editorial-hero editorial-hero--compact"><div class="editorial-shell"><p class="editorial-kicker">{% trans "Tu cuenta" %}</p><h1 class="editorial-title">{% trans "Tu información," %}<br><em>{% trans "a tu manera." %}</em></h1></div></header>
@@ -14,7 +14,7 @@
         <div class="account-field"><label for="id_last_name">{% trans "Apellido" %}</label><input type="text" name="last_name" id="id_last_name" value="{{ user.last_name|default:'' }}" required></div>
         <div class="account-field account-field--full"><label for="id_email">{% trans "Email" %}</label><input type="email" name="email" id="id_email" value="{{ user.email }}" required></div>
         <div class="account-field"><label for="id_age">{% trans "Edad" %}</label><input type="number" name="age" id="id_age" value="{{ user.age|default:'' }}" min="10" max="120"></div>
-        <div class="account-field"><label for="id_phone">{% trans "Telefono" %}</label><input type="tel" name="phone" id="id_phone" value="{{ user.phone|default:'' }}"></div>
+        <div class="account-field"><label for="id_phone">{% trans "Teléfono" %}</label><input type="tel" name="phone" id="id_phone" value="{{ user.phone|default:'' }}"></div>
       </div></div>
       <aside class="account-panel"><p class="editorial-kicker">{% trans "Protección" %}</p><h2>{% trans "Seguridad" %}</h2><details class="account-security"><summary>{% trans "Cambiar contraseña" %}</summary><div class="account-fields">
         <div class="account-field account-field--full"><label for="id_current_password">{% trans "Contraseña actual" %}</label><input type="password" name="current_password" id="id_current_password" autocomplete="current-password"></div>
@@ -30,7 +30,7 @@
         <h2>{% trans "Mis direcciones" %}</h2>
 
         {% if direcciones_formularios %}
-        <p class="account-address-hint">{% trans "Elige cual usar por defecto en tus pedidos:" %}</p>
+        <p class="account-address-hint">{% trans "Elige cuál usar por defecto en tus pedidos:" %}</p>
         <ul class="account-address-list">
           {% for item in direcciones_formularios %}
           <li>
@@ -47,7 +47,7 @@
             <form id="form-predeterminada-{{ item.direccion.pk }}" method="post" action="{% url 'address_set_default' item.direccion.pk %}">{% csrf_token %}</form>
 
             <details class="account-security">
-              <summary>{% trans "Editar direccion" %}</summary>
+              <summary>{% trans "Editar dirección" %}</summary>
               <form method="post" action="{% url 'address_edit' item.direccion.pk %}" class="account-fields" data-address-form>
                 {% csrf_token %}
                 {% for field in item.form %}
@@ -67,12 +67,12 @@
                 {% endif %}
                 {% endfor %}
                 <div class="account-actions account-field--full">
-                  <button type="submit" class="editorial-action">{% trans "Guardar direccion" %}</button>
+                  <button type="submit" class="editorial-action">{% trans "Guardar dirección" %}</button>
                 </div>
               </form>
             </details>
             <div class="account-actions">
-              <form method="post" action="{% url 'address_delete' item.direccion.pk %}" onsubmit="return confirm('{% trans "¿Eliminar esta direccion?" %}');">
+              <form method="post" action="{% url 'address_delete' item.direccion.pk %}" onsubmit="return confirm('{% trans "¿Eliminar esta dirección?" %}');">
                 {% csrf_token %}
                 <button type="submit" class="editorial-text-link" style="background:none;border:none;cursor:pointer;">{% trans "Eliminar" %}</button>
               </form>
@@ -81,11 +81,11 @@
           {% endfor %}
         </ul>
         {% else %}
-        <p>{% trans "Todavia no tienes direcciones guardadas." %}</p>
+        <p>{% trans "Todavía no tienes direcciones guardadas." %}</p>
         {% endif %}
 
         <details class="account-security">
-          <summary>{% trans "Agregar direccion" %}</summary>
+          <summary>{% trans "Agregar dirección" %}</summary>
           <form method="post" action="{% url 'address_new' %}" class="account-fields" data-address-form>
             {% csrf_token %}
             {% for field in address_form %}
@@ -105,7 +105,7 @@
             {% endif %}
             {% endfor %}
             <div class="account-actions account-field--full">
-              <button type="submit" class="editorial-action">{% trans "Guardar direccion" %}</button>
+              <button type="submit" class="editorial-action">{% trans "Guardar dirección" %}</button>
             </div>
           </form>
         </details>

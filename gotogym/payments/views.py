@@ -122,7 +122,7 @@ def mercadopago_webhook(request):
     """
     secret = getattr(settings, 'MERCADOPAGO_WEBHOOK_SECRET', '')
     if not verify_signature(request, secret):
-        return HttpResponseForbidden('Firma invalida o ausente.')
+        return HttpResponseForbidden('Firma inválida o ausente.')
 
     try:
         payload = json.loads(request.body or b'{}')

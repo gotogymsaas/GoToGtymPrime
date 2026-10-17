@@ -3,7 +3,7 @@
 {% block content %}
 <section class="page-head">
   <div>
-    <p class="eyebrow">Catalogo comercial</p>
+    <p class="eyebrow">Catálogo comercial</p>
     <h1>Productos</h1>
   </div>
   {% if perms.products.add_product %}<a class="button" href="{% url 'admin_product_new' %}">Crear producto</a>{% endif %}
@@ -27,7 +27,7 @@
 </form>
 <div class="panel">
   <table>
-    <thead><tr><th>Imagen</th><th>Producto</th><th>Categoria</th><th>Etiquetas</th><th>Precio</th><th>Stock</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
+    <thead><tr><th>Imagen</th><th>Producto</th><th>Categoría</th><th>Etiquetas</th><th>Precio</th><th>Stock</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
     <tbody>
       {% for product in page_obj %}
       <tr>
@@ -55,7 +55,7 @@
         <td class="actions">
           {% if perms.products.change_product %}<a class="ghost btn-sm" href="{% url 'admin_product_edit' product.pk %}">Editar</a>{% endif %}
           {% if perms.products.delete_product %}
-          <form method="post" action="{% url 'admin_product_delete' product.pk %}" onsubmit="return confirm('¿Eliminar {{ product.name|escapejs }} del catalogo? Esta accion no se puede deshacer.');">
+          <form method="post" action="{% url 'admin_product_delete' product.pk %}" onsubmit="return confirm('¿Eliminar {{ product.name|escapejs }} del catálogo? Esta acción no se puede deshacer.');">
             {% csrf_token %}<button class="button btn-sm product-delete-button" type="submit">Eliminar</button>
           </form>
           {% endif %}

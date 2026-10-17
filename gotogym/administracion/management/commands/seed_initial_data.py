@@ -3,7 +3,7 @@ from products.models import Brand, ProductCategory
 
 
 class Command(BaseCommand):
-    help = "Crea la marca y categorias iniciales de GoToGym para el panel administrador."
+    help = "Crea la marca y categorías iniciales de GoToGym para el panel administrador."
 
     categories = [
         "Conjuntos para dama",
@@ -31,12 +31,12 @@ class Command(BaseCommand):
             )
             if created:
                 created_count += 1
-                self.stdout.write(self.style.SUCCESS(f"Categoria creada: {category_name}"))
+                self.stdout.write(self.style.SUCCESS(f"Categoría creada: {category_name}"))
             else:
-                self.stdout.write(f"Categoria existente: {category_name}")
+                self.stdout.write(f"Categoría existente: {category_name}")
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Datos iniciales listos. Categorias nuevas: {created_count}. Marca activa: {brand.name}."
+                f"Datos iniciales listos. Categorías nuevas: {created_count}. Marca activa: {brand.name}."
             )
         )

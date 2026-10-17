@@ -313,7 +313,7 @@ def address_edit(request, pk=None):
             if es_nueva and not request.user.addresses.exists():
                 nueva.is_default = True
             nueva.save()
-            messages.success(request, gettext('Direccion guardada.'))
+            messages.success(request, gettext('Dirección guardada.'))
             return redirect('edit_profile')
     else:
         form = CustomerAddressForm(instance=direccion)
@@ -332,7 +332,7 @@ def address_delete(request, pk):
     direccion = get_object_or_404(CustomerAddress, pk=pk, user=request.user)
     if request.method == 'POST':
         direccion.delete()
-        messages.success(request, gettext('Direccion eliminada.'))
+        messages.success(request, gettext('Dirección eliminada.'))
     return redirect('edit_profile')
 
 
@@ -343,5 +343,5 @@ def address_set_default(request, pk):
         request.user.addresses.exclude(pk=direccion.pk).update(is_default=False)
         direccion.is_default = True
         direccion.save(update_fields=['is_default'])
-        messages.success(request, gettext('Direccion marcada como predeterminada.'))
+        messages.success(request, gettext('Dirección marcada como predeterminada.'))
     return redirect('edit_profile')

@@ -200,7 +200,7 @@ def suscribete(request):
 
     if not necesita_postularse:
         if profile.status == EstadoAfiliado.PENDING:
-            messages.info(request, gettext('Tu solicitud ya esta en revision.'))
+            messages.info(request, gettext('Tu solicitud ya está en revisión.'))
         else:
             messages.info(request, gettext('Ya eres afiliado.'))
         return redirect('afiliado_dashboard')
@@ -227,7 +227,7 @@ def suscribete(request):
 class AceptarTerminosForm(forms.Form):
     accept_terms = forms.BooleanField(
         required=True,
-        error_messages={'required': gettext('Debes aceptar los terminos para seguir usando el panel.')},
+        error_messages={'required': gettext('Debes aceptar los términos para seguir usando el panel.')},
     )
 
 
@@ -242,7 +242,7 @@ def aceptar_terminos(request):
     formulario = AceptarTerminosForm(request.POST or None)
     if request.method == 'POST' and formulario.is_valid():
         aceptar_terminos_vigentes(profile)
-        messages.success(request, gettext('Aceptaste los terminos vigentes del programa.'))
+        messages.success(request, gettext('Aceptaste los términos vigentes del programa.'))
         return redirect('afiliado_dashboard')
     return render(request, 'afiliados/aceptar_terminos.html', {
         'form': formulario, 'profile': profile,
@@ -334,7 +334,7 @@ def editar_perfil(request):
     with transaction.atomic():
         formulario.save()
         _reemplazar_redes(profile, redes)
-    messages.success(request, gettext('Tu perfil quedo actualizado.'))
+    messages.success(request, gettext('Tu perfil quedó actualizado.'))
     return redirect('afiliado_dashboard')
 
 
@@ -390,13 +390,13 @@ def cuenta_de_pago(request):
         nueva.data_consent_at = nueva.data_consent_at or ahora
         nueva.save()
         if nueva.documento_coincide_con_el_perfil:
-            messages.success(request, gettext('Tu cuenta Bre-B quedo guardada. Ya puedes solicitar tu comision.'))
+            messages.success(request, gettext('Tu cuenta Bre-B quedó guardada. Ya puedes solicitar tu comisión.'))
         else:
             messages.warning(
                 request,
                 gettext(
                     'Guardamos tu cuenta Bre-B, pero el documento del titular no coincide con el de tu perfil. '
-                    'Los terminos piden que la cuenta sea tuya: el equipo la revisara antes de pagarte.'
+                    'Los términos piden que la cuenta sea tuya: el equipo la revisará antes de pagarte.'
                 ),
             )
         return redirect('afiliado_dashboard')
@@ -415,17 +415,17 @@ def solicitar_retiro(request):
     if request.method != 'POST':
         return redirect('afiliado_dashboard')
     if profile.withdrawal_requests.filter(status=WithdrawalStatus.PENDING).exists():
-        messages.info(request, gettext('Ya tienes una solicitud de comision pendiente.'))
+        messages.info(request, gettext('Ya tienes una solicitud de comisión pendiente.'))
         return redirect('afiliado_dashboard')
 
     cuenta = PayoutAccount.objects.filter(afiliado=profile).first()
     if cuenta is None:
-        messages.error(request, gettext('Inscribe tu cuenta Bre-B antes de solicitar tu comision.'))
+        messages.error(request, gettext('Inscribe tu cuenta Bre-B antes de solicitar tu comisión.'))
         return redirect('afiliado_dashboard')
 
     nota = request.POST.get('payment_details', '').strip()
     if len(nota) > MAX_NOTA_DE_PAGO:
-        messages.error(request, gettext('El mensaje es muy largo (maximo %(maximo)s caracteres).') % {'maximo': MAX_NOTA_DE_PAGO})
+        messages.error(request, gettext('El mensaje es muy largo (máximo %(maximo)s caracteres).') % {'maximo': MAX_NOTA_DE_PAGO})
         return redirect('afiliado_dashboard')
 
     datos_de_pago = cuenta.as_payment_details()
@@ -442,12 +442,12 @@ def solicitar_retiro(request):
         )
         return redirect('afiliado_dashboard')
     if solicitud is None:
-        messages.error(request, gettext('No tienes comisiones confirmadas disponibles para solicitar todavia.'))
+        messages.error(request, gettext('No tienes comisiones confirmadas disponibles para solicitar todavía.'))
     else:
         limite = fecha_limite_de_la_solicitud(solicitud)
         messages.success(
             request,
-            gettext('Solicitud de comision por $%(monto)s enviada. Se paga a mas tardar el %(fecha)s (primeros 10 dias habiles del mes siguiente).') % {
+            gettext('Solicitud de comisión por $%(monto)s enviada. Se paga a más tardar el %(fecha)s (primeros 10 días hábiles del mes siguiente).') % {
                 'monto': solicitud.amount, 'fecha': f'{limite:%d/%m/%Y}',
             },
         )
@@ -466,14 +466,14 @@ def quitar_suscripcion(request):
         solicitar_baja(profile)
         messages.success(
             request,
-            gettext('Registramos tu aviso de baja. Sera efectiva el %(fecha)s; hasta entonces tu codigo y tu panel siguen activos.') % {
+            gettext('Registramos tu aviso de baja. Será efectiva el %(fecha)s; hasta entonces tu código y tu panel siguen activos.') % {
                 'fecha': f'{timezone.localtime(profile.exit_effective_at):%d/%m/%Y}',
             },
         )
         return redirect('afiliado_dashboard')
     if profile.is_active:
         deactivate_afiliado(profile)
-        messages.success(request, gettext('Cancelaste tu participacion en el programa de afiliados.'))
+        messages.success(request, gettext('Cancelaste tu participación en el programa de afiliados.'))
     return redirect('/')
 
 

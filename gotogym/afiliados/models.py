@@ -20,24 +20,24 @@ def generate_referral_code():
 
 
 class EstadoAfiliado(models.TextChoices):
-    PENDING = 'pending', gettext_lazy('Pendiente de revision')
+    PENDING = 'pending', gettext_lazy('Pendiente de revisión')
     APPROVED = 'approved', gettext_lazy('Aprobado')
     REJECTED = 'rejected', gettext_lazy('Rechazado')
 
 
 class DocumentType(models.TextChoices):
-    CC = 'CC', gettext_lazy('Cedula de ciudadania')
-    CE = 'CE', gettext_lazy('Cedula de extranjeria')
+    CC = 'CC', gettext_lazy('Cédula de ciudadanía')
+    CE = 'CE', gettext_lazy('Cédula de extranjería')
     NIT = 'NIT', gettext_lazy('NIT')
     PA = 'PA', gettext_lazy('Pasaporte')
-    PPT = 'PPT', gettext_lazy('Permiso por proteccion temporal (PPT)')
+    PPT = 'PPT', gettext_lazy('Permiso por protección temporal (PPT)')
     PEP = 'PEP', gettext_lazy('Permiso especial de permanencia (PEP)')
 
 
 class MotivoSalida(models.TextChoices):
     VOLUNTARY = 'voluntary', gettext_lazy('Baja solicitada por el afiliado')
-    FRAUD = 'fraud', gettext_lazy('Fraude o uso indebido del codigo')
-    BREACH = 'breach', gettext_lazy('Incumplimiento de los terminos')
+    FRAUD = 'fraud', gettext_lazy('Fraude o uso indebido del código')
+    BREACH = 'breach', gettext_lazy('Incumplimiento de los términos')
     INACTIVITY = 'inactivity', gettext_lazy('Inactividad prolongada')
     OTHER = 'other', gettext_lazy('Otro')
 
@@ -47,7 +47,7 @@ class PerfilAfiliado(models.Model):
     referral_code = models.CharField(max_length=36, unique=True, default=generate_referral_code)
     commission_rate = models.DecimalField(
         max_digits=5, decimal_places=2, null=True, blank=True,
-        help_text="Tasa propia de este afiliado. Vacio usa la tasa global del programa.",
+        help_text="Tasa propia de este afiliado. Vacío usa la tasa global del programa.",
     )
     # 12 digitos como el resto de importes: con 10 el tope era ~100 millones de
     # COP en ventas acumuladas, que un afiliado exitoso supera.
@@ -245,8 +245,8 @@ class PayoutAccount(models.Model):
             f"Llave Bre-B: {self.breb_key}\n"
             f"Titular: {self.full_name}\n"
             f"Documento: {self.document_type} {self.document_number}\n"
-            f"Telefono: {self.phone}\n"
-            f"Direccion: {self.address}"
+            f"Teléfono: {self.phone}\n"
+            f"Dirección: {self.address}"
         )
 
 
@@ -260,24 +260,24 @@ class ConfiguracionProgramaAfiliados(models.Model):
     )
     default_customer_discount = models.DecimalField(
         max_digits=5, decimal_places=2, default=Decimal('10.00'),
-        help_text="Porcentaje de descuento que recibe el cliente final al usar el codigo de un afiliado nuevo.",
+        help_text="Porcentaje de descuento que recibe el cliente final al usar el código de un afiliado nuevo.",
     )
     minimum_payout = models.DecimalField(
         max_digits=12, decimal_places=2, default=Decimal('100000.00'),
-        help_text="Monto minimo de comisiones confirmadas para poder solicitar un pago.",
+        help_text="Monto mínimo de comisiones confirmadas para poder solicitar un pago.",
     )
     inactivity_days = models.PositiveIntegerField(
         default=90,
-        help_text="Dias sin clics ni ventas a partir de los cuales un afiliado se lista como inactivo.",
+        help_text="Días sin clics ni ventas a partir de los cuales un afiliado se lista como inactivo.",
     )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Configuracion del programa de afiliados"
-        verbose_name_plural = "Configuracion del programa de afiliados"
+        verbose_name = "Configuración del programa de afiliados"
+        verbose_name_plural = "Configuración del programa de afiliados"
 
     def __str__(self):
-        return "Configuracion del programa de afiliados"
+        return "Configuración del programa de afiliados"
 
     @classmethod
     def load(cls):
@@ -392,7 +392,7 @@ class Commission(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"Comision {self.order.order_number}: ${self.amount} ({self.status})"
+        return f"Comisión {self.order.order_number}: ${self.amount} ({self.status})"
 
     @property
     def confirmation_date(self):

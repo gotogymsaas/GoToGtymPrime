@@ -33,7 +33,7 @@ class AuditCatalogTests(TestCase):
         shutil.rmtree(cls.media, ignore_errors=True)
 
     def _producto(self, nombre='Camiseta auditada', *, con_variante=True, stock=3, inventario=3):
-        categoria, _ = ProductCategory.objects.get_or_create(name='Categoria audit')
+        categoria, _ = ProductCategory.objects.get_or_create(name='Categoría audit')
         marca, _ = Brand.objects.get_or_create(name='Marca audit')
         producto = Product.objects.create(
             name=nombre, category=categoria, brand=marca, base_price=Decimal('50000'), stock=stock,
@@ -50,7 +50,7 @@ class AuditCatalogTests(TestCase):
         self._producto()
         with override_settings(MEDIA_ROOT=Path(self.media)):
             salida, _ = _correr('audit_catalog')
-        self.assertIn('Auditoria OK', salida)
+        self.assertIn('Auditoría OK', salida)
         self.assertIn('huerfana.png', salida)
 
     def test_producto_sin_variantes_falla(self):
@@ -79,16 +79,16 @@ class AuditCatalogTests(TestCase):
         ProductMedia.objects.create(product=producto, image='products/foto.png')
         with override_settings(MEDIA_ROOT=Path(self.media)):
             salida, _ = _correr('audit_catalog')
-        self.assertIn('Auditoria OK', salida)
+        self.assertIn('Auditoría OK', salida)
 
     def test_informa_variantes_genericas_y_stock_divergente_sin_fallar(self):
         producto = self._producto(stock=10, inventario=2)
         ProductVariant.objects.filter(product=producto).update(size='UNICA', color='UNICO')
         with override_settings(MEDIA_ROOT=Path(self.media)):
             salida, _ = _correr('audit_catalog')
-        self.assertIn('revision manual', salida)
+        self.assertIn('revisión manual', salida)
         self.assertIn('ya no coincide', salida)
-        self.assertIn('Auditoria OK', salida)
+        self.assertIn('Auditoría OK', salida)
 
     def test_sin_carpeta_de_medios_lo_avisa(self):
         self._producto()
@@ -115,7 +115,7 @@ class SecurityChecklistTests(TestCase):
             PAYMENTS_MOCK_UI_ENABLED=False,
         ):
             salida, _ = _correr('security_checklist')
-        self.assertIn('Problemas (bloquean produccion): 0', salida)
+        self.assertIn('Problemas (bloquean producción): 0', salida)
 
     def test_en_desarrollo_las_banderas_inseguras_son_avisos_no_problemas(self):
         with override_settings(
@@ -123,7 +123,7 @@ class SecurityChecklistTests(TestCase):
             SECURE_SSL_REDIRECT=False, SESSION_COOKIE_SECURE=False, CSRF_COOKIE_SECURE=False,
         ):
             salida, _ = _correr('security_checklist')
-        self.assertIn('Problemas (bloquean produccion): 0', salida)
+        self.assertIn('Problemas (bloquean producción): 0', salida)
         self.assertIn('DEBUG=True', salida)
         self.assertIn("ALLOWED_HOSTS incluye '*'", salida)
 
@@ -144,4 +144,4 @@ class SeedInitialDataTests(TestCase):
         salida, _ = _correr('seed_initial_data')
         self.assertEqual(ProductCategory.objects.count(), total)
         self.assertIn('Marca existente', salida)
-        self.assertIn('Categorias nuevas: 0', salida)
+        self.assertIn('Categorías nuevas: 0', salida)

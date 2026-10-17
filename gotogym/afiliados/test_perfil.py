@@ -68,7 +68,7 @@ class InicioDelAfiliadoTests(AfiliadoTestBase):
         )
         respuesta = self.client.get(reverse('afiliado_dashboard'))
         self.assertContains(respuesta, 'Ana Perez')
-        self.assertContains(respuesta, 'Cedula de ciudadania')
+        self.assertContains(respuesta, 'Cédula de ciudadanía')
         self.assertContains(respuesta, 'Editar mi perfil')
         self.assertContains(respuesta, reverse('afiliado_editar_perfil'))
 

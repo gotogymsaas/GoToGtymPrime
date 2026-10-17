@@ -74,13 +74,13 @@ class AutocompraTests(_ConPedidos):
         pedido = self._pedido_con_datos(self.perfil, phone='+57 (300) 555-1234')
         comision = Commission.objects.get(order=pedido)
         self.assertTrue(comision.needs_review)
-        self.assertIn('telefono', comision.review_reason)
+        self.assertIn('teléfono', comision.review_reason)
 
     def test_la_direccion_del_afiliado_marca_la_comision(self):
         pedido = self._pedido_con_datos(self.perfil, address_line='carrera 7 # 45-67')
         comision = Commission.objects.get(order=pedido)
         self.assertTrue(comision.needs_review)
-        self.assertIn('direccion', comision.review_reason)
+        self.assertIn('dirección', comision.review_reason)
 
     def test_una_comision_en_revision_no_se_confirma_hasta_liberarla(self):
         pedido = self._pedido_con_datos(self.perfil, email=self.afiliado_user.email)
@@ -406,7 +406,7 @@ class AnulacionManualTests(_ConPedidos):
 
         self.comision.refresh_from_db()
         self.assertEqual(self.comision.status, CommissionStatus.PENDING)
-        self.assertContains(respuesta, 'motivo de la anulacion')
+        self.assertContains(respuesta, 'motivo de la anulación')
 
     def test_sin_el_permiso_no_se_puede_anular(self):
         from django.contrib.auth.models import Group
@@ -436,11 +436,11 @@ class AnulacionManualTests(_ConPedidos):
         with self.captureOnCommitCallbacks(execute=True):
             self.client.post(
                 reverse('admin_commission_extend', args=[self.comision.pk]),
-                {'until': hasta, 'reason': 'Revision de fraude'},
+                {'until': hasta, 'reason': 'Revisión de fraude'},
             )
 
         self.comision.refresh_from_db()
-        self.assertEqual(self.comision.extension_reason, 'Revision de fraude')
+        self.assertEqual(self.comision.extension_reason, 'Revisión de fraude')
         self.assertEqual(len(mail.outbox), 1)
 
     def test_el_admin_libera_una_comision_en_revision(self):
@@ -458,7 +458,7 @@ class AnulacionManualTests(_ConPedidos):
         self._dar_permisos_de_admin(self.admin)
         self.client.force_login(self.admin)
         Commission.objects.filter(pk=self.comision.pk).update(needs_review=True)
-        self.assertContains(self.client.get(reverse('admin_afiliados')), 'marcada para revision')
+        self.assertContains(self.client.get(reverse('admin_afiliados')), 'marcada para revisión')
 
 
 class PedidosDemoradosTests(_ConPedidos):

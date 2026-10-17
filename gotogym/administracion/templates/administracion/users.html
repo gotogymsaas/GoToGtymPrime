@@ -57,7 +57,7 @@
           </form>
           {% endif %}
           {% if not member.is_superuser and perms.accounts.delete_user %}
-          <form method="post" action="{% url 'admin_user_delete' member.pk %}" onsubmit="return confirm('¿Eliminar definitivamente la cuenta {{ member.email|escapejs }}? Esta accion no se puede deshacer.');">
+          <form method="post" action="{% url 'admin_user_delete' member.pk %}" onsubmit="return confirm('¿Eliminar definitivamente la cuenta {{ member.email|escapejs }}? Esta acción no se puede deshacer.');">
             {% csrf_token %}
             <button class="button btn-sm product-delete-button" type="submit">Eliminar</button>
           </form>

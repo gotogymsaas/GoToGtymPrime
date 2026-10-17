@@ -3,15 +3,15 @@
 {% block content %}
 <section class="page-head">
   <div>
-    <p class="eyebrow">Operacion</p>
+    <p class="eyebrow">Operación</p>
     <h1>Pedidos y pagos</h1>
   </div>
 </section>
 {% if demorados %}
-<div class="panel"><p>Pedidos enviados hace mas de {{ dias_de_envio_demorado }} dias que siguen sin marcarse como entregados. Mientras no se entreguen, la comision del afiliado no empieza su periodo de validacion. <a href="{% url 'admin_orders' %}">Ver todos</a></p></div>
+<div class="panel"><p>Pedidos enviados hace más de {{ dias_de_envio_demorado }} días que siguen sin marcarse como entregados. Mientras no se entreguen, la comisión del afiliado no empieza su periodo de validación. <a href="{% url 'admin_orders' %}">Ver todos</a></p></div>
 {% endif %}
 <form class="search" method="get">
-  <input name="q" value="{{ query }}" placeholder="Buscar por numero, correo o referencia de pago">
+  <input name="q" value="{{ query }}" placeholder="Buscar por número, correo o referencia de pago">
   <select name="order_status" aria-label="Estado del pedido">
     <option value="">Todos los estados</option>
     {% for value, label in order_status_choices %}
@@ -43,7 +43,7 @@
           {% if ultima_transaccion %}
             <small>{{ ultima_transaccion.provider }} &middot; {{ ultima_transaccion.preference_id|default:ultima_transaccion.payment_id }}</small>
           {% else %}
-            <span class="empty-img">Sin pago aun</span>
+            <span class="empty-img">Sin pago aún</span>
           {% endif %}
           {% endwith %}
         </td>

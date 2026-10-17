@@ -9,7 +9,7 @@ class CustomerAddressForm(forms.ModelForm):
     # El catalogo de departamentos/ciudades es solo de Colombia (envios no
     # cubren otros paises todavia), asi que el desplegable de pais tiene una
     # sola opcion real en vez de dejarlo como texto libre.
-    country = forms.ChoiceField(label=gettext_lazy('Pais'), choices=[('Colombia', 'Colombia')], initial='Colombia')
+    country = forms.ChoiceField(label=gettext_lazy('País'), choices=[('Colombia', 'Colombia')], initial='Colombia')
     department = forms.ChoiceField(
         label=gettext_lazy('Departamento'),
         choices=[('', 'Selecciona un departamento')] + [(d, d) for d in DEPARTAMENTOS],
@@ -28,10 +28,10 @@ class CustomerAddressForm(forms.ModelForm):
             'postal_code', 'address_line', 'address_complement', 'notes',
         ]
         labels = {
-            'country': gettext_lazy('Pais'),
+            'country': gettext_lazy('País'),
             'city': gettext_lazy('Ciudad'),
-            'postal_code': gettext_lazy('Codigo postal'),
-            'address_line': gettext_lazy('Direccion'),
+            'postal_code': gettext_lazy('Código postal'),
+            'address_line': gettext_lazy('Dirección'),
             'address_complement': gettext_lazy('Complemento (apto, torre, etc.)'),
             'notes': gettext_lazy('Notas de entrega'),
         }
@@ -41,6 +41,6 @@ class CustomerAddressForm(forms.ModelForm):
         departamento = cleaned_data.get('department')
         ciudad = (cleaned_data.get('city') or '').strip()
         if departamento and ciudad and ciudad not in municipios_de(departamento):
-            self.add_error('city', 'Selecciona una ciudad valida para el departamento elegido.')
+            self.add_error('city', 'Selecciona una ciudad válida para el departamento elegido.')
         cleaned_data['city'] = ciudad
         return cleaned_data

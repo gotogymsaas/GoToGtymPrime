@@ -65,7 +65,7 @@ class MercadoPagoPaymentProvider(PaymentProvider):
 
         if order.shipping_cost:
             items.append({
-                'title': 'Envio',
+                'title': 'Envío',
                 'quantity': 1,
                 'unit_price': float(order.shipping_cost),
                 'currency_id': order.currency,
@@ -148,7 +148,7 @@ class MercadoPagoPaymentProvider(PaymentProvider):
             )
         if transaction is None:
             raise PaymentTransaction.DoesNotExist(
-                f'No se encontro una transaccion para procesar el webhook '
+                f'No se encontró una transacción para procesar el webhook '
                 f'(payment_id={payment_id!r}, external_reference={external_reference!r}).'
             )
 

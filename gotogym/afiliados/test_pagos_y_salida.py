@@ -80,7 +80,7 @@ class MinimoDePagoTests(AfiliadoTestBase):
         self._fijar_minimo(self.comision.amount + 5000)
         self.client.force_login(self.afiliado_user)
         html = self.client.get(reverse('afiliado_dashboard')).content.decode()
-        self.assertNotIn('Solicitar comision</summary>', html)
+        self.assertNotIn('Solicitar comisión</summary>', html)
         self.assertIn('Te faltan $5.000 COP', html)
 
     def test_lo_pendiente_no_cuenta_para_el_minimo(self):
@@ -166,7 +166,7 @@ class GastosDeTransaccionTests(AfiliadoTestBase):
         )
         self.solicitud.refresh_from_db()
         self.assertEqual(self.solicitud.status, WithdrawalStatus.PENDING)
-        self.assertIn('gastos de transaccion', _mensajes(respuesta)[-1])
+        self.assertIn('gastos de transacción', _mensajes(respuesta)[-1])
 
 
 class TotalPagadoPorAnioTests(AfiliadoTestBase):
@@ -440,7 +440,7 @@ class TasaDeComisionEnLosTerminosTests(AfiliadoTestBase):
         self.client.force_login(self.admin)
         self._dar_permisos_de_admin(self.admin)
         respuesta = self.client.get(reverse('admin_afiliados'))
-        self.assertContains(respuesta, 'Tasa de comision global (%)')
+        self.assertContains(respuesta, 'Tasa de comisión global (%)')
         self.assertContains(respuesta, 'value="20.00"')
 
 
@@ -501,9 +501,9 @@ class CobroDeQuienYaSalioTests(AfiliadoTestBase):
         self.assertFalse(self.perfil.is_active)
 
         respuesta = self.client.get(reverse('afiliado_dashboard'))
-        self.assertContains(respuesta, 'Tu suscripcion esta inactiva')
+        self.assertContains(respuesta, 'Tu suscripción está inactiva')
         self.assertContains(respuesta, 'Tus pagos')
-        self.assertContains(respuesta, 'Solicitar comision')
+        self.assertContains(respuesta, 'Solicitar comisión')
 
         self.client.post(reverse('afiliado_solicitar_retiro'))
         solicitud = WithdrawalRequest.objects.get(afiliado=self.perfil)

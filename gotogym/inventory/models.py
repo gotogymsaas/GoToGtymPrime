@@ -20,7 +20,7 @@ class Inventory(models.Model):
 class InventoryAdjustmentReason(models.TextChoices):
     MANUAL = 'manual', 'Ajuste manual'
     SALE = 'sale', 'Venta'
-    RESTOCK = 'restock', 'Reposicion (cancelacion o devolucion)'
+    RESTOCK = 'restock', 'Reposición (cancelación o devolución)'
 
 
 class InventoryAdjustment(models.Model):
@@ -34,7 +34,7 @@ class InventoryAdjustment(models.Model):
     reason = models.CharField(max_length=20, choices=InventoryAdjustmentReason.choices)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='+',
-        help_text="Vacio si el ajuste lo disparo el sistema (venta o reposicion), no una persona.",
+        help_text="Vacío si el ajuste lo disparo el sistema (venta o reposición), no una persona.",
     )
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -11,7 +11,7 @@ class PanelSettings(models.Model):
     """
 
     low_stock_threshold = models.PositiveIntegerField(
-        default=5, help_text="A partir de cuantas unidades una variante se marca como 'stock bajo'.",
+        default=5, help_text="A partir de cuántas unidades una variante se marca como 'stock bajo'.",
     )
     monthly_sales_goal = models.PositiveIntegerField(
         default=0,
@@ -20,11 +20,11 @@ class PanelSettings(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Configuracion del panel"
-        verbose_name_plural = "Configuracion del panel"
+        verbose_name = "Configuración del panel"
+        verbose_name_plural = "Configuración del panel"
 
     def __str__(self):
-        return "Configuracion del panel"
+        return "Configuración del panel"
 
     @classmethod
     def load(cls):

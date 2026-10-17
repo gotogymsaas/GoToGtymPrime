@@ -54,7 +54,7 @@
 {% endif %}
 
 <div class="panel">
-  <h2>Articulos</h2>
+  <h2>Artículos</h2>
   <table>
     <thead><tr><th>SKU</th><th>Producto</th><th>Talla/Color</th><th>Cantidad</th><th>Subtotal</th></tr></thead>
     <tbody>
@@ -69,11 +69,11 @@
       {% endfor %}
     </tbody>
   </table>
-  <p>Subtotal: ${{ order.subtotal|cop }} COP &middot; Envio: ${{ order.shipping_cost|cop }} COP &middot; <strong>Total: ${{ order.total|cop }} COP</strong></p>
+  <p>Subtotal: ${{ order.subtotal|cop }} COP &middot; Envío: ${{ order.shipping_cost|cop }} COP &middot; <strong>Total: ${{ order.total|cop }} COP</strong></p>
 </div>
 
 <div class="panel">
-  <h2>Direccion de entrega</h2>
+  <h2>Dirección de entrega</h2>
   {% with address=order.address %}
   <p>{{ address.full_name }}<br>
   {{ address.address_line }}{% if address.address_complement %}, {{ address.address_complement }}{% endif %}<br>
@@ -81,7 +81,7 @@
   {{ address.phone }}</p>
   {% endwith %}
   {% if order.shipping_quote %}
-  <p>{{ order.shipping_quote.carrier_name }} &middot; {{ order.shipping_quote.method_name }} &middot; {{ order.shipping_quote.estimated_days }} dias</p>
+  <p>{{ order.shipping_quote.carrier_name }} &middot; {{ order.shipping_quote.method_name }} &middot; {{ order.shipping_quote.estimated_days }} días</p>
   {% endif %}
 </div>
 
@@ -98,7 +98,7 @@
         <td class="nowrap">${{ transaction.amount|cop }} COP</td>
         <td>{{ transaction.created_at|date:"d/m/Y H:i" }}</td>
       </tr>
-      {% empty %}<tr><td colspan="5">Sin transacciones todavia.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="5">Sin transacciones todavía.</td></tr>{% endfor %}
     </tbody>
   </table>
   {% if puede_reembolsar and perms.payments.add_refund %}

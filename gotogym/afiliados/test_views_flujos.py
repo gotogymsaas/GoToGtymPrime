@@ -55,7 +55,7 @@ class RePostulacionTests(AfiliadoTestBase):
         respuesta = self._postular()
 
         self.assertEqual(PerfilAfiliado.objects.filter(user=self.afiliado_user).count(), 1)
-        self.assertIn('en revision', _mensajes(respuesta)[-1])
+        self.assertIn('en revisión', _mensajes(respuesta)[-1])
 
     def test_un_aprobado_que_reenvia_el_formulario_solo_recibe_un_aviso(self):
         perfil = self._crear_perfil_aprobado()
@@ -86,7 +86,7 @@ class RePostulacionTests(AfiliadoTestBase):
         respuesta = self._postular('CUPONAJENO')
 
         self.assertFalse(PerfilAfiliado.objects.filter(user=self.afiliado_user).exists())
-        self.assertIn('ya esta en uso', ' '.join(respuesta.context['form'].errors['referral_code']))
+        self.assertIn('ya está en uso', ' '.join(respuesta.context['form'].errors['referral_code']))
 
     def test_un_error_de_base_de_datos_al_guardar_se_informa_y_no_deja_un_perfil_a_medias(self):
         with patch('afiliados.views.SocialNetwork.objects.bulk_create', side_effect=IntegrityError):

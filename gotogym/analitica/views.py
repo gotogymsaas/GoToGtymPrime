@@ -86,7 +86,7 @@ def registrar_eventos(request):
     try:
         lote = json.loads(request.POST.get('eventos', '[]'))
     except (TypeError, ValueError):
-        return JsonResponse({'ok': False, 'error': 'json invalido'}, status=400)
+        return JsonResponse({'ok': False, 'error': 'json inválido'}, status=400)
 
     if not isinstance(lote, list):
         return JsonResponse({'ok': False, 'error': 'se esperaba una lista'}, status=400)

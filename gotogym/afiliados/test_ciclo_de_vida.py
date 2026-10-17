@@ -177,7 +177,7 @@ class BajaConPreavisoTests(AfiliadoTestBase):
         self.client.post(reverse('afiliado_quitar_suscripcion'))
         self.perfil.refresh_from_db()
         html = self.client.get(reverse('afiliado_dashboard')).content.decode()
-        self.assertIn('Tu baja esta programada', html)
+        self.assertIn('Tu baja está programada', html)
         self.assertIn(f'{timezone.localtime(self.perfil.exit_effective_at):%d/%m/%Y}', html)
 
         self.client.post(reverse('afiliado_cancelar_baja'))
@@ -304,11 +304,11 @@ class TerminacionPorGoToGymTests(AfiliadoTestBase):
 
     def test_desactiva_el_codigo_registra_el_motivo_y_avisa(self):
         with self.captureOnCommitCallbacks(execute=True):
-            self.client.post(self.url, {'reason': 'fraud', 'notes': 'Uso del codigo en sitios de cupones'})
+            self.client.post(self.url, {'reason': 'fraud', 'notes': 'Uso del código en sitios de cupones'})
         self.perfil.refresh_from_db()
         self.assertFalse(self.perfil.is_active)
         self.assertEqual(self.perfil.exit_reason, MotivoSalida.FRAUD)
-        self.assertEqual(self.perfil.exit_notes, 'Uso del codigo en sitios de cupones')
+        self.assertEqual(self.perfil.exit_notes, 'Uso del código en sitios de cupones')
         self.assertFalse(self.perfil.coupons.first().is_active)
         correo = mail.outbox[0]
         self.assertIn('Terminamos tu participación', correo.subject)
@@ -405,7 +405,7 @@ class InactividadTests(AfiliadoTestBase):
         perfiles = [p.pk for p in respuesta.context['page_obj']]
         self.assertEqual(perfiles, [self.perfil.pk])
         self.assertNotIn(otro.pk, perfiles)
-        self.assertContains(respuesta, 'Ultima actividad')
+        self.assertContains(respuesta, 'Última actividad')
         self.assertContains(respuesta, f'mailto:{self.afiliado_user.email}')
 
 
@@ -486,11 +486,11 @@ class AvisosAProgramaTests(AfiliadoTestBase):
         with self.captureOnCommitCallbacks(execute=True):
             respuesta = self.client.post(
                 reverse('admin_afiliados_notify'),
-                {'subject': 'Nuevos terminos', 'message': 'Actualizamos los terminos del programa.'},
+                {'subject': 'Nuevos términos', 'message': 'Actualizamos los términos del programa.'},
             )
         self.assertEqual([m.to for m in mail.outbox], [[self.afiliado_user.email]])
-        self.assertEqual(mail.outbox[0].subject, 'Nuevos terminos')
-        self.assertIn('Actualizamos los terminos', mail.outbox[0].body)
+        self.assertEqual(mail.outbox[0].subject, 'Nuevos términos')
+        self.assertIn('Actualizamos los términos', mail.outbox[0].body)
         self.assertIn('1 afiliado', _mensajes(respuesta)[-1])
 
     def test_el_aviso_exige_asunto_y_mensaje(self):

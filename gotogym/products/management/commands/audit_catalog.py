@@ -25,8 +25,8 @@ from products.variant_parsing import COLOR_UNKNOWN, SIZE_UNKNOWN
 
 class Command(BaseCommand):
     help = (
-        "Auditoria de solo lectura del catalogo: cuenta productos, categorias, "
-        "marcas y usuarios, y lista imagenes de media/products/ sin Product "
+        "Auditoría de solo lectura del catálogo: cuenta productos, categorías, "
+        "marcas y usuarios, y lista imágenes de media/products/ sin Product "
         "asociado. No escribe en la base de datos."
     )
 
@@ -43,10 +43,10 @@ class Command(BaseCommand):
         db_engine = settings.DATABASES[db_alias]['ENGINE']
         db_name = settings.DATABASES[db_alias]['NAME']
 
-        self.stdout.write(self.style.MIGRATE_HEADING('Auditoria de catalogo (solo lectura)'))
+        self.stdout.write(self.style.MIGRATE_HEADING('Auditoría de catálogo (solo lectura)'))
         self.stdout.write(f'  Motor/BD consultada: {db_engine} -> {db_name}')
         self.stdout.write(f'  Productos:    {product_count}')
-        self.stdout.write(f'  Categorias:   {category_count}')
+        self.stdout.write(f'  Categorías:   {category_count}')
         self.stdout.write(f'  Marcas:       {brand_count}')
         self.stdout.write(f'  Usuarios:     {user_count}')
         self.stdout.write(f'  Stock total (Product.stock, agregado): {stock_total}')
@@ -69,7 +69,7 @@ class Command(BaseCommand):
 
         self.stdout.write('')
         self.stdout.write(self.style.MIGRATE_HEADING(
-            f'Imagenes en media/products/ sin Product asociado ({len(orphan_files)})'
+            f'Imágenes en media/products/ sin Product asociado ({len(orphan_files)})'
         ))
         if orphan_files:
             for name in orphan_files:
@@ -132,7 +132,7 @@ class Command(BaseCommand):
         if genericas.exists():
             self.stdout.write('')
             self.stdout.write(self.style.WARNING(
-                f'  Variantes genericas ({SIZE_UNKNOWN}/{COLOR_UNKNOWN}) para revision manual: '
+                f'  Variantes genericas ({SIZE_UNKNOWN}/{COLOR_UNKNOWN}) para revisión manual: '
                 f'{genericas.count()}'
             ))
             for variant in genericas.select_related('product'):
@@ -142,11 +142,11 @@ class Command(BaseCommand):
 
         self.stdout.write('')
         if problems:
-            self.stderr.write(self.style.ERROR('Auditoria FALLIDA: ' + '; '.join(problems)))
+            self.stderr.write(self.style.ERROR('Auditoría FALLIDA: ' + '; '.join(problems)))
             raise SystemExit(1)
 
         self.stdout.write(self.style.SUCCESS(
-            f'Auditoria OK: {product_count} producto(s), todos con variante, media e inventario.'
+            f'Auditoría OK: {product_count} producto(s), todos con variante, media e inventario.'
         ))
 
     def _audit_inventory(self):

@@ -10,7 +10,7 @@ from products.models import ProductVariant
 from .services import build_cart_context, read_cart, write_cart
 
 CARRITO_REINICIADO = gettext_lazy(
-    'Tu carrito se reinicio por una actualizacion del sistema. '
+    'Tu carrito se reinició por una actualización del sistema. '
     'Vuelve a agregar los productos que quieras comprar.'
 )
 
@@ -74,7 +74,7 @@ def update_cart(request, variant_id):
     try:
         cantidad = int(request.POST.get('cantidad', 1))
     except (TypeError, ValueError):
-        return _responder(request, error='Cantidad invalida.')
+        return _responder(request, error='Cantidad inválida.')
 
     if cantidad <= 0:
         cart.pop(str(variante.id), None)

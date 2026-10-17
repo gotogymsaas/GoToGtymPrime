@@ -316,6 +316,22 @@ body.panel-shell {
   color: var(--pq-text);
 }
 .panel-shell select option:disabled { color: var(--pq-muted); }
+/* En iOS/Safari el <select> nativo ignora min-height y queda mas bajo que los
+ * <input> vecinos. Sin el aspecto nativo toma la misma altura y se dibuja una
+ * flecha propia. */
+.panel-shell select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  height: 44px;
+  padding-right: 38px;
+  text-overflow: ellipsis;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23c8cdd2' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 7.5l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+}
+.panel-shell select[multiple] { height: auto; padding-right: var(--space-3); background-image: none; }
 .panel-shell .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
 .panel-shell .form-grid label, .panel-shell .form-grid p { display: grid; gap: var(--space-2); margin: 0; color: var(--pq-muted); font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
 .panel-shell .form-grid > label { align-content: start; }
@@ -323,6 +339,9 @@ body.panel-shell {
 .panel-shell .form-actions { display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: var(--space-3); }
 .panel-shell .form-actions form { display: inline-flex; align-items: center; gap: var(--space-2); margin: 0; }
 .panel-shell .form-actions--start { justify-content: flex-start; }
+/* Un solo campo con su boton al lado, en la misma linea y alineados por abajo. */
+.panel-shell .form-inline { display: flex; align-items: flex-end; flex-wrap: wrap; gap: var(--space-3); }
+.panel-shell .form-inline label { display: grid; gap: var(--space-2); flex: 0 1 320px; min-width: 0; margin: 0; color: var(--pq-muted); font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
 /* Una fila de acciones que cuelga directamente de un panel se separa de lo
  * que tiene arriba; dentro de una rejilla de formulario ya la separa el gap. */
 .panel-shell .panel > .form-actions { margin-top: var(--space-4); }
@@ -628,14 +647,17 @@ body.panel-shell {
      existe en la primera, vacia) para que los campos queden alineados. */
   display: grid; grid-template-columns: minmax(150px, 1fr) minmax(0, 2fr) minmax(130px, 1fr) 92px;
   grid-template-areas: "red usuario seguidores accion";
-  align-items: end; gap: var(--space-3);
+  /* Alineadas por arriba: un mensaje de error bajo un campo crece hacia abajo
+     sin desplazar a los demas (con `end` los subia respecto al desplegable). */
+  align-items: start; gap: var(--space-3);
   padding: var(--space-4); border: 1px solid var(--pq-border); border-radius: 10px; background: var(--pq-surface);
 }
 .panel-shell .social-row > label { min-width: 0; }
 .panel-shell .social-row__platform { grid-area: red; }
 .panel-shell .social-row__user { grid-area: usuario; }
 .panel-shell .social-row__followers { grid-area: seguidores; }
-.panel-shell .social-row__action { grid-area: accion; display: flex; justify-content: flex-end; }
+/* El boton baja lo que ocupa el rotulo de los campos para quedar a la altura de sus inputs. */
+.panel-shell .social-row__action { grid-area: accion; display: flex; justify-content: flex-end; padding-top: 1.6rem; padding-top: calc(1lh + var(--space-2)); }
 /* "Otra": el nombre de la red va debajo del desplegable, en su misma columna. */
 .panel-shell .social-row__other { grid-column: 1; grid-row: 2; }
 .panel-shell .social-row [hidden] { display: none !important; }
@@ -644,7 +666,7 @@ body.panel-shell {
   .panel-shell .social-row__other { grid-column: 1; grid-row: 2; }
   .panel-shell .social-row__user { grid-row: 3; }
   .panel-shell .social-row__followers { grid-row: 4; }
-  .panel-shell .social-row__action { grid-row: 5; justify-content: flex-start; }
+  .panel-shell .social-row__action { grid-row: 5; justify-content: flex-start; padding-top: 0; }
   .panel-shell .social-row__action:empty { display: none; }
 }
 .panel-shell .field-error { color: var(--pq-red); font-size: .78rem; font-weight: 800; text-transform: none; letter-spacing: 0; }

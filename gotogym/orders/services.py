@@ -144,7 +144,7 @@ class CheckoutError(Exception):
 
 class EmptyCartError(CheckoutError):
     def __init__(self):
-        super().__init__(gettext('Tu carrito esta vacio.'))
+        super().__init__(gettext('Tu carrito está vacío.'))
 
 
 class OutOfStockError(CheckoutError):
@@ -161,7 +161,7 @@ class OutOfStockError(CheckoutError):
 
 class PaymentNotApprovedError(CheckoutError):
     def __init__(self):
-        super().__init__(gettext('El pago todavia no esta aprobado.'))
+        super().__init__(gettext('El pago todavía no está aprobado.'))
 
 
 class InvalidOrderTransitionError(CheckoutError):
@@ -457,7 +457,7 @@ def confirm_payment(order, payment_transaction):
             order.payment_status = PaymentStatus.APPROVED
             order.paid_at = ahora
             order.internal_note = _anotar(
-                order.internal_note, 'Pago aprobado despues de cancelar el pedido. Requiere reembolso manual.',
+                order.internal_note, 'Pago aprobado después de cancelar el pedido. Requiere reembolso manual.',
             )
             order.save(update_fields=['payment_status', 'paid_at', 'internal_note', 'updated_at'])
             enqueue(correos.pedido_cancelado, order.pk)
@@ -476,12 +476,12 @@ def confirm_payment(order, payment_transaction):
         order.cancelled_at = ahora
         order.internal_note = (
             f'Pago aprobado pero no se pudo descontar stock: variante(s) ya no '
-            f'existen en el catalogo ({skus}). Requiere revision manual.'
+            f'existen en el catálogo ({skus}). Requiere revisión manual.'
         )
         order.save(update_fields=[
             'payment_status', 'paid_at', 'order_status', 'cancelled_at', 'internal_note', 'updated_at',
         ])
-        _registrar_estado(order, estado_previo, OrderStatus.CANCELLED, nota='Pago aprobado sin variante en el catalogo.')
+        _registrar_estado(order, estado_previo, OrderStatus.CANCELLED, nota='Pago aprobado sin variante en el catálogo.')
         release_coupon(order)
         enqueue(correos.pedido_cancelado, order.pk)
         return order
@@ -549,7 +549,7 @@ def cancel_expired_orders(ahora=None, horas=None):
             pedido.payment_status = PaymentStatus.CANCELLED
             pedido.cancelled_at = ahora
             pedido.internal_note = _anotar(
-                pedido.internal_note, f'Cancelado automaticamente: sin pago tras {horas} horas.',
+                pedido.internal_note, f'Cancelado automáticamente: sin pago tras {horas} horas.',
             )
             pedido.save(update_fields=['order_status', 'payment_status', 'cancelled_at', 'internal_note', 'updated_at'])
             _registrar_estado(

@@ -29,8 +29,8 @@ class Post(models.Model):
     references = models.TextField(
         blank=True,
         help_text=(
-            'Una referencia por linea, con el formato "Texto de la referencia | URL". '
-            'En el contenido se citan como [1], [2]... segun el orden de esta lista.'
+            'Una referencia por línea, con el formato "Texto de la referencia | URL". '
+            'En el contenido se citan como [1], [2]... según el orden de esta lista.'
         ),
     )
     featured = models.ImageField(upload_to='blog/featured/', blank=True, null=True)

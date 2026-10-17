@@ -18,7 +18,7 @@ MAIN_CITIES = {'bogota', 'medellin', 'cali', 'barranquilla', 'bucaramanga'}
 FLAT_RATE_MAIN_CITY = Decimal('12000.00')
 FLAT_RATE_OTHER_CITY = Decimal('22000.00')
 
-CARRIER_NAME = 'GoToGym Envios'
+CARRIER_NAME = 'GoToGym Envíos'
 
 
 def normalize_city(city):
@@ -41,7 +41,7 @@ def get_mock_quote(city, subtotal):
 
     return {
         'carrier_name': CARRIER_NAME,
-        'method_name': 'Estandar' if es_ciudad_principal else 'Estandar (nacional)',
+        'method_name': 'Estándar' if es_ciudad_principal else 'Estándar (nacional)',
         'cost': costo,
         'estimated_days': dias_estimados,
     }

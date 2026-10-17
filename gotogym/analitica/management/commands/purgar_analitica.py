@@ -14,10 +14,10 @@ from analitica.models import EventoAnalitica
 
 
 class Command(BaseCommand):
-    help = 'Elimina los eventos de analitica anteriores a --dias (180 por defecto).'
+    help = 'Elimina los eventos de analítica anteriores a --dias (180 por defecto).'
 
     def add_arguments(self, parser):
-        parser.add_argument('--dias', type=int, default=180, help='Dias de eventos que se conservan.')
+        parser.add_argument('--dias', type=int, default=180, help='Días de eventos que se conservan.')
 
     def handle(self, *args, dias, **options):
         limite = timezone.now() - timedelta(days=dias)

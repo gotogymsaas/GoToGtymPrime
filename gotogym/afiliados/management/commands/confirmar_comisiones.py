@@ -10,7 +10,7 @@ from afiliados.services import confirmar_comisiones_vencidas
 
 
 class Command(BaseCommand):
-    help = 'Confirma las comisiones de afiliados cuyo periodo de validacion termino.'
+    help = 'Confirma las comisiones de afiliados cuyo periodo de validación terminó.'
 
     def handle(self, *args, **options):
         confirmadas = confirmar_comisiones_vencidas()

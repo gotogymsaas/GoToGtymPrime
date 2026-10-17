@@ -6,7 +6,7 @@
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261014-periodo">
+<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261017-responsive">
 {% endblock %}
 
 {% block content %}
@@ -23,10 +23,10 @@
       {% if profile.status == 'approved' and profile.is_active %}
       <div class="panel-referral">
         <div>
-          <small>{% trans "Tu codigo de referido" %}</small><br>
+          <small>{% trans "Tu código de referido" %}</small><br>
           <code>{{ profile.referral_code }}</code>
         </div>
-        <button type="button" class="ghost btn-sm" data-copy-code="{{ profile.referral_code }}">{% trans "Copiar codigo" %}</button>
+        <button type="button" class="ghost btn-sm" data-copy-code="{{ profile.referral_code }}">{% trans "Copiar código" %}</button>
       </div>
       <div class="panel-referral">
         <div>
@@ -50,21 +50,21 @@
       {% if puede_solicitar %}
       {% if payout_account %}
       <details class="request-commission">
-        <summary class="button btn-sm">{% trans "Solicitar comision" %}</summary>
+        <summary class="button btn-sm">{% trans "Solicitar comisión" %}</summary>
         <form method="post" action="{% url 'afiliado_solicitar_retiro' %}" class="request-commission__form">
           {% csrf_token %}
-          <p>{% blocktrans with llave=payout_account.breb_key monto=saldo_neto|cop %}Te pagaremos a tu llave Bre-B <strong>{{ llave }}</strong> ${{ monto }} COP. Las solicitudes de cada mes se pagan en los primeros 10 dias habiles del mes siguiente. Si necesitas, agrega una indicacion.{% endblocktrans %}</p>
+          <p>{% blocktrans with llave=payout_account.breb_key monto=saldo_neto|cop %}Te pagaremos a tu llave Bre-B <strong>{{ llave }}</strong> ${{ monto }} COP. Las solicitudes de cada mes se pagan en los primeros 10 días hábiles del mes siguiente. Si necesitas, agrega una indicación.{% endblocktrans %}</p>
           <label for="payment_details">{% trans "Nota (opcional)" %}</label>
           <textarea id="payment_details" name="payment_details" rows="3" maxlength="1000"></textarea>
           <button type="submit" class="button btn-sm">{% trans "Enviar solicitud" %}</button>
         </form>
       </details>
       {% else %}
-      <a href="{% url 'afiliado_cuenta_pago' %}" class="button btn-sm">{% trans "Inscribir cuenta para solicitar comision" %}</a>
+      <a href="{% url 'afiliado_cuenta_pago' %}" class="button btn-sm">{% trans "Inscribir cuenta para solicitar comisión" %}</a>
       {% endif %}
       {% endif %}
       {% if not profile.baja_solicitada %}
-      <form method="post" action="{% url 'afiliado_quitar_suscripcion' %}" onsubmit="return confirm('Tu baja se hara efectiva 15 dias despues del aviso. Hasta entonces tu codigo sigue activo. ¿Continuar?');">
+      <form method="post" action="{% url 'afiliado_quitar_suscripcion' %}" onsubmit="return confirm('Tu baja se hará efectiva 15 días después del aviso. Hasta entonces tu código sigue activo. ¿Continuar?');">
         {% csrf_token %}
         <button type="submit" class="danger btn-sm">{% trans "Solicitar baja" %}</button>
       </form>
@@ -73,8 +73,8 @@
 
     {% if profile.baja_solicitada %}
     <div class="panel panel-status">
-      <h2>{% trans "Tu baja esta programada" %}</h2>
-      <p>{% blocktrans with fecha=profile.exit_effective_at|date:"d/m/Y" %}Avisaste que quieres salir del programa. Tu baja sera efectiva el {{ fecha }}; hasta entonces tu codigo y tu panel siguen activos. Tus comisiones confirmadas se te pagan igual despues de esa fecha.{% endblocktrans %}</p>
+      <h2>{% trans "Tu baja está programada" %}</h2>
+      <p>{% blocktrans with fecha=profile.exit_effective_at|date:"d/m/Y" %}Avisaste que quieres salir del programa. Tu baja será efectiva el {{ fecha }}; hasta entonces tu código y tu panel siguen activos. Tus comisiones confirmadas se te pagan igual después de esa fecha.{% endblocktrans %}</p>
       <form method="post" action="{% url 'afiliado_cancelar_baja' %}">
         {% csrf_token %}
         <button type="submit" class="ghost btn-sm">{% trans "Cancelar mi aviso de baja" %}</button>
@@ -84,13 +84,13 @@
 
     <section class="stats">
       <article class="is-violet"><span>{{ profile.total_referred }}</span><p>{% trans "Ventas referidas" %}</p></article>
-      <article class="is-teal"><span>${{ profile.commission_balance|cop }} COP</span><p>{% trans "Comision disponible" %}</p></article>
-      <article class="is-gold"><span>${{ pending_commission_total|cop }} COP</span><p>{% trans "Comision pendiente" %}</p></article>
+      <article class="is-teal"><span>${{ profile.commission_balance|cop }} COP</span><p>{% trans "Comisión disponible" %}</p></article>
+      <article class="is-gold"><span>${{ pending_commission_total|cop }} COP</span><p>{% trans "Comisión pendiente" %}</p></article>
       <article><span>${{ pagado_en_el_anio|cop }} COP</span><p>{% trans "Pagado en" %} {{ anio_actual }}</p></article>
       <article><span>{{ click_count }}</span><p>{% trans "Clics en tu enlace" %}</p></article>
       <article class="is-green">
         <span>{% if conversion_rate %}{{ conversion_rate }}%{% else %}—{% endif %}</span>
-        <p>{% trans "Tasa de conversion" %}</p>
+        <p>{% trans "Tasa de conversión" %}</p>
         {% if conversion_rate %}
         <div class="pq-progress" style="margin-top:10px;">
           <div class="pq-progress__track"><div class="pq-progress__fill" style="width:{{ conversion_rate }}%;"></div></div>
@@ -143,7 +143,7 @@
 
     {% if compras %}
     <div class="panel">
-      <h2>{% trans "Ultimas compras referidas" %}</h2>
+      <h2>{% trans "Últimas compras referidas" %}</h2>
       <table>
         <thead><tr><th>{% trans "Pedido" %}</th><th>{% trans "Fecha" %}</th><th>{% trans "Venta" %}</th><th>{% trans "Comisión" %}</th><th>{% trans "Estado" %}</th></tr></thead>
         <tbody>
@@ -163,7 +163,7 @@
 
     {% elif profile.status == 'pending' %}
     <div class="panel panel-status">
-      <h2>{% trans "Tu solicitud esta en revision" %}</h2>
+      <h2>{% trans "Tu solicitud está en revisión" %}</h2>
       <p>{% trans "Un administrador va a revisar tu solicitud para unirte al programa de afiliados. Te avisaremos por correo cuando tengamos una respuesta." %}</p>
       <div class="actions">
         <a href="{% url 'afiliado_editar_perfil' %}" class="ghost btn-sm">{% trans "Editar mi perfil" %}</a>
@@ -182,8 +182,8 @@
     </div>
     {% else %}
     <div class="panel panel-status">
-      <h2>{% trans "Tu suscripcion esta inactiva" %}</h2>
-      <p>{% if ex_afiliado %}{% if profile.exited_at %}{% blocktrans with fecha=profile.exited_at|date:"d/m/Y" %}Tu participacion en el programa de afiliados termino el {{ fecha }}: tu codigo ya no genera comisiones. Las que ya tenias confirmadas, y las que aun estan en validacion, se te siguen pagando.{% endblocktrans %}{% else %}{% trans "Tu participacion en el programa de afiliados termino: tu codigo ya no genera comisiones. Las que ya tenias confirmadas, y las que aun estan en validacion, se te siguen pagando." %}{% endif %}{% else %}{% trans "Cancelaste tu participacion en el programa de afiliados." %}{% endif %} {% trans "Puedes volver a postularte cuando quieras." %}</p>
+      <h2>{% trans "Tu suscripción está inactiva" %}</h2>
+      <p>{% if ex_afiliado %}{% if profile.exited_at %}{% blocktrans with fecha=profile.exited_at|date:"d/m/Y" %}Tu participación en el programa de afiliados terminó el {{ fecha }}: tu código ya no genera comisiones. Las que ya tenías confirmadas, y las que aún están en validación, se te siguen pagando.{% endblocktrans %}{% else %}{% trans "Tu participación en el programa de afiliados terminó: tu código ya no genera comisiones. Las que ya tenías confirmadas, y las que aún están en validación, se te siguen pagando." %}{% endif %}{% else %}{% trans "Cancelaste tu participación en el programa de afiliados." %}{% endif %} {% trans "Puedes volver a postularte cuando quieras." %}</p>
       <a href="{% url 'afiliado_suscribete' %}" class="button btn-sm">{% trans "Volver a postularme" %}</a>
     </div>
     {% if ex_afiliado %}
@@ -194,7 +194,7 @@
         <p>{% trans "Te pagaremos a tu llave Bre-B" %} <strong>{{ payout_account.breb_key }}</strong> ${{ saldo_neto|cop }} COP.</p>
         <label for="payment_details">{% trans "Nota (opcional)" %}</label>
         <textarea id="payment_details" name="payment_details" rows="3" maxlength="1000"></textarea>
-        <button type="submit" class="button btn-sm">{% trans "Solicitar comision" %}</button>
+        <button type="submit" class="button btn-sm">{% trans "Solicitar comisión" %}</button>
       </form>
     </div>
     {% endif %}

@@ -231,7 +231,7 @@ def ventas_por_categoria(desde, hasta):
     )
     return [
         {
-            'categoria': fila['variant__product__category__name'] or 'Sin categoria',
+            'categoria': fila['variant__product__category__name'] or 'Sin categoría',
             'unidades': fila['unidades'],
             'ingresos': fila['ingresos'],
             'participacion': _pct(fila['ingresos'], total),
@@ -288,8 +288,8 @@ def canales_de_venta(desde, hasta):
     validos = _pedidos(desde, hasta, VENTA_VALIDA)
     total = _dec(validos.aggregate(t=Sum('total'))['t'])
     grupos = [
-        ('Con cupon de afiliado', Q(referred_by__isnull=False)),
-        ('Con otro cupon', Q(referred_by__isnull=True) & (Q(coupon__isnull=False) | Q(discount_total__gt=0))),
+        ('Con cupón de afiliado', Q(referred_by__isnull=False)),
+        ('Con otro cupón', Q(referred_by__isnull=True) & (Q(coupon__isnull=False) | Q(discount_total__gt=0))),
         ('Sin descuento', Q(referred_by__isnull=True, coupon__isnull=True, discount_total=0)),
     ]
     filas = []

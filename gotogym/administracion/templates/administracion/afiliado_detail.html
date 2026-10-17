@@ -10,7 +10,7 @@
 </section>
 
 <div class="panel">
-  <p><strong>Codigo de referido:</strong> {{ profile.referral_code }}</p>
+  <p><strong>Código de referido:</strong> {{ profile.referral_code }}</p>
   <p><strong>Correo:</strong> {{ profile.user.email }}</p>
   <p><strong>Estado:</strong>
     {% if profile.status == 'approved' and profile.is_active %}<span class="pill pill-ok">Aprobado</span>
@@ -20,37 +20,37 @@
   </p>
   {% if profile.reviewed_by %}<p><strong>Revisado por:</strong> {{ profile.reviewed_by.email }} el {{ profile.reviewed_at|date:"d/m/Y H:i" }}</p>{% endif %}
   {% if profile.rejection_reason %}<p><strong>Motivo de rechazo:</strong> {{ profile.rejection_reason }}</p>{% endif %}
-  <p><strong>Terminos aceptados:</strong> {% if profile.terms_accepted_at %}{{ profile.terms_accepted_at|date:"d/m/Y H:i" }}{% if profile.terms_version %} &middot; version {{ profile.terms_version }}{% else %} &middot; version anterior a que se registrara{% endif %}{% else %}No registrado{% endif %}</p>
+  <p><strong>Términos aceptados:</strong> {% if profile.terms_accepted_at %}{{ profile.terms_accepted_at|date:"d/m/Y H:i" }}{% if profile.terms_version %} &middot; versión {{ profile.terms_version }}{% else %} &middot; versión anterior a que se registrara{% endif %}{% else %}No registrado{% endif %}</p>
   {% if profile.exit_requested_at %}<p><strong>Aviso de baja:</strong> {{ profile.exit_requested_at|date:"d/m/Y" }}{% if profile.is_active %} &middot; efectiva el {{ profile.exit_effective_at|date:"d/m/Y" }}{% endif %}</p>{% endif %}
-  {% if profile.exited_at %}<p><strong>Salio del programa:</strong> {{ profile.exited_at|date:"d/m/Y" }}{% if profile.exit_reason %} &middot; {{ profile.get_exit_reason_display }}{% endif %}{% if profile.exit_notes %}<br><small>{{ profile.exit_notes }}</small>{% endif %}</p>{% endif %}
-  <p><strong>Ultima actividad (clic o venta):</strong> {{ ultima_actividad|date:"d/m/Y" }}</p>
-  <p><strong>Ventas referidas:</strong> {{ profile.total_referred }} &middot; <strong>Ventas generadas:</strong> ${{ profile.total_sales|cop }} COP &middot; <strong>Comision disponible:</strong> ${{ profile.commission_balance|cop }} COP{% if por_recuperar %} &middot; <strong>Por recuperar:</strong> ${{ por_recuperar|cop }} COP{% endif %}</p>
-  <p><strong>Clics en el enlace:</strong> {{ click_count }} &middot; <strong>Tasa de conversion:</strong> {% if conversion_rate %}{{ conversion_rate }}%{% else %}&mdash;{% endif %}</p>
-  <p><strong>Tasa de comision:</strong> {% if profile.commission_rate %}{{ profile.commission_rate }}% (propia){% else %}Tasa global del programa{% endif %}</p>
+  {% if profile.exited_at %}<p><strong>Salió del programa:</strong> {{ profile.exited_at|date:"d/m/Y" }}{% if profile.exit_reason %} &middot; {{ profile.get_exit_reason_display }}{% endif %}{% if profile.exit_notes %}<br><small>{{ profile.exit_notes }}</small>{% endif %}</p>{% endif %}
+  <p><strong>Última actividad (clic o venta):</strong> {{ ultima_actividad|date:"d/m/Y" }}</p>
+  <p><strong>Ventas referidas:</strong> {{ profile.total_referred }} &middot; <strong>Ventas generadas:</strong> ${{ profile.total_sales|cop }} COP &middot; <strong>Comisión disponible:</strong> ${{ profile.commission_balance|cop }} COP{% if por_recuperar %} &middot; <strong>Por recuperar:</strong> ${{ por_recuperar|cop }} COP{% endif %}</p>
+  <p><strong>Clics en el enlace:</strong> {{ click_count }} &middot; <strong>Tasa de conversión:</strong> {% if conversion_rate %}{{ conversion_rate }}%{% else %}&mdash;{% endif %}</p>
+  <p><strong>Tasa de comisión:</strong> {% if profile.commission_rate %}{{ profile.commission_rate }}% (propia){% else %}Tasa global del programa{% endif %}</p>
 
 </div>
 
 {% if perms.afiliados.change_perfilafiliado %}
 <div class="panel">
-  <h2>Comision y revision</h2>
+  <h2>Comisión y revisión</h2>
   <div class="detail-block">
-    <form method="post" action="{% url 'admin_afiliado_commission_rate_update' profile.pk %}" class="form-grid">
+    <form method="post" action="{% url 'admin_afiliado_commission_rate_update' profile.pk %}" class="form-inline">
       {% csrf_token %}
       <label>
-        <span>Tasa propia de comision (%)</span>
-        <input type="number" step="0.01" min="0" max="100" name="commission_rate" value="{{ profile.commission_rate|default_if_none:'' }}" placeholder="Vacio = tasa global">
+        <span>Tasa propia de comisión (%)</span>
+        <input type="number" step="0.01" min="0" max="100" name="commission_rate" value="{{ profile.commission_rate|default_if_none:'' }}" placeholder="Vacío = tasa global">
       </label>
-      <div class="form-actions"><button class="button" type="submit">Guardar tasa</button></div>
+      <button class="button" type="submit">Guardar tasa</button>
     </form>
   </div>
   <div class="detail-block">
     <form method="post" action="{% url 'admin_afiliado_notes_update' profile.pk %}" class="form-grid">
       {% csrf_token %}
       <label class="field-full">
-        <span>Notas internas de revision (el afiliado no las ve)</span>
+        <span>Notas internas de revisión (el afiliado no las ve)</span>
         <textarea name="review_notes" rows="3" maxlength="2000">{{ profile.review_notes }}</textarea>
       </label>
-      <div class="form-actions"><button class="ghost" type="submit">Guardar notas</button></div>
+      <div class="form-actions form-actions--start"><button class="button" type="submit">Guardar notas</button></div>
     </form>
   </div>
 </div>
@@ -70,12 +70,12 @@
     </form>
     {% elif es_aprobado_activo %}
     {% if profile.baja_solicitada %}
-    <form method="post" action="{% url 'admin_afiliado_advance_exit' profile.pk %}" onsubmit="return confirm('Se hara efectiva la baja de inmediato. ¿Continuar?');">
+    <form method="post" action="{% url 'admin_afiliado_advance_exit' profile.pk %}" onsubmit="return confirm('Se hará efectiva la baja de inmediato. ¿Continuar?');">
       {% csrf_token %}
       <button class="ghost" type="submit">Adelantar la baja solicitada</button>
     </form>
     {% endif %}
-    <form method="post" action="{% url 'admin_afiliado_deactivate' profile.pk %}" onsubmit="return confirm('¿Desactivar a este afiliado sin sancion?');">
+    <form method="post" action="{% url 'admin_afiliado_deactivate' profile.pk %}" onsubmit="return confirm('¿Desactivar a este afiliado sin sanción?');">
       {% csrf_token %}
       <button class="ghost" type="submit">Desactivar</button>
     </form>
@@ -93,7 +93,7 @@
 <div class="panel">
   <h2>Terminar o eliminar</h2>
   {% if perms.afiliados.change_perfilafiliado and es_aprobado_activo %}
-  <form id="terminar-participacion" method="post" action="{% url 'admin_afiliado_terminate' profile.pk %}" class="form-grid" onsubmit="return confirm('Se desactivara su codigo de inmediato y se le avisara por correo. ¿Continuar?');">
+  <form id="terminar-participacion" method="post" action="{% url 'admin_afiliado_terminate' profile.pk %}" class="form-grid" onsubmit="return confirm('Se desactivará su código de inmediato y se le avisará por correo. ¿Continuar?');">
     {% csrf_token %}
     <label><span>{{ terminacion_form.reason.label }}</span>{{ terminacion_form.reason }}</label>
     <label class="field-full"><span>{{ terminacion_form.notes.label }}</span>{{ terminacion_form.notes }}</label>
@@ -102,30 +102,30 @@
   {% endif %}
   <div class="form-actions">
     {% if perms.afiliados.change_perfilafiliado and es_aprobado_activo %}
-    <button class="button product-delete-button" type="submit" form="terminar-participacion">Terminar participacion</button>
+    <button class="button product-delete-button" type="submit" form="terminar-participacion">Terminar participación</button>
     {% endif %}
     {% if perms.afiliados.delete_perfilafiliado %}
-    <form method="post" action="{% url 'admin_afiliado_delete' profile.pk %}" onsubmit="return confirm('¿Eliminar definitivamente a {{ profile.user.email|escapejs }} del programa de afiliados? Esta accion no se puede deshacer.');">
+    <form method="post" action="{% url 'admin_afiliado_delete' profile.pk %}" onsubmit="return confirm('¿Eliminar definitivamente a {{ profile.user.email|escapejs }} del programa de afiliados? Esta acción no se puede deshacer.');">
       {% csrf_token %}
       <button class="button product-delete-button" type="submit">Eliminar afiliado</button>
     </form>
     {% endif %}
   </div>
-  <p class="hint">Terminar desactiva el codigo y le avisa al afiliado el motivo. Eliminar borra el perfil y su historial de forma definitiva.</p>
+  <p class="hint">Terminar desactiva el código y le avisa al afiliado el motivo. Eliminar borra el perfil y su historial de forma definitiva.</p>
 </div>
 {% endif %}
 
 <div class="panel">
   <h2>Pagos</h2>
   <p><strong>Pagado en {{ anio_actual }}:</strong> ${{ pagado_en_el_anio|cop }} COP</p>
-  <p class="hint">Neto de gastos de transaccion. No se aplican retenciones.</p>
-  <a class="button" href="{% url 'admin_afiliado_pagos' profile.pk %}">Ver historial de pagos (por ano y por mes)</a>
+  <p class="hint">Neto de gastos de transacción. No se aplican retenciones.</p>
+  <a class="button" href="{% url 'admin_afiliado_pagos' profile.pk %}">Ver historial de pagos (por año y por mes)</a>
 </div>
 
 <div class="panel">
   <h2>Cupones</h2>
   <table>
-    <thead><tr><th>Codigo</th><th>Descuento</th><th>Usos</th><th>Estado</th></tr></thead>
+    <thead><tr><th>Código</th><th>Descuento</th><th>Usos</th><th>Estado</th></tr></thead>
     <tbody>
       {% for coupon in coupons %}
       <tr>
@@ -134,7 +134,7 @@
         <td>{{ coupon.times_used }}{% if coupon.max_uses %} / {{ coupon.max_uses }}{% endif %}</td>
         <td>{% if coupon.is_usable %}<span class="pill pill-ok">Vigente</span>{% elif coupon.is_active %}<span class="badge badge-gold">Fuera de vigencia</span>{% else %}<span class="pill pill-off">Desactivado</span>{% endif %}</td>
       </tr>
-      {% empty %}<tr><td colspan="4">Sin cupones todavia.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="4">Sin cupones todavía.</td></tr>{% endfor %}
     </tbody>
   </table>
 </div>
@@ -152,8 +152,8 @@
         <td>
           {{ commission.get_status_display }}
           {% if commission.status == 'pending' %}
-            {% if commission.needs_review %}<br><span class="badge badge-gold">En revision</span><br><small>{{ commission.review_reason }}</small>
-            {% elif commission.validation_last_day %}<br><small>Validacion hasta el {{ commission.validation_last_day|date:"d/m/Y" }}</small>
+            {% if commission.needs_review %}<br><span class="badge badge-gold">En revisión</span><br><small>{{ commission.review_reason }}</small>
+            {% elif commission.validation_last_day %}<br><small>Validación hasta el {{ commission.validation_last_day|date:"d/m/Y" }}</small>
             {% else %}<br><small>Esperando la entrega</small>{% endif %}
           {% endif %}
           {% if commission.extension_reason %}<br><small>Extendida: {{ commission.extension_reason }}</small>{% endif %}
@@ -175,13 +175,13 @@
               {% csrf_token %}
               <input type="date" name="until" required aria-label="Extender hasta">
               <input type="text" name="reason" maxlength="200" placeholder="Motivo (se le avisa)" required size="18">
-              <button class="ghost btn-sm" type="submit">Extender validacion</button>
+              <button class="ghost btn-sm" type="submit">Extender validación</button>
             </form>
           </details>
           {% endif %}
           {% if commission.status == 'pending' or commission.status == 'approved' or commission.status == 'paid' %}
           <details class="payment-details"><summary>Anular</summary>
-            <form method="post" action="{% url 'admin_commission_void' commission.pk %}" onsubmit="return confirm('{% if commission.status == 'paid' %}Ya se pago: quedara por recuperar y se descontara del proximo pago. {% endif %}¿Anular esta comision?');">
+            <form method="post" action="{% url 'admin_commission_void' commission.pk %}" onsubmit="return confirm('{% if commission.status == 'paid' %}Ya se pago: quedará por recuperar y se descontará del próximo pago. {% endif %}¿Anular esta comisión?');">
               {% csrf_token %}
               <input type="text" name="reason" maxlength="200" placeholder="Motivo (obligatorio)" required size="18">
               <button class="button btn-sm product-delete-button" type="submit">Anular</button>
@@ -191,7 +191,7 @@
           {% endif %}
         </td>
       </tr>
-      {% empty %}<tr><td colspan="6">Sin comisiones todavia.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="6">Sin comisiones todavía.</td></tr>{% endfor %}
     </tbody>
   </table>
 </div>
@@ -203,12 +203,12 @@
     <tbody>
       <tr><th>Nombre</th><td>{{ profile.full_name }}</td></tr>
       <tr><th>Documento</th><td>{{ profile.get_document_type_display }} &middot; {{ profile.document_number }}</td></tr>
-      <tr><th>Telefono</th><td>{{ profile.phone }}</td></tr>
-      <tr><th>Direccion</th><td>{{ profile.address }}</td></tr>
+      <tr><th>Teléfono</th><td>{{ profile.phone }}</td></tr>
+      <tr><th>Dirección</th><td>{{ profile.address }}</td></tr>
     </tbody>
   </table>
   {% else %}
-  <p>Este afiliado se postulo antes de que se pidieran sus datos personales.</p>
+  <p>Este afiliado se postuló antes de que se pidieran sus datos personales.</p>
   {% endif %}
 </div>
 
@@ -244,19 +244,19 @@
       <tr><th>Titular</th><td>{{ cuenta.full_name }}</td></tr>
       <tr><th>Documento</th><td>{{ cuenta.get_document_type_display }} &middot; {{ cuenta.document_number }}</td></tr>
       <tr><th>Llave Bre-B</th><td>{{ cuenta.breb_key }}</td></tr>
-      <tr><th>Telefono</th><td>{{ cuenta.phone }}</td></tr>
-      <tr><th>Direccion</th><td>{{ cuenta.address }}</td></tr>
+      <tr><th>Teléfono</th><td>{{ cuenta.phone }}</td></tr>
+      <tr><th>Dirección</th><td>{{ cuenta.address }}</td></tr>
       <tr><th>Actualizada</th><td>{{ cuenta.updated_at|date:"d/m/Y H:i" }}</td></tr>
     </tbody>
   </table>
   {% endwith %}
   {% else %}
-  <p>Este afiliado todavia no inscribe su cuenta Bre-B.</p>
+  <p>Este afiliado todavía no inscribe su cuenta Bre-B.</p>
   {% endif %}
 </div>
 
 <div class="panel">
-  <h2>Solicitudes de comision</h2>
+  <h2>Solicitudes de comisión</h2>
   <table>
     <thead><tr><th>Monto</th><th>Estado</th><th>Datos de pago</th><th>Solicitada</th><th>Resuelta</th></tr></thead>
     <tbody>
@@ -265,7 +265,7 @@
         <td class="nowrap">
           ${{ withdrawal.amount|cop }} COP
           {% if withdrawal.recovery_amount %}<br><small>Incluye ${{ withdrawal.recovery_amount|cop }} descontados por devoluciones</small>{% endif %}
-          {% if withdrawal.status == 'paid' and withdrawal.transaction_fee %}<br><small>Gastos ${{ withdrawal.transaction_fee|cop }} &middot; Recibio ${{ withdrawal.net_paid|cop }}</small>{% endif %}
+          {% if withdrawal.status == 'paid' and withdrawal.transaction_fee %}<br><small>Gastos ${{ withdrawal.transaction_fee|cop }} &middot; Recibió ${{ withdrawal.net_paid|cop }}</small>{% endif %}
         </td>
         <td>{{ withdrawal.get_status_display }}</td>
         <td>
@@ -276,7 +276,7 @@
         <td><small>{{ withdrawal.requested_at|date:"d/m/Y" }}</small></td>
         <td><small>{{ withdrawal.resolved_at|date:"d/m/Y"|default:"—" }}</small></td>
       </tr>
-      {% empty %}<tr><td colspan="5">Sin solicitudes todavia.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="5">Sin solicitudes todavía.</td></tr>{% endfor %}
     </tbody>
   </table>
 </div>

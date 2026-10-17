@@ -10,7 +10,7 @@
 
 {% if pending_withdrawal %}
 <div class="panel panel-status">
-  <h2>{% trans "Solicitud de comision en curso" %}</h2>
+  <h2>{% trans "Solicitud de comisión en curso" %}</h2>
   <p>{% blocktrans with monto=pending_withdrawal.amount|cop fecha=pending_withdrawal.requested_at|date:"d/m/Y" limite=fecha_limite_de_pago|date:"d/m/Y" %}Solicitaste ${{ monto }} COP el {{ fecha }}. Las solicitudes de cada mes se pagan en los primeros 10 días hábiles del mes siguiente: la tuya se paga a más tardar el {{ limite }}. Te avisaremos por correo cuando se pague.{% endblocktrans %}</p>
 </div>
 {% endif %}

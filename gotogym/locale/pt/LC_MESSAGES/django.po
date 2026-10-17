@@ -208,7 +208,7 @@ msgstr "Descobrir coleção"
 msgid "Política de privacidad"
 msgstr "Política de Privacidade"
 
-msgid "Abrir menu"
+msgid "Abrir menú"
 msgstr "Abrir menu"
 
 msgid "Acepto los"
@@ -217,7 +217,7 @@ msgstr "Aceito os"
 msgid "Admin"
 msgstr "Admin"
 
-msgid "Agregar direccion"
+msgid "Agregar dirección"
 msgstr "Adicionar endereço"
 
 msgid "Artículos"
@@ -256,7 +256,7 @@ msgstr "Cancelar"
 msgid "Cerrar"
 msgstr "Fechar"
 
-msgid "Cerrar sesion"
+msgid "Cerrar sesión"
 msgstr "Sair"
 
 msgid "Cintura"
@@ -316,7 +316,7 @@ msgstr "Diminuir quantidade"
 msgid "Edad"
 msgstr "Idade"
 
-msgid "Editar direccion"
+msgid "Editar dirección"
 msgstr "Editar endereço"
 
 msgid "Editar perfil"
@@ -329,7 +329,7 @@ msgstr "O link para redefinir a senha expirou ou já foi usado. Peça um novo."
 msgid "El envío se suma en el checkout y ahí verás el total final a pagar."
 msgstr "O frete é somado no checkout, onde você verá o total final a pagar."
 
-msgid "Elige cual usar por defecto en tus pedidos:"
+msgid "Elige cuál usar por defecto en tus pedidos:"
 msgstr "Escolha qual usar por padrão nos seus pedidos:"
 
 msgid "Elige una contraseña segura para tu cuenta."
@@ -374,7 +374,7 @@ msgstr "Salvar"
 msgid "Guardar cambios"
 msgstr "Salvar alterações"
 
-msgid "Guardar direccion"
+msgid "Guardar dirección"
 msgstr "Salvar endereço"
 
 msgid "Herramienta de pruebas — no visible en producción real"
@@ -428,7 +428,7 @@ msgstr ""
 "Medidas do corpo, em centímetros. É uma referência geral, não uma medida "
 "verificada desta peça: cada corte pode variar."
 
-msgid "Menu de usuario"
+msgid "Menú de usuario"
 msgstr "Menu do usuário"
 
 msgid "Mi cuenta"
@@ -452,7 +452,7 @@ msgstr "Não foi possível adicionar"
 msgid "Nueva contraseña"
 msgstr "Nova senha"
 
-msgid "Nueva direccion"
+msgid "Nueva dirección"
 msgstr "Novo endereço"
 
 msgid "Ocultar contraseña"
@@ -555,13 +555,13 @@ msgstr "Solicitação de afiliado"
 msgid "Suscribirme"
 msgstr "Inscrever-me"
 
-msgid "Telefono"
+msgid "Teléfono"
 msgstr "Telefone"
 
-msgid "Terminos"
+msgid "Términos"
 msgstr "Termos"
 
-msgid "Todavia no tienes direcciones guardadas."
+msgid "Todavía no tienes direcciones guardadas."
 msgstr "Você ainda não tem endereços salvos."
 
 msgid "Tratamiento de datos"
@@ -627,7 +627,7 @@ msgstr "Senha redefinida!"
 msgid "¡Quedan pocas unidades!"
 msgstr "Restam poucas unidades!"
 
-msgid "¿Eliminar esta direccion?"
+msgid "¿Eliminar esta dirección?"
 msgstr "Excluir este endereço?"
 
 msgid "¿No tienes cuenta?"

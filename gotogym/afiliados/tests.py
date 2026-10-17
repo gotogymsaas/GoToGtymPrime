@@ -99,7 +99,7 @@ class AfiliadoTestBase(TestCase):
         ConfiguracionProgramaAfiliados.objects.update_or_create(
             pk=1, defaults={'minimum_payout': Decimal('0.00')},
         )
-        categoria = ProductCategory.objects.create(name='Categoria afiliado')
+        categoria = ProductCategory.objects.create(name='Categoría afiliado')
         marca = Brand.objects.create(name='Marca afiliado')
         cls.producto = Product.objects.create(
             name='Producto afiliado', category=categoria, brand=marca,
@@ -391,7 +391,7 @@ class SolicitudDeComisionTests(AfiliadoTestBase):
 
     def test_el_panel_ofrece_el_desplegable_con_la_llave_inscrita(self):
         respuesta = self.client.get(reverse('afiliado_dashboard'))
-        self.assertContains(respuesta, 'Solicitar comision')
+        self.assertContains(respuesta, 'Solicitar comisión')
         self.assertNotContains(respuesta, 'Solicitar retiro')
         self.assertContains(respuesta, 'Te pagaremos a tu llave Bre-B')
         self.assertContains(respuesta, '3001234567')
@@ -400,16 +400,16 @@ class SolicitudDeComisionTests(AfiliadoTestBase):
     def test_sin_cuenta_el_panel_pide_inscribirla_en_lugar_del_desplegable(self):
         self.cuenta.delete()
         respuesta = self.client.get(reverse('afiliado_dashboard'))
-        self.assertContains(respuesta, 'Inscribir cuenta para solicitar comision')
+        self.assertContains(respuesta, 'Inscribir cuenta para solicitar comisión')
         self.assertNotContains(respuesta, 'name="payment_details"')
 
     def test_la_solicitud_copia_los_datos_de_la_cuenta_y_la_nota(self):
-        self._solicitar(payment_details='  Pagar despues del 15  ')
+        self._solicitar(payment_details='  Pagar después del 15  ')
         solicitud = WithdrawalRequest.objects.get(afiliado=self.perfil)
         self.assertIn('Llave Bre-B: 3001234567', solicitud.payment_details)
         self.assertIn('Titular: Ana Perez', solicitud.payment_details)
         self.assertIn('Documento: CC 1020304050', solicitud.payment_details)
-        self.assertTrue(solicitud.payment_details.endswith('Nota del afiliado: Pagar despues del 15'))
+        self.assertTrue(solicitud.payment_details.endswith('Nota del afiliado: Pagar después del 15'))
         self.assertGreater(solicitud.amount, 0)
 
     def test_la_nota_es_opcional(self):
@@ -444,7 +444,7 @@ class SolicitudDeComisionTests(AfiliadoTestBase):
     def test_con_una_solicitud_en_curso_el_panel_la_muestra_y_no_ofrece_otra(self):
         self._solicitar()
         respuesta = self.client.get(reverse('afiliado_dashboard'))
-        self.assertContains(respuesta, 'Solicitud de comision en curso')
+        self.assertContains(respuesta, 'Solicitud de comisión en curso')
         self.assertNotContains(respuesta, 'name="payment_details"')
 
 
@@ -496,7 +496,7 @@ class AvisoDePagoPorCorreoTests(AfiliadoTestBase):
         self.assertContains(respuesta, 'Cuenta 123')
         self.assertNotContains(respuesta, 'Retiros de afiliados')
         panel = self.client.get(reverse('admin_dashboard'))
-        self.assertContains(panel, 'Solicitudes de comision')
+        self.assertContains(panel, 'Solicitudes de comisión')
         self.assertNotContains(panel, 'Retiros pendientes')
 
     def test_el_menu_lateral_tiene_boton_para_plegarse_en_celular(self):
@@ -513,7 +513,7 @@ class PanelDeAfiliadoViewTests(AfiliadoTestBase):
 
         respuesta = self.client.get(reverse('afiliado_dashboard'))
 
-        self.assertContains(respuesta, 'en revision')
+        self.assertContains(respuesta, 'en revisión')
         self.assertNotContains(respuesta, 'Copiar')
 
     def test_dashboard_de_aprobado_muestra_las_compras_reales(self):

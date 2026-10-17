@@ -90,9 +90,9 @@ class ProductAdminForm(forms.ModelForm):
         }
         labels = {
             "name": "Nombre",
-            "category": "Categoria",
+            "category": "Categoría",
             "brand": "Marca",
-            "description": "Descripcion",
+            "description": "Descripción",
             "discount": "Descuento (%)",
             "stock": "Stock inicial (heredado)",
             "featured": "Destacado",
@@ -322,13 +322,13 @@ class CouponForm(forms.ModelForm):
             "ends_at": forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"),
         }
         labels = {
-            "code": "Codigo",
+            "code": "Código",
             "discount_type": "Tipo de descuento",
             "value": "Valor",
-            "min_purchase": "Compra minima",
+            "min_purchase": "Compra mínima",
             "starts_at": "Vigente desde",
             "ends_at": "Vigente hasta",
-            "max_uses": "Usos maximos",
+            "max_uses": "Usos máximos",
             "is_active": "Activo",
         }
 
@@ -343,7 +343,7 @@ class CouponForm(forms.ModelForm):
         if self.instance.pk:
             existe = existe.exclude(pk=self.instance.pk)
         if existe.exists():
-            raise forms.ValidationError("Ya existe un cupon con este codigo.")
+            raise forms.ValidationError("Ya existe un cupón con este código.")
         return code
 
     def clean(self):
@@ -402,10 +402,10 @@ class ConfiguracionProgramaAfiliadosForm(forms.ModelForm):
         model = ConfiguracionProgramaAfiliados
         fields = ["default_commission_rate", "default_customer_discount", "minimum_payout", "inactivity_days"]
         labels = {
-            "default_commission_rate": "Tasa de comision global (%)",
+            "default_commission_rate": "Tasa de comisión global (%)",
             "default_customer_discount": "Descuento al cliente final (%)",
-            "minimum_payout": "Minimo para solicitar pago (COP)",
-            "inactivity_days": "Dias sin actividad para listar como inactivo",
+            "minimum_payout": "Mínimo para solicitar pago (COP)",
+            "inactivity_days": "Días sin actividad para listar como inactivo",
         }
 
 
@@ -413,7 +413,7 @@ class AfiliadoCommissionRateForm(forms.ModelForm):
     class Meta:
         model = PerfilAfiliado
         fields = ["commission_rate"]
-        labels = {"commission_rate": "Tasa propia (vacio = usar la tasa global)"}
+        labels = {"commission_rate": "Tasa propia (vacío = usar la tasa global)"}
 
 
 MOTIVOS_DE_TERMINACION = [(valor, etiqueta) for valor, etiqueta in MotivoSalida.choices if valor != MotivoSalida.VOLUNTARY]
@@ -436,8 +436,8 @@ class RecursoMarcaForm(forms.ModelForm):
         model = RecursoMarca
         fields = ["title", "description", "file", "order", "is_active"]
         labels = {
-            "title": "Titulo",
-            "description": "Descripcion",
+            "title": "Título",
+            "description": "Descripción",
             "file": "Archivo",
             "order": "Orden",
             "is_active": "Visible para afiliados",

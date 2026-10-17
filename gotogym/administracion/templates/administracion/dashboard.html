@@ -15,14 +15,14 @@
 
 <section class="stats stats-compact">
   <article><span>{{ product_count }}</span><p>Productos</p></article>
-  <article><span>{{ category_count }}</span><p>Categorias</p></article>
+  <article><span>{{ category_count }}</span><p>Categorías</p></article>
   <article><span>{{ active_coupon_count }}</span><p>Cupones activos</p></article>
   <article><span>{{ user_count }}</span><p>Usuarios inscritos</p></article>
   <article><span>{{ afiliado_count }}</span><p>Afiliados activos</p></article>
 </section>
 
 <section class="page-head">
-  <h2>Necesita tu atencion</h2>
+  <h2>Necesita tu atención</h2>
 </section>
 <section class="stats stats-secondary">
   <article class="{% if anuladas.por_devolver_pedidos %}stat-danger{% else %}is-green{% endif %}">
@@ -33,7 +33,7 @@
     <a href="{% url 'admin_afiliados' %}?status=pending"><span>{{ pending_afiliado_count }}</span><p>Solicitudes de afiliado</p></a>
   </article>
   <article class="{% if pending_withdrawal_count %}is-gold stat-warning{% else %}is-green{% endif %}">
-    <a href="{% url 'admin_withdrawals' %}"><span>{{ pending_withdrawal_count }}</span><p>Solicitudes de comision</p></a>
+    <a href="{% url 'admin_withdrawals' %}"><span>{{ pending_withdrawal_count }}</span><p>Solicitudes de comisión</p></a>
   </article>
   <article class="{% if low_stock_count %}is-gold stat-warning{% else %}is-green{% endif %}"><span>{{ low_stock_count }}</span><p>Variantes con stock bajo</p></article>
   <article class="{% if out_of_stock_count %}stat-danger{% else %}is-green{% endif %}"><span>{{ out_of_stock_count }}</span><p>Variantes agotadas</p></article>
@@ -42,7 +42,7 @@
 {% if bajo_stock %}
 <div class="panel">
   <h2>Stock bajo &mdash; reabastecer pronto</h2>
-  <p class="hint">Umbral actual: {{ low_stock_threshold }} unidades. Para saber cuanto dura el stock segun lo que se vende, mira la <a href="{% url 'admin_analytics' %}#inventario">cobertura de inventario</a>.</p>
+  <p class="hint">Umbral actual: {{ low_stock_threshold }} unidades. Para saber cuánto dura el stock según lo que se vende, mira la <a href="{% url 'admin_analytics' %}#inventario">cobertura de inventario</a>.</p>
   <table>
     <thead><tr><th>Producto</th><th>SKU</th><th>Talla/Color</th><th>Disponible</th></tr></thead>
     <tbody>
@@ -77,7 +77,7 @@
     {% include "administracion/partials/_delta.html" with valor=comparacion.neto %}
   </article>
   <article>
-    <span>{{ resumen.pedidos }}</span><p>Pedidos validos</p>
+    <span>{{ resumen.pedidos }}</span><p>Pedidos válidos</p>
     {% include "administracion/partials/_delta.html" with valor=comparacion.pedidos %}
   </article>
   <article>
@@ -91,7 +91,7 @@
 </section>
 <section class="stats stats-secondary">
   <article><span>${{ resumen.descuentos|cop }} COP</span><p>Descuentos{% if resumen.tasa_descuento is not None %} ({{ resumen.tasa_descuento }} % de la venta bruta){% endif %}</p></article>
-  <article><span>${{ resumen.envio|cop }} COP</span><p>Envio cobrado</p></article>
+  <article><span>${{ resumen.envio|cop }} COP</span><p>Envío cobrado</p></article>
   <article><span>${{ resumen.reembolsos|cop }} COP</span><p>Reembolsos parciales</p></article>
   <article class="{% if anuladas.pedidos %}is-gold{% endif %}"><span>${{ anuladas.monto|cop }} COP</span><p>Ventas anuladas ({{ anuladas.pedidos }} pedidos), no incluidas arriba</p></article>
 </section>
@@ -104,12 +104,12 @@
     <div class="pq-progress__track"><div class="pq-progress__fill" style="width:{{ meta_mes.avance_pct }}%;"></div></div>
   </div>
   <p class="hint">
-    A hoy deberias llevar ${{ meta_mes.esperado_a_hoy|cop }} COP{% if meta_mes.ritmo_pct is not None %} (vas al {{ meta_mes.ritmo_pct }} % del ritmo){% endif %}.
-    Al ritmo actual cerrarias el mes en ${{ meta_mes.proyeccion|cop }} COP.
-    {% if meta_mes.diario_necesario is not None and meta_mes.diario_necesario > 0 %}Para llegar a la meta necesitas ${{ meta_mes.diario_necesario|cop }} COP por dia durante los {{ meta_mes.dias_restantes }} dias que quedan.{% endif %}
+    A hoy deberías llevar ${{ meta_mes.esperado_a_hoy|cop }} COP{% if meta_mes.ritmo_pct is not None %} (vas al {{ meta_mes.ritmo_pct }} % del ritmo){% endif %}.
+    Al ritmo actual cerrarías el mes en ${{ meta_mes.proyeccion|cop }} COP.
+    {% if meta_mes.diario_necesario is not None and meta_mes.diario_necesario > 0 %}Para llegar a la meta necesitas ${{ meta_mes.diario_necesario|cop }} COP por día durante los {{ meta_mes.dias_restantes }} días que quedan.{% endif %}
   </p>
   {% else %}
-  <p class="hint">Define una meta mensual para ver tu avance, el ritmo esperado y la proyeccion del mes. Se mide siempre sobre el mes en curso, sin importar el rango filtrado arriba.</p>
+  <p class="hint">Define una meta mensual para ver tu avance, el ritmo esperado y la proyección del mes. Se mide siempre sobre el mes en curso, sin importar el rango filtrado arriba.</p>
   {% endif %}
   {% if perms.administracion.change_panelsettings %}
   <form method="post" action="{% url 'admin_sales_goal_update' %}" style="display:flex; align-items:center; gap: var(--space-3); flex-wrap: wrap;">
@@ -128,14 +128,14 @@
   <article><span>${{ comisiones.pendiente|default:0|cop }} COP</span><p>Comisiones pendientes</p></article>
   <article><span>${{ comisiones.aprobada|default:0|cop }} COP</span><p>Comisiones aprobadas</p></article>
   <article><span>${{ comisiones.pagada|default:0|cop }} COP</span><p>Comisiones pagadas</p></article>
-  <article><span>{% if comision_sobre_ventas_afiliados is not None %}{{ comision_sobre_ventas_afiliados }} %{% else %}&mdash;{% endif %}</span><p>Comision sobre ventas de afiliados</p></article>
+  <article><span>{% if comision_sobre_ventas_afiliados is not None %}{{ comision_sobre_ventas_afiliados }} %{% else %}&mdash;{% endif %}</span><p>Comisión sobre ventas de afiliados</p></article>
 </section>
 
 <section class="grid-two">
   <div class="panel">
-    <h2>Ventas por dia</h2>
+    <h2>Ventas por día</h2>
     <table>
-      <thead><tr><th>Fecha</th><th>Pedidos</th><th>Total</th><th><span class="sr-only">Proporcion respecto al mejor dia</span></th></tr></thead>
+      <thead><tr><th>Fecha</th><th>Pedidos</th><th>Total</th><th><span class="sr-only">Proporción respecto al mejor día</span></th></tr></thead>
       <tbody>
         {% for fila in serie_diaria %}
         <tr>
@@ -150,7 +150,7 @@
     </table>
   </div>
   <div class="panel">
-    <h2>Productos con mas ingresos</h2>
+    <h2>Productos con más ingresos</h2>
     <table>
       <thead><tr><th>Producto</th><th>Unid.</th><th>Ingresos</th><th>% del total</th></tr></thead>
       <tbody>
@@ -169,9 +169,9 @@
 
 <section class="grid-two">
   <div class="panel">
-    <h2>Ventas por categoria</h2>
+    <h2>Ventas por categoría</h2>
     <table>
-      <thead><tr><th>Categoria</th><th>Unid.</th><th>Ingresos</th><th>% del total</th></tr></thead>
+      <thead><tr><th>Categoría</th><th>Unid.</th><th>Ingresos</th><th>% del total</th></tr></thead>
       <tbody>
         {% for fila in categorias %}
         <tr>
@@ -199,7 +199,7 @@
         {% endfor %}
       </tbody>
     </table>
-    <p class="hint">Mas detalle del comportamiento (embudo, busquedas, clientes y cupones) en <a href="{% url 'admin_analytics' %}">Analitica</a>.</p>
+    <p class="hint">Más detalle del comportamiento (embudo, búsquedas, clientes y cupones) en <a href="{% url 'admin_analytics' %}">Analítica</a>.</p>
   </div>
 </section>
 {% endblock %}

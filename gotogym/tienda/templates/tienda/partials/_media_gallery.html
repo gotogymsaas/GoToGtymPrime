@@ -40,7 +40,7 @@ misma resolucion que usa la tarjeta de catalogo.
   </div>
 
   {% if gallery|length > 1 %}
-  <div class="pdp-gallery__thumbs" data-gallery-thumbs role="tablist" aria-label="{% trans 'Imagenes del producto' %}">
+  <div class="pdp-gallery__thumbs" data-gallery-thumbs role="tablist" aria-label="{% trans 'Imágenes del producto' %}">
     {% for media in gallery %}
     <button type="button" class="pdp-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-gallery-thumb data-gallery-index="{{ forloop.counter0 }}" role="tab" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="{% blocktrans with n=forloop.counter %}Ver imagen {{ n }}{% endblocktrans %}">
       <img src="{% url_imagen_producto media.image.name %}" alt="{{ media.alt_text|default:producto.name|traducir }}" class="object-contain w-full h-full">

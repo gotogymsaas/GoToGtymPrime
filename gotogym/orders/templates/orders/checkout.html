@@ -5,7 +5,7 @@
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261014-cookies">
+<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261017-responsive">
 <link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20261015-chips">
 {% endblock %}
 
@@ -240,7 +240,7 @@
       fetch(urlValidarCupon + '?code=' + encodeURIComponent(codigo), {
         credentials: 'same-origin'
       }).then(function (respuesta) {
-        if (!respuesta.ok) throw new Error('validacion no disponible');
+        if (!respuesta.ok) throw new Error('validación no disponible');
         return respuesta.json();
       }).then(function (datos) {
         if (datos.valid) {
@@ -273,7 +273,7 @@
       fetch(urlCotizar + '?city=' + encodeURIComponent(ciudadSelect.value), {
         credentials: 'same-origin'
       }).then(function (respuesta) {
-        if (!respuesta.ok) throw new Error('cotizacion no disponible');
+        if (!respuesta.ok) throw new Error('cotización no disponible');
         return respuesta.json();
       }).then(function (datos) {
         valorEnvio.dataset.cost = datos.cost;

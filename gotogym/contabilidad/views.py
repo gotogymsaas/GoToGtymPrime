@@ -8,8 +8,8 @@ from integrations.alegra.alegra_client import AlegraClient
 
 logger = logging.getLogger(__name__)
 
-MENSAJE_SIN_CREDENCIALES = 'Alegra no esta configurado: faltan las credenciales de la integracion.'
-MENSAJE_ERROR = 'No se pudo consultar Alegra. Intenta de nuevo en unos minutos; si persiste, revisa la integracion.'
+MENSAJE_SIN_CREDENCIALES = 'Alegra no está configurado: faltan las credenciales de la integración.'
+MENSAJE_ERROR = 'No se pudo consultar Alegra. Intenta de nuevo en unos minutos; si persiste, revisa la integración.'
 
 
 def _mensaje_de_error(error):

@@ -57,9 +57,9 @@ class Command(BaseCommand):
     help = 'Genera todos los correos con datos de muestra para revisar su diseño (no deja datos en la base).'
 
     def add_arguments(self, parser):
-        parser.add_argument('--carpeta', default='vista_previa_correos', help='Donde escribir los archivos HTML.')
+        parser.add_argument('--carpeta', default='vista_previa_correos', help='Dónde escribir los archivos HTML.')
         parser.add_argument('--idioma', default='es', choices=[codigo for codigo, _ in settings.LANGUAGES])
-        parser.add_argument('--enviar', metavar='CORREO', help='Manda tambien cada correo a esta bandeja.')
+        parser.add_argument('--enviar', metavar='CORREO', help='Manda también cada correo a esta bandeja.')
 
     def handle(self, *args, **options):
         idioma = options['idioma']

@@ -3,7 +3,7 @@
 {% block content %}
 <section class="page-head">
   <div>
-    <p class="eyebrow">Catalogo comercial</p>
+    <p class="eyebrow">Catálogo comercial</p>
     <h1>Inventario</h1>
   </div>
   {% if perms.administracion.change_panelsettings %}
@@ -20,7 +20,7 @@
 <form class="search" method="get">
   <input name="q" value="{{ query }}" placeholder="Buscar por SKU o producto">
   <select name="categoria">
-    <option value="">Todas las categorias</option>
+    <option value="">Todas las categorías</option>
     {% for categoria in categorias %}
     <option value="{{ categoria.pk }}" {% if selected_categoria == categoria.pk|stringformat:"s" %}selected{% endif %}>{{ categoria.name }}</option>
     {% endfor %}

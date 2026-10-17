@@ -10,7 +10,7 @@ from gotogym.correo import Correo, aviso, boton, datos, enviar_correo, parrafo
 
 
 class Command(BaseCommand):
-    help = 'Envia un correo de prueba al destinatario indicado.'
+    help = 'Envía un correo de prueba al destinatario indicado.'
 
     def add_arguments(self, parser):
         parser.add_argument('destinatario')

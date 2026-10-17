@@ -34,7 +34,7 @@ class FormularioDePostulacionTests(AfiliadoTestBase):
         for campo in CAMPOS_PERSONALES:
             self.assertContains(respuesta, f'name="{campo}"')
         self.assertContains(respuesta, '<select name="document_type"')
-        self.assertContains(respuesta, 'Cedula de ciudadania')
+        self.assertContains(respuesta, 'Cédula de ciudadanía')
 
     def test_instagram_viene_por_defecto_y_el_desplegable_ofrece_otras_redes(self):
         respuesta = self.client.get(self.url)
@@ -212,7 +212,7 @@ class VistaAdminPostulacionTests(AfiliadoTestBase):
     def test_el_admin_ve_datos_personales_redes_y_total(self):
         respuesta = self.client.get(reverse('admin_afiliado_detail', args=[self.perfil.pk]))
         self.assertContains(respuesta, 'Ana Perez')
-        self.assertContains(respuesta, 'Cedula de ciudadania')
+        self.assertContains(respuesta, 'Cédula de ciudadanía')
         self.assertContains(respuesta, '@anafit')
         self.assertContains(respuesta, 'Kwai')
         self.assertContains(respuesta, '1.500')

@@ -20,9 +20,9 @@ CAMPOS_PERSONALES = ('first_name', 'last_name', 'phone', 'address', 'document_ty
 ETIQUETAS_PERSONALES = {
     'first_name': gettext_lazy('Nombre'),
     'last_name': gettext_lazy('Apellido'),
-    'phone': gettext_lazy('Telefono'),
-    'address': gettext_lazy('Direccion'),
-    'document_number': gettext_lazy('Numero de documento'),
+    'phone': gettext_lazy('Teléfono'),
+    'address': gettext_lazy('Dirección'),
+    'document_number': gettext_lazy('Número de documento'),
 }
 
 
@@ -40,7 +40,7 @@ def normalizar_llave(llave):
         return llave.lower()
     if llave.startswith('@'):
         if not LLAVE_ALFANUMERICA.fullmatch(llave):
-            raise ValidationError(gettext('Una llave que empieza por @ lleva despues de 4 a 20 letras o numeros, sin espacios.'))
+            raise ValidationError(gettext('Una llave que empieza por @ lleva después de 4 a 20 letras o números, sin espacios.'))
         return llave
     # Los separadores (espacios, puntos, guiones, parentesis) solo se
     # perdonan en un numero; en un codigo con letras un espacio es un error.
@@ -51,7 +51,7 @@ def normalizar_llave(llave):
         return celular.group(1)
     if not DOCUMENTO_VALIDO.fullmatch(sin_separadores):
         raise ValidationError(
-            gettext('Escribe tu llave tal como la creaste en tu banco: documento, celular, correo o codigo con @.')
+            gettext('Escribe tu llave tal como la creaste en tu banco: documento, celular, correo o código con @.')
         )
     return sin_separadores
 
@@ -91,21 +91,21 @@ class DatosPersonalesForm(forms.ModelForm):
         telefono = self.cleaned_data['phone'].strip()
         if not TELEFONO_VALIDO.match(telefono):
             raise ValidationError(
-                gettext('Escribe un telefono valido: entre 7 y 20 caracteres, solo numeros y + ( ) - espacios.')
+                gettext('Escribe un teléfono válido: entre 7 y 20 caracteres, solo números y + ( ) - espacios.')
             )
         return telefono
 
     def clean_document_number(self):
         numero = re.sub(r'[\s.\-]', '', self.cleaned_data['document_number'])
         if not DOCUMENTO_VALIDO.fullmatch(numero):
-            raise ValidationError(gettext('Escribe el documento de 5 a 20 letras o numeros, sin puntos ni espacios.'))
+            raise ValidationError(gettext('Escribe el documento de 5 a 20 letras o números, sin puntos ni espacios.'))
         return numero.upper()
 
 
 class PayoutAccountForm(DatosPersonalesForm):
     accept_terms = forms.BooleanField(
         required=True,
-        error_messages={'required': gettext_lazy('Debes aceptar los terminos para inscribir tu cuenta.')},
+        error_messages={'required': gettext_lazy('Debes aceptar los términos para inscribir tu cuenta.')},
     )
     accept_data = forms.BooleanField(
         required=True,
@@ -136,12 +136,12 @@ class PostulacionForm(DatosPersonalesForm):
     aceptacion de los terminos. Las redes sociales van en `RedSocialFormSet`."""
 
     referral_code = forms.CharField(
-        label=gettext_lazy('Tu codigo de afiliado'), max_length=20,
-        error_messages={'required': gettext_lazy('Elige un codigo para tu marca.')},
+        label=gettext_lazy('Tu código de afiliado'), max_length=20,
+        error_messages={'required': gettext_lazy('Elige un código para tu marca.')},
     )
     accept_terms = forms.BooleanField(
         required=True,
-        error_messages={'required': gettext_lazy('Debes aceptar los terminos del programa para continuar.')},
+        error_messages={'required': gettext_lazy('Debes aceptar los términos del programa para continuar.')},
     )
 
     class Meta:
@@ -153,10 +153,10 @@ class PostulacionForm(DatosPersonalesForm):
         codigo = self.cleaned_data['referral_code'].strip().upper()
         if not CODIGO_REFERIDO_REGEX.fullmatch(codigo):
             raise ValidationError(
-                gettext('Elige un codigo de 4 a 20 letras o numeros (sin espacios ni simbolos) que te represente a ti y a tu marca.')
+                gettext('Elige un código de 4 a 20 letras o números (sin espacios ni símbolos) que te represente a ti y a tu marca.')
             )
         if not codigo_referido_disponible(codigo, excluir_profile_pk=self.instance.pk):
-            raise ValidationError(gettext('Ese codigo ya esta en uso. Elige otro.'))
+            raise ValidationError(gettext('Ese código ya está en uso. Elige otro.'))
         return codigo
 
 
@@ -205,13 +205,13 @@ class RedSocialForm(forms.Form):
     followers = SeguidoresField(
         label=gettext_lazy('Seguidores'), min_value=0, max_value=MAX_SEGUIDORES,
         widget=SeguidoresInput(attrs={'inputmode': 'numeric', 'autocomplete': 'off', 'placeholder': '0', 'data-miles': ''}),
-        error_messages={'required': gettext_lazy('Indica cuantos seguidores tienes.')},
+        error_messages={'required': gettext_lazy('Indica cuántos seguidores tienes.')},
     )
 
     def clean_username(self):
         usuario = self.cleaned_data['username'].strip().removeprefix('@')
         if not USUARIO_DE_RED.fullmatch(usuario):
-            raise ValidationError(gettext('Escribe solo tu usuario (2 a 60 letras, numeros, punto, guion o guion bajo), sin enlaces ni espacios.'))
+            raise ValidationError(gettext('Escribe solo tu usuario (2 a 60 letras, números, punto, guion o guion bajo), sin enlaces ni espacios.'))
         return usuario
 
     def clean(self):
@@ -247,5 +247,5 @@ RedSocialFormSet = forms.formset_factory(
 RedSocialFormSet.default_error_messages = {
     'too_few_forms': gettext_lazy('Agrega al menos una red social.'),
     'too_many_forms': gettext_lazy('Puedes agregar hasta %(max)s redes sociales.') % {'max': MAX_REDES},
-    'missing_management_form': gettext_lazy('Faltan datos del formulario de redes sociales. Recarga la pagina e intenta de nuevo.'),
+    'missing_management_form': gettext_lazy('Faltan datos del formulario de redes sociales. Recarga la página e intenta de nuevo.'),
 }

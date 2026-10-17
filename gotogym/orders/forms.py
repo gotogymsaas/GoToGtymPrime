@@ -53,7 +53,7 @@ class CheckoutForm(forms.Form):
         phone = self.cleaned_data['phone'].strip()
         if not TELEFONO_VALIDO.match(phone):
             raise forms.ValidationError(
-                gettext('Escribe un telefono valido: entre 7 y 20 caracteres, solo numeros y + ( ) - espacios.')
+                gettext('Escribe un teléfono válido: entre 7 y 20 caracteres, solo números y + ( ) - espacios.')
             )
         return phone
 
@@ -66,7 +66,7 @@ class CheckoutForm(forms.Form):
     def clean_address_line(self):
         direccion = self.cleaned_data['address_line'].strip()
         if len(direccion) < 5:
-            raise forms.ValidationError(gettext('La direccion es demasiado corta.'))
+            raise forms.ValidationError(gettext('La dirección es demasiado corta.'))
         return direccion
 
     def clean(self):
@@ -83,7 +83,7 @@ class CheckoutForm(forms.Form):
         if departamento and ciudad and ciudad not in municipios_de(departamento):
             self.add_error(
                 'city',
-                'Selecciona una ciudad valida para el departamento elegido.',
+                'Selecciona una ciudad válida para el departamento elegido.',
             )
         cleaned_data['city'] = ciudad
         return cleaned_data

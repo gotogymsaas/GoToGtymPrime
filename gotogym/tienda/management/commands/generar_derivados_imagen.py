@@ -35,19 +35,19 @@ CALIDAD = {'AVIF': 46, 'WEBP': 72}
 
 
 class Command(BaseCommand):
-    help = 'Crea derivados AVIF/WebP responsivos de las imagenes de catalogo y editoriales.'
+    help = 'Crea derivados AVIF/WebP responsivos de las imágenes de catálogo y editoriales.'
 
     def add_arguments(self, parser):
         parser.add_argument(
             '--forzar', action='store_true',
-            help='Regenera tambien los derivados que ya estan al dia.')
+            help='Regenera también los derivados que ya están al día.')
 
     def _origenes(self):
         """(etiqueta, directorio raiz, prefijo dentro del manifiesto)."""
         estaticos = raiz_estaticos()
         medios = Path(settings.MEDIA_ROOT)
         return [
-            ('catalogo', estaticos / 'product_media', 'product_media'),
+            ('catálogo', estaticos / 'product_media', 'product_media'),
             ('editorial', medios / 'products' / 'Imagenes Home', 'media/products/Imagenes Home'),
         ]
 
@@ -140,8 +140,8 @@ class Command(BaseCommand):
 
         self.stdout.write('')
         self.stdout.write(self.style.SUCCESS(
-            f'{len(manifiesto)} imagenes en el manifiesto '
-            f'({generados} derivados nuevos, {omitidos} ya al dia)'))
+            f'{len(manifiesto)} imágenes en el manifiesto '
+            f'({generados} derivados nuevos, {omitidos} ya al día)'))
         if bytes_origen:
             mb_origen = bytes_origen / 1048576.0
             mb_derivados = bytes_derivados / 1048576.0
@@ -150,5 +150,5 @@ class Command(BaseCommand):
                 f'en {len(ANCHOS)} anchos y {len(FORMATOS)} formatos')
             self.stdout.write(
                 'el navegador descarga UNO por imagen, no todos: '
-                'el mayor ahorro esta en servir 400-960 px donde antes iba el original'
+                'el mayor ahorro está en servir 400-960 px donde antes iba el original'
             )

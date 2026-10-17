@@ -2,11 +2,11 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% trans "Unete al programa de afiliados" %}{% endblock %}
+{% block title %}{% trans "Únete al programa de afiliados" %}{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261014-periodo">
+<link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261017-responsive">
 {% endblock %}
 
 {% block content %}
@@ -18,14 +18,14 @@
         <span class="quantum-signal-line"></span>
       </div>
       <p class="eyebrow">{% trans "Programa de afiliados" %}</p>
-      <h1>{% trans "Unete al programa de afiliados" %}</h1>
+      <h1>{% trans "Únete al programa de afiliados" %}</h1>
     </div>
   </section>
 
   <div class="editorial-shell">
     <div class="panel">
-      <h2>{% trans "Como funciona" %}</h2>
-      <p>{% trans "Tu solicitud sera revisada por un administrador, que verá tus datos y tus redes. Tu propio código (el que elijas abajo) se activa como cupón al aprobarse: cada compra hecha con él genera una comisión." %}</p>
+      <h2>{% trans "Cómo funciona" %}</h2>
+      <p>{% trans "Tu solicitud será revisada por un administrador, que verá tus datos y tus redes. Tu propio código (el que elijas abajo) se activa como cupón al aprobarse: cada compra hecha con él genera una comisión." %}</p>
       <p>{% trans "Para participar debes ser mayor de 18 años y tener al menos una cuenta activa en redes sociales orientada al fitness o al estilo de vida saludable." %}</p>
     </div>
 
@@ -54,15 +54,15 @@
           <span>{{ form.referral_code.label }}</span>
           <input type="text" name="referral_code" id="{{ form.referral_code.id_for_label }}" maxlength="20"
                  placeholder="{% trans 'Ej: TUMARCA2026' %}" required pattern="[A-Za-z0-9]{4,20}"
-                 title="{% trans '4 a 20 letras o numeros, sin espacios ni simbolos' %}" value="{{ form.referral_code.value|default:'' }}">
+                 title="{% trans '4 a 20 letras o números, sin espacios ni símbolos' %}" value="{{ form.referral_code.value|default:'' }}">
           {% if form.referral_code.errors %}<small class="field-error" role="alert">{{ form.referral_code.errors|join:" " }}</small>{% endif %}
         </label>
-        <p class="hint field-full">{% trans "Elige un codigo de 4 a 20 letras o numeros que te represente a ti y a tu marca (sin espacios ni simbolos). Sera tu cupon de descuento una vez aprobado." %}</p>
+        <p class="hint field-full">{% trans "Elige un código de 4 a 20 letras o números que te represente a ti y a tu marca (sin espacios ni símbolos). Será tu cupón de descuento una vez aprobado." %}</p>
 
-        <p class="hint field-full">{% trans "Al participar te comprometes a divulgar claramente a tu audiencia que usas un codigo o enlace de afiliado cuando lo promociones, conforme a la normativa de publicidad con influenciadores aplicable. El programa puede suspender el acceso de un afiliado que incumpla estas condiciones." %}</p>
+        <p class="hint field-full">{% trans "Al participar te comprometes a divulgar claramente a tu audiencia que usas un código o enlace de afiliado cuando lo promociones, conforme a la normativa de publicidad con influenciadores aplicable. El programa puede suspender el acceso de un afiliado que incumpla estas condiciones." %}</p>
         <label class="check field-full" for="{{ form.accept_terms.id_for_label }}">
           <input type="checkbox" name="accept_terms" id="{{ form.accept_terms.id_for_label }}" required{% if form.accept_terms.value %} checked{% endif %}>
-          <span>{% trans "Acepto los" %} <a href="{% url 'afiliado_terminos' %}" target="_blank" rel="noopener">{% trans "términos del programa de afiliados" %}</a> {% trans "y la obligacion de divulgacion publicitaria." %}</span>
+          <span>{% trans "Acepto los" %} <a href="{% url 'afiliado_terminos' %}" target="_blank" rel="noopener">{% trans "términos del programa de afiliados" %}</a> {% trans "y la obligación de divulgación publicitaria." %}</span>
         </label>
         {% if form.accept_terms.errors %}<small class="field-error field-full" role="alert">{{ form.accept_terms.errors|join:" " }}</small>{% endif %}
 

@@ -38,11 +38,11 @@ def checkout(request):
     cancel_expired_orders()
     cart, reiniciado = read_cart(request.session)
     if reiniciado:
-        messages.warning(request, gettext('Tu carrito se reinicio por una actualizacion del sistema.'))
+        messages.warning(request, gettext('Tu carrito se reinició por una actualización del sistema.'))
 
     resumen = build_cart_context(cart)
     if not resumen['items']:
-        messages.info(request, gettext('Tu carrito esta vacio.'))
+        messages.info(request, gettext('Tu carrito está vacío.'))
         return redirect('carrito:cart_detail')
 
     # float, no Decimal: es lo que necesita json_script para que el JS de
@@ -126,7 +126,7 @@ def cotizar_envio(request):
     cart, _reiniciado = read_cart(request.session)
     resumen = build_cart_context(cart)
     if not resumen['items']:
-        return JsonResponse({'error': gettext('El carrito esta vacio.')}, status=400)
+        return JsonResponse({'error': gettext('El carrito está vacío.')}, status=400)
 
     subtotal = Decimal(resumen['subtotal']).quantize(Decimal('0.01'))
     cotizacion = get_mock_quote(ciudad, subtotal)
@@ -155,7 +155,7 @@ def validar_cupon(request):
     cart, _reiniciado = read_cart(request.session)
     resumen = build_cart_context(cart)
     if not resumen['items']:
-        return JsonResponse({'error': gettext('El carrito esta vacio.')}, status=400)
+        return JsonResponse({'error': gettext('El carrito está vacío.')}, status=400)
 
     subtotal = Decimal(resumen['subtotal']).quantize(Decimal('0.01'))
     cupon = get_usable_coupon(codigo, user=request.user)

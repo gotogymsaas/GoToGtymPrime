@@ -10,12 +10,12 @@ from products.models import ProductVariant
 class OrderStatus(models.TextChoices):
     PENDING_PAYMENT = 'pending_payment', gettext_lazy('Pendiente de pago')
     CONFIRMED = 'confirmed', gettext_lazy('Confirmado')
-    PREPARING = 'preparing', gettext_lazy('En preparacion')
+    PREPARING = 'preparing', gettext_lazy('En preparación')
     SHIPPED = 'shipped', gettext_lazy('Enviado')
-    IN_TRANSIT = 'in_transit', gettext_lazy('En transito')
+    IN_TRANSIT = 'in_transit', gettext_lazy('En tránsito')
     DELIVERED = 'delivered', gettext_lazy('Entregado')
     CANCELLED = 'cancelled', gettext_lazy('Cancelado')
-    RETURNED = 'returned', gettext_lazy('Devolucion')
+    RETURNED = 'returned', gettext_lazy('Devolución')
 
 
 class PaymentStatus(models.TextChoices):
@@ -29,11 +29,11 @@ class DocumentType(models.TextChoices):
     # Mismos valores que `afiliados.models.DocumentType`. Se repiten aqui
     # porque `orders` esta por debajo de `afiliados` en la regla de capas y
     # no puede importarlo.
-    CC = 'CC', gettext_lazy('Cedula de ciudadania')
-    CE = 'CE', gettext_lazy('Cedula de extranjeria')
+    CC = 'CC', gettext_lazy('Cédula de ciudadanía')
+    CE = 'CE', gettext_lazy('Cédula de extranjería')
     NIT = 'NIT', gettext_lazy('NIT')
     PA = 'PA', gettext_lazy('Pasaporte')
-    PPT = 'PPT', gettext_lazy('Permiso por proteccion temporal (PPT)')
+    PPT = 'PPT', gettext_lazy('Permiso por protección temporal (PPT)')
     PEP = 'PEP', gettext_lazy('Permiso especial de permanencia (PEP)')
 
 
@@ -63,12 +63,12 @@ class Coupon(models.Model):
     afiliado = models.ForeignKey(
         'afiliados.PerfilAfiliado', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='coupons',
-        help_text='Si se asigna, las ventas hechas con este cupon se atribuyen a este afiliado.',
+        help_text='Si se asigna, las ventas hechas con este cupón se atribuyen a este afiliado.',
     )
     customer_segment = models.ForeignKey(
         'accounts.CustomerSegment', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='coupons',
-        help_text='Si se asigna, solo los clientes de este segmento pueden usar el cupon (precio diferenciado por segmento).',
+        help_text='Si se asigna, solo los clientes de este segmento pueden usar el cupón (precio diferenciado por segmento).',
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -36,7 +36,7 @@ class CarritoAutenticadoMixin:
 class CartMutationsRequirePostTests(CarritoAutenticadoMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
-        category = ProductCategory.objects.create(name='Categoria carrito test')
+        category = ProductCategory.objects.create(name='Categoría carrito test')
         brand = Brand.objects.create(name='Marca carrito test')
         cls.product = Product.objects.create(
             name='Producto de prueba carrito', category=category, brand=brand,
@@ -101,7 +101,7 @@ class CartMutationsRequirePostTests(CarritoAutenticadoMixin, TestCase):
 class DisponibilidadDelCarritoTests(CarritoAutenticadoMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
-        category = ProductCategory.objects.create(name='Categoria disponibilidad')
+        category = ProductCategory.objects.create(name='Categoría disponibilidad')
         brand = Brand.objects.create(name='Marca disponibilidad')
         cls.product = Product.objects.create(
             name='Producto disponibilidad', category=category, brand=brand,
@@ -129,7 +129,7 @@ class DisponibilidadDelCarritoTests(CarritoAutenticadoMixin, TestCase):
 class CartTotalCalculationTests(CarritoAutenticadoMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
-        category = ProductCategory.objects.create(name='Categoria totales test')
+        category = ProductCategory.objects.create(name='Categoría totales test')
         brand = Brand.objects.create(name='Marca totales test')
         cls.product_a = Product.objects.create(
             name='Producto A', category=category, brand=brand,
@@ -203,7 +203,7 @@ class CarritoHeredadoTests(CarritoAutenticadoMixin, TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        category = ProductCategory.objects.create(name='Categoria heredado')
+        category = ProductCategory.objects.create(name='Categoría heredado')
         brand = Brand.objects.create(name='Marca heredado')
         cls.product = Product.objects.create(
             name='Producto heredado', category=category, brand=brand,
@@ -219,7 +219,7 @@ class CarritoHeredadoTests(CarritoAutenticadoMixin, TestCase):
         response = self.client.get(reverse('carrito:cart_detail'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.client.session['cart'], {})
-        self.assertContains(response, 'se reinicio')
+        self.assertContains(response, 'se reinició')
 
     def test_carrito_con_version_actual_se_conserva(self):
         self._poner_en_carrito({str(self.variant.pk): 1})
@@ -252,9 +252,9 @@ class AccesoAlCarritoTests(TestCase):
             email='comprador@example.com', username='comprador@example.com', password='secret123',
         )
         producto = Product.objects.create(
-            name='Producto acceso anonimo',
-            category=ProductCategory.objects.create(name='Categoria acceso anonimo'),
-            brand=Brand.objects.create(name='Marca acceso anonimo'),
+            name='Producto acceso anónimo',
+            category=ProductCategory.objects.create(name='Categoría acceso anónimo'),
+            brand=Brand.objects.create(name='Marca acceso anónimo'),
             base_price=Decimal('100000.0000'), stock=10,
         )
         variante = _crear_variante(producto, 'ANON-TEST-U-UNI', 'UNICA', 'UNICO', 10)

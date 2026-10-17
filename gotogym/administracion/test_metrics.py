@@ -41,9 +41,9 @@ def _variante(producto, sku, size, stock, precio=None):
 class MetricasBase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.categoria = ProductCategory.objects.create(name='Categoria metricas')
-        cls.otra_categoria = ProductCategory.objects.create(name='Otra categoria')
-        cls.marca = Brand.objects.create(name='Marca metricas')
+        cls.categoria = ProductCategory.objects.create(name='Categoría métricas')
+        cls.otra_categoria = ProductCategory.objects.create(name='Otra categoría')
+        cls.marca = Brand.objects.create(name='Marca métricas')
         cls.barato = Product.objects.create(
             name='Camiseta barata', category=cls.categoria, brand=cls.marca,
             base_price=Decimal('40000'), stock=0,
@@ -186,8 +186,8 @@ class VentasTests(MetricasBase):
     def test_ventas_por_categoria(self):
         self._venta(self.ana, [(self.v_barato_s, 1), (self.v_caro, 1)])
         filas = {f['categoria']: f for f in metrics.ventas_por_categoria(self.hoy, self.hoy)}
-        self.assertEqual(filas['Otra categoria']['ingresos'], Decimal('400000'))
-        self.assertEqual(filas['Categoria metricas']['ingresos'], Decimal('40000'))
+        self.assertEqual(filas['Otra categoría']['ingresos'], Decimal('400000'))
+        self.assertEqual(filas['Categoría métricas']['ingresos'], Decimal('40000'))
 
 
 class ClientesYCanalesTests(MetricasBase):
@@ -240,8 +240,8 @@ class ClientesYCanalesTests(MetricasBase):
         self._venta(self.ana, [(self.v_caro, 1)])
         filas = {f['canal']: f for f in metrics.canales_de_venta(self.hoy, self.hoy)}
 
-        self.assertEqual(filas['Con cupon de afiliado']['pedidos'], 1)
-        self.assertEqual(filas['Con otro cupon']['pedidos'], 1)
+        self.assertEqual(filas['Con cupón de afiliado']['pedidos'], 1)
+        self.assertEqual(filas['Con otro cupón']['pedidos'], 1)
         self.assertEqual(filas['Sin descuento']['pedidos'], 1)
         self.assertAlmostEqual(
             sum(f['participacion'] for f in filas.values()), 100.0, delta=0.2,

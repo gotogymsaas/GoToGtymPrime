@@ -55,7 +55,7 @@ Plantilla completa: `environments/azure/.env.release.example`.
 
 ## Correo
 
-El correo sale por **Azure Communication Services (correo)** usando SMTP; el proyecto no necesita código propio para ello, solo las variables `EMAIL_*`.
+El correo sale por **Azure Communication Services (correo)** usando SMTP; el proyecto no necesita código propio para ello, solo las variables `EMAIL_*`. El procedimiento paso a paso con el que se configuró está en [CONFIGURACION_CORREO.md](CONFIGURACION_CORREO.md).
 
 | Qué | Valor |
 |---|---|

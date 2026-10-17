@@ -39,7 +39,7 @@ class ChromeDelPanelTests(PanelAdminBaseTestCase):
         respuesta = self.client.get(reverse('admin_dashboard'))
         self.assertContains(respuesta, f'href="{reverse("tienda:producto_list")}"')
         self.assertContains(respuesta, 'Salir del panel')
-        self.assertContains(respuesta, 'Cerrar sesion')
+        self.assertContains(respuesta, 'Cerrar sesión')
 
     def test_salir_del_panel_no_cierra_la_sesion(self):
         self.client.get(reverse('tienda:producto_list'))
@@ -74,7 +74,7 @@ class CuponesAdminTests(PanelAdminBaseTestCase):
             'code': 'duplicado', 'discount_type': 'percentage', 'value': '5',
         })
         self.assertEqual(respuesta.status_code, 200)
-        self.assertContains(respuesta, 'Ya existe un cupon')
+        self.assertContains(respuesta, 'Ya existe un cupón')
 
     def test_cupon_fuera_de_vigencia_no_es_usable(self):
         cupon = Coupon.objects.create(
@@ -106,10 +106,10 @@ class CuponesAdminTests(PanelAdminBaseTestCase):
 class EtiquetasProductoAdminTests(PanelAdminBaseTestCase):
     def test_crea_etiqueta(self):
         respuesta = self.client.post(reverse('admin_catalogs'), {
-            'kind': 'tag', 'tag-name': 'Edicion limitada', 'tag-color_token': 'gold',
+            'kind': 'tag', 'tag-name': 'Edición limitada', 'tag-color_token': 'gold',
         })
         self.assertRedirects(respuesta, reverse('admin_catalogs'))
-        self.assertTrue(ProductTag.objects.filter(name='Edicion limitada').exists())
+        self.assertTrue(ProductTag.objects.filter(name='Edición limitada').exists())
 
     def test_seed_de_badges_por_defecto_existe(self):
         for slug in ('best-seller', 'nuevo', 'oferta', 'destacado'):
@@ -128,7 +128,7 @@ class InventarioAdminTests(PanelAdminBaseTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.categoria = ProductCategory.objects.create(name='Categoria inventario')
+        cls.categoria = ProductCategory.objects.create(name='Categoría inventario')
         cls.producto = Product.objects.create(
             name='Producto inventario', category=cls.categoria, base_price=Decimal('10000'),
         )
@@ -137,7 +137,7 @@ class InventarioAdminTests(PanelAdminBaseTestCase):
         )
         cls.inventario = Inventory.objects.create(variant=cls.variante, quantity_available=3)
 
-        cls.otra_categoria = ProductCategory.objects.create(name='Otra categoria inventario')
+        cls.otra_categoria = ProductCategory.objects.create(name='Otra categoría inventario')
         cls.otro_producto = Product.objects.create(
             name='Otro producto inventario', category=cls.otra_categoria, base_price=Decimal('20000'),
         )

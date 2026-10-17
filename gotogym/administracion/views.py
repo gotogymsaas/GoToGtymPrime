@@ -143,7 +143,7 @@ def dashboard(request):
         pagada=Sum("amount", filter=Q(status=CommissionStatus.PAID)),
     )
     comisionado = sum((comisiones[k] or 0) for k in ("pendiente", "aprobada", "pagada"))
-    ventas_afiliados = next((c["ventas"] for c in canales if c["canal"] == "Con cupon de afiliado"), 0)
+    ventas_afiliados = next((c["ventas"] for c in canales if c["canal"] == "Con cupón de afiliado"), 0)
 
     # Reemplaza a "Productos recientes"/"Usuarios recientes" (duplicaban lo
     # que ya hacen /productos/ y /usuarios/ con busqueda real, sin ayudar a
@@ -463,7 +463,7 @@ def product_delete(request, pk):
         )
         return redirect("admin_products")
     product.delete()
-    messages.success(request, "Producto eliminado del catalogo comercial.")
+    messages.success(request, "Producto eliminado del catálogo comercial.")
     return redirect("admin_products")
 
 
@@ -558,7 +558,7 @@ def variant_stock_update(request, pk):
         if cantidad < 0:
             raise ValueError
     except (TypeError, ValueError):
-        messages.error(request, "La cantidad de stock debe ser un numero entero valido (0 o mas).")
+        messages.error(request, "La cantidad de stock debe ser un número entero válido (0 o más).")
         return _safe_redirect(request, "admin_variants")
 
     anterior = Inventory.objects.filter(variant=variant).values_list("quantity_available", flat=True).first() or 0
@@ -824,7 +824,7 @@ def user_role_update(request, pk):
         target.is_staff = False
         target.es_afiliado = False
     else:
-        messages.error(request, "Rol invalido.")
+        messages.error(request, "Rol inválido.")
         return _safe_redirect(request, "admin_users")
 
     target.save(update_fields=["is_staff", "es_afiliado"])
@@ -906,13 +906,13 @@ def catalogs(request):
             "tag": "products.add_producttag",
         }.get(kind)
         if required_perm and not request.user.has_perm(required_perm):
-            messages.error(request, "No tienes permisos para esta accion.")
+            messages.error(request, "No tienes permisos para esta acción.")
             return redirect("admin_catalogs")
         if kind == "category":
             category_form = CategoryForm(request.POST, prefix="category")
             if category_form.is_valid():
                 category_form.save()
-                messages.success(request, "Categoria creada.")
+                messages.success(request, "Categoría creada.")
                 return redirect("admin_catalogs")
         if kind == "brand":
             brand_form = BrandForm(request.POST, prefix="brand")
@@ -965,10 +965,10 @@ def tag_delete(request, pk):
 def category_delete(request, pk):
     category = get_object_or_404(ProductCategory, pk=pk)
     if category.products.exists():
-        messages.error(request, "No se puede eliminar la categoria porque tiene productos asociados.")
+        messages.error(request, "No se puede eliminar la categoría porque tiene productos asociados.")
         return redirect("admin_catalogs")
     category.delete()
-    messages.success(request, "Categoria eliminada.")
+    messages.success(request, "Categoría eliminada.")
     return redirect("admin_catalogs")
 
 
@@ -1012,7 +1012,7 @@ def coupon_edit(request, pk=None):
         form = CouponForm(request.POST, instance=coupon)
         if form.is_valid():
             form.save()
-            messages.success(request, "Cupon guardado.")
+            messages.success(request, "Cupón guardado.")
             return redirect("admin_coupons")
     else:
         form = CouponForm(instance=coupon)
@@ -1026,7 +1026,7 @@ def coupon_toggle(request, pk):
     coupon.is_active = not coupon.is_active
     coupon.save(update_fields=["is_active"])
     estado = "activado" if coupon.is_active else "desactivado"
-    messages.success(request, f"Cupon {coupon.code} {estado}.")
+    messages.success(request, f"Cupón {coupon.code} {estado}.")
     return redirect("admin_coupons")
 
 
@@ -1035,7 +1035,7 @@ def coupon_toggle(request, pk):
 def coupon_delete(request, pk):
     coupon = get_object_or_404(Coupon, pk=pk)
     coupon.delete()
-    messages.success(request, "Cupon eliminado.")
+    messages.success(request, "Cupón eliminado.")
     return redirect("admin_coupons")
 
 
@@ -1116,13 +1116,13 @@ def afiliado_settings_update(request):
     form = ConfiguracionProgramaAfiliadosForm(request.POST, instance=configuracion)
     if form.is_valid():
         form.save()
-        mensaje = "Configuracion del programa de afiliados actualizada."
+        mensaje = "Configuración del programa de afiliados actualizada."
         if configuracion.default_commission_rate != tasa_anterior:
             avisados = avisar_cambio_de_tasa(configuracion.default_commission_rate)
-            mensaje += f" Se aviso del cambio de comision a {avisados} afiliado(s) con la tasa global."
+            mensaje += f" Se avisó del cambio de comisión a {avisados} afiliado(s) con la tasa global."
         messages.success(request, mensaje)
     else:
-        messages.error(request, "No se pudo guardar la configuracion.")
+        messages.error(request, "No se pudo guardar la configuración.")
     return redirect("admin_afiliados")
 
 
@@ -1179,16 +1179,16 @@ def afiliado_commission_rate_update(request, pk):
     form = AfiliadoCommissionRateForm(request.POST, instance=profile)
     if form.is_valid():
         form.save()
-        mensaje = "Tasa de comision actualizada."
+        mensaje = "Tasa de comisión actualizada."
         if profile.commission_rate != tasa_anterior and profile.status == EstadoAfiliado.APPROVED and profile.is_active:
             nueva = profile.commission_rate if profile.commission_rate is not None else (
                 ConfiguracionProgramaAfiliados.load().default_commission_rate
             )
             avisar_cambio_de_tasa(nueva, afiliado=profile)
-            mensaje += " Se aviso al afiliado por correo."
+            mensaje += " Se avisó al afiliado por correo."
         messages.success(request, mensaje)
     else:
-        messages.error(request, "No se pudo guardar la tasa de comision.")
+        messages.error(request, "No se pudo guardar la tasa de comisión.")
     return redirect("admin_afiliado_detail", pk=pk)
 
 
@@ -1198,7 +1198,7 @@ def afiliado_notes_update(request, pk):
     profile = get_object_or_404(PerfilAfiliado, pk=pk)
     profile.review_notes = request.POST.get("review_notes", "").strip()[:2000]
     profile.save(update_fields=["review_notes"])
-    messages.success(request, "Notas de revision guardadas.")
+    messages.success(request, "Notas de revisión guardadas.")
     return redirect("admin_afiliado_detail", pk=pk)
 
 
@@ -1245,13 +1245,13 @@ def afiliado_terminate(request, pk):
     profile = get_object_or_404(PerfilAfiliado, pk=pk)
     form = TerminacionAfiliadoForm(request.POST)
     if not form.is_valid():
-        messages.error(request, "Indica el motivo de la terminacion.")
+        messages.error(request, "Indica el motivo de la terminación.")
         return redirect("admin_afiliado_detail", pk=pk)
     deactivate_afiliado(
         profile, motivo=form.cleaned_data["reason"], notas=form.cleaned_data["notes"],
         anular_comisiones=form.cleaned_data["void_commissions"], usuario=request.user,
     )
-    messages.success(request, f"Se termino la participacion de {profile.user.email}. Se le aviso por correo.")
+    messages.success(request, f"Se terminó la participación de {profile.user.email}. Se le avisó por correo.")
     return redirect("admin_afiliado_detail", pk=pk)
 
 
@@ -1264,7 +1264,7 @@ def afiliado_advance_exit(request, pk):
         messages.error(request, "Este afiliado no tiene un aviso de baja.")
         return redirect("admin_afiliado_detail", pk=pk)
     deactivate_afiliado(profile, motivo=MotivoSalida.VOLUNTARY)
-    messages.success(request, f"Se adelanto la baja de {profile.user.email}.")
+    messages.success(request, f"Se adelantó la baja de {profile.user.email}.")
     return redirect("admin_afiliado_detail", pk=pk)
 
 
@@ -1287,13 +1287,13 @@ def withdrawal_resolve(request, pk):
             gastos = Decimal(request.POST.get("transaction_fee", "").strip().replace(",", ".") or "0")
             resolve_withdrawal(solicitud, True, request.user, transaction_fee=gastos)
         except (InvalidOperation, ValueError):
-            messages.error(request, "Los gastos de transaccion deben ser un valor entre 0 y el monto de la solicitud.")
+            messages.error(request, "Los gastos de transacción deben ser un valor entre 0 y el monto de la solicitud.")
             return _safe_redirect(request, "admin_afiliados")
     else:
         resolve_withdrawal(solicitud, False, request.user)
     messages.success(
         request,
-        "Solicitud de comision pagada. Se le aviso al afiliado por correo." if aprobar else "Solicitud de comision rechazada.",
+        "Solicitud de comisión pagada. Se le avisó al afiliado por correo." if aprobar else "Solicitud de comisión rechazada.",
     )
     return _safe_redirect(request, "admin_afiliados")
 
@@ -1333,9 +1333,9 @@ def commission_void(request, pk):
         messages.error(request, str(error))
     else:
         if anulada:
-            messages.success(request, "Comision anulada." if comision.status == CommissionStatus.REVERTED else "La comision ya se habia pagado: queda por recuperar y se descuenta del proximo pago.")
+            messages.success(request, "Comisión anulada." if comision.status == CommissionStatus.REVERTED else "La comisión ya se había pagado: queda por recuperar y se descuenta del próximo pago.")
         else:
-            messages.info(request, "Esa comision ya no se puede anular.")
+            messages.info(request, "Esa comisión ya no se puede anular.")
     return redirect("admin_afiliado_detail", pk=comision.afiliado_id)
 
 
@@ -1344,7 +1344,7 @@ def commission_void(request, pk):
 def commission_release(request, pk):
     comision = get_object_or_404(Commission, pk=pk)
     liberar_revision(comision, request.user, request.POST.get("note", "").strip())
-    messages.success(request, "Revision resuelta: la comision sigue su curso.")
+    messages.success(request, "Revisión resuelta: la comisión sigue su curso.")
     return redirect("admin_afiliado_detail", pk=comision.afiliado_id)
 
 
@@ -1358,10 +1358,10 @@ def commission_extend(request, pk):
     except ValueError as error:
         mensaje = str(error)
         if "does not match" in mensaje or "unconverted" in mensaje:
-            mensaje = "Escribe una fecha valida."
+            mensaje = "Escribe una fecha válida."
         messages.error(request, mensaje)
     else:
-        messages.success(request, "Periodo de validacion extendido. Se aviso al afiliado por correo.")
+        messages.success(request, "Periodo de validación extendido. Se avisó al afiliado por correo.")
     return redirect("admin_afiliado_detail", pk=comision.afiliado_id)
 
 

@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% load static i18n %}
-{% block title %}{% if direccion %}{% trans "Editar direccion" %}{% else %}{% trans "Nueva direccion" %}{% endif %} | GoToGym{% endblock %}
+{% block title %}{% if direccion %}{% trans "Editar dirección" %}{% else %}{% trans "Nueva dirección" %}{% endif %} | GoToGym{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261014-cookies">{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261017-responsive">{% endblock %}
 {% block content %}
 <div class="editorial-page">
   <header class="editorial-hero editorial-hero--compact">
     <div class="editorial-shell">
       <p class="editorial-kicker">{% trans "Tu cuenta" %}</p>
-      <h1 class="editorial-title">{% if direccion %}{% trans "Editar direccion" %}{% else %}{% trans "Nueva direccion" %}{% endif %}</h1>
+      <h1 class="editorial-title">{% if direccion %}{% trans "Editar dirección" %}{% else %}{% trans "Nueva dirección" %}{% endif %}</h1>
     </div>
   </header>
   <section class="editorial-section editorial-section--mist">

@@ -35,7 +35,7 @@ if not SECRET_KEY:
         # Arrancar con una clave publica y conocida deja firmas de sesion,
         # tokens y enlaces de recuperacion falsificables por cualquiera.
         raise ImproperlyConfigured(
-            'Falta DJANGO_SECRET_KEY. En produccion es obligatoria: genera una con '
+            'Falta DJANGO_SECRET_KEY. En producción es obligatoria: genera una con '
             '`python -c "import secrets; print(secrets.token_urlsafe(64))"`.'
         )
     SECRET_KEY = 'clave-solo-para-desarrollo-y-pruebas-no-usar-nunca-en-produccion-0123456789'

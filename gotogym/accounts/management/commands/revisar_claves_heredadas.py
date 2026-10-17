@@ -34,10 +34,10 @@ def clave_aleatoria():
 
 
 class Command(BaseCommand):
-    help = 'Detecta (y con --rotar corrige) cuentas que aceptan una contrasena que estuvo publicada en el codigo.'
+    help = 'Detecta (y con --rotar corrige) cuentas que aceptan una contraseña que estuvo publicada en el código.'
 
     def add_arguments(self, parser):
-        parser.add_argument('--rotar', action='store_true', help='Cambia la contrasena de las cuentas afectadas.')
+        parser.add_argument('--rotar', action='store_true', help='Cambia la contraseña de las cuentas afectadas.')
 
     def handle(self, *args, **options):
         afectadas = [
@@ -45,7 +45,7 @@ class Command(BaseCommand):
             if any(usuario.check_password(clave) for clave in CLAVES_PUBLICADAS)
         ]
         if not afectadas:
-            self.stdout.write(self.style.SUCCESS('Ninguna cuenta acepta una contrasena publicada.'))
+            self.stdout.write(self.style.SUCCESS('Ninguna cuenta acepta una contraseña publicada.'))
             return
         for usuario in afectadas:
             rol = 'superusuario' if usuario.is_superuser else 'personal' if usuario.is_staff else 'cliente'
@@ -54,6 +54,6 @@ class Command(BaseCommand):
                 nueva = clave_aleatoria()
                 usuario.set_password(nueva)
                 usuario.save(update_fields=['password'])
-                self.stdout.write(f'  Nueva contrasena (guardala ahora, no se vuelve a mostrar): {nueva}')
+                self.stdout.write(f'  Nueva contraseña (guárdala ahora, no se vuelve a mostrar): {nueva}')
         if not options['rotar']:
             self.stdout.write('Vuelve a ejecutar con --rotar para cambiarlas.')

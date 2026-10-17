@@ -199,7 +199,10 @@
 .contact-socials svg { width: 20px; height: 20px; fill: currentColor; }
 
 @media (max-width: 860px) {
-  .legal-layout, .contact-grid { grid-template-columns: 1fr; }
+  /* minmax(0,1fr): con `1fr` a secas la columna crece hasta el min-content de
+   * la tabla legal (min-width 560px) y el texto se sale de la pantalla. */
+  .legal-layout, .contact-grid { grid-template-columns: minmax(0, 1fr); }
+  .legal-layout > *, .contact-grid > * { min-width: 0; }
   .legal-nav { position: static; grid-template-columns: repeat(2,1fr); }
   .legal-nav > p { grid-column: 1/-1; }
   .contact-card--primary { grid-row: auto; min-height: 300px; }

@@ -97,9 +97,9 @@ class PaginaDeAnaliticaTests(MetricasBase):
         respuesta = self.client.get(reverse('admin_analytics'))
         self.assertEqual(respuesta.status_code, 200)
         for texto in (
-            'Embudo de compra', 'Canales de entrada', 'Busquedas internas', 'Clientes',
-            'Rendimiento de cupones', 'Operacion de pedidos', 'Cobertura de inventario',
-            'Todavia no hay sesiones medidas',
+            'Embudo de compra', 'Canales de entrada', 'Búsquedas internas', 'Clientes',
+            'Rendimiento de cupones', 'Operación de pedidos', 'Cobertura de inventario',
+            'Todavía no hay sesiones medidas',
         ):
             self.assertContains(respuesta, texto)
 
@@ -113,7 +113,7 @@ class PaginaDeAnaliticaTests(MetricasBase):
         self.client.force_login(self.staff)
         respuesta = self.client.get(reverse('admin_analytics'))
         self.assertContains(respuesta, 'Agregaron al carrito')
-        self.assertContains(respuesta, 'Movil frente a escritorio')
+        self.assertContains(respuesta, 'Móvil frente a escritorio')
         self.assertContains(respuesta, 'Stock que no rota')
 
 

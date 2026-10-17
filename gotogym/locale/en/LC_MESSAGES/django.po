@@ -459,7 +459,7 @@ msgstr "Total"
 msgid "Sin costo por ahora"
 msgstr "No cost for now"
 
-msgid "Abrir menu"
+msgid "Abrir menú"
 msgstr "Open menu"
 
 msgid "Acepto los"
@@ -468,7 +468,7 @@ msgstr "I accept the"
 msgid "Admin"
 msgstr "Admin"
 
-msgid "Agregar direccion"
+msgid "Agregar dirección"
 msgstr "Add address"
 
 msgid "Artículos"
@@ -507,7 +507,7 @@ msgstr "Cancel"
 msgid "Cerrar"
 msgstr "Close"
 
-msgid "Cerrar sesion"
+msgid "Cerrar sesión"
 msgstr "Log out"
 
 msgid "Cintura"
@@ -567,7 +567,7 @@ msgstr "Decrease quantity"
 msgid "Edad"
 msgstr "Age"
 
-msgid "Editar direccion"
+msgid "Editar dirección"
 msgstr "Edit address"
 
 msgid "Editar perfil"
@@ -582,7 +582,7 @@ msgid "El envío se suma en el checkout y ahí verás el total final a pagar."
 msgstr ""
 "Shipping is added at checkout, where you will see the final total to pay."
 
-msgid "Elige cual usar por defecto en tus pedidos:"
+msgid "Elige cuál usar por defecto en tus pedidos:"
 msgstr "Choose which one to use by default for your orders:"
 
 msgid "Elige una contraseña segura para tu cuenta."
@@ -627,7 +627,7 @@ msgstr "Save"
 msgid "Guardar cambios"
 msgstr "Save changes"
 
-msgid "Guardar direccion"
+msgid "Guardar dirección"
 msgstr "Save address"
 
 msgid "Herramienta de pruebas — no visible en producción real"
@@ -682,7 +682,7 @@ msgstr ""
 "Body measurements, in centimeters. This is a general reference, not a "
 "verified measurement of this garment: each cut may vary."
 
-msgid "Menu de usuario"
+msgid "Menú de usuario"
 msgstr "User menu"
 
 msgid "Mi cuenta"
@@ -706,7 +706,7 @@ msgstr "Could not add"
 msgid "Nueva contraseña"
 msgstr "New password"
 
-msgid "Nueva direccion"
+msgid "Nueva dirección"
 msgstr "New address"
 
 msgid "Ocultar contraseña"
@@ -809,13 +809,13 @@ msgstr "Affiliate application"
 msgid "Suscribirme"
 msgstr "Subscribe"
 
-msgid "Telefono"
+msgid "Teléfono"
 msgstr "Phone"
 
-msgid "Terminos"
+msgid "Términos"
 msgstr "Terms"
 
-msgid "Todavia no tienes direcciones guardadas."
+msgid "Todavía no tienes direcciones guardadas."
 msgstr "You don't have any saved addresses yet."
 
 msgid "Tratamiento de datos"
@@ -882,7 +882,7 @@ msgstr "Password reset!"
 msgid "¡Quedan pocas unidades!"
 msgstr "Only a few left!"
 
-msgid "¿Eliminar esta direccion?"
+msgid "¿Eliminar esta dirección?"
 msgstr "Delete this address?"
 
 msgid "¿No tienes cuenta?"
@@ -1862,10 +1862,10 @@ msgstr ""
 "commission requests: a request in progress keeps the details it was made "
 "with."
 
-msgid "Tu codigo de referido"
+msgid "Tu código de referido"
 msgstr "Your referral code"
 
-msgid "Copiar codigo"
+msgid "Copiar código"
 msgstr "Copy code"
 
 msgid "Tu enlace para compartir"
@@ -1883,7 +1883,7 @@ msgstr "My payments"
 msgid "Recursos"
 msgstr "Resources"
 
-msgid "Solicitar comision"
+msgid "Solicitar comisión"
 msgstr "Request commission"
 
 msgid "Nota (opcional)"
@@ -1892,13 +1892,13 @@ msgstr "Note (optional)"
 msgid "Enviar solicitud"
 msgstr "Send request"
 
-msgid "Inscribir cuenta para solicitar comision"
+msgid "Inscribir cuenta para solicitar comisión"
 msgstr "Register an account to request commission"
 
 msgid "Solicitar baja"
 msgstr "Request to leave"
 
-msgid "Tu baja esta programada"
+msgid "Tu baja está programada"
 msgstr "Your exit is scheduled"
 
 msgid "Cancelar mi aviso de baja"
@@ -1907,10 +1907,10 @@ msgstr "Cancel my leave notice"
 msgid "Ventas referidas"
 msgstr "Referred sales"
 
-msgid "Comision disponible"
+msgid "Comisión disponible"
 msgstr "Available commission"
 
-msgid "Comision pendiente"
+msgid "Comisión pendiente"
 msgstr "Pending commission"
 
 msgid "Pagado en"
@@ -1919,7 +1919,7 @@ msgstr "Paid in"
 msgid "Clics en tu enlace"
 msgstr "Clicks on your link"
 
-msgid "Tasa de conversion"
+msgid "Tasa de conversión"
 msgstr "Conversion rate"
 
 msgid "Tus redes sociales"
@@ -1976,10 +1976,10 @@ msgstr "content guide"
 msgid "y recuerda identificar tus publicaciones como publicidad."
 msgstr "and remember to label your posts as advertising."
 
-msgid "Ultimas compras referidas"
+msgid "Últimas compras referidas"
 msgstr "Latest referred purchases"
 
-msgid "Tu solicitud esta en revision"
+msgid "Tu solicitud está en revisión"
 msgstr "Your application is under review"
 
 msgid ""
@@ -2004,19 +2004,19 @@ msgstr "You can apply again if you think the conditions have changed."
 msgid "Volver a postularme"
 msgstr "Apply again"
 
-msgid "Tu suscripcion esta inactiva"
+msgid "Tu suscripción está inactiva"
 msgstr "Your membership is inactive"
 
 msgid ""
-"Tu participacion en el programa de afiliados termino: tu codigo ya no genera"
-" comisiones. Las que ya tenias confirmadas, y las que aun estan en "
-"validacion, se te siguen pagando."
+"Tu participación en el programa de afiliados terminó: tu código ya no genera"
+" comisiones. Las que ya tenías confirmadas, y las que aún están en "
+"validación, se te siguen pagando."
 msgstr ""
 "Your participation in the affiliate program has ended: your code no longer "
 "earns commissions. The ones already confirmed, and those still being "
 "validated, will still be paid to you."
 
-msgid "Cancelaste tu participacion en el programa de afiliados."
+msgid "Cancelaste tu participación en el programa de afiliados."
 msgstr "You canceled your participation in the affiliate program."
 
 msgid "Puedes volver a postularte cuando quieras."
@@ -2028,8 +2028,8 @@ msgstr "We will pay you to your Bre-B key"
 #, python-format
 msgid ""
 "Te pagaremos a tu llave Bre-B <strong>%(llave)s</strong> $%(monto)s COP. Las"
-" solicitudes de cada mes se pagan en los primeros 10 dias habiles del mes "
-"siguiente. Si necesitas, agrega una indicacion."
+" solicitudes de cada mes se pagan en los primeros 10 días hábiles del mes "
+"siguiente. Si necesitas, agrega una indicación."
 msgstr ""
 "We will pay $%(monto)s COP to your Bre-B key <strong>%(llave)s</strong>. "
 "Each month's requests are paid within the first 10 business days of the "
@@ -2037,9 +2037,9 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Avisaste que quieres salir del programa. Tu baja sera efectiva el %(fecha)s;"
-" hasta entonces tu codigo y tu panel siguen activos. Tus comisiones "
-"confirmadas se te pagan igual despues de esa fecha."
+"Avisaste que quieres salir del programa. Tu baja será efectiva el %(fecha)s;"
+" hasta entonces tu código y tu panel siguen activos. Tus comisiones "
+"confirmadas se te pagan igual después de esa fecha."
 msgstr ""
 "You said you want to leave the program. Your exit takes effect on %(fecha)s;"
 " until then your code and your dashboard stay active. Your confirmed "
@@ -2057,9 +2057,9 @@ msgstr "%(n)s followers"
 
 #, python-format
 msgid ""
-"Tu participacion en el programa de afiliados termino el %(fecha)s: tu codigo"
-" ya no genera comisiones. Las que ya tenias confirmadas, y las que aun estan"
-" en validacion, se te siguen pagando."
+"Tu participación en el programa de afiliados terminó el %(fecha)s: tu código"
+" ya no genera comisiones. Las que ya tenías confirmadas, y las que aún están"
+" en validación, se te siguen pagando."
 msgstr ""
 "Your participation in the affiliate program ended on %(fecha)s: your code no"
 " longer earns commissions. The ones already confirmed, and those still being"
@@ -2207,14 +2207,14 @@ msgstr ""
 "«#Ad Ready for my routine with my new @GoToGym outfit! Use my code "
 "%(codigo)s and visit %(enlace)s.»"
 
-msgid "Unete al programa de afiliados"
+msgid "Únete al programa de afiliados"
 msgstr "Join the affiliate program"
 
-msgid "Como funciona"
+msgid "Cómo funciona"
 msgstr "How it works"
 
 msgid ""
-"Tu solicitud sera revisada por un administrador, que verá tus datos y tus "
+"Tu solicitud será revisada por un administrador, que verá tus datos y tus "
 "redes. Tu propio código (el que elijas abajo) se activa como cupón al "
 "aprobarse: cada compra hecha con él genera una comisión."
 msgstr ""
@@ -2247,12 +2247,12 @@ msgstr "Your code and the terms"
 msgid "Ej: TUMARCA2026"
 msgstr "E.g. YOURBRAND2026"
 
-msgid "4 a 20 letras o numeros, sin espacios ni simbolos"
+msgid "4 a 20 letras o números, sin espacios ni símbolos"
 msgstr "4 to 20 letters or numbers, no spaces or symbols"
 
 msgid ""
-"Elige un codigo de 4 a 20 letras o numeros que te represente a ti y a tu "
-"marca (sin espacios ni simbolos). Sera tu cupon de descuento una vez "
+"Elige un código de 4 a 20 letras o números que te represente a ti y a tu "
+"marca (sin espacios ni símbolos). Será tu cupón de descuento una vez "
 "aprobado."
 msgstr ""
 "Choose a code of 4 to 20 letters or numbers that represents you and your "
@@ -2260,7 +2260,7 @@ msgstr ""
 
 msgid ""
 "Al participar te comprometes a divulgar claramente a tu audiencia que usas "
-"un codigo o enlace de afiliado cuando lo promociones, conforme a la "
+"un código o enlace de afiliado cuando lo promociones, conforme a la "
 "normativa de publicidad con influenciadores aplicable. El programa puede "
 "suspender el acceso de un afiliado que incumpla estas condiciones."
 msgstr ""
@@ -2269,7 +2269,7 @@ msgstr ""
 "applicable influencer advertising rules. The program may suspend the access "
 "of an affiliate who does not comply with these conditions."
 
-msgid "y la obligacion de divulgacion publicitaria."
+msgid "y la obligación de divulgación publicitaria."
 msgstr "and the advertising disclosure obligation."
 
 msgid "En revisión por el equipo"
@@ -2371,7 +2371,7 @@ msgstr ""
 msgid "Editar cuenta"
 msgstr "Edit account"
 
-msgid "Solicitud de comision en curso"
+msgid "Solicitud de comisión en curso"
 msgstr "Commission request in progress"
 
 msgid "Tus pagos"
@@ -2801,20 +2801,20 @@ msgstr "Previous image"
 msgid "Imagen siguiente"
 msgstr "Next image"
 
-msgid "Imagenes del producto"
+msgid "Imágenes del producto"
 msgstr "Product images"
 
 #, python-format
 msgid "Ver imagen %(n)s"
 msgstr "View image %(n)s"
 
-msgid "Pais"
+msgid "País"
 msgstr "Country"
 
-msgid "Codigo postal"
+msgid "Código postal"
 msgstr "Postal code"
 
-msgid "Direccion"
+msgid "Dirección"
 msgstr "Address"
 
 msgid "Complemento (apto, torre, etc.)"
@@ -2823,10 +2823,10 @@ msgstr "Address line 2 (apt, tower, etc.)"
 msgid "Notas de entrega"
 msgstr "Delivery notes"
 
-msgid "Direccion eliminada."
+msgid "Dirección eliminada."
 msgstr "Address deleted."
 
-msgid "Direccion marcada como predeterminada."
+msgid "Dirección marcada como predeterminada."
 msgstr "Address set as default."
 
 msgid "Completa tu nombre, correo y contraseña, y acepta los términos."
@@ -2838,7 +2838,7 @@ msgstr "Profile updated successfully."
 msgid "No se realizaron cambios."
 msgstr "No changes were made."
 
-msgid "Direccion guardada."
+msgid "Dirección guardada."
 msgstr "Address saved."
 
 msgid "Las contraseñas no coinciden."
@@ -2859,14 +2859,14 @@ msgstr "The email is already registered."
 msgid "Registro exitoso. Ya iniciaste sesión."
 msgstr "Registration successful. You are now logged in."
 
-msgid "Numero de documento"
+msgid "Número de documento"
 msgstr "ID number"
 
 msgid "Agrega al menos una red social."
 msgstr "Add at least one social network."
 
 msgid ""
-"Faltan datos del formulario de redes sociales. Recarga la pagina e intenta "
+"Faltan datos del formulario de redes sociales. Recarga la página e intenta "
 "de nuevo."
 msgstr ""
 "Some social network form data is missing. Reload the page and try again."
@@ -2877,7 +2877,7 @@ msgstr "You can add up to %(max)s social networks."
 
 msgid ""
 "Escribe tu llave tal como la creaste en tu banco: documento, celular, correo"
-" o codigo con @."
+" o código con @."
 msgstr ""
 "Type your key as you created it in your bank: ID number, mobile phone, email"
 " or code with @."
@@ -2885,56 +2885,56 @@ msgstr ""
 msgid "Tipo de documento"
 msgstr "ID type"
 
-msgid "Tu codigo de afiliado"
+msgid "Tu código de afiliado"
 msgstr "Your affiliate code"
 
 msgid ""
-"Una llave que empieza por @ lleva despues de 4 a 20 letras o numeros, sin "
+"Una llave que empieza por @ lleva después de 4 a 20 letras o números, sin "
 "espacios."
 msgstr ""
 "A key that starts with @ must be followed by 4 to 20 letters or numbers, "
 "with no spaces."
 
 msgid ""
-"Escribe un telefono valido: entre 7 y 20 caracteres, solo numeros y + ( ) - "
+"Escribe un teléfono válido: entre 7 y 20 caracteres, solo números y + ( ) - "
 "espacios."
 msgstr ""
 "Enter a valid phone number: 7 to 20 characters, numbers and + ( ) - spaces "
 "only."
 
 msgid ""
-"Escribe el documento de 5 a 20 letras o numeros, sin puntos ni espacios."
+"Escribe el documento de 5 a 20 letras o números, sin puntos ni espacios."
 msgstr ""
 "Enter the ID number, 5 to 20 letters or numbers, with no dots or spaces."
 
-msgid "Debes aceptar los terminos para inscribir tu cuenta."
+msgid "Debes aceptar los términos para inscribir tu cuenta."
 msgstr "You must accept the terms to register your account."
 
 msgid "Debes autorizar el tratamiento de tus datos para inscribir tu cuenta."
 msgstr ""
 "You must authorize the processing of your data to register your account."
 
-msgid "Elige un codigo para tu marca."
+msgid "Elige un código para tu marca."
 msgstr "Choose a code for your brand."
 
-msgid "Debes aceptar los terminos del programa para continuar."
+msgid "Debes aceptar los términos del programa para continuar."
 msgstr "You must accept the program terms to continue."
 
 msgid ""
-"Elige un codigo de 4 a 20 letras o numeros (sin espacios ni simbolos) que te"
+"Elige un código de 4 a 20 letras o números (sin espacios ni símbolos) que te"
 " represente a ti y a tu marca."
 msgstr ""
 "Choose a code of 4 to 20 letters or numbers (no spaces or symbols) that "
 "represents you and your brand."
 
-msgid "Ese codigo ya esta en uso. Elige otro."
+msgid "Ese código ya está en uso. Elige otro."
 msgstr "That code is already in use. Choose another one."
 
-msgid "Indica cuantos seguidores tienes."
+msgid "Indica cuántos seguidores tienes."
 msgstr "Enter how many followers you have."
 
 msgid ""
-"Escribe solo tu usuario (2 a 60 letras, numeros, punto, guion o guion bajo),"
+"Escribe solo tu usuario (2 a 60 letras, números, punto, guion o guion bajo),"
 " sin enlaces ni espacios."
 msgstr ""
 "Enter only your username (2 to 60 letters, numbers, dot, hyphen or "
@@ -2947,7 +2947,7 @@ msgstr ""
 "A network is repeated: the same network with the same username is only "
 "counted once."
 
-msgid "Pendiente de revision"
+msgid "Pendiente de revisión"
 msgstr "Pending review"
 
 msgid "Aprobado"
@@ -2956,16 +2956,16 @@ msgstr "Approved"
 msgid "Rechazado"
 msgstr "Rejected"
 
-msgid "Cedula de ciudadania"
+msgid "Cédula de ciudadanía"
 msgstr "National ID card (CC)"
 
-msgid "Cedula de extranjeria"
+msgid "Cédula de extranjería"
 msgstr "Foreigner ID card (CE)"
 
 msgid "Pasaporte"
 msgstr "Passport"
 
-msgid "Permiso por proteccion temporal (PPT)"
+msgid "Permiso por protección temporal (PPT)"
 msgstr "Temporary protection permit (PPT)"
 
 msgid "Permiso especial de permanencia (PEP)"
@@ -2974,10 +2974,10 @@ msgstr "Special stay permit (PEP)"
 msgid "Baja solicitada por el afiliado"
 msgstr "Exit requested by the affiliate"
 
-msgid "Fraude o uso indebido del codigo"
+msgid "Fraude o uso indebido del código"
 msgstr "Fraud or misuse of the code"
 
-msgid "Incumplimiento de los terminos"
+msgid "Incumplimiento de los términos"
 msgstr "Breach of the terms"
 
 msgid "Inactividad prolongada"
@@ -3004,7 +3004,7 @@ msgstr "Confirmed"
 msgid "Revertida"
 msgstr "Reversed"
 
-msgid "Tu perfil quedo actualizado."
+msgid "Tu perfil quedó actualizado."
 msgstr "Your profile has been updated."
 
 msgid "Tu solicitud fue enviada de nuevo. Te avisaremos cuando sea revisada."
@@ -3015,22 +3015,22 @@ msgstr ""
 msgid "Tu solicitud fue enviada. Te avisaremos cuando sea aprobada."
 msgstr "Your application was sent. We will let you know once it is approved."
 
-msgid "Aceptaste los terminos vigentes del programa."
+msgid "Aceptaste los términos vigentes del programa."
 msgstr "You accepted the current program terms."
 
-msgid "Ya tienes una solicitud de comision pendiente."
+msgid "Ya tienes una solicitud de comisión pendiente."
 msgstr "You already have a pending commission request."
 
-msgid "Inscribe tu cuenta Bre-B antes de solicitar tu comision."
+msgid "Inscribe tu cuenta Bre-B antes de solicitar tu comisión."
 msgstr "Register your Bre-B account before requesting your commission."
 
-msgid "No tienes comisiones confirmadas disponibles para solicitar todavia."
+msgid "No tienes comisiones confirmadas disponibles para solicitar todavía."
 msgstr "You have no confirmed commissions available to request yet."
 
 msgid "Cancelaste tu aviso de baja: sigues en el programa."
 msgstr "You canceled your leave notice: you stay in the program."
 
-msgid "Tu solicitud ya esta en revision."
+msgid "Tu solicitud ya está en revisión."
 msgstr "Your application is already under review."
 
 msgid "Ya eres afiliado."
@@ -3039,37 +3039,37 @@ msgstr "You are already an affiliate."
 msgid "Hubo un problema al enviar tu solicitud. Intenta de nuevo."
 msgstr "There was a problem sending your application. Please try again."
 
-msgid "Debes aceptar los terminos para seguir usando el panel."
+msgid "Debes aceptar los términos para seguir usando el panel."
 msgstr "You must accept the terms to keep using the dashboard."
 
-msgid "Tu cuenta Bre-B quedo guardada. Ya puedes solicitar tu comision."
+msgid "Tu cuenta Bre-B quedó guardada. Ya puedes solicitar tu comisión."
 msgstr "Your Bre-B account was saved. You can now request your commission."
 
 msgid ""
 "Guardamos tu cuenta Bre-B, pero el documento del titular no coincide con el "
-"de tu perfil. Los terminos piden que la cuenta sea tuya: el equipo la "
-"revisara antes de pagarte."
+"de tu perfil. Los términos piden que la cuenta sea tuya: el equipo la "
+"revisará antes de pagarte."
 msgstr ""
 "We saved your Bre-B account, but the holder's ID does not match the one in "
 "your profile. The terms require the account to be yours: the team will "
 "review it before paying you."
 
 #, python-format
-msgid "El mensaje es muy largo (maximo %(maximo)s caracteres)."
+msgid "El mensaje es muy largo (máximo %(maximo)s caracteres)."
 msgstr "The message is too long (maximum %(maximo)s characters)."
 
 #, python-format
 msgid ""
-"Solicitud de comision por $%(monto)s enviada. Se paga a mas tardar el "
-"%(fecha)s (primeros 10 dias habiles del mes siguiente)."
+"Solicitud de comisión por $%(monto)s enviada. Se paga a más tardar el "
+"%(fecha)s (primeros 10 días hábiles del mes siguiente)."
 msgstr ""
 "Commission request for $%(monto)s sent. It will be paid by %(fecha)s at the "
 "latest (first 10 business days of the following month)."
 
 #, python-format
 msgid ""
-"Registramos tu aviso de baja. Sera efectiva el %(fecha)s; hasta entonces tu "
-"codigo y tu panel siguen activos."
+"Registramos tu aviso de baja. Será efectiva el %(fecha)s; hasta entonces tu "
+"código y tu panel siguen activos."
 msgstr ""
 "We registered your leave notice. It takes effect on %(fecha)s; until then "
 "your code and your dashboard stay active."
@@ -3093,7 +3093,7 @@ msgstr ""
 " sportswear explained with their sources."
 
 msgid ""
-"Tu carrito se reinicio por una actualizacion del sistema. Vuelve a agregar "
+"Tu carrito se reinició por una actualización del sistema. Vuelve a agregar "
 "los productos que quieras comprar."
 msgstr ""
 "Your cart was reset by a system update. Add the products you want to buy "
@@ -3121,7 +3121,7 @@ msgstr ""
 "Write or call us: help with purchases, products, customization and corporate"
 " wellbeing."
 
-msgid "La direccion es demasiado corta."
+msgid "La dirección es demasiado corta."
 msgstr "The address is too short."
 
 msgid "Pendiente de pago"
@@ -3130,13 +3130,13 @@ msgstr "Pending payment"
 msgid "Confirmado"
 msgstr "Confirmed"
 
-msgid "En preparacion"
+msgid "En preparación"
 msgstr "Preparing"
 
 msgid "Enviado"
 msgstr "Shipped"
 
-msgid "En transito"
+msgid "En tránsito"
 msgstr "In transit"
 
 msgid "Entregado"
@@ -3145,7 +3145,7 @@ msgstr "Delivered"
 msgid "Cancelado"
 msgstr "Cancelled"
 
-msgid "Devolucion"
+msgid "Devolución"
 msgstr "Returned"
 
 msgid "Porcentaje"
@@ -3154,10 +3154,10 @@ msgstr "Percentage"
 msgid "Valor fijo"
 msgstr "Fixed amount"
 
-msgid "Tu carrito esta vacio."
+msgid "Tu carrito está vacío."
 msgstr "Your cart is empty."
 
-msgid "El pago todavia no esta aprobado."
+msgid "El pago todavía no está aprobado."
 msgstr "The payment has not been approved yet."
 
 #, python-format
@@ -3168,7 +3168,7 @@ msgstr "There are not enough units. %(detalle)s"
 msgid "%(sku)s: pediste %(pedido)s, quedan %(disponible)s"
 msgstr "%(sku)s: you asked for %(pedido)s, %(disponible)s left"
 
-msgid "Tu carrito se reinicio por una actualizacion del sistema."
+msgid "Tu carrito se reinició por una actualización del sistema."
 msgstr "Your cart was reset by a system update."
 
 msgid "Solo puedes calificar productos de pedidos confirmados."
@@ -3186,7 +3186,7 @@ msgstr "Check your rating and try again."
 msgid "Falta la ciudad."
 msgstr "The city is missing."
 
-msgid "El carrito esta vacio."
+msgid "El carrito está vacío."
 msgstr "The cart is empty."
 
 msgid "Fallido"
@@ -3316,13 +3316,13 @@ msgstr "Materials"
 msgid "Tecnología textil"
 msgstr "Textile technology"
 
-msgid "Estandar"
+msgid "Estándar"
 msgstr "Standard"
 
-msgid "Estandar (nacional)"
+msgid "Estándar (nacional)"
 msgstr "Standard (nationwide)"
 
-msgid "GoToGym Envios"
+msgid "GoToGym Envíos"
 msgstr "GoToGym Shipping"
 
 msgid "Equipo de investigación GoToGym"

@@ -61,7 +61,7 @@ class FakeMercadoPagoClient:
 class MercadoPagoProviderTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        categoria = ProductCategory.objects.create(name='Categoria MP')
+        categoria = ProductCategory.objects.create(name='Categoría MP')
         marca = Brand.objects.create(name='Marca MP')
         cls.producto = Product.objects.create(
             name='Producto MP', category=categoria, brand=marca,
@@ -94,9 +94,9 @@ class MercadoPagoProviderTestCase(TestCase):
 
         preferencia_enviada = cliente_falso.llamadas[0]
         titulos = [item['title'] for item in preferencia_enviada['items']]
-        self.assertIn('Envio', titulos)
+        self.assertIn('Envío', titulos)
 
-        item_envio = next(item for item in preferencia_enviada['items'] if item['title'] == 'Envio')
+        item_envio = next(item for item in preferencia_enviada['items'] if item['title'] == 'Envío')
         self.assertEqual(Decimal(str(item_envio['unit_price'])), self.pedido.shipping_cost)
 
     def test_la_suma_de_los_items_coincide_con_el_total_de_la_orden(self):
@@ -125,7 +125,7 @@ class MercadoPagoProviderTestCase(TestCase):
         provider.create_payment_intent(self.pedido)
 
         titulos = [item['title'] for item in cliente_falso.llamadas[0]['items']]
-        self.assertNotIn('Envio', titulos)
+        self.assertNotIn('Envío', titulos)
 
     def test_llamar_dos_veces_mientras_esta_pendiente_no_duplica(self):
         cliente_falso = FakeMercadoPagoClient()
@@ -141,7 +141,7 @@ class MercadoPagoProviderTestCase(TestCase):
 class HandleCallbackTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        categoria = ProductCategory.objects.create(name='Categoria callback')
+        categoria = ProductCategory.objects.create(name='Categoría callback')
         marca = Brand.objects.create(name='Marca callback')
         producto = Product.objects.create(
             name='Producto callback', category=categoria, brand=marca,
@@ -266,7 +266,7 @@ class SignatureTests(TestCase):
 
 class MercadoPagoWebhookViewTests(TestCase):
     def setUp(self):
-        categoria = ProductCategory.objects.create(name='Categoria webhook')
+        categoria = ProductCategory.objects.create(name='Categoría webhook')
         marca = Brand.objects.create(name='Marca webhook')
         producto = Product.objects.create(
             name='Producto webhook', category=categoria, brand=marca,
@@ -370,7 +370,7 @@ class MercadoPagoRefundTestCase(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        categoria = ProductCategory.objects.create(name='Categoria MP reembolso')
+        categoria = ProductCategory.objects.create(name='Categoría MP reembolso')
         marca = Brand.objects.create(name='Marca MP reembolso')
         producto = Product.objects.create(
             name='Producto MP reembolso', category=categoria, brand=marca,

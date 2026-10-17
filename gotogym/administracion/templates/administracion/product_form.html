@@ -42,7 +42,7 @@
     {% endif %}
   {% endfor %}
   {% if not product %}
-    <p class="hint field-full">La imagen del producto se agrega despues de guardar, en la seccion "Imagenes" de abajo.</p>
+    <p class="hint field-full">La imagen del producto se agrega después de guardar, en la sección "Imágenes" de abajo.</p>
   {% endif %}
 
   <script>
@@ -75,7 +75,7 @@
   {% if variant_formset %}
   <div class="panel field-full variants-panel">
     <h2>Variantes</h2>
-    <p class="hint">Cada fila es una presentacion vendible del producto (talla + color), con su propio stock. Para un descuento, escribe el precio final a pagar o el porcentaje (no ambos): el precio normal se mostrara tachado en la tienda. El SKU lo genera el sistema solo, a partir del producto, la talla y el color.</p>
+    <p class="hint">Cada fila es una presentación vendible del producto (talla + color), con su propio stock. Para un descuento, escribe el precio final a pagar o el porcentaje (no ambos): el precio normal se mostrará tachado en la tienda. El SKU lo genera el sistema solo, a partir del producto, la talla y el color.</p>
     {{ variant_formset.non_form_errors }}
     {{ variant_formset.management_form }}
     <div class="variants-table-wrap">
@@ -202,9 +202,9 @@
 
 {% if product %}
 <div class="panel">
-  <h2>Imagenes</h2>
+  <h2>Imágenes</h2>
   {% if perms.products.change_product and media_items|length > 1 %}
-  <p class="hint">Arrastra una imagen para cambiar su orden en la galeria.</p>
+  <p class="hint">Arrastra una imagen para cambiar su orden en la galería.</p>
   {% endif %}
   <div class="media-gallery" id="media-gallery" data-reorder-url="{% url 'admin_product_media_reorder' product.pk %}">
     {% for media in media_items %}
@@ -217,18 +217,18 @@
       </form>
     </div>
     {% empty %}
-    <p>Este producto todavia no tiene imagenes en la galeria.</p>
+    <p>Este producto todavía no tiene imágenes en la galería.</p>
     {% endfor %}
   </div>
 
   <form method="post" action="{% url 'admin_product_media_add' product.pk %}" enctype="multipart/form-data" class="media-upload-form">
     {% csrf_token %}
-    <p class="hint">Puedes seleccionar varias fotos a la vez. Se agregan al final de la galeria; arrastra despues para reordenar o elegir cual va primero.</p>
+    <p class="hint">Puedes seleccionar varias fotos a la vez. Se agregan al final de la galería; arrastra después para reordenar o elegir cuál va primero.</p>
     <label>
-      <span>Imagenes</span>
+      <span>Imágenes</span>
       <input type="file" name="image" accept="image/*" multiple required>
     </label>
-    <button class="button" type="submit">Agregar imagenes</button>
+    <button class="button" type="submit">Agregar imágenes</button>
   </form>
 </div>
 <script>

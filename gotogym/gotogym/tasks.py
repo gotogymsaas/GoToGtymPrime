@@ -59,8 +59,8 @@ def _ruta_de(funcion):
     nombre = getattr(funcion, '__qualname__', '')
     if not callable(funcion) or '<lambda>' in nombre or '<locals>' in nombre or '.' in nombre:
         raise TaskError(
-            'Una tarea debe ser una funcion definida a nivel de modulo '
-            '(no una lambda, una funcion interna ni un metodo).'
+            'Una tarea debe ser una función definida a nivel de módulo '
+            '(no una lambda, una función interna ni un método).'
         )
     return f'{funcion.__module__}.{nombre}'
 
@@ -85,7 +85,7 @@ def enqueue(funcion, *args, after_commit=True, **kwargs):
         json.dumps([args, kwargs])
     except TypeError as error:
         raise TaskError(
-            f'Los argumentos de {ruta} deben ser datos simples (ids, texto, numeros): {error}'
+            f'Los argumentos de {ruta} deben ser datos simples (ids, texto, números): {error}'
         ) from error
 
     def lanzar():

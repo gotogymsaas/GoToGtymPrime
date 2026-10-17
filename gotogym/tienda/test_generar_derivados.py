@@ -55,7 +55,7 @@ class GenerarDerivadosTests(SimpleTestCase):
         self.assertTrue((imagenes.raiz_derivados() / f'{nombre}-640.avif').exists())
         self.assertTrue((imagenes.raiz_derivados() / f'{nombre}-960.webp').exists())
         self.assertFalse((imagenes.raiz_derivados() / f'{nombre}-1280.avif').exists())
-        self.assertIn('1 imagenes en el manifiesto', salida)
+        self.assertIn('1 imágenes en el manifiesto', salida)
 
     def test_una_imagen_mas_pequena_que_el_menor_ancho_genera_uno_solo(self):
         self._foto(self.catalogo / 'mini.png', 200)
@@ -69,9 +69,9 @@ class GenerarDerivadosTests(SimpleTestCase):
         self._correr()
         segunda = self._correr()
         self.assertIn('0 derivados nuevos', segunda)
-        self.assertNotIn(' 0 ya al dia', segunda)
+        self.assertNotIn(' 0 ya al día', segunda)
         forzada = self._correr('--forzar')
-        self.assertIn('0 ya al dia', forzada)
+        self.assertIn('0 ya al día', forzada)
 
     def test_ignora_archivos_que_no_son_imagenes(self):
         (self.catalogo / 'notas.txt').write_text('no soy una foto')
@@ -94,5 +94,5 @@ class GenerarDerivadosTests(SimpleTestCase):
     def test_sin_carpetas_de_origen_avisa_y_deja_un_manifiesto_vacio(self):
         shutil.rmtree(self.base / 'static' / 'product_media')
         salida = self._correr()
-        self.assertIn('sin carpeta catalogo', salida)
+        self.assertIn('sin carpeta catálogo', salida)
         self.assertEqual(self._manifiesto(), {})
