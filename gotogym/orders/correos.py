@@ -77,6 +77,27 @@ def _resumen(pedido):
     return '\n'.join(lineas)
 
 
+def pedido_recibido(order_id):
+    """Sale al crear el pedido, antes de que el pago se confirme: deja claro que
+    esta pendiente y cuanto tiempo hay para pagarlo."""
+    pedido = _pedido(order_id)
+    with _en_el_idioma_del_pedido(pedido):
+        _enviar(
+            pedido, gettext('Recibimos tu pedido %(numero)s') % {'numero': pedido.order_number},
+            f'{_saludo(pedido)}'
+            + gettext('Recibimos tu pedido %(numero)s y está pendiente de pago.') % {
+                'numero': pedido.order_number} + '\n\n'
+            f'{_resumen(pedido)}\n\n'
+            + gettext('Si ya pagaste, te enviaremos la confirmación en cuanto se acredite el pago.') + '\n'
+            + gettext(
+                'Si el pago no se completa en %(horas)s horas, el pedido se cancelará automáticamente '
+                'y no se hará ningún cobro.'
+            ) % {'horas': settings.ORDER_PAYMENT_WINDOW_HOURS} + '\n\n'
+            + gettext('Puedes ver el estado de tu pedido aquí: %(enlace)s') % {'enlace': _enlace_del_pedido(pedido)} + '\n\n'
+            f'{_firma()}',
+        )
+
+
 def pedido_confirmado(order_id):
     pedido = _pedido(order_id)
     with _en_el_idioma_del_pedido(pedido):

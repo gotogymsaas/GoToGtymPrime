@@ -7,11 +7,12 @@ from django.core import mail
 from django.core.management import call_command
 from django.test import override_settings
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import timezone, translation
 from payments.models import PaymentTransaction
 
 from .models import Coupon, Order, OrderStatus, PaymentStatus
 from .services import (
+    EmptyCartError,
     apply_order_status_transition,
     cancel_expired_orders,
     confirm_payment,
@@ -26,6 +27,33 @@ def _envejecer(pedido, horas):
 
 
 class CorreosDelPedidoTests(ConfirmPaymentBaseTestCase):
+    def test_al_crear_el_pedido_llega_el_aviso_de_pedido_recibido(self):
+        with self.captureOnCommitCallbacks(execute=True):
+            pedido = create_order_from_cart(self.usuario, {str(self.variante.pk): 2}, DATOS)
+        self.assertEqual(len(mail.outbox), 1)
+        correo = mail.outbox[0]
+        self.assertEqual(correo.to, [DATOS['email']])
+        self.assertEqual(correo.subject, f'Recibimos tu pedido {pedido.order_number}')
+        self.assertIn('pendiente de pago', correo.body)
+        self.assertIn('Hola Ana', correo.body)
+        self.assertIn('Producto confirm', correo.body)
+        self.assertIn('48 horas', correo.body)
+        self.assertIn('/pedidos-tienda/', correo.body)
+
+    def test_el_aviso_de_pedido_recibido_sale_en_el_idioma_del_pedido(self):
+        with translation.override('en'):
+            with self.captureOnCommitCallbacks(execute=True):
+                pedido = create_order_from_cart(self.usuario, {str(self.variante.pk): 1}, DATOS)
+        self.assertEqual(mail.outbox[0].subject, f'We received your order {pedido.order_number}')
+        self.assertIn('pending payment', mail.outbox[0].body)
+        self.assertIn('within 48 hours', mail.outbox[0].body)
+
+    def test_un_pedido_que_no_se_crea_no_envia_aviso(self):
+        with self.captureOnCommitCallbacks(execute=True):
+            with self.assertRaises(EmptyCartError):
+                create_order_from_cart(self.usuario, {}, DATOS)
+        self.assertEqual(len(mail.outbox), 0)
+
     def test_al_confirmarse_el_pago_llega_la_confirmacion(self):
         pedido = self._crear_pedido(2)
         with self.captureOnCommitCallbacks(execute=True):

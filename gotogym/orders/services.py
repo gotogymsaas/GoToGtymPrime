@@ -418,6 +418,7 @@ def create_order_from_cart(user, cart, datos):
         estimated_days=cotizacion['estimated_days'],
     )
 
+    enqueue(correos.pedido_recibido, pedido.pk)
     return pedido
 
 

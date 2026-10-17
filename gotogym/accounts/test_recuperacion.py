@@ -6,9 +6,11 @@ requirements.txt pero no en INSTALLED_APPS. Estas pruebas recorren el flujo
 completo para que no vuelva a pasar sin que nadie lo note.
 """
 import re
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.core.mail import EmailMultiAlternatives
 from django.test import TestCase
 from django.urls import reverse
 
@@ -53,6 +55,12 @@ class RecuperarContrasenaTests(TestCase):
         respuesta = self.client.post(reverse('password_reset'), {'email': 'nadie@example.com'})
         self.assertRedirects(respuesta, reverse('password_reset_done'))
         self.assertEqual(len(mail.outbox), 0)
+
+    def test_un_proveedor_de_correo_caido_no_rompe_la_pantalla(self):
+        with patch.object(EmailMultiAlternatives, 'send', side_effect=OSError('smtp caido')):
+            with self.assertLogs('django.contrib.auth', level='ERROR'):
+                respuesta = self.client.post(reverse('password_reset'), {'email': 'olvido@example.com'})
+        self.assertRedirects(respuesta, reverse('password_reset_done'))
 
     def test_un_enlace_invalido_se_rechaza_sin_romper(self):
         respuesta = self.client.get(reverse('password_reset_confirm', args=['abc', 'token-falso']))

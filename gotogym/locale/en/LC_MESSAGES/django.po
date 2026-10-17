@@ -3520,3 +3520,20 @@ msgstr "Tracking number"
 
 msgid "Transportadora: %(transportadora)s · Guía: %(guia)s"
 msgstr "Carrier: %(transportadora)s · Tracking number: %(guia)s"
+
+
+
+#, python-format
+msgid "Recibimos tu pedido %(numero)s"
+msgstr "We received your order %(numero)s"
+
+#, python-format
+msgid "Recibimos tu pedido %(numero)s y está pendiente de pago."
+msgstr "We received your order %(numero)s and it is pending payment."
+
+msgid "Si ya pagaste, te enviaremos la confirmación en cuanto se acredite el pago."
+msgstr "If you have already paid, we will send you the confirmation as soon as the payment is credited."
+
+#, python-format
+msgid "Si el pago no se completa en %(horas)s horas, el pedido se cancelará automáticamente y no se hará ningún cobro."
+msgstr "If the payment is not completed within %(horas)s hours, the order will be cancelled automatically and you will not be charged."

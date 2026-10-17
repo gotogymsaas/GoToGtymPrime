@@ -39,8 +39,8 @@ Las lee `gotogym/gotogym/settings.py`. Con `DEBUG` apagado y sin `DJANGO_SECRET_
 | `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS` | Dominios permitidos | Declaradas (`shop.gotogym.store` y el de Azure) |
 | `SECURE_PROXY_SSL_HEADER`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_SSL_REDIRECT` | HTTPS | Declaradas; `SECURE_SSL_REDIRECT` estaba en `false` |
 | `SECURE_HSTS_SECONDS` | HSTS. Arranca en 3600 en producción; subir por etapas a 604800 y luego 31536000 | Sin declarar (usa 3600) |
-| `SITIO_URL` | Dirección pública para los enlaces de los correos. Por defecto `https://gotogym.store` | **Falta: debe ser `https://shop.gotogym.store`** |
-| `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL` | Correo real. Sin `EMAIL_HOST` los correos salen por consola | Faltan |
+| `SITIO_URL` | Dirección pública para los enlaces de los correos. Por defecto `https://gotogym.store`, que no es donde vive la tienda | Debe ser `https://shop.gotogym.store`; confirmar que está declarada antes de probar los enlaces |
+| `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL` | Correo real. Sin `EMAIL_HOST` los correos salen por consola. Valores y recursos en [Correo](#correo) | Declaradas el 17 de octubre de 2026; `probar_correo` entregó a la bandeja de entrada |
 | `PAYMENT_PROVIDER`, `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_WEBHOOK_SECRET`, `PAYMENTS_MOCK_UI_ENABLED` | Pagos. Por defecto `mock` | Faltan |
 | `ALEGRA_EMAIL`, `ALEGRA_API_TOKEN` | Contabilidad | Faltan |
 | `SENTRY_DSN`, `SENTRY_ENVIRONMENT` | Monitoreo de errores | Faltan |
@@ -53,13 +53,54 @@ Las lee `gotogym/gotogym/settings.py`. Con `DEBUG` apagado y sin `DJANGO_SECRET_
 
 Plantilla completa: `environments/azure/.env.release.example`.
 
+## Correo
+
+El correo sale por **Azure Communication Services (correo)** usando SMTP; el proyecto no necesita código propio para ello, solo las variables `EMAIL_*`.
+
+| Qué | Valor |
+|---|---|
+| Recurso de comunicación | `acs-gotogym-prod` (grupo `rg-gotogym-app`, suscripción `Azure subscription 1`) |
+| Recurso de correo | `email-gotogym-prod`, con el dominio `gotogym.store` conectado y verificado (dominio, SPF, DKIM y DKIM2) |
+| Remitente | `DoNotReply@gotogym.store` (la única dirección dada de alta). `DEFAULT_FROM_EMAIL` debe ser `GoToGym <DoNotReply@gotogym.store>`: Azure rechaza cualquier remitente que no esté dado de alta, incluido el `no-reply@` que trae el código por defecto |
+| Servidor SMTP | `smtp.azurecomm.net`, puerto 587, `EMAIL_USE_TLS=true` |
+| Usuario SMTP | `gotogym-tienda` (usuario personalizado en `acs-gotogym-prod` → Email → SMTP Usernames), ligado a la aplicación de Microsoft Entra `gotogym-smtp` |
+| Contraseña SMTP | El valor del secreto de cliente de esa aplicación (Entra → Certificates & secrets). **Caduca**: anotar su fecha al crearlo y renovarlo antes; al vencer, el correo deja de salir sin aviso y el síntoma es un error de autenticación en el log |
+| DNS del dominio | Registrado y administrado en GoDaddy. Los registros de Azure ya están; quien tenga la cuenta de GoDaddy debe editarlos |
+| Cuotas de envío | El resumen del dominio muestra 30 y 100 (por minuto y por hora, según el rótulo cortado del portal). Alcanza para el volumen actual; el límite de recuperación de contraseña (5 solicitudes cada 10 minutos por IP) queda por debajo |
+| Seguimiento de aperturas | Apagado |
+
+**Comprobar que entrega.** Desde SSH en el App Service: `python gotogym/manage.py probar_correo <destinatario>`. Si el backend activo es el de consola, el comando lo avisa.
+
+**Si falla la autenticación.** El nombre de usuario largo que usa Azure para este tipo de credencial es `<recurso>.<id-de-la-aplicación>.<id-del-directorio>`; se puede probar como `EMAIL_HOST_USER` si el nombre corto fallara.
+
+### Qué correos envía la aplicación y cuándo
+
+| Correo | Cuándo sale | Si el envío falla |
+|---|---|---|
+| Recuperación de contraseña | Al pedirla desde `/accounts/password_reset/` (cuentas existentes; una cuenta inexistente no revela nada) | Django lo deja en el log (`django.contrib.auth`) y la persona ve igual la pantalla de "revisa tu correo" |
+| Pedido recibido | Al crear el pedido, antes de pagar: resumen, aviso de que está pendiente de pago y plazo de `ORDER_PAYMENT_WINDOW_HOURS` horas (48 por defecto) antes de la cancelación automática. Sale por cada intento de compra, aunque la persona abandone el pago | Se registra en el log (`orders.correos`); la creación del pedido no se deshace |
+| Pedido confirmado | Cuando el pago queda **aprobado** | Se registra en el log (`orders.correos`); la compra y el webhook no se deshacen |
+| Pedido enviado, pedido cancelado | Al cambiar el estado del pedido; el cancelado también sale al vencer el plazo sin pagar o si un pago aprobado no se pudo atender | Igual que el anterior |
+| Programa de afiliados | Solicitud recibida, aprobada o rechazada, bajas, terminación, cambio de tasa, validación extendida y avisos generales | Se registra en el log (`afiliados.correos`) |
+
+Los enlaces de los correos de pedidos y afiliados se arman con `SITIO_URL`; el de recuperación recibe el mismo valor al cargar `accounts/urls.py`, así que cambiarlo exige reiniciar la aplicación. Los correos de pedidos salen en el idioma en que se hizo el pedido. Hoy el envío ocurre dentro de la petición (`TASK_BACKEND=sync`) con un tiempo máximo de 10 segundos por conexión (`EMAIL_TIMEOUT`).
+
+### Limitaciones conocidas
+
+- El correo de pedido cancelado y el de pedido enviado dicen "responde a este correo" o "escríbenos". Con `DoNotReply` como remitente una respuesta no llega a nadie. Mientras no exista una dirección que reciba respuestas, hay que cambiar el texto o fijar una dirección de respuesta (`support@gotogym.store` aparece en la firma; confirmar que existe y que alguien la lee).
+- El nombre visible del remitente es "DoNotReply", no "GoToGym": lo toma Azure de la dirección dada de alta (MailFrom addresses → Display Name), no de `DEFAULT_FROM_EMAIL`. Para cambiarlo: en `email-gotogym-prod` → Provision domains → `gotogym.store` → Email services → MailFrom addresses, agregar una dirección nueva (por ejemplo `no-reply`, con nombre visible `GoToGym`) y **solo después** apuntar `DEFAULT_FROM_EMAIL` a ella (`GoToGym <no-reply@gotogym.store>`). Si la variable apunta a una dirección que no está dada de alta, Azure rechaza los envíos y los correos se pierden con un error solo en el log. Si el botón Add está atenuado, la cuenta no tiene permiso de edición sobre ese recurso.
+- Los correos de pedido solo están traducidos al inglés (`gotogym/locale/en/LC_MESSAGES/django.po`); en portugués salen en español. Al agregar textos nuevos, editar el `.po` y recompilar el `.mo` con `polib` (no hay `msgfmt` en Windows), como indica el README.
+- La cancelación automática de pedidos sin pagar (y su correo) solo se ejecuta cuando alguien abre el checkout. Hasta que `cancelar_pedidos_vencidos` se programe cada hora (ver Tareas periódicas), el aviso puede salir mucho después de las 48 horas en una tienda con poco tráfico.
+- El dominio publica **dos registros SPF**; solo puede haber uno. Debe quedar el que incluye `spf.protection.outlook.com` y `spf.azurecomm.net`, y borrarse el que solo incluye `spf.protection.outlook.com`. Se corrige en GoDaddy.
+- Con `PAYMENT_PROVIDER` sin declarar el pago es simulado y `PAYMENTS_MOCK_UI_ENABLED` está apagado: en producción no hay forma de aprobar un pago, así que la confirmación de pedido no se puede ejercitar hasta configurar Mercado Pago (o encender el panel de simulación de forma temporal, que `security_checklist` marca como hallazgo mientras esté activo).
+
 ## Tareas periódicas
 
 No hay un programador desplegado. Cada una se ejecuta también al abrir la pantalla que la necesita, pero conviene programarlas (WebJob de Azure o una tarea programada):
 
 | Comando | Cada cuánto | Qué hace |
 |---|---|---|
-| `python manage.py cancelar_pedidos_vencidos` | Cada hora | Cancela pedidos sin pagar pasado el plazo y devuelve sus cupones |
+| `python manage.py cancelar_pedidos_vencidos` | Cada hora | Cancela pedidos sin pagar pasado el plazo, devuelve sus cupones y envía el correo de pedido cancelado. No toca pedidos con un pago pendiente en el proveedor (por ejemplo, efectivo) |
 | `python manage.py confirmar_comisiones` | A diario | Confirma comisiones de afiliados cuyo periodo de validación terminó |
 | `python manage.py aplicar_bajas` | A diario | Aplica las bajas de afiliados con preaviso vencido |
 
@@ -77,7 +118,7 @@ Para probar el árbol de trabajo actual: empaquetarlo como lo hace el flujo de C
 
 ## Antes de abrir al público
 
-1. `SITIO_URL`, `EMAIL_*`, `SENTRY_DSN` y, para cobrar, `PAYMENT_PROVIDER=mercadopago` con sus credenciales y el webhook registrado.
+1. `SITIO_URL`, `SENTRY_DSN` y, para cobrar, `PAYMENT_PROVIDER=mercadopago` con sus credenciales y el webhook registrado.
 2. `SECURE_SSL_REDIRECT=true` (o `httpsOnly` en Azure) y comprobar que todo el sitio funciona por HTTPS antes de subir HSTS.
 3. `PAYMENTS_MOCK_UI_ENABLED` apagado.
 4. `python manage.py security_checklist` en el App Service.
