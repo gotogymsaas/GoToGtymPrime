@@ -19,7 +19,8 @@
   <meta name="twitter:card" content="summary_large_image">
   {% if seo_json_ld %}<script type="application/ld+json">{{ seo_json_ld }}</script>{% endif %}
   <title>{% block title %}GoToGym{% endblock %}</title>
-  <link rel="icon" type="image/png" href="{% static 'images/logo-gotogym-symbol-transparent.png' %}">
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <link rel="apple-touch-icon" href="{% static 'images/apple-touch-icon.png' %}">
   <link rel="stylesheet" href="{% static 'css/material_icons.css' %}?v=20260925-features">
   {% comment %}
   El almacenamiento de estaticos (CompressedStaticFilesStorage) no agrega
