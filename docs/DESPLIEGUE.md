@@ -42,7 +42,9 @@ Las lee `gotogym/gotogym/settings.py`. Con `DEBUG` apagado y sin `DJANGO_SECRET_
 | `SITIO_URL` | Dirección pública para los enlaces de los correos. Por defecto `https://gotogym.store`, que no es donde vive la tienda | Debe ser `https://shop.gotogym.store`; confirmar que está declarada antes de probar los enlaces |
 | `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL` | Correo real. Sin `EMAIL_HOST` los correos salen por consola. Valores y recursos en [Correo](#correo) | Declaradas el 17 de octubre de 2026; `probar_correo` entregó a la bandeja de entrada |
 | `PAYMENT_PROVIDER`, `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_WEBHOOK_SECRET`, `PAYMENTS_MOCK_UI_ENABLED` | Pagos. Por defecto `mock` | Faltan |
-| `ALEGRA_EMAIL`, `ALEGRA_API_TOKEN` | Contabilidad | Faltan |
+| `ALEGRA_EMAIL`, `ALEGRA_API_TOKEN` | Contabilidad y facturación (`ALEGRA_TOKEN` también se acepta) | Faltan |
+| `ALEGRA_FACTURACION_ACTIVA` | Emite la factura de cada pedido pagado. Por defecto `false`. Detalle en [Facturación electrónica](FACTURACION_ALEGRA.md) | Sin declarar |
+| `ALEGRA_NUMBER_TEMPLATE_ID`, `ALEGRA_IVA_TAX_ID`, `ALEGRA_IVA_PORCENTAJE`, `ALEGRA_PRECIOS_INCLUYEN_IVA`, `ALEGRA_EMITIR_ELECTRONICA`, `ALEGRA_MEDIO_DE_PAGO`, `ALEGRA_CONSUMIDOR_FINAL_ID`, `ALEGRA_ITEM_GENERICO_ID`, `ALEGRA_FACTURAR_DESDE` | Parámetros de la factura | Sin declarar |
 | `SENTRY_DSN`, `SENTRY_ENVIRONMENT` | Monitoreo de errores | Faltan |
 | `REDIS_URL` | Caché compartida en Redis. Sin ella y con `DATABASE_URL`, la caché es una tabla de la base | Opcional |
 | `ADMIN_URL` | Ruta del administrador de Django (por defecto `admin/`); conviene una no obvia, por ejemplo `gestion-xxxx/` | Sin declarar |
@@ -119,8 +121,13 @@ No hay un programador desplegado. Cada una se ejecuta también al abrir la panta
 | Comando | Cada cuánto | Qué hace |
 |---|---|---|
 | `python manage.py cancelar_pedidos_vencidos` | Cada hora | Cancela pedidos sin pagar pasado el plazo, devuelve sus cupones y envía el correo de pedido cancelado. No toca pedidos con un pago pendiente en el proveedor (por ejemplo, efectivo) |
+| `python manage.py emitir_facturas_pendientes` | Cada 15 minutos | Emite en Alegra las facturas pendientes y reintenta las fallidas (hasta 5 intentos). No hace nada si `ALEGRA_FACTURACION_ACTIVA` está apagada |
 | `python manage.py confirmar_comisiones` | A diario | Confirma comisiones de afiliados cuyo periodo de validación terminó |
 | `python manage.py aplicar_bajas` | A diario | Aplica las bajas de afiliados con preaviso vencido |
+
+## Facturación electrónica con Alegra
+
+Está terminada y apagada (`ALEGRA_FACTURACION_ACTIVA=false`). Qué hace, cómo probarla sin enviar y todo lo que falta para activarla está en [FACTURACION_ALEGRA.md](FACTURACION_ALEGRA.md).
 
 ## Respaldos, restauración y reversión
 

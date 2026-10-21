@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from orders.models import DocumentType
 
 
 class UserManager(BaseUserManager):
@@ -53,6 +54,10 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=150, blank=True)
     age = models.PositiveIntegerField(null=True, blank=True)
     phone = models.CharField(max_length=40, blank=True)
+    # Identificacion para la factura electronica. En el checkout, "usar datos
+    # de usuario" la copia al pedido; sin ella el comprador la escribe ahi.
+    document_type = models.CharField(max_length=3, choices=DocumentType.choices, blank=True)
+    document_number = models.CharField(max_length=20, blank=True)
     accepted_terms = models.BooleanField(default=False)
     terms_accepted_at = models.DateTimeField(null=True, blank=True)
     terms_hash = models.CharField(max_length=128, blank=True)

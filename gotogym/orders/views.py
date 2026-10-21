@@ -32,6 +32,18 @@ REVIEWABLE_ORDER_STATUSES = {
 }
 
 
+def _datos_de_usuario(user):
+    """Lo que la casilla "Usar datos de usuario" vuelca en el formulario."""
+    return {
+        'first_name': user.first_name or '',
+        'last_name': user.last_name or '',
+        'document_type': user.document_type,
+        'document_number': user.document_number,
+        'email': user.email,
+        'phone': user.phone or '',
+    }
+
+
 @login_required
 def checkout(request):
     # Avanza lo que depende del tiempo (pedidos sin pagar que vencieron y sus
@@ -76,13 +88,11 @@ def checkout(request):
                 write_cart(request.session, {})
                 return redirect('payments:pending', order_number=pedido.order_number)
     else:
+        # Los datos personales (nombre, documento, correo, telefono) no se
+        # precargan: el comprador los trae con la casilla "Usar datos de
+        # usuario" (ver `datos_usuario`), o escribe otros si compra para
+        # alguien mas.
         initial = {
-            'email': request.user.email,
-            'first_name': request.user.first_name or '',
-            'last_name': request.user.last_name or '',
-            # El telefono del perfil es el contacto de la persona; la
-            # direccion predeterminada solo lo aporta si el perfil no tiene.
-            'phone': request.user.phone or '',
             # Enlace de referido capturado por ReferralTrackingMiddleware:
             # precarga el codigo, pero el comprador sigue pudiendo cambiarlo.
             'coupon_code': request.session.get('referral_code', ''),
@@ -93,7 +103,6 @@ def checkout(request):
         direccion_default = request.user.addresses.filter(is_default=True).first()
         if direccion_default:
             initial.update({
-                'phone': request.user.phone or direccion_default.phone,
                 'country': direccion_default.country,
                 'department': direccion_default.department,
                 'city': direccion_default.city,
@@ -106,6 +115,7 @@ def checkout(request):
     return render(request, 'orders/checkout.html', {
         'form': form,
         'resumen': resumen,
+        'datos_usuario': _datos_de_usuario(request.user),
         'municipios_por_departamento': MUNICIPIOS_POR_DEPARTAMENTO,
     })
 

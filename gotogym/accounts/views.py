@@ -29,6 +29,8 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect
 from gotogym.ratelimit import rate_limit
+from orders.documentos import error_de_documento, limpiar_numero
+from orders.models import DocumentType
 
 from .forms import CustomerAddressForm
 from .models import CustomerAddress
@@ -217,6 +219,22 @@ def edit_profile(request):
         if phone != user.phone:
             user.phone = phone
             changed = True
+        if 'document_type' in request.POST or 'document_number' in request.POST:
+            document_type = request.POST.get('document_type', '').strip()
+            document_number = limpiar_numero(document_type, request.POST.get('document_number', ''))
+            if document_type not in DocumentType.values + ['']:
+                document_type = ''
+            error_documento = error_de_documento(document_type, document_number)
+            if error_documento:
+                mensaje = str(error_documento[1])
+                if is_ajax:
+                    return JsonResponse({'ok': False, 'message': mensaje}, status=400)
+                messages.error(request, mensaje)
+                return redirect('edit_profile')
+            if (document_type, document_number) != (user.document_type, user.document_number):
+                user.document_type = document_type
+                user.document_number = document_number
+                changed = True
         if age:
             try:
                 age_value = int(age)
@@ -280,6 +298,7 @@ def edit_profile(request):
         'direcciones_formularios': direcciones_formularios,
         'address_form': CustomerAddressForm(),
         'municipios_por_departamento': MUNICIPIOS_POR_DEPARTAMENTO,
+        'tipos_documento': DocumentType.choices,
     }
     return render(request, 'accounts/edit_profile.html', context)
 

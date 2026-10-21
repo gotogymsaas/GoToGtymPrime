@@ -307,6 +307,35 @@ HUBSPOT_PRIVATE_TOKEN = os.environ.get('HUBSPOT_PRIVATE_TOKEN', '')
 ALEGRA_API_TOKEN = os.environ.get('ALEGRA_API_TOKEN') or os.environ.get('ALEGRA_TOKEN', '')
 ALEGRA_EMAIL = os.environ.get('ALEGRA_EMAIL', '')
 
+# Facturacion electronica con Alegra (ver orders/facturacion.py). Apagada por
+# defecto: con las credenciales puestas pero sin esta variable, ningun pedido
+# genera factura.
+ALEGRA_FACTURACION_ACTIVA = _as_bool(os.environ.get('ALEGRA_FACTURACION_ACTIVA'), False)
+# True emite ante la DIAN (requiere habilitacion y una numeracion electronica
+# en Alegra); False deja la factura sin emitir electronicamente.
+ALEGRA_EMITIR_ELECTRONICA = _as_bool(os.environ.get('ALEGRA_EMITIR_ELECTRONICA'), True)
+# Id de la numeracion (resolucion) de Alegra. Vacio usa la predeterminada.
+ALEGRA_NUMBER_TEMPLATE_ID = os.environ.get('ALEGRA_NUMBER_TEMPLATE_ID', '')
+# Id del impuesto IVA en Alegra y su tarifa. Sin id, las lineas van sin impuesto.
+ALEGRA_IVA_TAX_ID = os.environ.get('ALEGRA_IVA_TAX_ID', '')
+ALEGRA_IVA_PORCENTAJE = os.environ.get('ALEGRA_IVA_PORCENTAJE', '19')
+# Si el precio publicado en la tienda ya incluye IVA. Alegra espera el precio
+# sin impuestos, asi que con True se descuenta el IVA antes de enviarlo.
+ALEGRA_PRECIOS_INCLUYEN_IVA = _as_bool(os.environ.get('ALEGRA_PRECIOS_INCLUYEN_IVA'), True)
+# Medio de pago DIAN de la factura cuando no se puede deducir de Mercado Pago
+# (que informa si fue tarjeta, transferencia PSE o efectivo). Catalogo de
+# Alegra Colombia.
+ALEGRA_MEDIO_DE_PAGO = os.environ.get('ALEGRA_MEDIO_DE_PAGO', 'INSTRUMENT_NOT_DEFINED')
+# Contacto de Alegra para ventas sin documento del comprador. Vacio: un
+# pedido sin documento queda con la factura fallida hasta que se complete.
+ALEGRA_CONSUMIDOR_FINAL_ID = os.environ.get('ALEGRA_CONSUMIDOR_FINAL_ID', '')
+# Id de un producto generico de Alegra para todas las lineas. Vacio: cada SKU
+# se busca (o se crea) como producto propio en Alegra.
+ALEGRA_ITEM_GENERICO_ID = os.environ.get('ALEGRA_ITEM_GENERICO_ID', '')
+# Fecha (AAAA-MM-DD) desde la que `emitir_facturas_pendientes` factura pedidos
+# pagados que aun no tienen factura. Vacio: solo reintenta los ya intentados.
+ALEGRA_FACTURAR_DESDE = os.environ.get('ALEGRA_FACTURAR_DESDE', '')
+
 # Monitoreo de errores (Sentry). Sin SENTRY_DSN en el entorno queda
 # desactivado: no requiere la librería instalada para arrancar y no rompe
 # entornos (local, tests) que no lo configuren.

@@ -10,6 +10,8 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from .colombia_data import DEPARTAMENTOS, municipios_de
+from .documentos import error_de_documento, limpiar_numero
+from .models import DocumentType
 from .services import es_cupon_propio, get_usable_coupon
 
 TELEFONO_VALIDO = re.compile(r'^[0-9+()\s-]{7,20}$')
@@ -18,6 +20,14 @@ TELEFONO_VALIDO = re.compile(r'^[0-9+()\s-]{7,20}$')
 class CheckoutForm(forms.Form):
     first_name = forms.CharField(label=_('Nombre'), max_length=100)
     last_name = forms.CharField(label=_('Apellido'), max_length=100)
+    # Identificacion para la factura electronica. Opcional: sin ella la
+    # factura sale a nombre de consumidor final, si la tienda lo tiene
+    # configurado. Va justo debajo del nombre porque es de la misma persona.
+    document_type = forms.ChoiceField(
+        label=_('Tipo de documento'), required=False,
+        choices=[('', _('Selecciona un tipo'))] + list(DocumentType.choices),
+    )
+    document_number = forms.CharField(label=_('Número de documento'), max_length=20, required=False)
     email = forms.EmailField(label=_('Correo electrónico'))
     phone = forms.CharField(label=_('Teléfono'), max_length=40)
 
@@ -57,6 +67,9 @@ class CheckoutForm(forms.Form):
             )
         return phone
 
+    def clean_document_number(self):
+        return limpiar_numero(self.data.get('document_type'), self.cleaned_data['document_number'])
+
     def clean_first_name(self):
         return self._texto_no_vacio('first_name', 'Escribe tu nombre.')
 
@@ -78,6 +91,7 @@ class CheckoutForm(forms.Form):
             else:
                 self.add_error('coupon_code', 'El cupón no es válido.')
         cleaned_data['coupon_code'] = codigo_cupon
+        self._validar_documento(cleaned_data)
         departamento = cleaned_data.get('department')
         ciudad = cleaned_data.get('city', '').strip()
         if departamento and ciudad and ciudad not in municipios_de(departamento):
@@ -87,6 +101,15 @@ class CheckoutForm(forms.Form):
             )
         cleaned_data['city'] = ciudad
         return cleaned_data
+
+    def _validar_documento(self, cleaned_data):
+        if 'document_type' in self.errors or 'document_number' in self.errors:
+            return
+        error = error_de_documento(
+            cleaned_data.get('document_type', ''), cleaned_data.get('document_number', ''),
+        )
+        if error:
+            self.add_error(*error)
 
     def _texto_no_vacio(self, campo, mensaje):
         valor = self.cleaned_data[campo].strip()

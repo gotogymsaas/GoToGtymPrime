@@ -111,7 +111,7 @@ Variables de entorno que lee la configuración: `DJANGO_SECRET_KEY`, `DEBUG`, `A
 | Proveedor | Estado |
 |---|---|
 | Mercado Pago | Construido (preferencias, webhook con firma, reembolsos) y apagado por defecto; nunca se probó con credenciales reales |
-| Alegra | Funcional para consultar clientes y facturas desde el panel de contabilidad; requiere `ALEGRA_EMAIL` y `ALEGRA_API_TOKEN` |
+| Alegra | Consulta de clientes y facturas desde el panel de contabilidad y emisión de la factura electrónica de cada pedido pagado (`orders/facturacion.py`, apagada por defecto); requiere `ALEGRA_EMAIL` y `ALEGRA_API_TOKEN` |
 | HubSpot | Solo un esqueleto sin llamadas reales |
 | Sentry | Se activa al declarar `SENTRY_DSN` |
 | Correo (SMTP) | Se activa al declarar `EMAIL_HOST`; sin él, los correos salen por consola. Lo usan la recuperación de contraseña, los avisos del pedido y los del programa de afiliados |

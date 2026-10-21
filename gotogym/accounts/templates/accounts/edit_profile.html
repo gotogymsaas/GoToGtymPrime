@@ -12,6 +12,8 @@
       <div class="account-panel"><p class="editorial-kicker">{% trans "Identidad" %}</p><h2>{% trans "Datos personales" %}</h2><div class="account-fields">
         <div class="account-field"><label for="id_first_name">{% trans "Nombre" %}</label><input type="text" name="first_name" id="id_first_name" value="{{ user.first_name|default:'' }}" required></div>
         <div class="account-field"><label for="id_last_name">{% trans "Apellido" %}</label><input type="text" name="last_name" id="id_last_name" value="{{ user.last_name|default:'' }}" required></div>
+        <div class="account-field"><label for="id_document_type">{% trans "Tipo de documento" %}</label><select name="document_type" id="id_document_type"><option value="">{% trans "Selecciona un tipo" %}</option>{% for valor, etiqueta in tipos_documento %}<option value="{{ valor }}"{% if user.document_type == valor %} selected{% endif %}>{{ etiqueta }}</option>{% endfor %}</select></div>
+        <div class="account-field"><label for="id_document_number">{% trans "Número de documento" %}</label><input type="text" name="document_number" id="id_document_number" value="{{ user.document_number|default:'' }}" maxlength="20" autocomplete="off"></div>
         <div class="account-field account-field--full"><label for="id_email">{% trans "Email" %}</label><input type="email" name="email" id="id_email" value="{{ user.email }}" required></div>
         <div class="account-field"><label for="id_age">{% trans "Edad" %}</label><input type="number" name="age" id="id_age" value="{{ user.age|default:'' }}" min="10" max="120"></div>
         <div class="account-field"><label for="id_phone">{% trans "Teléfono" %}</label><input type="tel" name="phone" id="id_phone" value="{{ user.phone|default:'' }}"></div>

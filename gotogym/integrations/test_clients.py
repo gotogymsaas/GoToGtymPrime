@@ -3,9 +3,11 @@ hace una llamada de red real."""
 import os
 from unittest.mock import MagicMock, patch
 
+import requests
 from django.test import SimpleTestCase
 
-from integrations.alegra.alegra_client import AlegraClient
+from integrations.alegra import alegra_client
+from integrations.alegra.alegra_client import AlegraClient, AlegraError
 from integrations.hubspot.hubspot_client import HubSpotClient
 from integrations.mercadopago import mercadopago_client
 from integrations.mercadopago.mercadopago_client import MercadoPagoClient, MercadoPagoError
@@ -57,12 +59,89 @@ class AlegraClientHttpTests(SimpleTestCase):
         self.assertTrue(post.call_args.args[0].endswith('/expenses'))
 
     @patch('integrations.alegra.alegra_client.requests.get')
-    def test_un_error_http_se_propaga(self, get):
+    def test_un_error_inesperado_se_propaga(self, get):
         respuesta = self._respuesta([])
         respuesta.raise_for_status.side_effect = RuntimeError('401')
         get.return_value = respuesta
         with self.assertRaises(RuntimeError):
             self.cliente.get_clients()
+
+    @patch('integrations.alegra.alegra_client.requests.get')
+    def test_cada_llamada_lleva_timeout(self, get):
+        get.return_value = self._respuesta([])
+        self.cliente.get_clients()
+        self.assertEqual(get.call_args.kwargs['timeout'], alegra_client.TIMEOUT)
+
+    @patch('integrations.alegra.alegra_client.requests.post')
+    def test_un_error_http_de_alegra_se_convierte_en_alegra_error(self, post):
+        error_http = requests.HTTPError('400 Client Error: https://api.alegra.com/secreto')
+        error_http.response = MagicMock(status_code=400)
+        error_http.response.json.return_value = {'error': 'falta la numeración', 'invoice': {'id': 5}}
+        respuesta = self._respuesta({})
+        respuesta.raise_for_status.side_effect = error_http
+        post.return_value = respuesta
+
+        with self.assertRaises(AlegraError) as contexto:
+            self.cliente.create_invoice({})
+
+        self.assertEqual(contexto.exception.status, 400)
+        self.assertEqual(contexto.exception.payload['invoice']['id'], 5)
+        self.assertIn('falta la numeración', str(contexto.exception))
+        self.assertNotIn('alegra.com', str(contexto.exception))
+
+    @patch('integrations.alegra.alegra_client.requests.get')
+    def test_un_fallo_de_red_se_convierte_en_alegra_error(self, get):
+        get.side_effect = requests.ConnectionError('https://api.alegra.com/x')
+        with self.assertRaises(AlegraError) as contexto:
+            self.cliente.get_clients()
+        self.assertIsNone(contexto.exception.status)
+        self.assertNotIn('alegra.com', str(contexto.exception))
+
+    @patch('integrations.alegra.alegra_client.requests.get')
+    def test_busca_un_contacto_por_documento_exacto(self, get):
+        get.return_value = self._respuesta([
+            {'id': 1, 'identification': '1020304050123'},
+            {'id': 2, 'identificationObject': {'type': 'CC', 'number': '1020304050'}},
+        ])
+        self.assertEqual(self.cliente.find_contact('1.020.304.050')['id'], 2)
+        self.assertEqual(get.call_args.kwargs['params']['identification'], '1020304050')
+
+    @patch('integrations.alegra.alegra_client.requests.get')
+    def test_busca_un_nit_con_su_digito_de_verificacion(self, get):
+        get.return_value = self._respuesta([{'id': 3, 'identification': '900123456-8'}])
+        self.assertEqual(self.cliente.find_contact('900123456', dv='8')['id'], 3)
+
+    @patch('integrations.alegra.alegra_client.requests.get')
+    def test_contacto_inexistente_devuelve_none(self, get):
+        get.return_value = self._respuesta([{'id': 1, 'identification': '999'}])
+        self.assertIsNone(self.cliente.find_contact('1020304050'))
+
+    @patch('integrations.alegra.alegra_client.requests.get')
+    def test_busca_un_producto_por_referencia_exacta(self, get):
+        get.return_value = self._respuesta([
+            {'id': 1, 'reference': 'SKU-10'}, {'id': 2, 'reference': 'SKU-1'},
+        ])
+        self.assertEqual(self.cliente.find_item('SKU-1')['id'], 2)
+
+    @patch('integrations.alegra.alegra_client.requests.post')
+    def test_crea_contacto_y_producto(self, post):
+        post.return_value = self._respuesta({'id': 4})
+        self.assertEqual(self.cliente.create_contact({'name': 'Ana'}), {'id': 4})
+        self.assertTrue(post.call_args.args[0].endswith('/contacts'))
+        self.assertEqual(self.cliente.create_item({'name': 'X'}), {'id': 4})
+        self.assertTrue(post.call_args.args[0].endswith('/items'))
+
+    @patch('integrations.alegra.alegra_client.requests.delete')
+    def test_borra_una_factura(self, delete):
+        delete.return_value = self._respuesta({})
+        self.cliente.delete_invoice(55)
+        self.assertTrue(delete.call_args.args[0].endswith('/invoices/55'))
+
+    def test_el_token_del_entorno_prefiere_alegra_api_token(self):
+        with patch.dict(os.environ, {
+            'ALEGRA_EMAIL': 'a@b.co', 'ALEGRA_API_TOKEN': 'nuevo', 'ALEGRA_TOKEN': 'viejo',
+        }):
+            self.assertEqual(AlegraClient().token, 'nuevo')
 
 
 class MercadoPagoClientTests(SimpleTestCase):

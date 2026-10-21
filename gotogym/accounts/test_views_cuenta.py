@@ -131,6 +131,49 @@ class EditarPerfilTests(TestCase):
         self.assertEqual((usuario.first_name, usuario.last_name), ('Anita', 'Mar'))
         self.assertEqual((usuario.phone, usuario.age), ('3001112233', 31))
 
+    def test_guarda_el_documento_sin_formato(self):
+        respuesta = self._post(document_type='CC', document_number='1.020.304.050')
+        self.assertRedirects(respuesta, reverse('home'), fetch_redirect_response=False)
+        usuario = self._refrescar()
+        self.assertEqual((usuario.document_type, usuario.document_number), ('CC', '1020304050'))
+
+    def test_un_nit_se_guarda_sin_digito_de_verificacion(self):
+        self._post(document_type='NIT', document_number='900.123.456-8')
+        self.assertEqual(self._refrescar().document_number, '900123456')
+
+    def test_un_documento_invalido_no_se_guarda(self):
+        respuesta = self._ajax(document_type='CC', document_number='12AB5')
+        self.assertEqual(respuesta.status_code, 400)
+        self.assertEqual(self._refrescar().document_number, '')
+
+    def test_numero_sin_tipo_no_se_guarda(self):
+        respuesta = self._ajax(document_number='1020304050')
+        self.assertEqual(respuesta.status_code, 400)
+        self.assertEqual(self._refrescar().document_number, '')
+
+    def test_se_puede_borrar_el_documento(self):
+        get_user_model().objects.filter(pk=self.usuario.pk).update(
+            document_type='CC', document_number='1020304050',
+        )
+        self._post(document_type='', document_number='')
+        usuario = self._refrescar()
+        self.assertEqual((usuario.document_type, usuario.document_number), ('', ''))
+
+    def test_un_envio_sin_campos_de_documento_no_lo_borra(self):
+        get_user_model().objects.filter(pk=self.usuario.pk).update(
+            document_type='CC', document_number='1020304050',
+        )
+        self._post(first_name='Nueva')
+        self.assertEqual(self._refrescar().document_number, '1020304050')
+
+    def test_el_formulario_muestra_el_documento_guardado(self):
+        get_user_model().objects.filter(pk=self.usuario.pk).update(
+            document_type='CE', document_number='998877',
+        )
+        respuesta = self.client.get(self.url)
+        self.assertContains(respuesta, 'value="998877"')
+        self.assertContains(respuesta, '<option value="CE" selected>')
+
     def test_sin_cambios_lo_informa(self):
         respuesta = self._ajax(first_name='Ana', last_name='Marin', age='30')
         self.assertEqual(respuesta.json(), {'ok': True, 'message': 'No se realizaron cambios.'})

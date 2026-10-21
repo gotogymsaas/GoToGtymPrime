@@ -320,38 +320,54 @@ class VistaDeCheckoutTests(CheckoutBaseTestCase):
 
         response = self.client.get(self._url())
 
-        self.assertContains(response, '3009876543')
         self.assertContains(response, 'Carrera 50 # 10-20')
+        # El telefono de la libreta tampoco es un dato de contacto precargado.
+        self.assertNotIn('phone', response.context['form'].initial)
 
-    def test_precarga_el_telefono_del_perfil(self):
-        get_user_model().objects.filter(pk=self.usuario.pk).update(phone='3151112233')
-        self._poner_en_carrito({str(self.variante.pk): 1})
-
-        response = self.client.get(self._url())
-
-        self.assertEqual(response.context['form'].initial['phone'], '3151112233')
-        self.assertContains(response, '3151112233')
-
-    def test_el_telefono_del_perfil_gana_sobre_el_de_la_direccion(self):
-        from accounts.models import CustomerAddress
-
-        get_user_model().objects.filter(pk=self.usuario.pk).update(phone='3151112233')
-        CustomerAddress.objects.create(
-            user=self.usuario, is_default=True, full_name='Ana Marin', phone='3009876543',
-            country='Colombia', department='Antioquia', city='Medellín',
-            address_line='Carrera 50 # 10-20',
+    def test_los_datos_personales_no_se_precargan(self):
+        get_user_model().objects.filter(pk=self.usuario.pk).update(
+            first_name='Ana', last_name='Marin', phone='3151112233',
+            document_type='CC', document_number='1020304050',
         )
         self._poner_en_carrito({str(self.variante.pk): 1})
 
         response = self.client.get(self._url())
 
-        self.assertEqual(response.context['form'].initial['phone'], '3151112233')
-        self.assertContains(response, 'Carrera 50 # 10-20')
+        initial = response.context['form'].initial
+        for campo in ('first_name', 'last_name', 'email', 'phone', 'document_type', 'document_number'):
+            self.assertNotIn(campo, initial)
 
-    def test_sin_telefono_en_el_perfil_el_campo_queda_vacio(self):
+    def test_la_casilla_usar_datos_de_usuario_lleva_los_datos_de_la_cuenta(self):
+        get_user_model().objects.filter(pk=self.usuario.pk).update(
+            first_name='Ana', last_name='Marin', phone='3151112233',
+            document_type='CC', document_number='1020304050',
+        )
+        self._poner_en_carrito({str(self.variante.pk): 1})
+
+        response = self.client.get(self._url())
+
+        self.assertContains(response, 'id="use-user-data"')
+        self.assertEqual(response.context['datos_usuario'], {
+            'first_name': 'Ana', 'last_name': 'Marin',
+            'document_type': 'CC', 'document_number': '1020304050',
+            'email': self.usuario.email, 'phone': '3151112233',
+        })
+        self.assertContains(response, 'id="checkout-user-data"')
+
+    def test_documento_y_telefono_quedan_vacios_si_la_cuenta_no_los_tiene(self):
         self._poner_en_carrito({str(self.variante.pk): 1})
         response = self.client.get(self._url())
-        self.assertEqual(response.context['form'].initial['phone'], '')
+        datos = response.context['datos_usuario']
+        self.assertEqual((datos['phone'], datos['document_type'], datos['document_number']), ('', '', ''))
+
+    def test_el_documento_va_debajo_del_nombre_y_el_apellido(self):
+        self._poner_en_carrito({str(self.variante.pk): 1})
+        response = self.client.get(self._url())
+        campos = list(response.context['form'].fields)
+        self.assertEqual(
+            campos[:6],
+            ['first_name', 'last_name', 'document_type', 'document_number', 'email', 'phone'],
+        )
 
     def test_post_valido_crea_el_pedido_y_vacia_el_carrito(self):
         self._poner_en_carrito({str(self.variante.pk): 2})

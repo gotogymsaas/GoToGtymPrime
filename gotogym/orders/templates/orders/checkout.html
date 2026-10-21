@@ -31,6 +31,7 @@
 
   {{ municipios_por_departamento|json_script:"municipios-data" }}
   {{ resumen.subtotal_float|json_script:"checkout-subtotal" }}
+  {{ datos_usuario|json_script:"checkout-user-data" }}
 
   <section class="editorial-section editorial-section--mist">
     <form method="post" novalidate class="editorial-shell account-layout">
@@ -39,8 +40,17 @@
       <div class="account-panel">
         <p class="editorial-kicker">{% trans "Contacto" %}</p>
         <h2>{% trans "Datos de contacto" %}</h2>
+        {% comment %}
+        Mejora progresiva: sin JS la casilla queda oculta y el formulario se
+        llena a mano, igual que antes. No lleva `name`, asi que no viaja en el
+        POST: solo vuelca los datos de la cuenta en los campos de abajo.
+        {% endcomment %}
+        <label id="use-user-data-wrap" hidden style="align-items: center; gap: 8px; margin-bottom: 20px; cursor: pointer;">
+          <input type="checkbox" id="use-user-data">
+          <span>{% trans "Usar datos de usuario" %}</span>
+        </label>
         <div class="account-fields">
-          {% for field in form %}{% if field.name in 'first_name,last_name,email,phone' %}
+          {% for field in form %}{% if field.name in 'first_name,last_name,email,phone,document_type,document_number' %}
           <div class="account-field{% if field.name == 'email' %} account-field--full{% endif %}">
             <label for="{{ field.id_for_label }}">
               {{ field.label }}{% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
@@ -56,7 +66,7 @@
         <p class="editorial-kicker" style="margin-top: 44px;">{% trans "Entrega" %}</p>
         <h2>{% trans "Dirección de entrega" %}</h2>
         <div class="account-fields">
-          {% for field in form %}{% if field.name not in 'first_name,last_name,email,phone,coupon_code' %}
+          {% for field in form %}{% if field.name not in 'first_name,last_name,email,phone,document_type,document_number,coupon_code' %}
           <div class="account-field{% if field.name == 'address_line' or field.name == 'address_complement' or field.name == 'notes' %} account-field--full{% endif %}">
             <label for="{{ field.id_for_label }}">
               {{ field.label }}{% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
@@ -146,6 +156,38 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script>
+  // --- "Usar datos de usuario" ----------------------------------------------
+  // Al marcarla vuelca los datos de la cuenta en los campos de contacto (solo
+  // los que la cuenta tiene) y guarda lo que habia escrito; al desmarcarla lo
+  // devuelve. Nada se envia hasta confirmar el pedido.
+  document.addEventListener('DOMContentLoaded', function () {
+    var casilla = document.getElementById('use-user-data');
+    var envoltorio = document.getElementById('use-user-data-wrap');
+    var datosUsuarioEl = document.getElementById('checkout-user-data');
+    if (!casilla || !envoltorio || !datosUsuarioEl) return;
+
+    var datosUsuario = JSON.parse(datosUsuarioEl.textContent);
+    var anteriores = {};
+    envoltorio.hidden = false;
+    envoltorio.style.display = 'flex';
+
+    casilla.addEventListener('change', function () {
+      Object.keys(datosUsuario).forEach(function (nombre) {
+        var campo = document.getElementById('id_' + nombre);
+        if (!campo) return;
+        if (casilla.checked) {
+          if (!datosUsuario[nombre]) return;
+          anteriores[nombre] = campo.value;
+          campo.value = datosUsuario[nombre];
+        } else if (nombre in anteriores) {
+          campo.value = anteriores[nombre];
+        }
+      });
+      if (!casilla.checked) anteriores = {};
+    });
+  });
+</script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     var datosEl = document.getElementById('municipios-data');

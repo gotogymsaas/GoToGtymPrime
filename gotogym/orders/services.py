@@ -30,7 +30,7 @@ from inventory.services import (
 from shipping.models import ShippingQuote, ShippingStatus
 from shipping.services import get_mock_quote
 
-from . import correos
+from . import correos, facturacion
 from .models import (
     Address,
     Coupon,
@@ -368,6 +368,8 @@ def create_order_from_cart(user, cart, datos):
                     language=get_language() or 'es',
                     email=datos['email'],
                     phone=datos['phone'],
+                    customer_document_type=datos.get('document_type', ''),
+                    customer_document_number=datos.get('document_number', ''),
                     subtotal=subtotal,
                     shipping_cost=envio,
                     discount_total=descuento,
@@ -517,6 +519,7 @@ def confirm_payment(order, payment_transaction):
     _registrar_estado(order, estado_previo, OrderStatus.CONFIRMED, nota='Pago aprobado.')
     register_order_commission(order)
     enqueue(correos.pedido_confirmado, order.pk)
+    enqueue(facturacion.emitir_factura, order.pk)
     return order
 
 

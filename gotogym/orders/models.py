@@ -270,6 +270,50 @@ class OrderStatusHistory(models.Model):
         return f"{self.order.order_number}: {self.from_status or '-'} -> {self.to_status}"
 
 
+class InvoiceStatus(models.TextChoices):
+    PENDING = 'pending', gettext_lazy('Pendiente')
+    PROCESSING = 'processing', gettext_lazy('En proceso')
+    ISSUED = 'issued', gettext_lazy('Emitida')
+    FAILED = 'failed', gettext_lazy('Fallida')
+
+
+class Invoice(models.Model):
+    """Factura electronica de un pedido pagado, emitida en Alegra.
+
+    Solo guarda el rastro de la emision: el documento vive en Alegra. Un
+    pedido tiene como maximo una factura; `attempts` y `last_error` dicen por
+    que una emision fallida sigue pendiente de reintento.
+    """
+
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='invoice')
+    status = models.CharField(
+        max_length=12, choices=InvoiceStatus.choices, default=InvoiceStatus.PENDING,
+    )
+    alegra_contact_id = models.CharField(max_length=40, blank=True)
+    alegra_invoice_id = models.CharField(max_length=40, blank=True)
+    number = models.CharField(max_length=60, blank=True)
+    cufe = models.CharField(max_length=200, blank=True)
+    # Respuesta de Alegra tal cual, para reconstruir datos que no se extraigan.
+    raw_response = models.JSONField(default=dict, blank=True)
+
+    attempts = models.PositiveSmallIntegerField(default=0)
+    last_error = models.TextField(blank=True)
+    last_attempt_at = models.DateTimeField(null=True, blank=True)
+    issued_at = models.DateTimeField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at', '-id']
+        indexes = [
+            models.Index(fields=['status', 'last_attempt_at'], name='invoice_status_attempt_idx'),
+        ]
+
+    def __str__(self):
+        return f"{self.order.order_number}: {self.number or self.status}"
+
+
 class Address(models.Model):
     """Direccion de entrega del pedido."""
 
