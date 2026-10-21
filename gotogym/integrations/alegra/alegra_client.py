@@ -76,10 +76,12 @@ class AlegraClient:
         except requests.HTTPError as error:
             respuesta = error.response
             status = getattr(respuesta, "status_code", None)
-            try:
-                payload = respuesta.json()
-            except (AttributeError, ValueError):
-                payload = None
+            payload = None
+            if respuesta is not None:
+                try:
+                    payload = respuesta.json()
+                except ValueError:
+                    pass
             raise AlegraError(_mensaje_de_error(payload, status), status, payload) from error
         except requests.RequestException as error:
             raise AlegraError(f"No se pudo conectar con Alegra ({type(error).__name__})") from error
