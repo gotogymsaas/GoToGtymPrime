@@ -6,6 +6,9 @@ __pycache__/
 *.sqlite3
 *.log
 
+# Registro de errores de la aplicacion (logs/errores.txt y sus rotaciones)
+logs/
+
 # Node modules
 node_modules/
 

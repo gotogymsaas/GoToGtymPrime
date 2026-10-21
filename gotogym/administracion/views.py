@@ -600,6 +600,47 @@ def inventory_threshold_update(request):
 
 @require_perms("administracion.change_panelsettings")
 @require_POST
+def store_pause_toggle(request):
+    """Interruptor de pausa de compras (barra superior del panel).
+
+    Bloquea carrito y checkout sin tocar `Inventory`: el stock queda como
+    esta, asi que reanudar no necesita "restaurar" nada, y un pago que ya
+    estaba en curso todavia puede confirmarse contra su stock."""
+    pausar = request.POST.get("pausar") == "1"
+    ajustes = PanelSettings.load()
+    if ajustes.purchases_paused != pausar:
+        ajustes.purchases_paused = pausar
+        ajustes.purchases_paused_at = timezone.now() if pausar else None
+        ajustes.save(update_fields=["purchases_paused", "purchases_paused_at", "updated_at"])
+    if pausar:
+        messages.warning(request, "Compras en pausa: la tienda no acepta carritos ni pedidos nuevos. El stock no se modificó.")
+    else:
+        messages.success(request, "Compras reanudadas: la tienda vuelve a vender con el stock que ya tenía.")
+    return _safe_redirect(request, "admin_dashboard")
+
+
+@require_perms("administracion.change_panelsettings")
+@require_POST
+def online_payments_toggle(request):
+    """Interruptor "Recibir pagos" (barra superior del panel).
+
+    Solo decide si el checkout abre pagos nuevos con Mercado Pago. No toca
+    pedidos ni stock, y un pago que ya estaba en curso (retorno del comprador
+    o webhook) se sigue confirmando."""
+    habilitar = request.POST.get("habilitar") == "1"
+    ajustes = PanelSettings.load()
+    if ajustes.online_payments_enabled != habilitar:
+        ajustes.online_payments_enabled = habilitar
+        ajustes.save(update_fields=["online_payments_enabled", "updated_at"])
+    if habilitar:
+        messages.success(request, "Pagos habilitados: el checkout vuelve a ofrecer Mercado Pago.")
+    else:
+        messages.warning(request, "Pagos deshabilitados: no se abren pagos nuevos. Los pagos en curso se siguen confirmando.")
+    return _safe_redirect(request, "admin_dashboard")
+
+
+@require_perms("administracion.change_panelsettings")
+@require_POST
 def sales_goal_update(request):
     """Meta de ventas customizable: reusa el mismo patron de ajuste rapido
     que el umbral de stock bajo, pero vive junto a los KPIs de ventas en el

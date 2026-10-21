@@ -30,6 +30,65 @@
 
 </div>
 
+<div class="panel">
+  <h2>Datos personales</h2>
+  {% if profile.first_name %}
+  <table>
+    <tbody>
+      <tr><th>Nombre</th><td>{{ profile.full_name }}</td></tr>
+      <tr><th>Documento</th><td>{{ profile.get_document_type_display }} &middot; {{ profile.document_number }}</td></tr>
+      <tr><th>Teléfono</th><td>{{ profile.phone }}</td></tr>
+      <tr><th>Dirección</th><td>{{ profile.address }}</td></tr>
+    </tbody>
+  </table>
+  {% else %}
+  <p>Este afiliado se postuló antes de que se pidieran sus datos personales.</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Redes sociales</h2>
+  {% if redes %}
+  <table>
+    <thead><tr><th>Red</th><th>Usuario</th><th>Seguidores declarados</th></tr></thead>
+    <tbody>
+      {% for red in redes %}
+      <tr>
+        <td>{{ red.platform_label }}</td>
+        <td>{% if red.profile_url %}<a href="{{ red.profile_url }}" target="_blank" rel="noopener noreferrer nofollow">@{{ red.username }}</a>{% else %}@{{ red.username }}{% endif %}</td>
+        <td>{{ red.followers|cop }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot><tr><th colspan="2">Total</th><th>{{ total_seguidores|cop }}</th></tr></tfoot>
+  </table>
+  <p class="hint">Las cifras las declara la persona; no se verifican contra cada red.</p>
+  {% else %}
+  <p>Este afiliado no declaro redes sociales.</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Cuenta Bre-B</h2>
+  {% if titular_no_coincide %}<p role="alert"><span class="badge badge-gold">Revisar</span> El documento del titular de la cuenta no coincide con el del perfil.</p>{% endif %}
+  {% if profile.payout_account %}
+  {% with cuenta=profile.payout_account %}
+  <table>
+    <tbody>
+      <tr><th>Titular</th><td>{{ cuenta.full_name }}</td></tr>
+      <tr><th>Documento</th><td>{{ cuenta.get_document_type_display }} &middot; {{ cuenta.document_number }}</td></tr>
+      <tr><th>Llave Bre-B</th><td>{{ cuenta.breb_key }}</td></tr>
+      <tr><th>Teléfono</th><td>{{ cuenta.phone }}</td></tr>
+      <tr><th>Dirección</th><td>{{ cuenta.address }}</td></tr>
+      <tr><th>Actualizada</th><td>{{ cuenta.updated_at|date:"d/m/Y H:i" }}</td></tr>
+    </tbody>
+  </table>
+  {% endwith %}
+  {% else %}
+  <p>Este afiliado todavía no inscribe su cuenta Bre-B.</p>
+  {% endif %}
+</div>
+
 {% if perms.afiliados.change_perfilafiliado %}
 <div class="panel">
   <h2>Comisión y revisión</h2>
@@ -86,32 +145,6 @@
     </form>
     {% endif %}
   </div>
-</div>
-{% endif %}
-
-{% if perms.afiliados.change_perfilafiliado and es_aprobado_activo or perms.afiliados.delete_perfilafiliado %}
-<div class="panel">
-  <h2>Terminar o eliminar</h2>
-  {% if perms.afiliados.change_perfilafiliado and es_aprobado_activo %}
-  <form id="terminar-participacion" method="post" action="{% url 'admin_afiliado_terminate' profile.pk %}" class="form-grid" onsubmit="return confirm('Se desactivará su código de inmediato y se le avisará por correo. ¿Continuar?');">
-    {% csrf_token %}
-    <label><span>{{ terminacion_form.reason.label }}</span>{{ terminacion_form.reason }}</label>
-    <label class="field-full"><span>{{ terminacion_form.notes.label }}</span>{{ terminacion_form.notes }}</label>
-    <label class="check field-full">{{ terminacion_form.void_commissions }}<span>{{ terminacion_form.void_commissions.label }}</span></label>
-  </form>
-  {% endif %}
-  <div class="form-actions">
-    {% if perms.afiliados.change_perfilafiliado and es_aprobado_activo %}
-    <button class="button product-delete-button" type="submit" form="terminar-participacion">Terminar participación</button>
-    {% endif %}
-    {% if perms.afiliados.delete_perfilafiliado %}
-    <form method="post" action="{% url 'admin_afiliado_delete' profile.pk %}" onsubmit="return confirm('¿Eliminar definitivamente a {{ profile.user.email|escapejs }} del programa de afiliados? Esta acción no se puede deshacer.');">
-      {% csrf_token %}
-      <button class="button product-delete-button" type="submit">Eliminar afiliado</button>
-    </form>
-    {% endif %}
-  </div>
-  <p class="hint">Terminar desactiva el código y le avisa al afiliado el motivo. Eliminar borra el perfil y su historial de forma definitiva.</p>
 </div>
 {% endif %}
 
@@ -197,65 +230,6 @@
 </div>
 
 <div class="panel">
-  <h2>Datos personales</h2>
-  {% if profile.first_name %}
-  <table>
-    <tbody>
-      <tr><th>Nombre</th><td>{{ profile.full_name }}</td></tr>
-      <tr><th>Documento</th><td>{{ profile.get_document_type_display }} &middot; {{ profile.document_number }}</td></tr>
-      <tr><th>Teléfono</th><td>{{ profile.phone }}</td></tr>
-      <tr><th>Dirección</th><td>{{ profile.address }}</td></tr>
-    </tbody>
-  </table>
-  {% else %}
-  <p>Este afiliado se postuló antes de que se pidieran sus datos personales.</p>
-  {% endif %}
-</div>
-
-<div class="panel">
-  <h2>Redes sociales</h2>
-  {% if redes %}
-  <table>
-    <thead><tr><th>Red</th><th>Usuario</th><th>Seguidores declarados</th></tr></thead>
-    <tbody>
-      {% for red in redes %}
-      <tr>
-        <td>{{ red.platform_label }}</td>
-        <td>{% if red.profile_url %}<a href="{{ red.profile_url }}" target="_blank" rel="noopener noreferrer nofollow">@{{ red.username }}</a>{% else %}@{{ red.username }}{% endif %}</td>
-        <td>{{ red.followers|cop }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-    <tfoot><tr><th colspan="2">Total</th><th>{{ total_seguidores|cop }}</th></tr></tfoot>
-  </table>
-  <p class="hint">Las cifras las declara la persona; no se verifican contra cada red.</p>
-  {% else %}
-  <p>Este afiliado no declaro redes sociales.</p>
-  {% endif %}
-</div>
-
-<div class="panel">
-  <h2>Cuenta Bre-B</h2>
-  {% if titular_no_coincide %}<p role="alert"><span class="badge badge-gold">Revisar</span> El documento del titular de la cuenta no coincide con el del perfil.</p>{% endif %}
-  {% if profile.payout_account %}
-  {% with cuenta=profile.payout_account %}
-  <table>
-    <tbody>
-      <tr><th>Titular</th><td>{{ cuenta.full_name }}</td></tr>
-      <tr><th>Documento</th><td>{{ cuenta.get_document_type_display }} &middot; {{ cuenta.document_number }}</td></tr>
-      <tr><th>Llave Bre-B</th><td>{{ cuenta.breb_key }}</td></tr>
-      <tr><th>Teléfono</th><td>{{ cuenta.phone }}</td></tr>
-      <tr><th>Dirección</th><td>{{ cuenta.address }}</td></tr>
-      <tr><th>Actualizada</th><td>{{ cuenta.updated_at|date:"d/m/Y H:i" }}</td></tr>
-    </tbody>
-  </table>
-  {% endwith %}
-  {% else %}
-  <p>Este afiliado todavía no inscribe su cuenta Bre-B.</p>
-  {% endif %}
-</div>
-
-<div class="panel">
   <h2>Solicitudes de comisión</h2>
   <table>
     <thead><tr><th>Monto</th><th>Estado</th><th>Datos de pago</th><th>Solicitada</th><th>Resuelta</th></tr></thead>
@@ -274,10 +248,36 @@
           {% else %}&mdash;{% endif %}
         </td>
         <td><small>{{ withdrawal.requested_at|date:"d/m/Y" }}</small></td>
-        <td><small>{{ withdrawal.resolved_at|date:"d/m/Y"|default:"—" }}</small></td>
+        <td><small>{{ withdrawal.resolved_at|date:"d/m/Y"|default:"-" }}</small></td>
       </tr>
       {% empty %}<tr><td colspan="5">Sin solicitudes todavía.</td></tr>{% endfor %}
     </tbody>
   </table>
 </div>
+
+{% if perms.afiliados.change_perfilafiliado and es_aprobado_activo or perms.afiliados.delete_perfilafiliado %}
+<div class="panel">
+  <h2>Terminar o eliminar</h2>
+  {% if perms.afiliados.change_perfilafiliado and es_aprobado_activo %}
+  <form id="terminar-participacion" method="post" action="{% url 'admin_afiliado_terminate' profile.pk %}" class="form-grid" onsubmit="return confirm('Se desactivará su código de inmediato y se le avisará por correo. ¿Continuar?');">
+    {% csrf_token %}
+    <label><span>{{ terminacion_form.reason.label }}</span>{{ terminacion_form.reason }}</label>
+    <label class="field-full"><span>{{ terminacion_form.notes.label }}</span>{{ terminacion_form.notes }}</label>
+    <label class="check field-full">{{ terminacion_form.void_commissions }}<span>{{ terminacion_form.void_commissions.label }}</span></label>
+  </form>
+  {% endif %}
+  <div class="form-actions">
+    {% if perms.afiliados.change_perfilafiliado and es_aprobado_activo %}
+    <button class="button product-delete-button" type="submit" form="terminar-participacion">Terminar participación</button>
+    {% endif %}
+    {% if perms.afiliados.delete_perfilafiliado %}
+    <form method="post" action="{% url 'admin_afiliado_delete' profile.pk %}" onsubmit="return confirm('¿Eliminar definitivamente a {{ profile.user.email|escapejs }} del programa de afiliados? Esta acción no se puede deshacer.');">
+      {% csrf_token %}
+      <button class="button product-delete-button" type="submit">Eliminar afiliado</button>
+    </form>
+    {% endif %}
+  </div>
+  <p class="hint">Terminar desactiva el código y le avisa al afiliado el motivo. Eliminar borra el perfil y su historial de forma definitiva.</p>
+</div>
+{% endif %}
 {% endblock %}

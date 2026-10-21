@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+from administracion.models import PanelSettings
+from administracion.pausa import MENSAJE_COMPRAS_PAUSADAS
 from analitica.services import registrar_evento
 from carrito.services import build_cart_context, read_cart, write_cart
 from django.contrib import messages
@@ -36,6 +38,9 @@ def checkout(request):
     # Avanza lo que depende del tiempo (pedidos sin pagar que vencieron y sus
     # cupones) sin requerir una tarea periodica programada.
     cancel_expired_orders()
+    if PanelSettings.compras_pausadas():
+        messages.warning(request, str(MENSAJE_COMPRAS_PAUSADAS))
+        return redirect('carrito:cart_detail')
     cart, reiniciado = read_cart(request.session)
     if reiniciado:
         messages.warning(request, gettext('Tu carrito se reinició por una actualización del sistema.'))

@@ -1599,3 +1599,12 @@ picture source {
   }
 }
 
+
+.gtg-pausa {
+  margin: 0;
+  padding: 10px 16px;
+  background: var(--color-ink, #101012);
+  color: var(--color-premium-white, #f8f9fa);
+  font-size: .875rem;
+  text-align: center;
+}

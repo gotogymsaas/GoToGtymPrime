@@ -117,6 +117,41 @@ body.panel-shell {
 .panel-shell .topbar-actions form { margin: 0; }
 .panel-shell .topbar span, .panel-shell .eyebrow, .panel-shell small { color: var(--pq-muted); }
 
+/* ---------- Pausa de compras ---------- */
+.panel-shell .pause-switch {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  padding: 6px 12px 6px 8px; border: 1px solid var(--pq-border); border-radius: 999px;
+  background: transparent; color: var(--pq-text); font: inherit; font-size: .8rem; cursor: pointer;
+}
+.panel-shell .pause-switch:hover { border-color: var(--pq-border-strong); }
+.panel-shell .pause-switch__track {
+  position: relative; width: 34px; height: 18px; border-radius: 999px;
+  background: var(--pq-green); transition: background var(--motion-ui, 200ms);
+}
+.panel-shell .pause-switch__thumb {
+  position: absolute; top: 2px; left: 18px; width: 14px; height: 14px; border-radius: 50%;
+  background: #fff; transition: left var(--motion-ui, 200ms);
+}
+.panel-shell .pause-switch.is-paused { border-color: var(--pq-red); }
+.panel-shell .pause-switch.is-paused .pause-switch__track { background: var(--pq-red); }
+.panel-shell .pause-switch.is-paused .pause-switch__thumb { left: 2px; }
+.panel-shell .pause-switch span { color: inherit; }
+.panel-shell .topbar .pause-badge, .panel-shell .pause-notice {
+  color: var(--pq-red); font-weight: 700; font-size: .8rem;
+}
+.panel-shell .pause-notice {
+  margin: 0 0 var(--space-4); padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--pq-red); border-radius: 8px;
+}
+.panel-shell .pause-dialog {
+  max-width: 440px; padding: var(--space-5); border: 1px solid var(--pq-border-strong);
+  border-radius: 12px; background: #0b0f14; color: var(--pq-text);
+}
+.panel-shell .pause-dialog::backdrop { background: rgba(0, 0, 0, .6); }
+.panel-shell .pause-dialog h2 { margin: 0 0 var(--space-3); font-size: 1.1rem; }
+.panel-shell .pause-dialog p { margin: 0 0 var(--space-3); color: var(--pq-muted); line-height: 1.5; }
+.panel-shell .pause-dialog__actions { display: flex; justify-content: flex-end; gap: var(--space-3); }
+
 /* ---------- Encabezados de pantalla ---------- */
 .panel-shell .hero, .panel-shell .page-head {
   position: relative;

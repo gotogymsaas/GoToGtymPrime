@@ -44,7 +44,7 @@
             <td>{{ order.order_number }}</td>
             <td>{{ order.created_at|date:'d/m/Y' }}</td>
             <td>${{ order.subtotal|cop }} COP</td>
-            <td>{% if order.commission %}${{ order.commission.amount|cop }} COP{% else %}—{% endif %}</td>
+            <td>{% if order.commission %}${{ order.commission.amount|cop }} COP{% else %}-{% endif %}</td>
             <td>{% include 'afiliados/_estado_comision.html' with comision=order.commission %}</td>
           </tr>
           {% endfor %}

@@ -7,6 +7,8 @@ un precio que venga de la sesion o del formulario.
 from datetime import timedelta
 from decimal import Decimal
 
+from administracion.models import PanelSettings
+from administracion.pausa import MENSAJE_COMPRAS_PAUSADAS
 from afiliados.services import (
     afiliado_operativo,
     register_order_commission,
@@ -337,6 +339,11 @@ def create_order_from_cart(user, cart, datos):
 
     Devuelve la `Order` creada. Si algo falla no queda nada a medias.
     """
+    # Ultima barrera: la vista ya redirige, pero un POST directo o una
+    # pestana abierta antes de la pausa llegan hasta aqui.
+    if PanelSettings.compras_pausadas():
+        raise CheckoutError(str(MENSAJE_COMPRAS_PAUSADAS))
+
     contexto = build_cart_context(cart)
     items = contexto['items']
 

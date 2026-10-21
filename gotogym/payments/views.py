@@ -1,13 +1,18 @@
 import json
+import logging
 
 from django.conf import settings
 from django.contrib import messages
+from administracion.models import PanelSettings
+from administracion.pausa import MENSAJE_PAGOS_DESHABILITADOS
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from gotogym.ratelimit import rate_limit
+from integrations.mercadopago.mercadopago_client import MercadoPagoError
 from orders.models import Order
 from orders.services import confirm_payment
 
@@ -15,6 +20,8 @@ from .models import PaymentTransaction
 from .providers.mercadopago import MercadoPagoPaymentProvider
 from .providers.mock import MockPaymentProvider
 from .signature import verify_signature
+
+logger = logging.getLogger(__name__)
 
 # Proveedor usado por la pantalla de simulacion (Sprint 9): siempre el mock,
 # sin importar PAYMENT_PROVIDER, porque esa pantalla existe precisamente
@@ -71,13 +78,68 @@ def _current_or_new_transaction(order, provider):
 def payment_pending(request, order_number):
     order = get_object_or_404(Order, order_number=order_number, user=request.user)
     provider = get_active_provider()
-    transaction = _current_or_new_transaction(order, provider)
+    if not PanelSettings.pagos_habilitados():
+        # Con los pagos deshabilitados no se abre ningun intento nuevo; si el
+        # pedido ya estaba pagado, la pantalla se muestra igual.
+        previa = _latest_transaction(order, provider)
+        if previa is None or previa.status != PaymentTransaction.Status.APPROVED:
+            messages.warning(request, str(MENSAJE_PAGOS_DESHABILITADOS))
+            return redirect('orders:order_detail', order_number=order.order_number)
+    try:
+        transaction = _current_or_new_transaction(order, provider)
+    except MercadoPagoError:
+        logger.exception('No se pudo crear la preferencia de pago de %s', order.order_number)
+        messages.error(request, gettext(
+            'No pudimos conectar con Mercado Pago. Intenta de nuevo en unos minutos.'
+        ))
+        return redirect('orders:order_detail', order_number=order.order_number)
+
+    checkout_url = ''
+    if provider.name == 'mercadopago' and transaction.status != PaymentTransaction.Status.APPROVED:
+        checkout_url = provider.checkout_url(transaction)
+
     return render(request, 'payments/pending.html', {
         'order': order,
         'transaction': transaction,
-        'mock_ui_enabled': mock_ui_enabled(),
+        'checkout_url': checkout_url,
+        # La simulacion usa su propio proveedor: con uno real activo no
+        # tiene nada que ver con el pago que se esta mostrando.
+        'mock_ui_enabled': mock_ui_enabled() and provider.name == 'mock',
         'estados': PaymentTransaction.Status.choices,
     })
+
+
+@login_required
+def payment_return(request, order_number):
+    """Adonde vuelve el comprador desde Mercado Pago (back_urls).
+
+    Los parametros de la URL (`payment_id`, `status`...) los puede escribir
+    cualquiera, asi que solo se usa el id para consultar el pago a Mercado
+    Pago. Sin esto, el pedido dependeria de que el webhook llegue (y en
+    local, donde Mercado Pago no puede llamar, nunca llegaria).
+    """
+    order = get_object_or_404(Order, order_number=order_number, user=request.user)
+    payment_id = request.GET.get('payment_id') or request.GET.get('collection_id') or ''
+
+    if payment_id.isdigit() and getattr(settings, 'PAYMENT_PROVIDER', 'mock') == 'mercadopago':
+        try:
+            transaction = MercadoPagoPaymentProvider().sync_payment(payment_id)
+        except (PaymentTransaction.DoesNotExist, MercadoPagoError):
+            logger.exception('No se pudo verificar el pago %s del pedido %s', payment_id, order.order_number)
+        else:
+            if transaction.order_id == order.pk:
+                if transaction.status == PaymentTransaction.Status.APPROVED:
+                    confirm_payment(order, transaction)
+                    messages.success(request, gettext('¡Pago recibido! Tu pedido quedó confirmado.'))
+                    return redirect('orders:order_detail', order_number=order.order_number)
+                if transaction.status == PaymentTransaction.Status.PENDING:
+                    messages.info(request, gettext(
+                        'Tu pago está en proceso. Te avisaremos cuando Mercado Pago lo confirme.'
+                    ))
+                else:
+                    messages.error(request, gettext('El pago no fue aprobado. Puedes intentarlo de nuevo.'))
+
+    return redirect('payments:pending', order_number=order.order_number)
 
 
 @login_required
@@ -116,10 +178,8 @@ def simulate(request, order_number, status):
 @csrf_exempt
 @require_POST
 def mercadopago_webhook(request):
-    """Webhook de Mercado Pago: existe y valida origen, pero no hay ninguna
-    integracion activa que lo invoque hoy (`PAYMENT_PROVIDER=mock` por
-    defecto). Queda listo para cuando se activen credenciales reales.
-    """
+    """Webhook de Mercado Pago: valida la firma, y del aviso solo toma el id
+    del pago, cuyo estado se consulta a la API (ver `sync_payment`)."""
     secret = getattr(settings, 'MERCADOPAGO_WEBHOOK_SECRET', '')
     if not verify_signature(request, secret):
         return HttpResponseForbidden('Firma inválida o ausente.')
@@ -129,11 +189,23 @@ def mercadopago_webhook(request):
     except ValueError:
         return HttpResponse(status=400)
 
+    # Mercado Pago tambien avisa de otros temas (merchant_order, etc.) si se
+    # suscriben en el panel: se acusa recibo para que no los reintente.
+    tipo = payload.get('type') or request.GET.get('type') or 'payment'
+    if tipo != 'payment':
+        return HttpResponse(status=200)
+
+    # El id de la query es el que cubre la firma; el del cuerpo no.
+    payment_id = request.GET.get('data.id') or (payload.get('data') or {}).get('id')
     provider = MercadoPagoPaymentProvider()
     try:
-        transaction = provider.handle_callback(payload)
+        transaction = provider.handle_callback({'data': {'id': payment_id}})
     except PaymentTransaction.DoesNotExist:
         return HttpResponse(status=404)
+    except MercadoPagoError:
+        logger.exception('Webhook: no se pudo consultar el pago %s', payment_id)
+        # 5xx para que Mercado Pago reintente: no es culpa del aviso.
+        return HttpResponse(status=502)
 
     if transaction.status == PaymentTransaction.Status.APPROVED:
         confirm_payment(transaction.order, transaction)

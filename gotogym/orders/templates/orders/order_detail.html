@@ -137,7 +137,11 @@
     {% if pedido.payment_status == 'pending' %}
     <p class="px-4 py-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-sm no-print">
       {% trans "Tu pedido quedó registrado y está pendiente de pago." %}
+      {% if pagos_habilitados %}
       <a href="{% url 'payments:pending' pedido.order_number %}" class="underline font-semibold">{% trans "Ir a pagar" %}</a>
+      {% else %}
+      {% trans "Los pagos en línea están deshabilitados temporalmente. Vuelve más tarde para pagarlo." %}
+      {% endif %}
     </p>
     {% endif %}
 

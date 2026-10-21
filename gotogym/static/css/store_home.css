@@ -83,7 +83,7 @@
 .home-product-card__meta small { color: #5f6066; }
 .store-empty { padding: var(--space-8); border: 1px solid #cececc; text-align: center; }
 
-.store-story { min-height: 720px; display: grid; grid-template-columns: 1.08fr .92fr; background: var(--home-graphite); color: var(--home-white); }
+.store-story { min-height: 720px; display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); padding-inline: max(0px, calc((100% - 1440px) / 2)); background: var(--home-graphite); color: var(--home-white); }
 .store-story__image { min-height: 620px; overflow: hidden; }
 .store-story__image img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.75) contrast(1.06); }
 .store-story__content { align-self: center; padding: clamp(60px, 8vw, 120px); }

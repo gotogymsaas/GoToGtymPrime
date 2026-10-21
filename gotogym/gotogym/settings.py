@@ -5,6 +5,8 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 
+from .registro_errores import configuracion_logging
+
 
 def _split_csv(value: str) -> list[str]:
     return [item.strip() for item in value.split(',') if item.strip()]
@@ -83,6 +85,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'afiliados.middleware.ReferralTrackingMiddleware',
+    # Ultimo a proposito: renderiza la pagina de los 405/429 con la sesion y el
+    # usuario ya resueltos por los anteriores.
+    'gotogym.errores.PaginaDeErrorMiddleware',
 ]
 
 ROOT_URLCONF = 'gotogym.urls'
@@ -101,6 +106,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'carrito.context_processors.cart_count',
+                'administracion.context_processors.compras_pausadas',
+                'administracion.context_processors.pagos_habilitados',
             ],
         },
     },
@@ -315,6 +322,21 @@ if SENTRY_DSN:
         traces_sample_rate=float(os.environ.get('SENTRY_TRACES_SAMPLE_RATE', '0.2')),
         send_default_pii=False,
     )
+
+# Registro de errores en un archivo de texto (ver gotogym/registro_errores.py).
+# Las pruebas escriben en un directorio temporal para no ensuciar el log real.
+if _EN_PRUEBAS:
+    import tempfile
+
+    _LOG_DIR_POR_DEFECTO = str(Path(tempfile.gettempdir()) / 'gotogym_pruebas_logs')
+else:
+    _LOG_DIR_POR_DEFECTO = str(BASE_DIR.parent / 'logs')
+LOG_DIR = os.environ.get('LOG_DIR') or _LOG_DIR_POR_DEFECTO
+LOGGING = configuracion_logging(LOG_DIR)
+
+# Paginas de error propias (ver gotogym/errores.py). El 500 es autonomo; 405 y
+# 429 los cubre PaginaDeErrorMiddleware.
+CSRF_FAILURE_VIEW = 'gotogym.errores.fallo_csrf'
 
 AUTH_USER_MODEL = 'accounts.User'
 LOGIN_URL = 'commercial_login'

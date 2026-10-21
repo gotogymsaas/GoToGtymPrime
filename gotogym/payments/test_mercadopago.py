@@ -9,10 +9,12 @@ import hashlib
 import hmac
 import json
 from decimal import Decimal
+from unittest import mock
 
 from django.contrib.auth import get_user_model
 from django.test import Client, RequestFactory, TestCase, override_settings
 from django.urls import reverse
+from integrations.mercadopago.mercadopago_client import MercadoPagoError
 from inventory.models import Inventory
 from orders.models import OrderStatus
 from orders.services import create_order_from_cart
@@ -43,11 +45,20 @@ def _crear_variante(producto, sku, size, color, stock):
 class FakeMercadoPagoClient:
     """Doble de MercadoPagoClient: no hace ninguna llamada de red."""
 
-    def __init__(self, response=None, refund_response=None):
-        self.response = response or {'id': 'pref-fake-123'}
+    def __init__(self, response=None, refund_response=None, payments=None):
+        self.response = response or {
+            'id': 'pref-fake-123',
+            'init_point': 'https://www.mercadopago.com.co/checkout/v1/redirect?pref_id=pref-fake-123',
+        }
         self.refund_response = refund_response or {'id': 'refund-fake-1', 'status': 'approved'}
+        self.payments = payments if payments is not None else {}
         self.llamadas = []
         self.llamadas_refund = []
+
+    def get_payment(self, payment_id):
+        if isinstance(self.payments, Exception):
+            raise self.payments
+        return self.payments[str(payment_id)]
 
     def create_preference(self, preference_data):
         self.llamadas.append(preference_data)
@@ -56,6 +67,17 @@ class FakeMercadoPagoClient:
     def refund_payment(self, payment_id, amount=None):
         self.llamadas_refund.append({'payment_id': payment_id, 'amount': amount})
         return self.refund_response
+
+
+def _pago(pedido, status, payment_id='pay-abc-1', amount=None, currency='COP'):
+    """Lo que devolveria `GET /v1/payments/{id}` de Mercado Pago."""
+    return {
+        'id': payment_id,
+        'status': status,
+        'external_reference': pedido.order_number,
+        'transaction_amount': float(pedido.total if amount is None else amount),
+        'currency_id': currency,
+    }
 
 
 class MercadoPagoProviderTestCase(TestCase):
@@ -137,6 +159,46 @@ class MercadoPagoProviderTestCase(TestCase):
         self.assertEqual(t1.pk, t2.pk)
         self.assertEqual(len(cliente_falso.llamadas), 1)
 
+    def test_con_descuento_se_cobra_un_solo_item_por_el_total_real(self):
+        # Mercado Pago no admite items negativos: sin esto el comprador
+        # pagaria el total sin el descuento del cupon.
+        self.pedido.discount_total = Decimal('10000.00')
+        self.pedido.total = self.pedido.total - Decimal('10000.00')
+        self.pedido.save(update_fields=['discount_total', 'total'])
+
+        cliente_falso = FakeMercadoPagoClient()
+        MercadoPagoPaymentProvider(client=cliente_falso).create_payment_intent(self.pedido)
+
+        items = cliente_falso.llamadas[0]['items']
+        self.assertEqual(len(items), 1)
+        self.assertEqual(Decimal(str(items[0]['unit_price'])), self.pedido.total)
+
+    @override_settings(SITIO_URL='https://gotogym.store')
+    def test_con_https_la_preferencia_trae_retorno_automatico_y_webhook(self):
+        cliente_falso = FakeMercadoPagoClient()
+        MercadoPagoPaymentProvider(client=cliente_falso).create_payment_intent(self.pedido)
+
+        preferencia = cliente_falso.llamadas[0]
+        self.assertEqual(preferencia['auto_return'], 'approved')
+        self.assertEqual(preferencia['notification_url'], 'https://gotogym.store/pagos/webhook/mercadopago/')
+        self.assertTrue(preferencia['back_urls']['success'].startswith('https://gotogym.store/'))
+        self.assertIn(self.pedido.order_number, preferencia['back_urls']['success'])
+
+    @override_settings(SITIO_URL='http://127.0.0.1:8000')
+    def test_en_local_http_no_se_piden_auto_return_ni_webhook(self):
+        cliente_falso = FakeMercadoPagoClient()
+        MercadoPagoPaymentProvider(client=cliente_falso).create_payment_intent(self.pedido)
+
+        preferencia = cliente_falso.llamadas[0]
+        self.assertNotIn('auto_return', preferencia)
+        self.assertNotIn('notification_url', preferencia)
+        self.assertIn('success', preferencia['back_urls'])
+
+    def test_checkout_url_sale_del_init_point_de_la_preferencia(self):
+        provider = MercadoPagoPaymentProvider(client=FakeMercadoPagoClient())
+        transaccion = provider.create_payment_intent(self.pedido)
+        self.assertIn('pref_id=pref-fake-123', provider.checkout_url(transaccion))
+
 
 class HandleCallbackTests(TestCase):
     @classmethod
@@ -156,16 +218,14 @@ class HandleCallbackTests(TestCase):
         cls.pedido = create_order_from_cart(cls.usuario, {str(cls.variante.pk): 1}, DATOS)
 
     def setUp(self):
-        cliente_falso = FakeMercadoPagoClient()
-        self.provider = MercadoPagoPaymentProvider(client=cliente_falso)
+        self.cliente_falso = FakeMercadoPagoClient()
+        self.provider = MercadoPagoPaymentProvider(client=self.cliente_falso)
         self.transaccion = self.provider.create_payment_intent(self.pedido)
 
-    def _payload(self, status, payment_id='pay-abc-1'):
-        return {
-            'data': {'id': payment_id},
-            'external_reference': self.pedido.order_number,
-            'status': status,
-        }
+    def _payload(self, status, payment_id='pay-abc-1', **kwargs):
+        # El aviso solo trae el id; el estado sale de consultar el pago.
+        self.cliente_falso.payments[payment_id] = _pago(self.pedido, status, payment_id, **kwargs)
+        return {'type': 'payment', 'data': {'id': payment_id}}
 
     def test_aprobado_actualiza_el_estado_y_el_payment_id(self):
         transaccion = self.provider.handle_callback(self._payload('approved'))
@@ -192,9 +252,37 @@ class HandleCallbackTests(TestCase):
         self.assertEqual(self.transaccion.updated_at, actualizado_en_1)
 
     def test_payload_sin_transaccion_correspondiente_lanza_does_not_exist(self):
-        payload = {'data': {'id': 'pago-que-no-existe'}, 'external_reference': 'GTG-NO-EXISTE', 'status': 'approved'}
+        self.cliente_falso.payments['pago-que-no-existe'] = {
+            'id': 'pago-que-no-existe', 'status': 'approved', 'external_reference': 'GTG-NO-EXISTE',
+            'transaction_amount': 1.0, 'currency_id': 'COP',
+        }
         with self.assertRaises(PaymentTransaction.DoesNotExist):
-            self.provider.handle_callback(payload)
+            self.provider.handle_callback({'data': {'id': 'pago-que-no-existe'}})
+
+    def test_un_importe_distinto_al_cobrado_no_aprueba_el_pago(self):
+        payload = self._payload('approved', amount=self.pedido.total - Decimal('1.00'))
+        transaccion = self.provider.handle_callback(payload)
+        self.assertEqual(transaccion.status, PaymentTransaction.Status.PENDING)
+
+    def test_una_moneda_distinta_a_la_cobrada_no_aprueba_el_pago(self):
+        payload = self._payload('approved', currency='USD')
+        transaccion = self.provider.handle_callback(payload)
+        self.assertEqual(transaccion.status, PaymentTransaction.Status.PENDING)
+
+    def test_aplicar_un_pago_conserva_la_preferencia_con_su_init_point(self):
+        transaccion = self.provider.handle_callback(self._payload('rejected'))
+        self.assertIn('init_point', transaccion.raw_payload)
+        self.assertEqual(transaccion.raw_payload['payment']['status'], 'rejected')
+
+    def test_un_pago_rechazado_puede_pasar_a_aprobado_al_reintentar(self):
+        self.provider.handle_callback(self._payload('rejected', payment_id='pay-1'))
+        transaccion = self.provider.handle_callback(self._payload('approved', payment_id='pay-2'))
+        self.assertEqual(transaccion.status, PaymentTransaction.Status.APPROVED)
+        self.assertEqual(transaccion.payment_id, 'pay-2')
+
+    def test_notificacion_sin_id_de_pago_lanza_does_not_exist(self):
+        with self.assertRaises(PaymentTransaction.DoesNotExist):
+            self.provider.handle_callback({'type': 'payment'})
 
 
 class SignatureTests(TestCase):
@@ -280,12 +368,21 @@ class MercadoPagoWebhookViewTests(TestCase):
         )
         self.pedido = create_order_from_cart(self.usuario, {str(self.variante.pk): 2}, DATOS)
 
-        cliente_falso = FakeMercadoPagoClient()
-        self.provider = MercadoPagoPaymentProvider(client=cliente_falso)
+        self.cliente_falso = FakeMercadoPagoClient()
+        self.provider = MercadoPagoPaymentProvider(client=self.cliente_falso)
         self.transaccion = self.provider.create_payment_intent(self.pedido)
+        # La vista crea su propio proveedor: se le entrega el que usa el doble.
+        parche = mock.patch('payments.views.MercadoPagoPaymentProvider', return_value=self.provider)
+        parche.start()
+        self.addCleanup(parche.stop)
 
         self.client = Client()
         self.secret = 'webhook-secret-de-prueba'
+
+    def _aviso(self, status, payment_id='pay-webhook-1'):
+        """Registra el pago en el doble y devuelve el aviso (solo trae el id)."""
+        self.cliente_falso.payments[payment_id] = _pago(self.pedido, status, payment_id)
+        return {'type': 'payment', 'data': {'id': payment_id}}
 
     def _post_firmado(self, payload, payment_id='pay-webhook-1'):
         ts = '1700000000'
@@ -301,12 +398,7 @@ class MercadoPagoWebhookViewTests(TestCase):
 
     @override_settings(MERCADOPAGO_WEBHOOK_SECRET='webhook-secret-de-prueba')
     def test_webhook_con_firma_valida_aprueba_y_confirma_el_pedido(self):
-        payload = {
-            'data': {'id': 'pay-webhook-1'},
-            'external_reference': self.pedido.order_number,
-            'status': 'approved',
-        }
-        response = self._post_firmado(payload)
+        response = self._post_firmado(self._aviso('approved'))
 
         self.assertEqual(response.status_code, 200)
         self.pedido.refresh_from_db()
@@ -315,15 +407,36 @@ class MercadoPagoWebhookViewTests(TestCase):
 
     @override_settings(MERCADOPAGO_WEBHOOK_SECRET='webhook-secret-de-prueba')
     def test_notificacion_duplicada_no_descuenta_stock_dos_veces(self):
-        payload = {
-            'data': {'id': 'pay-webhook-1'},
-            'external_reference': self.pedido.order_number,
-            'status': 'approved',
-        }
+        payload = self._aviso('approved')
         self._post_firmado(payload)
         self._post_firmado(payload)
 
         self.assertEqual(Inventory.objects.get(variant=self.variante).quantity_available, 3)
+
+    @override_settings(MERCADOPAGO_WEBHOOK_SECRET='webhook-secret-de-prueba')
+    def test_el_estado_del_cuerpo_del_aviso_se_ignora(self):
+        # Solo cuenta lo que Mercado Pago responde al consultar el pago: un
+        # cuerpo que diga "approved" no aprueba nada por si solo.
+        self.cliente_falso.payments['pay-webhook-1'] = _pago(self.pedido, 'rejected', 'pay-webhook-1')
+        aviso = {'type': 'payment', 'data': {'id': 'pay-webhook-1'}, 'status': 'approved'}
+
+        self._post_firmado(aviso)
+
+        self.pedido.refresh_from_db()
+        self.assertEqual(self.pedido.order_status, OrderStatus.PENDING_PAYMENT)
+
+    @override_settings(MERCADOPAGO_WEBHOOK_SECRET='webhook-secret-de-prueba')
+    def test_avisos_de_otros_temas_se_acusan_sin_consultar_nada(self):
+        response = self._post_firmado({'type': 'merchant_order', 'data': {'id': 'pay-webhook-1'}})
+        self.assertEqual(response.status_code, 200)
+        self.pedido.refresh_from_db()
+        self.assertEqual(self.pedido.order_status, OrderStatus.PENDING_PAYMENT)
+
+    @override_settings(MERCADOPAGO_WEBHOOK_SECRET='webhook-secret-de-prueba')
+    def test_si_mercado_pago_no_responde_se_pide_reintento(self):
+        self.cliente_falso.payments = MercadoPagoError('caido')
+        response = self._post_firmado({'type': 'payment', 'data': {'id': 'pay-webhook-1'}})
+        self.assertEqual(response.status_code, 502)
 
     def test_webhook_sin_secreto_configurado_se_rechaza(self):
         payload = {'data': {'id': 'x'}, 'external_reference': self.pedido.order_number, 'status': 'approved'}
@@ -355,13 +468,129 @@ class MercadoPagoWebhookViewTests(TestCase):
         # Un webhook lo llama el servidor de Mercado Pago, no un navegador
         # con sesion: sin cliente autenticado y sin token CSRF, la firma
         # valida debe bastar para que la peticion se procese.
-        payload = {
-            'data': {'id': 'pay-webhook-2'},
-            'external_reference': self.pedido.order_number,
-            'status': 'pending',
-        }
+        payload = self._aviso('pending', payment_id='pay-webhook-2')
         response = self._post_firmado(payload, payment_id='pay-webhook-2')
         self.assertEqual(response.status_code, 200)
+
+
+class PaymentReturnViewTests(TestCase):
+    """Vista a la que vuelve el comprador desde Mercado Pago."""
+
+    def setUp(self):
+        categoria = ProductCategory.objects.create(name='Categoría retorno')
+        marca = Brand.objects.create(name='Marca retorno')
+        producto = Product.objects.create(
+            name='Producto retorno', category=categoria, brand=marca,
+            base_price=Decimal('80000.0000'), stock=0,
+        )
+        self.variante = _crear_variante(producto, 'MP-004-S-NEG', 'S', 'negro', 5)
+        User = get_user_model()
+        self.usuario = User.objects.create_user(
+            email='mp-retorno@example.com', username='mp-retorno@example.com', password='secret123',
+        )
+        self.pedido = create_order_from_cart(self.usuario, {str(self.variante.pk): 1}, DATOS)
+
+        self.cliente_falso = FakeMercadoPagoClient()
+        self.provider = MercadoPagoPaymentProvider(client=self.cliente_falso)
+        self.provider.create_payment_intent(self.pedido)
+        parche = mock.patch('payments.views.MercadoPagoPaymentProvider', return_value=self.provider)
+        parche.start()
+        self.addCleanup(parche.stop)
+
+        self.client = Client()
+        self.client.force_login(self.usuario)
+        self.url = reverse('payments:return', args=[self.pedido.order_number])
+
+    def _volver(self, status, payment_id='123456'):
+        self.cliente_falso.payments[payment_id] = _pago(self.pedido, status, payment_id)
+        # Lo que trae la URL lo puede escribir cualquiera: solo cuenta el id.
+        return self.client.get(self.url, {'payment_id': payment_id, 'status': 'approved'})
+
+    @override_settings(PAYMENT_PROVIDER='mercadopago')
+    def test_pago_aprobado_confirma_el_pedido_sin_esperar_al_webhook(self):
+        respuesta = self._volver('approved')
+
+        self.assertRedirects(
+            respuesta, reverse('orders:order_detail', args=[self.pedido.order_number]),
+            fetch_redirect_response=False,
+        )
+        self.pedido.refresh_from_db()
+        self.assertEqual(self.pedido.order_status, OrderStatus.CONFIRMED)
+
+    @override_settings(PAYMENT_PROVIDER='mercadopago')
+    def test_el_status_de_la_url_no_aprueba_si_mercado_pago_dice_otra_cosa(self):
+        respuesta = self._volver('rejected')
+
+        self.assertRedirects(
+            respuesta, reverse('payments:pending', args=[self.pedido.order_number]),
+            fetch_redirect_response=False,
+        )
+        self.pedido.refresh_from_db()
+        self.assertEqual(self.pedido.order_status, OrderStatus.PENDING_PAYMENT)
+
+    @override_settings(PAYMENT_PROVIDER='mercadopago')
+    def test_pago_en_proceso_vuelve_a_la_pagina_de_pago(self):
+        respuesta = self._volver('in_process')
+        self.assertRedirects(
+            respuesta, reverse('payments:pending', args=[self.pedido.order_number]),
+            fetch_redirect_response=False,
+        )
+
+    @override_settings(PAYMENT_PROVIDER='mercadopago')
+    def test_un_pago_de_otro_pedido_no_confirma_este(self):
+        otro = create_order_from_cart(self.usuario, {str(self.variante.pk): 1}, DATOS)
+        otro_proveedor_cliente = FakeMercadoPagoClient()
+        self.provider = MercadoPagoPaymentProvider(client=otro_proveedor_cliente)
+        self.provider.create_payment_intent(otro)
+        otro_proveedor_cliente.payments['999'] = _pago(otro, 'approved', '999')
+
+        with mock.patch('payments.views.MercadoPagoPaymentProvider', return_value=self.provider):
+            self.client.get(self.url, {'payment_id': '999'})
+
+        self.pedido.refresh_from_db()
+        self.assertEqual(self.pedido.order_status, OrderStatus.PENDING_PAYMENT)
+
+    @override_settings(PAYMENT_PROVIDER='mercadopago')
+    def test_sin_payment_id_solo_vuelve_a_la_pagina_de_pago(self):
+        respuesta = self.client.get(self.url)
+        self.assertRedirects(
+            respuesta, reverse('payments:pending', args=[self.pedido.order_number]),
+            fetch_redirect_response=False,
+        )
+
+    @override_settings(PAYMENT_PROVIDER='mercadopago')
+    def test_si_mercado_pago_falla_no_rompe_la_pagina(self):
+        self.cliente_falso.payments = MercadoPagoError('caido')
+        respuesta = self.client.get(self.url, {'payment_id': '123456'})
+        self.assertEqual(respuesta.status_code, 302)
+
+    @override_settings(PAYMENT_PROVIDER='mercadopago', DEBUG=True)
+    def test_la_pagina_de_pago_ofrece_ir_a_mercado_pago_y_oculta_la_simulacion(self):
+        respuesta = self.client.get(reverse('payments:pending', args=[self.pedido.order_number]))
+
+        self.assertContains(respuesta, 'pref_id=pref-fake-123')
+        self.assertContains(respuesta, 'Pagar con Mercado Pago')
+        self.assertNotContains(respuesta, 'Herramienta de pruebas')
+
+    @override_settings(PAYMENT_PROVIDER='mercadopago')
+    def test_si_no_se_puede_crear_la_preferencia_no_se_rompe_la_pagina(self):
+        otro = create_order_from_cart(self.usuario, {str(self.variante.pk): 1}, DATOS)
+        self.provider._client = mock.Mock(create_preference=mock.Mock(side_effect=MercadoPagoError('sin red')))
+
+        respuesta = self.client.get(reverse('payments:pending', args=[otro.order_number]))
+
+        self.assertRedirects(
+            respuesta, reverse('orders:order_detail', args=[otro.order_number]), fetch_redirect_response=False,
+        )
+
+    def test_requiere_sesion_y_que_el_pedido_sea_del_usuario(self):
+        self.client.logout()
+        self.assertEqual(self.client.get(self.url).status_code, 302)
+
+        User = get_user_model()
+        ajeno = User.objects.create_user(email='ajeno@example.com', username='ajeno@example.com', password='secret123')
+        self.client.force_login(ajeno)
+        self.assertEqual(self.client.get(self.url, {'payment_id': '1'}).status_code, 404)
 
 
 class MercadoPagoRefundTestCase(TestCase):

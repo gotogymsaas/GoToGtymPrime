@@ -78,3 +78,8 @@ urlpatterns += i18n_patterns(
 )
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler400 = 'gotogym.errores.error_400'
+handler403 = 'gotogym.errores.error_403'
+handler404 = 'gotogym.errores.error_404'
+handler500 = 'gotogym.errores.error_500'

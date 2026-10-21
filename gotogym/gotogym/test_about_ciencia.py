@@ -49,7 +49,7 @@ class AcercaDeMarcaTests(TestCase):
     def test_rotula_proposito_mision_y_vision_como_el_manual_de_marca(self):
         self.assertIn('<small>Propósito</small><p>Crear bienestar para todos.</p>', self.html)
         self.assertIn('<small>Misión</small><p>Hacer el bienestar personalizado universalmente accesible.</p>', self.html)
-        self.assertIn('<small>Visión</small><p>Un mundo donde cada persona pueda vivir en bienestar — en movimiento.</p>', self.html)
+        self.assertIn('<small>Visión</small><p>Un mundo donde cada persona pueda vivir en bienestar y en movimiento.</p>', self.html)
 
     def test_presenta_los_valores(self):
         for dato in ('Lealtad', 'Confianza', 'Competitividad', 'Honestidad'):

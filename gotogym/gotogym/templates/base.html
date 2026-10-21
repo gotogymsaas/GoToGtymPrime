@@ -28,7 +28,7 @@
   hay: al editar style.css o tokens.css hay que subirlo o el navegador
   seguira sirviendo la copia vieja.
   {% endcomment %}
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261016-menu-limpio9">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261019-pausa">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
   <link rel="stylesheet" href="{% static 'css/cookie_banner.css' %}?v=20261017-responsive">
   {% block extra_head %}{% endblock %}
@@ -217,6 +217,9 @@
 {% endblock %}
 
   <main class="gtg-page" id="main-content">
+    {% if compras_pausadas %}
+    <p class="gtg-pausa" role="status">{% trans "Las compras están en pausa temporalmente. Puedes seguir explorando el catálogo." %}</p>
+    {% endif %}
     {% block content %}{% endblock %}
   </main>
 

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% block title %}{{ titulo }} | GoToGym{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261017-responsive"><link rel="stylesheet" href="{% static 'css/error_pages.css' %}?v=20261019-errores">{% endblock %}
+{% block content %}
+<div class="editorial-page">
+  <header class="editorial-hero error-page">
+    <div class="editorial-shell">
+      <p class="editorial-kicker">{% trans "Error" %} {{ codigo }}</p>
+      <h1 class="editorial-title">{{ titulo }}</h1>
+      <p class="editorial-lead">{{ mensaje }}</p>
+      <p class="error-page__actions">
+        <a class="editorial-text-link" href="{% url 'home' %}">{% trans "Volver al inicio →" %}</a>
+        <a class="editorial-text-link" href="{% url 'tienda:producto_list' %}">{% trans "Ir a la tienda →" %}</a>
+        {% if codigo >= 500 %}<a class="editorial-text-link" href="{% url 'contacto' %}">{% trans "Contactar soporte →" %}</a>{% endif %}
+      </p>
+      {% if codigo >= 500 %}<p class="error-page__ref">{% trans "Referencia" %}: <strong>{{ referencia }}</strong></p>{% endif %}
+    </div>
+  </header>
+</div>
+{% endblock %}

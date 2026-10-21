@@ -98,6 +98,20 @@ Los enlaces de los correos de pedidos y afiliados se arman con `SITIO_URL`; el d
 - El dominio publica **dos registros SPF**; solo puede haber uno. Debe quedar el que incluye `spf.protection.outlook.com` y `spf.azurecomm.net`, y borrarse el que solo incluye `spf.protection.outlook.com`. Se corrige en GoDaddy.
 - Con `PAYMENT_PROVIDER` sin declarar el pago es simulado y `PAYMENTS_MOCK_UI_ENABLED` está apagado: en producción no hay forma de aprobar un pago, así que la confirmación de pedido no se puede ejercitar hasta configurar Mercado Pago (o encender el panel de simulación de forma temporal, que `security_checklist` marca como hallazgo mientras esté activo).
 
+## Registro de errores
+
+Todo WARNING o superior (404, 403, 405, 429, fallos de CSRF, excepciones no controladas y los `logger.error/warning` de cada app) se escribe en `logs/errores.txt`, en la raíz del repositorio. Una línea por evento, con el traceback debajo cuando lo hay:
+
+```
+2026-10-19 21:45:34,016 | ERROR | 500 | ref=BE9EE7D6 | ip=127.0.0.1 | usuario=anonimo | GET /prueba/explota/ | django.request | Internal Server Error: /prueba/explota/
+```
+
+- El archivo rota a los 5 MB y conserva 5 copias (`errores.txt.1` … `.5`). No se versiona.
+- `LOG_DIR` cambia el directorio. En Azure App Service usar una ruta persistente, p. ej. `LOG_DIR=/home/LogFiles/gotogym`; el disco de la aplicación se pierde al reiniciar. Si el directorio no se puede escribir, el sitio arranca igual y los errores quedan solo en la consola.
+- Se guarda el id del usuario (no su correo) y la ruta sin la cadena de consulta, para no acumular datos personales ni tokens.
+- Las páginas 500 muestran una **referencia** (`ref=`). Si un cliente la reporta, `grep BE9EE7D6 logs/errores.txt` lleva a la línea y al traceback.
+- Cada código tiene su página (400, 403, 404, 405, 429, 500) en `gotogym/errores.py`. El 500 es autónomo (`templates/errores/500.html`, sin base de datos ni estáticos).
+
 ## Tareas periódicas
 
 No hay un programador desplegado. Cada una se ejecuta también al abrir la pantalla que la necesita, pero conviene programarlas (WebJob de Azure o una tarea programada):

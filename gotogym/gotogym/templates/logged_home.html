@@ -2,7 +2,7 @@
 {% load idiomas %}
 {% load static i18n imagenes %}
 
-{% block title %}GoToGym — Wear the intelligence{% endblock %}
+{% block title %}GoToGym | Wear the intelligence{% endblock %}
 
 {% block extra_head %}
 {% comment %}
@@ -15,7 +15,7 @@ ancho de pantalla, incluido el movil.
 {% if preload_movil %}<link rel="preload" as="image" type="image/avif" media="(max-width: 720px)" href="{{ preload_movil }}" fetchpriority="high">{% endif %}
 {% if preload_escritorio %}<link rel="preload" as="image" type="image/avif" media="(min-width: 721px)" href="{{ preload_escritorio }}" fetchpriority="high">{% endif %}
 <link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260923-fringe-fix">
-<link rel="stylesheet" href="{% static 'css/store_home.css' %}?v=20261004-sin-journal">
+<link rel="stylesheet" href="{% static 'css/store_home.css' %}?v=20261019-story-ancho-maximo">
 {% endblock %}
 
 {% block content %}
@@ -31,7 +31,7 @@ ancho de pantalla, incluido el movil.
     <div class="store-shell store-hero__content">
       <p class="store-eyebrow">{% trans "Ropa deportiva con tecnología textil" %}</p>
       <h1 id="store-hero-title">Wear the <em>intelligence.</em></h1>
-      <p class="store-hero__lead">{% trans "Prendas construidas con materiales de nueva generación que regulan, protegen y duran. Tecnología que no se ve — pero se siente cada vez que te mueves." %}</p>
+      <p class="store-hero__lead">{% trans "Prendas construidas con materiales de nueva generación que regulan, protegen y duran. Tecnología que no se ve, pero se siente cada vez que te mueves." %}</p>
       <div class="store-actions">
         <a class="store-button store-button--primary" data-track="hero_collection" href="{% url 'tienda:producto_list' %}">{% trans "Descubrir la colección" %}</a>
         <a class="store-link" data-track="hero_technology" href="#tecnologia">{% trans "Conocer la tecnología" %} <span aria-hidden="true">↗</span></a>
@@ -109,11 +109,11 @@ ancho de pantalla, incluido el movil.
     <div class="store-story__content">
       <p class="store-eyebrow">GoToGym Technology</p>
       <h2 id="technology-title">{% trans "Innovación que trabaja alrededor de ti." %}</h2>
-      <p>{% trans "No es marketing. Son materiales de nueva generación, probados y certificados, que regulan tu temperatura, protegen tu piel y duran más que la ropa convencional. Tecnología que no se ve — pero cambia cómo te mueves." %}</p>
+      <p>{% trans "No es marketing. Son materiales de nueva generación, probados y certificados, que regulan tu temperatura, protegen tu piel y duran más que la ropa convencional. Tecnología que no se ve, pero cambia cómo te mueves." %}</p>
       <dl class="technology-list">
         <div><dt>01</dt><dd><strong>{% trans "Materiales de nueva generación" %}</strong><span>{% trans "Textiles con grafeno que regulan el calor, repelen el agua y resisten el desgaste. Ciencia aplicada a cada costura." %}</span></dd></div>
-        <div><dt>02</dt><dd><strong>{% trans "Rendimiento medible" %}</strong><span>{% trans "Resultados certificados: mayor transpirabilidad, estabilidad UV y resistencia comprobada. No lo decimos nosotros — lo dicen las pruebas." %}</span></dd></div>
-        <div><dt>03</dt><dd><strong>{% trans "Diseño que evoluciona contigo" %}</strong><span>{% trans "Cada prenda se desarrolla pensando en cómo se usa de verdad — en el gym, en la calle, en tu día completo." %}</span></dd></div>
+        <div><dt>02</dt><dd><strong>{% trans "Rendimiento medible" %}</strong><span>{% trans "Resultados certificados: mayor transpirabilidad, estabilidad UV y resistencia comprobada. No lo decimos nosotros: lo dicen las pruebas." %}</span></dd></div>
+        <div><dt>03</dt><dd><strong>{% trans "Diseño que evoluciona contigo" %}</strong><span>{% trans "Cada prenda se desarrolla pensando en cómo se usa de verdad: en el gym, en la calle, en tu día completo." %}</span></dd></div>
       </dl>
     </div>
   </section>
@@ -123,7 +123,7 @@ ancho de pantalla, incluido el movil.
       <div class="store-wellness__copy">
         <p class="store-eyebrow">{% trans "Bienestar en movimiento" %}</p>
         <h2 id="wellness-title">{% trans "Cuando tu equipo se mueve bien, todo funciona mejor." %}</h2>
-        <p>{% trans "Prendas y experiencias diseñadas para organizaciones que entienden el bienestar como parte de su cultura — no como un beneficio adicional, sino como una decisión estratégica." %}</p>
+        <p>{% trans "Prendas y experiencias diseñadas para organizaciones que entienden el bienestar como parte de su cultura, no como un beneficio adicional, sino como una decisión estratégica." %}</p>
         <a class="store-button store-button--dark" href="{% url 'contacto' %}">{% trans "Hablar con GoToGym" %}</a>
       </div>
       {% imagen_editorial "bienestar_empresarial_3.jpeg" alt=_("Equipo usando prendas GoToGym en una experiencia de bienestar empresarial") sizes="(max-width: 980px) 100vw, 60vw" %}

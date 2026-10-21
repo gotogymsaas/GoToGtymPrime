@@ -89,7 +89,7 @@
       <article><span>${{ pagado_en_el_anio|cop }} COP</span><p>{% trans "Pagado en" %} {{ anio_actual }}</p></article>
       <article><span>{{ click_count }}</span><p>{% trans "Clics en tu enlace" %}</p></article>
       <article class="is-green">
-        <span>{% if conversion_rate %}{{ conversion_rate }}%{% else %}—{% endif %}</span>
+        <span>{% if conversion_rate %}{{ conversion_rate }}%{% else %}-{% endif %}</span>
         <p>{% trans "Tasa de conversión" %}</p>
         {% if conversion_rate %}
         <div class="pq-progress" style="margin-top:10px;">
@@ -152,7 +152,7 @@
             <td>{{ order.order_number }}</td>
             <td>{{ order.created_at|date:'d/m/Y' }}</td>
             <td>${{ order.subtotal|cop }} COP</td>
-            <td>{% if order.commission %}${{ order.commission.amount|cop }} COP{% else %}—{% endif %}</td>
+            <td>{% if order.commission %}${{ order.commission.amount|cop }} COP{% else %}-{% endif %}</td>
             <td>{% include 'afiliados/_estado_comision.html' with comision=order.commission %}</td>
           </tr>
           {% endfor %}

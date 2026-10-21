@@ -137,8 +137,8 @@ msgstr ""
 "normais, mas com o tempo notei a diferença positiva em desempenho e "
 "conforto. Agora não consigo treinar sem elas."
 
-msgid "— Juan Manuel Goenaga"
-msgstr "— Juan Manuel Goenaga"
+msgid "Juan Manuel Goenaga"
+msgstr "Juan Manuel Goenaga"
 
 msgid "Tecnología innovadora"
 msgstr "Tecnologia inovadora"
@@ -377,8 +377,8 @@ msgstr "Salvar alterações"
 msgid "Guardar dirección"
 msgstr "Salvar endereço"
 
-msgid "Herramienta de pruebas — no visible en producción real"
-msgstr "Ferramenta de testes — não visível em produção real"
+msgid "Herramienta de pruebas que no es visible en producción real"
+msgstr "Ferramenta de testes que não é visível em produção real"
 
 msgid "Historias relacionadas"
 msgstr "Histórias relacionadas"
@@ -1464,12 +1464,12 @@ msgstr "Sobre a GoToGym: marca e ciência de materiais"
 
 msgid ""
 "GoToGym es una marca de sastrería deportiva de alta tecnología. "
-"Desarrollamos prendas con materiales de nueva generación — probados, "
+"Desarrollamos prendas con materiales de nueva generación, probados, "
 "certificados y diseñados para responder al cuerpo en movimiento. No hacemos "
 "ropa que parece técnica. Hacemos ropa que lo es."
 msgstr ""
 "A GoToGym é uma marca de alfaiataria esportiva de alta tecnologia. "
-"Desenvolvemos peças com materiais de nova geração — testados, certificados e"
+"Desenvolvemos peças com materiais de nova geração, testados, certificados e"
 " projetados para responder ao corpo em movimento. Não fazemos roupa que "
 "parece técnica. Fazemos roupa que é."
 
@@ -1477,20 +1477,20 @@ msgid ""
 "La tecnología adquiere valor cuando se integra con naturalidad a la vida. "
 "Por eso cada prenda comienza con una necesidad humana y termina en una "
 "experiencia clara, útil y propia. Creemos que cada persona puede liderar su "
-"propia revolución interna — y estamos aquí para acompañarla con la prenda, "
+"propia revolución interna, y estamos aquí para acompañarla con la prenda, "
 "la tecnología y la comunidad que eso requiere."
 msgstr ""
 "A tecnologia ganha valor quando se integra com naturalidade à vida. Por isso"
 " cada peça começa com uma necessidade humana e termina em uma experiência "
 "clara, útil e própria. Acreditamos que cada pessoa pode liderar sua própria "
-"revolução interior — e estamos aqui para acompanhá-la com a peça, a "
+"revolução interior, e estamos aqui para acompanhá-la com a peça, a "
 "tecnologia e a comunidade que isso exige."
 
 msgid "Hacer el bienestar personalizado universalmente accesible."
 msgstr "Tornar o bem-estar personalizado universalmente acessível."
 
-msgid "Un mundo donde cada persona pueda vivir en bienestar — en movimiento."
-msgstr "Um mundo em que cada pessoa possa viver em bem-estar — em movimento."
+msgid "Un mundo donde cada persona pueda vivir en bienestar y en movimiento."
+msgstr "Um mundo em que cada pessoa possa viver em bem-estar e em movimento."
 
 msgid ""
 "Prendas que combinan sastrería deportiva con textiles avanzados como el "
@@ -1533,11 +1533,11 @@ msgstr ""
 
 msgid ""
 "Empieza por la colección o profundiza en el Journal: ciencia textil, "
-"tecnología aplicada al movimiento y todo lo que hay detrás de cada prenda — "
+"tecnología aplicada al movimiento y todo lo que hay detrás de cada prenda, "
 "con sus referencias."
 msgstr ""
 "Comece pela coleção ou aprofunde-se no Journal: ciência têxtil, tecnologia "
-"aplicada ao movimento e tudo o que há por trás de cada peça — com suas "
+"aplicada ao movimento e tudo o que há por trás de cada peça, com suas "
 "referências."
 
 msgid ""
@@ -1641,3 +1641,61 @@ msgstr "Rejeitar"
 
 msgid "Idioma"
 msgstr "Idioma"
+
+
+msgid "Las compras están en pausa temporalmente. Vuelve pronto: tu carrito se conserva."
+msgstr "As compras estão temporariamente pausadas. Volte em breve: seu carrinho é mantido."
+
+msgid "Las compras están en pausa temporalmente. Puedes seguir explorando el catálogo."
+msgstr "As compras estão temporariamente pausadas. Você pode continuar explorando o catálogo."
+
+
+# Paginas de error
+msgid "Solicitud no válida"
+msgstr "Solicitação inválida"
+
+msgid "No pudimos entender lo que se envió. Revisa los datos e inténtalo de nuevo."
+msgstr "Não conseguimos entender o que foi enviado. Revise os dados e tente novamente."
+
+msgid "Acceso denegado"
+msgstr "Acesso negado"
+
+msgid "No tienes permiso para ver esta página. Si crees que es un error, escríbenos."
+msgstr "Você não tem permissão para ver esta página. Se acha que é um erro, escreva para nós."
+
+msgid "Página no encontrada"
+msgstr "Página não encontrada"
+
+msgid "La dirección que buscas no existe o fue movida."
+msgstr "O endereço que você procura não existe ou foi movido."
+
+msgid "Acción no permitida"
+msgstr "Ação não permitida"
+
+msgid "Esta página no admite la acción que intentaste realizar."
+msgstr "Esta página não aceita a ação que você tentou realizar."
+
+msgid "Demasiadas solicitudes"
+msgstr "Muitas solicitações"
+
+msgid "Hiciste muchas solicitudes seguidas. Espera unos segundos e inténtalo de nuevo."
+msgstr "Você fez muitas solicitações seguidas. Aguarde alguns segundos e tente novamente."
+
+msgid "Algo salió mal"
+msgstr "Algo deu errado"
+
+msgid "Tuvimos un problema de nuestro lado. Ya quedó registrado y lo revisaremos."
+msgstr "Tivemos um problema do nosso lado. Já foi registrado e vamos verificar."
+
+msgid "Error"
+msgstr "Erro"
+
+msgid "Volver al inicio →"
+msgstr "Voltar ao início →"
+
+msgid "Ir a la tienda →"
+msgstr "Ir para a loja →"
+
+msgid "Contactar soporte →"
+msgstr "Falar com o suporte →"
+

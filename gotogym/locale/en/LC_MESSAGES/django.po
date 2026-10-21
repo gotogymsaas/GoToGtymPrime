@@ -136,8 +136,8 @@ msgstr ""
 "time I noticed the positive difference in performance and comfort. Now I "
 "can't work out without them."
 
-msgid "— Juan Manuel Goenaga"
-msgstr "— Juan Manuel Goenaga"
+msgid "Juan Manuel Goenaga"
+msgstr "Juan Manuel Goenaga"
 
 msgid "Tecnología innovadora"
 msgstr "Innovative technology"
@@ -630,8 +630,8 @@ msgstr "Save changes"
 msgid "Guardar dirección"
 msgstr "Save address"
 
-msgid "Herramienta de pruebas — no visible en producción real"
-msgstr "Testing tool — not visible in real production"
+msgid "Herramienta de pruebas que no es visible en producción real"
+msgstr "Testing tool that is not visible in real production"
 
 msgid "Historias relacionadas"
 msgstr "Related stories"
@@ -1487,12 +1487,12 @@ msgstr "About GoToGym: brand and materials science"
 
 msgid ""
 "GoToGym es una marca de sastrería deportiva de alta tecnología. "
-"Desarrollamos prendas con materiales de nueva generación — probados, "
+"Desarrollamos prendas con materiales de nueva generación, probados, "
 "certificados y diseñados para responder al cuerpo en movimiento. No hacemos "
 "ropa que parece técnica. Hacemos ropa que lo es."
 msgstr ""
 "GoToGym is a high-tech sports tailoring brand. We develop garments with "
-"next-generation materials — tested, certified and designed to respond to the"
+"next-generation materials, tested, certified and designed to respond to the"
 " body in motion. We don't make clothes that look technical. We make clothes "
 "that are."
 
@@ -1500,20 +1500,20 @@ msgid ""
 "La tecnología adquiere valor cuando se integra con naturalidad a la vida. "
 "Por eso cada prenda comienza con una necesidad humana y termina en una "
 "experiencia clara, útil y propia. Creemos que cada persona puede liderar su "
-"propia revolución interna — y estamos aquí para acompañarla con la prenda, "
+"propia revolución interna, y estamos aquí para acompañarla con la prenda, "
 "la tecnología y la comunidad que eso requiere."
 msgstr ""
 "Technology gains value when it blends naturally into life. That is why every"
 " garment starts with a human need and ends in a clear, useful and personal "
-"experience. We believe everyone can lead their own inner revolution — and we"
+"experience. We believe everyone can lead their own inner revolution, and we"
 " are here to support them with the garment, the technology and the community"
 " that takes."
 
 msgid "Hacer el bienestar personalizado universalmente accesible."
 msgstr "To make personalized wellbeing universally accessible."
 
-msgid "Un mundo donde cada persona pueda vivir en bienestar — en movimiento."
-msgstr "A world where everyone can live in wellbeing — on the move."
+msgid "Un mundo donde cada persona pueda vivir en bienestar y en movimiento."
+msgstr "A world where everyone can live in wellbeing and on the move."
 
 msgid ""
 "Prendas que combinan sastrería deportiva con textiles avanzados como el "
@@ -1554,11 +1554,11 @@ msgstr ""
 
 msgid ""
 "Empieza por la colección o profundiza en el Journal: ciencia textil, "
-"tecnología aplicada al movimiento y todo lo que hay detrás de cada prenda — "
+"tecnología aplicada al movimiento y todo lo que hay detrás de cada prenda, "
 "con sus referencias."
 msgstr ""
 "Start with the collection or go deeper in the Journal: textile science, "
-"technology applied to movement and everything behind each garment — with its"
+"technology applied to movement and everything behind each garment, with its"
 " references."
 
 msgid ""
@@ -2546,10 +2546,10 @@ msgstr "Sportswear with textile technology"
 
 msgid ""
 "Prendas construidas con materiales de nueva generación que regulan, protegen"
-" y duran. Tecnología que no se ve — pero se siente cada vez que te mueves."
+" y duran. Tecnología que no se ve, pero se siente cada vez que te mueves."
 msgstr ""
 "Garments built with next-generation materials that regulate, protect and "
-"last. Technology you can't see — but feel every time you move."
+"last. Technology you can't see, but feel every time you move."
 
 msgid "Conocer la tecnología"
 msgstr "Discover the technology"
@@ -2606,11 +2606,11 @@ msgstr "Innovation that works around you."
 msgid ""
 "No es marketing. Son materiales de nueva generación, probados y "
 "certificados, que regulan tu temperatura, protegen tu piel y duran más que "
-"la ropa convencional. Tecnología que no se ve — pero cambia cómo te mueves."
+"la ropa convencional. Tecnología que no se ve, pero cambia cómo te mueves."
 msgstr ""
 "It is not marketing. They are next-generation materials, tested and "
 "certified, that regulate your temperature, protect your skin and last longer"
-" than conventional clothing. Technology you can't see — but it changes how "
+" than conventional clothing. Technology you can't see, but it changes how "
 "you move."
 
 msgid "Materiales de nueva generación"
@@ -2628,19 +2628,19 @@ msgstr "Measurable performance"
 
 msgid ""
 "Resultados certificados: mayor transpirabilidad, estabilidad UV y "
-"resistencia comprobada. No lo decimos nosotros — lo dicen las pruebas."
+"resistencia comprobada. No lo decimos nosotros: lo dicen las pruebas."
 msgstr ""
 "Certified results: greater breathability, UV stability and proven strength. "
-"We are not the ones saying it — the tests are."
+"We are not the ones saying it: the tests are."
 
 msgid "Diseño que evoluciona contigo"
 msgstr "Design that evolves with you"
 
 msgid ""
-"Cada prenda se desarrolla pensando en cómo se usa de verdad — en el gym, en "
+"Cada prenda se desarrolla pensando en cómo se usa de verdad: en el gym, en "
 "la calle, en tu día completo."
 msgstr ""
-"Every garment is developed with real use in mind — at the gym, on the "
+"Every garment is developed with real use in mind: at the gym, on the "
 "street, throughout your whole day."
 
 msgid "Bienestar en movimiento"
@@ -2651,11 +2651,11 @@ msgstr "When your team moves well, everything works better."
 
 msgid ""
 "Prendas y experiencias diseñadas para organizaciones que entienden el "
-"bienestar como parte de su cultura — no como un beneficio adicional, sino "
+"bienestar como parte de su cultura, no como un beneficio adicional, sino "
 "como una decisión estratégica."
 msgstr ""
 "Garments and experiences designed for organizations that see wellbeing as "
-"part of their culture — not as an extra perk, but as a strategic decision."
+"part of their culture, not as an extra perk, but as a strategic decision."
 
 msgid "Hablar con GoToGym"
 msgstr "Talk to GoToGym"
@@ -3562,3 +3562,61 @@ msgstr "Carrier"
 
 msgid "Si tienes dudas, escríbenos a support@gotogym.store con tu número de pedido."
 msgstr "If you have any questions, write to us at support@gotogym.store with your order number."
+
+
+msgid "Las compras están en pausa temporalmente. Vuelve pronto: tu carrito se conserva."
+msgstr "Purchases are temporarily paused. Come back soon: your cart is kept."
+
+msgid "Las compras están en pausa temporalmente. Puedes seguir explorando el catálogo."
+msgstr "Purchases are temporarily paused. You can keep browsing the catalog."
+
+
+# Paginas de error
+msgid "Solicitud no válida"
+msgstr "Invalid request"
+
+msgid "No pudimos entender lo que se envió. Revisa los datos e inténtalo de nuevo."
+msgstr "We could not understand what was sent. Check the data and try again."
+
+msgid "Acceso denegado"
+msgstr "Access denied"
+
+msgid "No tienes permiso para ver esta página. Si crees que es un error, escríbenos."
+msgstr "You do not have permission to view this page. If you think this is a mistake, write to us."
+
+msgid "Página no encontrada"
+msgstr "Page not found"
+
+msgid "La dirección que buscas no existe o fue movida."
+msgstr "The address you are looking for does not exist or has been moved."
+
+msgid "Acción no permitida"
+msgstr "Action not allowed"
+
+msgid "Esta página no admite la acción que intentaste realizar."
+msgstr "This page does not support the action you tried to perform."
+
+msgid "Demasiadas solicitudes"
+msgstr "Too many requests"
+
+msgid "Hiciste muchas solicitudes seguidas. Espera unos segundos e inténtalo de nuevo."
+msgstr "You made too many requests in a row. Wait a few seconds and try again."
+
+msgid "Algo salió mal"
+msgstr "Something went wrong"
+
+msgid "Tuvimos un problema de nuestro lado. Ya quedó registrado y lo revisaremos."
+msgstr "We had a problem on our side. It has been recorded and we will look into it."
+
+msgid "Error"
+msgstr "Error"
+
+msgid "Volver al inicio →"
+msgstr "Back to home →"
+
+msgid "Ir a la tienda →"
+msgstr "Go to the store →"
+
+msgid "Contactar soporte →"
+msgstr "Contact support →"
+

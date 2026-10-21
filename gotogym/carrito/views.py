@@ -1,3 +1,5 @@
+from administracion.models import PanelSettings
+from administracion.pausa import MENSAJE_COMPRAS_PAUSADAS
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -40,6 +42,8 @@ def _responder(request, error=None, cart=None):
 @rate_limit('add_to_cart', limit=30, period_seconds=60)
 def add_to_cart(request, variant_id):
     variante = get_object_or_404(ProductVariant, pk=variant_id, is_active=True)
+    if PanelSettings.compras_pausadas():
+        return _responder(request, error=str(MENSAJE_COMPRAS_PAUSADAS))
     cart = _get_cart(request)
 
     en_carrito = int(cart.get(str(variante.id), 0))
@@ -80,6 +84,9 @@ def update_cart(request, variant_id):
         cart.pop(str(variante.id), None)
         write_cart(request.session, cart)
         return _responder(request, cart=cart)
+
+    if cantidad > int(cart.get(str(variante.id), 0)) and PanelSettings.compras_pausadas():
+        return _responder(request, error=str(MENSAJE_COMPRAS_PAUSADAS))
 
     disponible = get_available_quantity(variante)
     if cantidad > disponible:

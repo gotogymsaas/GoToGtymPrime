@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="{% static 'images/apple-touch-icon.png' %}">
   <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261014-turquesa">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
-  <link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261017-responsive">
+  <link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261019-pausa">
 </head>
 <body class="panel-shell">
   <aside class="sidebar">
@@ -42,6 +42,26 @@
         <span>{% if request.user.is_superuser %}Superusuario{% else %}Administrador{% endif %}</span>
       </div>
       <div class="topbar-actions">
+        {% if perms.administracion.change_panelsettings %}
+          <button type="button" class="pause-switch{% if compras_pausadas %} is-paused{% endif %}" role="switch"
+                  aria-checked="{% if compras_pausadas %}true{% else %}false{% endif %}"
+                  aria-haspopup="dialog" data-pause-open>
+            <span class="pause-switch__track" aria-hidden="true"><span class="pause-switch__thumb"></span></span>
+            <span class="pause-switch__label">{% if compras_pausadas %}Compras en pausa{% else %}Compras activas{% endif %}</span>
+          </button>
+        {% elif compras_pausadas %}
+          <span class="pause-badge">Compras en pausa</span>
+        {% endif %}
+        {% if perms.administracion.change_panelsettings %}
+          <button type="button" class="pause-switch{% if not pagos_habilitados %} is-paused{% endif %}" role="switch"
+                  aria-checked="{% if pagos_habilitados %}true{% else %}false{% endif %}"
+                  aria-haspopup="dialog" data-payments-open>
+            <span class="pause-switch__track" aria-hidden="true"><span class="pause-switch__thumb"></span></span>
+            <span class="pause-switch__label">Recibir pagos</span>
+          </button>
+        {% elif not pagos_habilitados %}
+          <span class="pause-badge">Pagos deshabilitados</span>
+        {% endif %}
         <a class="ghost btn-sm" href="{% url 'tienda:producto_list' %}">Salir del panel</a>
         <form method="post" action="{% url 'logout' %}">
           {% csrf_token %}
@@ -49,7 +69,53 @@
         </form>
       </div>
     </header>
+    {% if compras_pausadas %}
+      <p class="pause-notice" role="status">Las compras están en pausa: la tienda no acepta carritos ni pedidos nuevos. El stock está intacto.</p>
+    {% endif %}
+    {% if not pagos_habilitados %}
+      <p class="pause-notice" role="status">Los pagos en línea están deshabilitados: la tienda no abre pagos nuevos con Mercado Pago. Los pagos en curso se siguen confirmando.</p>
+    {% endif %}
     {% block content %}{% endblock %}
+    {% if perms.administracion.change_panelsettings %}
+      <dialog class="pause-dialog" id="pause-dialog" aria-labelledby="pause-dialog-title">
+        <form method="post" action="{% url 'admin_store_pause_toggle' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input type="hidden" name="pausar" value="{% if compras_pausadas %}0{% else %}1{% endif %}">
+          {% if compras_pausadas %}
+            <h2 id="pause-dialog-title">¿Reanudar las compras?</h2>
+            <p>La tienda volverá a aceptar carritos y pedidos de inmediato, con el stock que hay ahora.</p>
+          {% else %}
+            <h2 id="pause-dialog-title">¿Pausar las compras?</h2>
+            <p>Los clientes no podrán agregar productos al carrito ni crear pedidos nuevos. Los carritos se conservan y los pagos que ya están en curso se pueden confirmar.</p>
+            <p>El stock no se modifica: al reanudar, todo queda exactamente como estaba.</p>
+          {% endif %}
+          <div class="pause-dialog__actions">
+            <button type="button" class="ghost btn-sm" data-pause-cancel>Cancelar</button>
+            <button type="submit" class="{% if compras_pausadas %}button{% else %}danger{% endif %} btn-sm">{% if compras_pausadas %}Reanudar compras{% else %}Pausar compras{% endif %}</button>
+          </div>
+        </form>
+      </dialog>
+      <dialog class="pause-dialog" id="payments-dialog" aria-labelledby="payments-dialog-title">
+        <form method="post" action="{% url 'admin_online_payments_toggle' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input type="hidden" name="habilitar" value="{% if pagos_habilitados %}0{% else %}1{% endif %}">
+          {% if pagos_habilitados %}
+            <h2 id="payments-dialog-title">¿Dejar de recibir pagos?</h2>
+            <p>El checkout no ofrecerá Mercado Pago y no se abrirán pagos nuevos. Los pedidos ya creados se conservan para pagarlos después.</p>
+            <p>Los pagos que ya están en curso se siguen confirmando.</p>
+          {% else %}
+            <h2 id="payments-dialog-title">¿Volver a recibir pagos?</h2>
+            <p>El checkout volverá a ofrecer Mercado Pago de inmediato.</p>
+          {% endif %}
+          <div class="pause-dialog__actions">
+            <button type="button" class="ghost btn-sm" data-payments-cancel>Cancelar</button>
+            <button type="submit" class="{% if pagos_habilitados %}danger{% else %}button{% endif %} btn-sm">{% if pagos_habilitados %}Dejar de recibir pagos{% else %}Recibir pagos{% endif %}</button>
+          </div>
+        </form>
+      </dialog>
+    {% endif %}
     {% if messages %}
       <div class="messages">
         {% for message in messages %}
@@ -77,6 +143,18 @@
         boton.setAttribute('aria-expanded', abierto ? 'true' : 'false');
       });
     })();
+    // Pausar las compras o dejar de recibir pagos siempre pasa por una
+    // confirmacion.
+    function conectarDialogo(idDialogo, atributoAbrir, atributoCancelar) {
+      var dialogo = document.getElementById(idDialogo);
+      var abrir = document.querySelector('[' + atributoAbrir + ']');
+      if (!dialogo || !abrir || typeof dialogo.showModal !== 'function') return;
+      abrir.addEventListener('click', function () { dialogo.showModal(); });
+      dialogo.querySelector('[' + atributoCancelar + ']').addEventListener('click', function () { dialogo.close(); });
+      dialogo.addEventListener('click', function (evento) { if (evento.target === dialogo) dialogo.close(); });
+    }
+    conectarDialogo('pause-dialog', 'data-pause-open', 'data-pause-cancel');
+    conectarDialogo('payments-dialog', 'data-payments-open', 'data-payments-cancel');
     // Un panel con tabla ancha desplaza su contenido: sin foco no se puede
     // recorrer con el teclado.
     document.querySelectorAll('.panel').forEach(function (panel) {

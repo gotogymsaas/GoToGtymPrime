@@ -8,7 +8,7 @@ from django.test import SimpleTestCase
 from integrations.alegra.alegra_client import AlegraClient
 from integrations.hubspot.hubspot_client import HubSpotClient
 from integrations.mercadopago import mercadopago_client
-from integrations.mercadopago.mercadopago_client import MercadoPagoClient
+from integrations.mercadopago.mercadopago_client import MercadoPagoClient, MercadoPagoError
 
 
 class AlegraClientHttpTests(SimpleTestCase):
@@ -73,22 +73,42 @@ class MercadoPagoClientTests(SimpleTestCase):
         self.addCleanup(parche.stop)
 
     def test_crea_preferencia_y_devuelve_la_respuesta(self):
-        self.sdk.preference.return_value.create.return_value = {'response': {'id': 'pref-1'}}
+        self.sdk.preference.return_value.create.return_value = {'status': 201, 'response': {'id': 'pref-1'}}
         cliente = MercadoPagoClient(access_token='tok')
         self.assertEqual(cliente.create_preference({'items': []}), {'id': 'pref-1'})
         self.sdk.preference.return_value.create.assert_called_once_with({'items': []})
 
-    def test_respuesta_sin_cuerpo_devuelve_vacio(self):
+    def test_respuesta_sin_status_se_trata_como_error(self):
         self.sdk.preference.return_value.create.return_value = {}
-        self.assertEqual(MercadoPagoClient(access_token='tok').create_preference({}), {})
+        with self.assertRaises(MercadoPagoError):
+            MercadoPagoClient(access_token='tok').create_preference({})
+
+    def test_un_error_http_del_sdk_lanza_en_vez_de_parecer_un_exito(self):
+        # El SDK no lanza ante un 401: devuelve el error dentro del dict.
+        self.sdk.preference.return_value.create.return_value = {
+            'status': 401, 'response': {'message': 'invalid access token'},
+        }
+        with self.assertRaisesMessage(MercadoPagoError, 'invalid access token'):
+            MercadoPagoClient(access_token='tok').create_preference({})
+
+    def test_consulta_un_pago_por_id(self):
+        self.sdk.payment.return_value.get.return_value = {'status': 200, 'response': {'id': 5, 'status': 'approved'}}
+        pago = MercadoPagoClient(access_token='tok').get_payment('5')
+        self.assertEqual(pago['status'], 'approved')
+        self.sdk.payment.return_value.get.assert_called_once_with('5')
+
+    def test_sin_token_no_se_crea_el_cliente(self):
+        with patch.dict(os.environ, {'MERCADOPAGO_ACCESS_TOKEN': ''}):
+            with self.assertRaises(RuntimeError):
+                MercadoPagoClient()
 
     def test_reembolso_total_no_envia_monto(self):
-        self.sdk.refund.return_value.create.return_value = {'response': {'id': 7}}
+        self.sdk.refund.return_value.create.return_value = {'status': 201, 'response': {'id': 7}}
         self.assertEqual(MercadoPagoClient(access_token='tok').refund_payment('pay-1'), {'id': 7})
         self.sdk.refund.return_value.create.assert_called_once_with('pay-1', None)
 
     def test_reembolso_parcial_envia_el_monto(self):
-        self.sdk.refund.return_value.create.return_value = {'response': {}}
+        self.sdk.refund.return_value.create.return_value = {'status': 201, 'response': {}}
         MercadoPagoClient(access_token='tok').refund_payment('pay-1', amount=25.5)
         self.sdk.refund.return_value.create.assert_called_once_with('pay-1', {'amount': 25.5})
 

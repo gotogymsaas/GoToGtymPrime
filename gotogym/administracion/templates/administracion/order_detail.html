@@ -116,7 +116,7 @@
       <tr>
         <td class="nowrap">${{ refund.amount|cop }} COP</td>
         <td>{{ refund.get_status_display }}</td>
-        <td>{{ refund.requested_by.email|default:"—" }}</td>
+        <td>{{ refund.requested_by.email|default:"-" }}</td>
         <td>{{ refund.created_at|date:"d/m/Y H:i" }}</td>
       </tr>
       {% endfor %}
@@ -133,10 +133,10 @@
       {% for cambio in history %}
       <tr>
         <td class="nowrap">{{ cambio.created_at|date:"d/m/Y H:i" }}</td>
-        <td>{{ cambio.get_from_status_display|default:"—" }}</td>
+        <td>{{ cambio.get_from_status_display|default:"-" }}</td>
         <td>{{ cambio.get_to_status_display }}</td>
         <td>{{ cambio.changed_by.email|default:"Sistema" }}</td>
-        <td>{{ cambio.note|default:"—" }}</td>
+        <td>{{ cambio.note|default:"-" }}</td>
       </tr>
       {% empty %}<tr><td colspan="5">Sin cambios registrados.</td></tr>{% endfor %}
     </tbody>

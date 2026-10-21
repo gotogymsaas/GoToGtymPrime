@@ -46,10 +46,18 @@
     </p>
     {% endif %}
 
+    {% if checkout_url %}
+    <a href="{{ checkout_url }}"
+       class="block w-full text-center px-4 py-3 rounded-lg bg-[var(--color-zafiro)] text-white font-semibold hover:opacity-90">
+      {% if transaction.status == 'rejected' or transaction.status == 'cancelled' %}{% trans "Intentar el pago de nuevo" %}{% else %}{% trans "Pagar con Mercado Pago" %}{% endif %}
+    </a>
+    <p class="text-xs text-gray-600 mt-2 text-center">{% trans "Pagarás en el sitio seguro de Mercado Pago y volverás aquí al terminar." %}</p>
+    {% endif %}
+
     {% if mock_ui_enabled %}
     <div class="border-t border-gray-200 pt-5">
       <p class="text-xs uppercase tracking-wide text-gray-600 font-semibold mb-3">
-        {% trans "Herramienta de pruebas — no visible en producción real" %}
+        {% trans "Herramienta de pruebas que no es visible en producción real" %}
       </p>
       <div class="grid grid-cols-2 gap-2">
         {% for value, label in estados %}

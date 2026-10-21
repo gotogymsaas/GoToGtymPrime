@@ -49,9 +49,9 @@
       <tr{% if not fila.cantidad %} class="is-muted"{% endif %}>
         <td>{{ fila.mes|date:"F"|capfirst }}</td>
         <td>{{ fila.cantidad }}</td>
-        <td class="nowrap">{% if fila.cantidad %}${{ fila.bruto|cop }} COP{% else %}—{% endif %}</td>
-        <td class="nowrap">{% if fila.cantidad %}${{ fila.gastos|cop }} COP{% else %}—{% endif %}</td>
-        <td class="nowrap">{% if fila.cantidad %}<strong>${{ fila.neto|cop }} COP</strong>{% else %}—{% endif %}</td>
+        <td class="nowrap">{% if fila.cantidad %}${{ fila.bruto|cop }} COP{% else %}-{% endif %}</td>
+        <td class="nowrap">{% if fila.cantidad %}${{ fila.gastos|cop }} COP{% else %}-{% endif %}</td>
+        <td class="nowrap">{% if fila.cantidad %}<strong>${{ fila.neto|cop }} COP</strong>{% else %}-{% endif %}</td>
       </tr>
       {% endfor %}
     </tbody>

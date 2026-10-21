@@ -1,0 +1,4 @@
+.error-page { min-height: 60vh; display: flex; align-items: center; }
+.error-page__actions { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-6); margin: var(--space-6) 0 0; }
+.error-page__ref { margin: var(--space-6) 0 0; color: rgba(248,249,250,.55); font-size: .8rem; letter-spacing: .04em; }
+.error-page__ref strong { color: var(--ed-gold); font-weight: 800; }
