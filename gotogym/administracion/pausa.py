@@ -1,9 +1,5 @@
-from django.utils.translation import gettext_lazy
+"""Los textos de la pausa viven en `gotogym.ajustes_tienda`, que es lo que
+pueden importar carrito, pedidos y pagos."""
+from gotogym.ajustes_tienda import MENSAJE_COMPRAS_PAUSADAS, MENSAJE_PAGOS_DESHABILITADOS
 
-MENSAJE_COMPRAS_PAUSADAS = gettext_lazy(
-    'Las compras están en pausa temporalmente. Vuelve pronto: tu carrito se conserva.'
-)
-
-MENSAJE_PAGOS_DESHABILITADOS = gettext_lazy(
-    'Los pagos en línea están deshabilitados temporalmente. Tu pedido queda guardado: vuelve más tarde para pagarlo.'
-)
+__all__ = ['MENSAJE_COMPRAS_PAUSADAS', 'MENSAJE_PAGOS_DESHABILITADOS']

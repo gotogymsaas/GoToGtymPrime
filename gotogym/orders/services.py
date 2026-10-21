@@ -7,8 +7,6 @@ un precio que venga de la sesion o del formulario.
 from datetime import timedelta
 from decimal import Decimal
 
-from administracion.models import PanelSettings
-from administracion.pausa import MENSAJE_COMPRAS_PAUSADAS
 from afiliados.services import (
     afiliado_operativo,
     register_order_commission,
@@ -21,6 +19,7 @@ from django.db import IntegrityError, transaction
 from django.db.models import F
 from django.utils import timezone
 from django.utils.translation import get_language, gettext
+from gotogym.ajustes_tienda import MENSAJE_COMPRAS_PAUSADAS, compras_pausadas
 from gotogym.tasks import enqueue
 from inventory.services import (
     InsufficientStockError,
@@ -341,7 +340,7 @@ def create_order_from_cart(user, cart, datos):
     """
     # Ultima barrera: la vista ya redirige, pero un POST directo o una
     # pestana abierta antes de la pausa llegan hasta aqui.
-    if PanelSettings.compras_pausadas():
+    if compras_pausadas():
         raise CheckoutError(str(MENSAJE_COMPRAS_PAUSADAS))
 
     contexto = build_cart_context(cart)

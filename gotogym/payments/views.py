@@ -3,14 +3,13 @@ import logging
 
 from django.conf import settings
 from django.contrib import messages
-from administracion.models import PanelSettings
-from administracion.pausa import MENSAJE_PAGOS_DESHABILITADOS
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from gotogym.ajustes_tienda import MENSAJE_PAGOS_DESHABILITADOS, pagos_habilitados
 from gotogym.ratelimit import rate_limit
 from integrations.mercadopago.mercadopago_client import MercadoPagoError
 from orders.models import Order
@@ -78,7 +77,7 @@ def _current_or_new_transaction(order, provider):
 def payment_pending(request, order_number):
     order = get_object_or_404(Order, order_number=order_number, user=request.user)
     provider = get_active_provider()
-    if not PanelSettings.pagos_habilitados():
+    if not pagos_habilitados():
         # Con los pagos deshabilitados no se abre ningun intento nuevo; si el
         # pedido ya estaba pagado, la pantalla se muestra igual.
         previa = _latest_transaction(order, provider)

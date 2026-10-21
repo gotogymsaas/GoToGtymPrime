@@ -1,7 +1,5 @@
 from decimal import Decimal
 
-from administracion.models import PanelSettings
-from administracion.pausa import MENSAJE_COMPRAS_PAUSADAS
 from analitica.services import registrar_evento
 from carrito.services import build_cart_context, read_cart, write_cart
 from django.contrib import messages
@@ -9,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext
+from gotogym.ajustes_tienda import MENSAJE_COMPRAS_PAUSADAS, compras_pausadas
 from products.forms import ProductReviewForm
 from shipping.services import get_mock_quote
 from tienda.catalog import curated_product_cards
@@ -38,7 +37,7 @@ def checkout(request):
     # Avanza lo que depende del tiempo (pedidos sin pagar que vencieron y sus
     # cupones) sin requerir una tarea periodica programada.
     cancel_expired_orders()
-    if PanelSettings.compras_pausadas():
+    if compras_pausadas():
         messages.warning(request, str(MENSAJE_COMPRAS_PAUSADAS))
         return redirect('carrito:cart_detail')
     cart, reiniciado = read_cart(request.session)

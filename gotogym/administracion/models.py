@@ -1,4 +1,5 @@
 from django.db import models
+from gotogym.ajustes_tienda import compras_pausadas, pagos_habilitados
 
 
 class PanelSettings(models.Model):
@@ -44,11 +45,10 @@ class PanelSettings(models.Model):
     def compras_pausadas(cls):
         """Lectura liviana (sin crear la fila) para consultar en cada
         peticion de la tienda."""
-        return bool(cls.objects.filter(pk=1).values_list("purchases_paused", flat=True).first())
+        return compras_pausadas()
 
     @classmethod
     def pagos_habilitados(cls):
         """Igual que `compras_pausadas`: sin fila todavia, los pagos estan
         habilitados (el valor por defecto)."""
-        valor = cls.objects.filter(pk=1).values_list("online_payments_enabled", flat=True).first()
-        return True if valor is None else bool(valor)
+        return pagos_habilitados()
