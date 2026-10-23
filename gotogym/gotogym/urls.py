@@ -33,6 +33,7 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path('accounts', lambda request: redirect('commercial_login', permanent=False)),
     path('setlang/', set_language, name='set_language'),
     path('healthz', views.healthz, name='healthz'),
+    path('readyz', views.readyz, name='readyz'),
     path('robots.txt', views.robots_txt, name='robots_txt'),
     path('sitemap.xml', sitemap, {'sitemaps': SITEMAPS}, name='sitemap'),
     path('crm/healthz', views.healthz, name='legacy_crm_healthz'),

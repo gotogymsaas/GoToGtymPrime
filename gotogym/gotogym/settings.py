@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 import urllib.parse
@@ -302,7 +303,6 @@ PAYMENT_PROVIDER = os.environ.get('PAYMENT_PROVIDER', 'mock')
 # Variables críticas de integraciones para runtime.
 MERCADOPAGO_ACCESS_TOKEN = os.environ.get('MERCADOPAGO_ACCESS_TOKEN', '')
 MERCADOPAGO_WEBHOOK_SECRET = os.environ.get('MERCADOPAGO_WEBHOOK_SECRET', '')
-HUBSPOT_PRIVATE_TOKEN = os.environ.get('HUBSPOT_PRIVATE_TOKEN', '')
 # Compatibilidad: prioriza ALEGRA_API_TOKEN y usa ALEGRA_TOKEN como fallback.
 ALEGRA_API_TOKEN = os.environ.get('ALEGRA_API_TOKEN') or os.environ.get('ALEGRA_TOKEN', '')
 ALEGRA_EMAIL = os.environ.get('ALEGRA_EMAIL', '')
@@ -340,13 +340,21 @@ ALEGRA_FACTURAR_DESDE = os.environ.get('ALEGRA_FACTURAR_DESDE', '')
 # desactivado: no requiere la librería instalada para arrancar y no rompe
 # entornos (local, tests) que no lo configuren.
 SENTRY_DSN = os.environ.get('SENTRY_DSN', '')
+if PRODUCCION and not SENTRY_DSN:
+    raise ImproperlyConfigured(
+        'Falta SENTRY_DSN. En producción es obligatorio para monitorear errores.'
+    )
 if SENTRY_DSN:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
+    from sentry_sdk.integrations.logging import LoggingIntegration
 
     sentry_sdk.init(
         dsn=SENTRY_DSN,
-        integrations=[DjangoIntegration()],
+        integrations=[
+            DjangoIntegration(),
+            LoggingIntegration(level=logging.INFO, event_level=logging.ERROR),
+        ],
         environment=os.environ.get('SENTRY_ENVIRONMENT', 'production'),
         traces_sample_rate=float(os.environ.get('SENTRY_TRACES_SAMPLE_RATE', '0.2')),
         send_default_pii=False,

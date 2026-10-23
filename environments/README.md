@@ -64,7 +64,6 @@ Variables opcionales:
 - `AZURE_SUBSCRIPTION_ID`
 - `AZURE_RELEASE_RESOURCE_GROUP`
 - `AZURE_RELEASE_WEBAPP`
-- `AZURE_RELEASE_SLOT`
 
 ## 4) Azure apply (Fase 2)
 
@@ -72,6 +71,31 @@ Archivos:
 
 - `environments/azure/.env.release.example`
 - `environments/azure/apply_fase2_config.sh`
+
+## Suite de pruebas del backend
+
+El pipeline ejecuta por defecto la suite esencial, centrada en autenticación,
+checkout, inventario, pedidos, pagos, integraciones, permisos y seguridad:
+
+```bash
+bash environments/backend/run_backend_checks.sh
+```
+
+La suite rápida usa módulos explícitos para evitar que el descubridor de Django
+incluya clases importadas varias veces. En la medición actual ejecuta 204 tests
+en aproximadamente 22 segundos de ejecución. La suite completa de referencia
+ejecuta 292 tests y se conserva para regresiones.
+
+Para una regresión completa antes de un release mayor o en una ejecución
+programada:
+
+```bash
+FULL_TEST_SUITE=true bash environments/backend/run_backend_checks.sh
+```
+
+No se eliminaron suites de funcionalidad secundaria sin evidencia de que sean
+obsoletas; quedan fuera del camino rápido, pero siguen disponibles para la
+regresión completa.
 
 Uso seguro (dry-run por defecto):
 

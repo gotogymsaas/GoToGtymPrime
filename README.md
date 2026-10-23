@@ -3,7 +3,7 @@ GoToGym Prime es el servicio al Cliente de la Marca GoToGym Sportwear as a Servi
 
 Este repositorio contiene un monolito Django (`gotogym/`), con un modulo
 `gotogym/integrations/` para los proveedores externos (Mercado Pago,
-Alegra, HubSpot).
+Alegra).
 
 ## 🚀 Inicio Rápido
 
@@ -67,17 +67,10 @@ collectstatic --noinput && gunicorn --chdir gotogym gotogym.wsgi:application --b
 
 - **Alegra** - API de contabilidad
 - **MercadoPago** - Procesamiento de pagos
-- **HubSpot** - CRM y gestión de contactos
 
 ---
 
 ## 🔐 Variables de Entorno
-
-### HubSpot
-
-`HUBSPOT_PRIVATE_TOKEN` se lee de la configuración, pero la integración con HubSpot
-es todavía un esqueleto (`integrations/hubspot/`): no crea contactos ni hace llamadas
-reales.
 
 ### Correo, pagos y monitoreo
 
@@ -165,7 +158,6 @@ Con el selector en inglés, todo el sitio de cara al cliente sale en inglés: ti
 - **Autenticación:** Sesiones de Django, con reglas de contraseña y límite de intentos de acceso
 - **Pagos:** Mercado Pago (proveedor real construido, apagado por defecto)
 - **Contabilidad:** Alegra API
-- **CRM:** HubSpot (solo un esqueleto)
 
 ---
 
@@ -181,7 +173,6 @@ GoToGtymPrime/
 │   ├── integrations/       # Integraciones externas
 │   │   ├── alegra/
 │   │   ├── mercadopago/
-│   │   └── hubspot/
 │   └── ...                 # Otras apps
 ├── environments/           # Scripts de CI, despliegue y checks
 ├── design/                 # Fuentes tipográficas fuente

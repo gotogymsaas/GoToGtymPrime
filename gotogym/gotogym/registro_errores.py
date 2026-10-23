@@ -86,6 +86,12 @@ def configuracion_logging(directorio):
         'formatter': 'errores',
         'filters': ['contexto_peticion'],
     }
+    handlers['consola'] = {
+        'class': 'logging.StreamHandler',
+        'level': 'WARNING',
+        'formatter': 'errores',
+        'filters': ['contexto_peticion'],
+    }
     return {
         'version': 1,
         'disable_existing_loggers': False,
@@ -98,5 +104,5 @@ def configuracion_logging(directorio):
         'handlers': handlers,
         # El logger raiz recibe tambien lo que propagan `django.request`,
         # `django.security` y los loggers de cada app (payments, orders...).
-        'root': {'handlers': ['archivo_errores'], 'level': 'WARNING'},
+        'root': {'handlers': ['archivo_errores', 'consola'], 'level': 'WARNING'},
     }

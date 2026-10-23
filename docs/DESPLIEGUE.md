@@ -10,8 +10,8 @@ Verificado contra Azure y el código el 14 de octubre de 2026. Para ejecutar el 
 | Dirección pública | `https://shop.gotogym.store` (y `gotogym-prime.azurewebsites.net`) |
 | Base de datos | PostgreSQL, por la variable `DATABASE_URL` |
 | Respaldos | El servidor flexible `psql-gotogym-prod` (grupo `rg-gotogym-data`) conserva respaldos automáticos 7 días, sin redundancia geográfica |
-| Slots | Slot `staging` (`gotogym-prime-staging.azurewebsites.net`) con configuración propia, SQLite y pagos simulados. El flujo de CI sigue desplegando directo a producción; el slot se actualiza a mano (ver más abajo) |
-| HTTPS | `httpsOnly` está apagado en la aplicación; la redirección la hace Django con `SECURE_SSL_REDIRECT` |
+| Despliegue | Producción directa mediante el workflow de GitHub Actions; no hay slot adicional |
+| HTTPS | `httpsOnly=true` en App Service y redirección defensiva en Django |
 
 ## Cómo se despliega
 
@@ -21,7 +21,7 @@ Verificado contra Azure y el código el 14 de octubre de 2026. Para ejecutar el 
 4. El **Startup Command** que ejecuta el App Service (configurado en el Portal, no en git) es:
 
    ```
-   python gotogym/manage.py migrate --noinput && python gotogym/manage.py collectstatic --noinput && gunicorn --chdir gotogym gotogym.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120 --access-logfile '-' --error-logfile '-'
+   python gotogym/manage.py migrate --noinput && python gotogym/manage.py collectstatic --noinput && gunicorn --chdir gotogym gotogym.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120 --error-logfile '-'
    ```
 
    El `migrate` es el del proyecto: adapta una base antigua del programa "influencer" y crea la tabla de caché (`django_cache`) si la caché vive en la base. `wsgi.py` no migra.
@@ -38,7 +38,7 @@ Las lee `gotogym/gotogym/settings.py`. Con `DEBUG` apagado y sin `DJANGO_SECRET_
 |---|---|---|
 | `DJANGO_SECRET_KEY`, `DEBUG`, `DATABASE_URL` | Núcleo | Declaradas |
 | `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS` | Dominios permitidos | Declaradas (`shop.gotogym.store` y el de Azure) |
-| `SECURE_PROXY_SSL_HEADER`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_SSL_REDIRECT` | HTTPS | Declaradas; `SECURE_SSL_REDIRECT` estaba en `false` |
+| `SECURE_PROXY_SSL_HEADER`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_SSL_REDIRECT` | HTTPS | Obligatorias y activas |
 | `SECURE_HSTS_SECONDS` | HSTS. Arranca en 3600 en producción; subir por etapas a 604800 y luego 31536000 | Sin declarar (usa 3600) |
 | `SITIO_URL` | Dirección pública para los enlaces de los correos. Por defecto `https://gotogym.store`, que no es donde vive la tienda | Debe ser `https://shop.gotogym.store`; confirmar que está declarada antes de probar los enlaces |
 | `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL` | Correo real. Sin `EMAIL_HOST` los correos salen por consola. Valores y recursos en [Correo](#correo) | Declaradas el 17 de octubre de 2026; `probar_correo` entregó a la bandeja de entrada |
@@ -46,7 +46,7 @@ Las lee `gotogym/gotogym/settings.py`. Con `DEBUG` apagado y sin `DJANGO_SECRET_
 | `ALEGRA_EMAIL`, `ALEGRA_API_TOKEN` | Contabilidad y facturación (`ALEGRA_TOKEN` también se acepta) | Faltan |
 | `ALEGRA_FACTURACION_ACTIVA` | Emite la factura de cada pedido pagado. Por defecto `false`. Detalle en [Facturación electrónica](FACTURACION_ALEGRA.md) | Sin declarar |
 | `ALEGRA_NUMBER_TEMPLATE_ID`, `ALEGRA_IVA_TAX_ID`, `ALEGRA_IVA_PORCENTAJE`, `ALEGRA_PRECIOS_INCLUYEN_IVA`, `ALEGRA_EMITIR_ELECTRONICA`, `ALEGRA_MEDIO_DE_PAGO`, `ALEGRA_CONSUMIDOR_FINAL_ID`, `ALEGRA_ITEM_GENERICO_ID`, `ALEGRA_FACTURAR_DESDE` | Parámetros de la factura | Sin declarar |
-| `SENTRY_DSN`, `SENTRY_ENVIRONMENT` | Monitoreo de errores | Faltan |
+| `SENTRY_DSN`, `SENTRY_ENVIRONMENT` | Monitoreo de errores | Obligatorios en producción; errores también salen por consola |
 | `REDIS_URL` | Caché compartida en Redis. Sin ella y con `DATABASE_URL`, la caché es una tabla de la base | Opcional |
 | `ADMIN_URL` | Ruta del administrador de Django (por defecto `admin/`); conviene una no obvia, por ejemplo `gestion-xxxx/` | Sin declarar |
 | `TRUSTED_PROXY_HOPS` | Proxies de confianza delante de la aplicación (1 en producción) para obtener la IP real del cliente | Sin declarar (usa 1) |
@@ -133,19 +133,13 @@ Está terminada y apagada (`ALEGRA_FACTURACION_ACTIVA=false`). Qué hace, cómo 
 ## Respaldos, restauración y reversión
 
 - **Base de datos.** Restauración a un punto en el tiempo de los últimos 7 días: crea un servidor nuevo, no pisa el actual (`az postgres flexible-server restore --resource-group rg-gotogym-data --name <servidor-nuevo> --source-server psql-gotogym-prod --restore-time <fecha-hora-UTC>`). Ensayada el 15 de octubre de 2026: el servidor restaurado quedó listo con todos los datos (44 tablas, pedidos, catálogo y Journal) y tarda unos 30 minutos; se borró al terminar. Valorar subir la retención de 7 días.
-- **Código.** Para volver a una versión anterior, ejecutar el workflow sobre el commit anterior o revertir el commit en `main`. Sin slot de staging no hay intercambio instantáneo.
+- **Código.** Para volver a una versión anterior, ejecutar el workflow sobre el commit anterior o revertir el commit en `main`. La reversión debe validarse con el health check y los logs de arranque.
 - **Archivos subidos.** Las imágenes que se suban desde el panel quedan en `gotogym/media/` dentro de la aplicación desplegada; verificar que ese almacenamiento persista entre despliegues (pendiente de resolver).
-
-## Slot de staging
-
-Sirve para ensayar una versión antes de publicarla. Se creó **sin copiar** la configuración de producción (no hereda `DATABASE_URL` ni la clave secreta) y todos sus ajustes son de slot, así que un intercambio no los mueve. Usa SQLite y el proveedor de pago simulado; su arranque carga el catálogo y crea el usuario de panel `staff-staging@example.com` con la clave del ajuste `DJANGO_SUPERUSER_PASSWORD`.
-
-Para probar el árbol de trabajo actual: empaquetarlo como lo hace el flujo de CI (sin `.git`, `.venv`, `docs`, `node_modules`, `*.sqlite3` ni `*.bat`) y ejecutar `az webapp deploy -g rg-gotogym-prime -n gotogym-prime --slot staging --src-path <zip> --type zip`. Un intercambio (`slot swap`) mueve solo el código: los ajustes de slot se quedan donde están. Aun así, el slot no ejercita PostgreSQL; para un ensayo fiel, darle una base propia.
 
 ## Antes de abrir al público
 
 1. `SITIO_URL`, `SENTRY_DSN` y, para cobrar, `PAYMENT_PROVIDER=mercadopago` con sus credenciales y el webhook registrado.
-2. `SECURE_SSL_REDIRECT=true` (o `httpsOnly` en Azure) y comprobar que todo el sitio funciona por HTTPS antes de subir HSTS.
+2. `httpsOnly=true` en Azure, `SECURE_SSL_REDIRECT=true` y comprobar que todo el sitio funciona por HTTPS antes de subir HSTS.
 3. `PAYMENTS_MOCK_UI_ENABLED` apagado.
 4. `python manage.py security_checklist` en el App Service.
 5. Revisar que no exista el administrador heredado con una contraseña publicada: `python manage.py revisar_claves_heredadas`.

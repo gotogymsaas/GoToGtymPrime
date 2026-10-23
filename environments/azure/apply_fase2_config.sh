@@ -15,7 +15,6 @@ fi
 SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID:?Define AZURE_SUBSCRIPTION_ID (ver environments/azure/.env.release.example)}"
 RESOURCE_GROUP="${AZURE_RELEASE_RESOURCE_GROUP:-rg-gotogym-prime}"
 WEBAPP_NAME="${AZURE_RELEASE_WEBAPP:-gotogym-prime}"
-STAGING_SLOT="${AZURE_RELEASE_SLOT:-staging}"
 
 required_env=(
   "DJANGO_SECRET_KEY"
@@ -23,6 +22,7 @@ required_env=(
   "ALLOWED_HOSTS"
   "MERCADOPAGO_ACCESS_TOKEN"
   "ALEGRA_API_TOKEN"
+  "SENTRY_DSN"
   "DATABASE_URL"
 )
 
@@ -50,13 +50,9 @@ if [[ "${state}" != "Enabled" ]]; then
   exit 2
 fi
 
-slot_count="$(az webapp deployment slot list -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" --query "[?contains(name, '/${STAGING_SLOT}')]|length(@)" -o tsv)"
-if [[ "${slot_count}" == "0" ]]; then
-  run_cmd webapp deployment slot create -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" --slot "${STAGING_SLOT}"
-fi
-
 startup_cmd="bash environments/azure/startup.sh"
 run_cmd webapp config set -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" --startup-file "${startup_cmd}"
+run_cmd webapp update -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" --set httpsOnly=true
 
 # Opcionales: solo se envian las que esten definidas (no pisan lo que Azure ya tenga).
 opcionales=()
@@ -77,7 +73,6 @@ run_cmd webapp config appsettings set -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}"
   ALLOWED_HOSTS="${ALLOWED_HOSTS}" \
   MERCADOPAGO_ACCESS_TOKEN="${MERCADOPAGO_ACCESS_TOKEN}" \
   ALEGRA_API_TOKEN="${ALEGRA_API_TOKEN}" \
-  HUBSPOT_PRIVATE_TOKEN="${HUBSPOT_PRIVATE_TOKEN:-}" \
   DATABASE_URL="${DATABASE_URL}"
 
 run_cmd webapp log config -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" --application-logging filesystem --web-server-logging filesystem --level information

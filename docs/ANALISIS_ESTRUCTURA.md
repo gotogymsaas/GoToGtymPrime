@@ -38,7 +38,7 @@ Un monolito Django (`gotogym/`) que sirve la tienda, el blog, el panel administr
 | `analitica` | Eventos de uso del sitio, sin datos personales y solo con consentimiento de cookies | `EventoAnalitica` |
 | `contabilidad` | Consulta de clientes y facturas en Alegra (solo personal) | (sin modelos) |
 
-`gotogym/integrations/` contiene los clientes de proveedores externos: `mercadopago` (pagos y reembolsos), `alegra` (contabilidad) y `hubspot` (esqueleto sin integración real).
+`gotogym/integrations/` contiene los clientes de proveedores externos: `mercadopago` (pagos y reembolsos) y `alegra` (contabilidad).
 
 ## Mapa de rutas
 
@@ -81,7 +81,7 @@ Hay tres módulos de configuración, todos heredan de `gotogym/settings.py`:
 | `gotogym.settings_local` | Desarrollo | SQLite `db_local.sqlite3`, `DEBUG` activo |
 | `gotogym.settings_test` | Pruebas y CI | SQLite, hash de contraseñas rápido, estáticos sin manifiesto |
 
-Variables de entorno que lee la configuración: `DJANGO_SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL`, `CSRF_TRUSTED_ORIGINS`, `SITIO_URL`, `ADMIN_URL`, `TRUSTED_PROXY_HOPS`, `RATE_LIMIT_ENABLED`, `SECURE_HSTS_SECONDS`, `SECURE_PROXY_SSL_HEADER`, `SECURE_SSL_REDIRECT`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `PAYMENT_PROVIDER`, `PAYMENTS_MOCK_UI_ENABLED`, `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_WEBHOOK_SECRET`, `ALEGRA_API_TOKEN`, `HUBSPOT_PRIVATE_TOKEN`, `EMAIL_HOST` (con `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `EMAIL_USE_SSL`, `DEFAULT_FROM_EMAIL`) y `SENTRY_DSN` (con `SENTRY_ENVIRONMENT`, `SENTRY_TRACES_SAMPLE_RATE`), `REDIS_URL` y `ORDER_PAYMENT_WINDOW_HOURS`.
+Variables de entorno que lee la configuración: `DJANGO_SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL`, `CSRF_TRUSTED_ORIGINS`, `SITIO_URL`, `ADMIN_URL`, `TRUSTED_PROXY_HOPS`, `RATE_LIMIT_ENABLED`, `SECURE_HSTS_SECONDS`, `SECURE_PROXY_SSL_HEADER`, `SECURE_SSL_REDIRECT`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `PAYMENT_PROVIDER`, `PAYMENTS_MOCK_UI_ENABLED`, `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_WEBHOOK_SECRET`, `ALEGRA_API_TOKEN`, `EMAIL_HOST` (con `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `EMAIL_USE_SSL`, `DEFAULT_FROM_EMAIL`) y `SENTRY_DSN` (con `SENTRY_ENVIRONMENT`, `SENTRY_TRACES_SAMPLE_RATE`), `REDIS_URL` y `ORDER_PAYMENT_WINDOW_HOURS`.
 
 ## Calidad y pruebas
 
@@ -113,7 +113,6 @@ Variables de entorno que lee la configuración: `DJANGO_SECRET_KEY`, `DEBUG`, `A
 |---|---|
 | Mercado Pago | Construido (preferencias, webhook con firma, reembolsos) y apagado por defecto; nunca se probó con credenciales reales |
 | Alegra | Consulta de clientes y facturas desde el panel de contabilidad y emisión de la factura electrónica de cada pedido pagado (`orders/facturacion.py`, apagada por defecto); requiere `ALEGRA_EMAIL` y `ALEGRA_API_TOKEN` |
-| HubSpot | Solo un esqueleto sin llamadas reales |
 | Sentry | Se activa al declarar `SENTRY_DSN` |
 | Correo (SMTP) | Se activa al declarar `EMAIL_HOST`; sin él, los correos salen por consola. Lo usan la recuperación de contraseña, los avisos del pedido y los del programa de afiliados |
 | Idiomas | Selector ES / EN en el menú, el panel móvil y el pie; las rutas llevan `/es/` o `/en/` y la elección se guarda en la cookie `django_language`. Todo el sitio de cara al cliente está traducido al inglés (portada, tienda, carrito, checkout, cuenta, afiliados, Journal, políticas, términos y correos del pedido). Las políticas y los términos en inglés son una traducción de cortesía; prevalece el español. El contenido de la base de datos se traduce con el filtro `traducir` (el `.po` hace de diccionario). El portugués existe en los catálogos pero no tiene selector ni las traducciones nuevas. El panel de administración y los correos internos siguen en español. Regresión: `gotogym/test_ingles_completo.py` |

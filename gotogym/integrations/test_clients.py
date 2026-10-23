@@ -8,7 +8,6 @@ from django.test import SimpleTestCase
 
 from integrations.alegra import alegra_client
 from integrations.alegra.alegra_client import AlegraClient, AlegraError
-from integrations.hubspot.hubspot_client import HubSpotClient
 from integrations.mercadopago import mercadopago_client
 from integrations.mercadopago.mercadopago_client import MercadoPagoClient, MercadoPagoError
 
@@ -201,13 +200,3 @@ class MercadoPagoSinPaqueteTests(SimpleTestCase):
         with patch.object(mercadopago_client, 'mercadopago', None):
             with self.assertRaises(RuntimeError):
                 MercadoPagoClient(access_token='tok')
-
-
-class HubSpotClientTests(SimpleTestCase):
-    def test_usa_el_token_recibido_o_el_del_entorno(self):
-        self.assertEqual(HubSpotClient(token='abc').token, 'abc')
-        with patch.dict(os.environ, {'HUBSPOT_PRIVATE_TOKEN': 'env'}):
-            self.assertEqual(HubSpotClient().token, 'env')
-
-    def test_crear_contacto_es_un_esqueleto_que_no_falla(self):
-        self.assertIsNone(HubSpotClient(token='abc').create_contact('a@b.co', {'x': 1}))

@@ -27,7 +27,12 @@ print(
 
 def _cargar(modulo='gotogym.settings', **entorno):
     env = {k: v for k, v in os.environ.items() if not k.startswith(('DJANGO_', 'SECURE_', 'DEBUG', 'REDIS', 'TASK_', 'SESSION_', 'CSRF_'))}
-    env.update(DJANGO_SETTINGS_MODULE=modulo, PYTHONUTF8='1', **entorno)
+    env.update(
+        DJANGO_SETTINGS_MODULE=modulo,
+        PYTHONUTF8='1',
+        SENTRY_DSN='https://public@example.ingest.sentry.io/1',
+        **entorno,
+    )
     return subprocess.run(
         [sys.executable, '-c', LEER], cwd=RAIZ, env=env, capture_output=True, text=True, timeout=60,
     )

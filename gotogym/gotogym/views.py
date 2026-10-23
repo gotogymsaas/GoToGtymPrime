@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponsePermanentRedirect
+from django.db import connection
+from django.db.utils import OperationalError
+from django.http import HttpResponse, HttpResponsePermanentRedirect, JsonResponse
 from django.shortcuts import render
 from django.templatetags.static import static
 from django.urls import reverse
@@ -52,6 +54,15 @@ def home(request):
 
 def healthz(request):
     return HttpResponse('OK')
+
+
+def readyz(request):
+    """Indica si la aplicación puede atender tráfico dependiente de la BD."""
+    try:
+        connection.ensure_connection()
+    except OperationalError:
+        return JsonResponse({'status': 'unavailable', 'database': 'unavailable'}, status=503)
+    return JsonResponse({'status': 'ready', 'database': 'available'})
 
 
 def acerca_de(request):

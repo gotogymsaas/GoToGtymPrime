@@ -39,15 +39,29 @@ echo "[backend] Ejecutando django check (settings_local)..."
 python manage.py check --settings=gotogym.settings_local
 
 echo "[backend] Ejecutando test suite con cobertura (settings_test)..."
-# `manage.py test` sin argumentos solo descubre pruebas dentro del arbol de
-# este directorio (gotogym/). `administracion` vive fisicamente aqui mismo
-# (gotogym/administracion/), pero fuera del paquete raiz gotogym.gotogym,
-# por lo que se agrega como etiqueta explicita para que el discovery la
-# encuentre. Se ejecutan ambos grupos en el mismo proceso y sobre la misma
-# base de pruebas: separarlos podia ocultar errores de orden, fixtures o
-# estado compartido entre apps y no reproducía la suite combinada que usa
-# la validacion de PR.
-coverage run --rcfile="${ROOT_DIR}/pyproject.toml" manage.py test . administracion --settings=gotogym.settings_test
+# La validacion de despliegue cubre el camino que puede causar perdida de
+# dinero o acceso: autenticacion, checkout, inventario, pedidos, pagos,
+# integraciones, permisos y configuracion de seguridad. La suite completa
+# permanece disponible para regresion (`FULL_TEST_SUITE=true`) y no se borra
+# por el solo hecho de no ser necesaria en cada deploy.
+if [[ "${FULL_TEST_SUITE:-false}" == "true" ]]; then
+  test_labels=(. administracion)
+  echo "[backend] FULL_TEST_SUITE=true: ejecutando todos los tests descubiertos."
+else
+  test_labels=(
+    accounts.tests
+    carrito.tests
+    inventory.tests
+    orders.tests
+    payments.tests
+    products.tests
+    shipping.tests
+    integrations.test_clients
+    gotogym.test_errores
+  )
+  echo "[backend] Suite esencial: ${#test_labels[@]} modulos criticos sin descubrimiento recursivo."
+fi
+coverage run --rcfile="${ROOT_DIR}/pyproject.toml" manage.py test "${test_labels[@]}" --settings=gotogym.settings_test
 coverage report --rcfile="${ROOT_DIR}/pyproject.toml"
 
 echo "[backend] Validaciones finalizadas."

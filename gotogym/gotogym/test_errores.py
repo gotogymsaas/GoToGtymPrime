@@ -108,6 +108,11 @@ class PaginasDeErrorTests(TestCase):
         self.assertEqual(r.status_code, 405)
         self.assertNotIn(b'Error 405', r.content)
 
+    def test_readiness_confirma_la_base_de_datos(self):
+        r = self.cliente.get('/readyz')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json(), {'status': 'ready', 'database': 'available'})
+
     def test_fallo_csrf_muestra_403_y_se_registra(self):
         cliente = Client(enforce_csrf_checks=True)
         r = cliente.post('/es/accounts/acceso/', {'username': 'a', 'password': 'b'})

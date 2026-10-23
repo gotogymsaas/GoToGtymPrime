@@ -4,7 +4,6 @@ set -uo pipefail
 SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID:?Define AZURE_SUBSCRIPTION_ID (ver environments/azure/.env.release.example)}"
 RESOURCE_GROUP="${AZURE_RELEASE_RESOURCE_GROUP:-rg-gotogym-prime}"
 WEBAPP_NAME="${AZURE_RELEASE_WEBAPP:-gotogym-prime}"
-STAGING_SLOT="${AZURE_RELEASE_SLOT:-staging}"
 
 required_settings=(
   "DJANGO_SECRET_KEY"
@@ -15,6 +14,7 @@ required_settings=(
   "MERCADOPAGO_ACCESS_TOKEN"
   "ALEGRA_API_TOKEN"
   "ALEGRA_EMAIL"
+  "SENTRY_DSN"
 )
 
 # Recomendadas: la aplicacion arranca sin ellas, pero faltan funciones o
@@ -52,13 +52,14 @@ run_or_warn "Web App objetivo" az webapp show -g "${RESOURCE_GROUP}" -n "${WEBAP
 
 run_or_warn "Configuracion runtime/startup" az webapp config show -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" --query "{linuxFxVersion:linuxFxVersion,appCommandLine:appCommandLine,alwaysOn:alwaysOn,http20Enabled:http20Enabled}" -o table
 
-echo "[azure-preflight] Verificando slot staging"
-slot_count="$(az webapp deployment slot list -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" --query "[?contains(name, '/${STAGING_SLOT}')]|length(@)" -o tsv 2>/dev/null || echo "0")"
-if [[ "${slot_count}" == "1" ]]; then
-  echo "[azure-preflight] OK: slot ${STAGING_SLOT} existe."
+https_only="$(az webapp show -g "${RESOURCE_GROUP}" -n "${WEBAPP_NAME}" --query "httpsOnly" -o tsv 2>/dev/null || echo "unknown")"
+if [[ "${https_only}" == "true" ]]; then
+  echo "[azure-preflight] OK: httpsOnly=true"
+elif [[ "${https_only}" == "false" ]]; then
+  echo "[azure-preflight] ERROR: httpsOnly=false; debe ser true."
+  exit 1
 else
-  echo "[azure-preflight] WARNING: slot ${STAGING_SLOT} no existe."
-  echo "[azure-preflight] Sugerencia: az webapp deployment slot create -g ${RESOURCE_GROUP} -n ${WEBAPP_NAME} --slot ${STAGING_SLOT}"
+  echo "[azure-preflight] WARNING: no fue posible confirmar httpsOnly (${https_only})."
 fi
 
 run_or_warn "Gobernanza: policy assignments" az policy assignment list --query "[].{name:name,scope:scope,enforcementMode:enforcementMode}" -o table
