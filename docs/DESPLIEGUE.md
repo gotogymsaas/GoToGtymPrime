@@ -46,7 +46,7 @@ Las lee `gotogym/gotogym/settings.py`. Con `DEBUG` apagado y sin `DJANGO_SECRET_
 | `ALEGRA_EMAIL`, `ALEGRA_API_TOKEN` | Contabilidad y facturación (`ALEGRA_TOKEN` también se acepta) | Faltan |
 | `ALEGRA_FACTURACION_ACTIVA` | Emite la factura de cada pedido pagado. Por defecto `false`. Detalle en [Facturación electrónica](FACTURACION_ALEGRA.md) | Sin declarar |
 | `ALEGRA_NUMBER_TEMPLATE_ID`, `ALEGRA_IVA_TAX_ID`, `ALEGRA_IVA_PORCENTAJE`, `ALEGRA_PRECIOS_INCLUYEN_IVA`, `ALEGRA_EMITIR_ELECTRONICA`, `ALEGRA_MEDIO_DE_PAGO`, `ALEGRA_CONSUMIDOR_FINAL_ID`, `ALEGRA_ITEM_GENERICO_ID`, `ALEGRA_FACTURAR_DESDE` | Parámetros de la factura | Sin declarar |
-| `SENTRY_DSN`, `SENTRY_ENVIRONMENT` | Monitoreo de errores | Obligatorios en producción; errores también salen por consola |
+| `SENTRY_DSN`, `SENTRY_ENVIRONMENT` | Monitoreo de errores | `SENTRY_DSN` es requisito del preflight de producción; si falta, la aplicación arranca con una alerta crítica y sin Sentry para no tumbar el sitio |
 | `REDIS_URL` | Caché compartida en Redis. Sin ella y con `DATABASE_URL`, la caché es una tabla de la base | Opcional |
 | `ADMIN_URL` | Ruta del administrador de Django (por defecto `admin/`); conviene una no obvia, por ejemplo `gestion-xxxx/` | Sin declarar |
 | `TRUSTED_PROXY_HOPS` | Proxies de confianza delante de la aplicación (1 en producción) para obtener la IP real del cliente | Sin declarar (usa 1) |

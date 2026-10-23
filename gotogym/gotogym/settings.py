@@ -336,13 +336,15 @@ ALEGRA_ITEM_GENERICO_ID = os.environ.get('ALEGRA_ITEM_GENERICO_ID', '')
 # pagados que aun no tienen factura. Vacio: solo reintenta los ya intentados.
 ALEGRA_FACTURAR_DESDE = os.environ.get('ALEGRA_FACTURAR_DESDE', '')
 
-# Monitoreo de errores (Sentry). Sin SENTRY_DSN en el entorno queda
-# desactivado: no requiere la librería instalada para arrancar y no rompe
-# entornos (local, tests) que no lo configuren.
+# Monitoreo de errores (Sentry). La configuración de despliegue y el preflight
+# lo exigen en producción, pero su ausencia no debe impedir que la aplicación
+# arranque y quede completamente indisponible por un fallo de configuración
+# operativa. En ese caso se deja una alerta visible en el log de arranque.
 SENTRY_DSN = os.environ.get('SENTRY_DSN', '')
 if PRODUCCION and not SENTRY_DSN:
-    raise ImproperlyConfigured(
-        'Falta SENTRY_DSN. En producción es obligatorio para monitorear errores.'
+    logging.getLogger(__name__).critical(
+        'Falta SENTRY_DSN: Sentry esta desactivado en produccion; '
+        'configuralo antes de abrir ventas.'
     )
 if SENTRY_DSN:
     import sentry_sdk
