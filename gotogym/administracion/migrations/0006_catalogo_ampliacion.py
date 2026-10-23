@@ -304,9 +304,14 @@ def aplicar_ampliacion(apps):
     ProductVariant.objects.filter(product__name__in=OCULTOS, is_active=True).update(is_active=False)
 
     # Inventario de los antiguos en 0, con el asiento manual de cada variante que cambia.
+    # El bloqueo se pide sin joins (solo filas de Inventory): ids primero, bloqueo despues.
+    ids = list(
+        Inventory.objects.filter(variant__product__name__in=ANTIGUOS, quantity_available__gt=0)
+        .values_list("pk", flat=True)
+    )
     inventarios = list(
         Inventory.objects.select_for_update()
-        .filter(variant__product__name__in=ANTIGUOS, quantity_available__gt=0)
+        .filter(pk__in=ids, quantity_available__gt=0)
         .order_by("variant_id")
     )
     if inventarios:

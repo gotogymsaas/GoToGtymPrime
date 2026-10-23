@@ -413,7 +413,10 @@ class Command(BaseCommand):
                 variant__product__name__in=ANTIGUOS, quantity_available__gt=0,
             ).order_by("variant_id")
             if not dry_run:
-                inventarios = inventarios.select_for_update()
+                # El bloqueo se pide sin joins (solo filas de Inventory): ids primero.
+                inventarios = Inventory.objects.select_for_update().filter(
+                    pk__in=list(inventarios.values_list("pk", flat=True)), quantity_available__gt=0,
+                ).order_by("variant_id")
             a_cambiar = list(inventarios)
             unidades = sum(inventario.quantity_available for inventario in a_cambiar)
             if not dry_run and a_cambiar:
