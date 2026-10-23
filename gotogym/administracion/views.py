@@ -298,7 +298,7 @@ def products_reorder(request):
 
         ids_enviados = {producto.pk for producto in enviados}
         huecos = [i for i, producto in enumerate(orden) if producto.pk in ids_enviados]
-        for hueco, producto in zip(huecos, enviados):
+        for hueco, producto in zip(huecos, enviados, strict=True):
             orden[hueco] = producto
 
         cambiados = []

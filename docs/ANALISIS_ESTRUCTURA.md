@@ -97,6 +97,7 @@ Variables de entorno que lee la configuración: `DJANGO_SECRET_KEY`, `DEBUG`, `A
 |---|---|
 | `seed_initial_data` | Crea la marca y las categorías iniciales |
 | `seed_catalog` | Siembra o actualiza el catálogo base |
+| `seed_catalog_ampliacion` | Crea 11 prendas nuevas con variantes, inventario y fotos. Solo crea: no pisa lo que ya existe. `--dry-run` verifica además que las fotos estén desplegadas; `--stock N` da unidades iniciales por variante (por defecto 0) |
 | `seed_journal` | Carga las entradas del Journal (`--solo-faltantes` no pisa las existentes) |
 | `audit_catalog` | Auditoría de solo lectura de catálogo, variantes e inventario |
 | `security_checklist` | Revisa variables sensibles del entorno donde se ejecuta |
