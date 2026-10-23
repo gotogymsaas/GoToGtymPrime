@@ -68,7 +68,7 @@ from products.models import (
     ProductVariant,
 )
 from products.variant_parsing import COLOR_UNKNOWN, SIZE_UNKNOWN, build_sku
-from tienda.catalog import SIZE_ORDER
+from tienda.catalog import ORDEN_DEL_PANEL, SIZE_ORDER
 
 from . import metrics
 from .forms import (
@@ -254,18 +254,60 @@ def products_list(request):
             variant_count=Count("variants", distinct=True),
             real_stock=Sum("variants__inventory__quantity_available"),
         )
-        .order_by("-id")
+        .order_by(*ORDEN_DEL_PANEL)
     )
     if query:
         products = products.filter(name__icontains=query)
-    paginator = Paginator(products, 8)
-    page_obj = paginator.get_page(request.GET.get("page"))
     context = {
-        "page_obj": page_obj,
+        "products": products,
         "query": query,
+        # Sin paginar, para que todo el orden este a la vista y se pueda
+        # arrastrar cualquier producto a cualquier posicion. Con una busqueda
+        # activa solo se ve un subconjunto, asi que ahi no se reordena.
+        "puede_reordenar": request.user.has_perm("products.change_product") and not query,
         "threshold_form": PanelSettingsForm(instance=PanelSettings.load()),
     }
     return render(request, "administracion/products.html", context)
+
+
+@require_perms("products.change_product")
+@require_POST
+def products_reorder(request):
+    """Guarda el orden del catalogo tras arrastrar y soltar una fila.
+
+    Recibe los ids (`product_id`, repetido) en el orden final. Los ids
+    recibidos se reparten, en ese orden, entre los huecos que ya ocupaban en
+    el catalogo, y despues se renumera todo de 1 a N: asi un subconjunto no
+    mueve a los demas, un id desconocido se ignora y los empates o huecos
+    heredados de datos viejos no dejan el orden ambiguo."""
+    recibidos = []
+    for crudo in request.POST.getlist("product_id"):
+        try:
+            recibidos.append(int(crudo))
+        except ValueError:
+            continue
+
+    with transaction.atomic():
+        orden = list(
+            Product.objects.select_for_update().only("pk", "sort_order").order_by(*ORDEN_DEL_PANEL)
+        )
+        por_id = {producto.pk: producto for producto in orden}
+        enviados = [por_id[pk] for pk in dict.fromkeys(recibidos) if pk in por_id]
+        if not enviados:
+            return JsonResponse({"ok": False}, status=400)
+
+        ids_enviados = {producto.pk for producto in enviados}
+        huecos = [i for i, producto in enumerate(orden) if producto.pk in ids_enviados]
+        for hueco, producto in zip(huecos, enviados):
+            orden[hueco] = producto
+
+        cambiados = []
+        for posicion, producto in enumerate(orden, start=1):
+            if producto.sort_order != posicion:
+                producto.sort_order = posicion
+                cambiados.append(producto)
+        Product.objects.bulk_update(cambiados, ["sort_order"])
+    return JsonResponse({"ok": True})
 
 
 def _safe_redirect(request, fallback):
@@ -570,6 +612,57 @@ def variant_stock_update(request, pk):
         )
     messages.success(request, f"Stock de {variant.sku} actualizado a {cantidad}.")
     return _safe_redirect(request, "admin_variants")
+
+
+# Valores que admite el ajuste masivo de Productos. Se acotan aqui para que
+# los botones no se conviertan en un campo libre capaz de fijar cualquier
+# cantidad a todo el catalogo con una sola peticion.
+CANTIDADES_AJUSTE_MASIVO = (0, 5)
+
+
+@require_perms("inventory.change_inventory")
+@require_POST
+def inventory_bulk_set(request):
+    """Deja todas las variantes con la misma cantidad disponible.
+
+    Cada variante que cambia deja su ajuste manual en el historial, igual
+    que la edicion individual, para que el kardex siga explicando el stock.
+    Las variantes sin fila de inventario reciben una, asi que tras el ajuste
+    ninguna queda como "sin inventario"."""
+    try:
+        cantidad = int(request.POST.get("cantidad", ""))
+    except (TypeError, ValueError):
+        cantidad = None
+    if cantidad not in CANTIDADES_AJUSTE_MASIVO:
+        messages.error(request, "Ajuste masivo de inventario no válido.")
+        return _safe_redirect(request, "admin_products")
+
+    with transaction.atomic():
+        Inventory.objects.bulk_create(
+            [Inventory(variant=variante) for variante in ProductVariant.objects.filter(inventory__isnull=True)]
+        )
+        a_cambiar = [
+            inventario
+            for inventario in Inventory.objects.select_for_update().order_by("variant_id")
+            if inventario.quantity_available != cantidad
+        ]
+        Inventory.objects.filter(pk__in=[inventario.pk for inventario in a_cambiar]).update(
+            quantity_available=cantidad, updated_at=timezone.now(),
+        )
+        InventoryAdjustment.objects.bulk_create([
+            InventoryAdjustment(
+                inventory=inventario, delta=cantidad - inventario.quantity_available,
+                quantity_after=cantidad, reason=InventoryAdjustmentReason.MANUAL,
+                created_by=request.user,
+            )
+            for inventario in a_cambiar
+        ])
+
+    if cantidad == 0:
+        messages.warning(request, f"Inventario llevado a 0: {len(a_cambiar)} variantes ajustadas.")
+    else:
+        messages.success(request, f"Inventario precargado con {cantidad} unidades: {len(a_cambiar)} variantes ajustadas.")
+    return _safe_redirect(request, "admin_products")
 
 
 @staff_required

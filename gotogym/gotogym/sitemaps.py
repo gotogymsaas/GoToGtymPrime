@@ -13,7 +13,7 @@ Quedan fuera, a proposito:
 from blog.models import Post
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
-from products.models import Product
+from tienda.catalog import storefront_products
 
 
 class PaginasPublicas(Sitemap):
@@ -40,7 +40,7 @@ class Productos(Sitemap):
     priority = 0.8
 
     def items(self):
-        return Product.objects.order_by('pk')
+        return storefront_products().order_by('pk')
 
     def location(self, item):
         return reverse('tienda:producto_detail', args=[item.pk])

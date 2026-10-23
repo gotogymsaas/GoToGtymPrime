@@ -60,9 +60,18 @@ class Product(models.Model):
     featured = models.BooleanField(default=False)
     tags = models.ManyToManyField(ProductTag, blank=True, related_name='products')
     image = models.ImageField(upload_to='products/', blank=True, null=True)
+    # Posicion del producto en el listado del panel y en la tienda. 0 solo
+    # significa "sin asignar": `save` le da la siguiente posicion libre.
+    sort_order = models.PositiveIntegerField(default=0, db_index=True)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self._state.adding and not self.sort_order:
+            ultimo = Product.objects.aggregate(ultimo=models.Max('sort_order'))['ultimo']
+            self.sort_order = (ultimo or 0) + 1
+        super().save(*args, **kwargs)
 
     @property
     def primary_image(self):

@@ -545,6 +545,58 @@ class EliminarVarianteReferenciadaTests(CatalogAdminTestCase):
         self.assertEqual(pedido.items.get().variant_id, self.variante.pk)
 
 
+class DesactivarProductoEnLaTiendaTests(CatalogAdminTestCase):
+    """Desmarcar "Activo" en las variantes desde "Editar producto" debe
+    retirar el producto de la tienda."""
+
+    def setUp(self):
+        super().setUp()
+        self.producto = Product.objects.create(
+            name='Producto por retirar', category=self.categoria, brand=self.marca,
+            base_price=Decimal('70000'), stock=0,
+        )
+        self.variante = ProductVariant.objects.create(
+            product=self.producto, sku='OFF-001-S-NEG', size='S', color='negro',
+        )
+        Inventory.objects.create(variant=self.variante, quantity_available=6)
+
+    def _guardar(self, activa):
+        data = {
+            'name': self.producto.name, 'category': self.categoria.pk, 'brand': self.marca.pk,
+            'description': '', 'base_price': '70000', 'discount': '0', 'stock': '0', 'featured': '',
+            'variants-0-id': str(self.variante.pk),
+            'variants-0-size': 'S',
+            'variants-0-color': 'negro',
+            'variants-0-price_override': '',
+            'variants-0-quantity_available': '6',
+            **({'variants-0-is_active': 'on'} if activa else {}),
+            **self._formset_management(total=1, initial=1),
+        }
+        return self.client.post(reverse('admin_product_edit', args=[self.producto.pk]), data)
+
+    def _nombres_en_la_tienda(self):
+        response = self.client.get(reverse('tienda:producto_list'))
+        return [card['product'].name for card in response.context['cards']]
+
+    def test_producto_activo_se_ve_en_la_tienda(self):
+        self._guardar(activa=True)
+        self.assertIn(self.producto.name, self._nombres_en_la_tienda())
+
+    def test_producto_desactivado_deja_de_verse_en_la_tienda(self):
+        self._guardar(activa=False)
+
+        self.variante.refresh_from_db()
+        self.assertFalse(self.variante.is_active)
+        self.assertNotIn(self.producto.name, self._nombres_en_la_tienda())
+        ficha = self.client.get(reverse('tienda:producto_detail', args=[self.producto.pk]))
+        self.assertEqual(ficha.status_code, 404)
+
+    def test_reactivarlo_lo_devuelve_a_la_tienda(self):
+        self._guardar(activa=False)
+        self._guardar(activa=True)
+        self.assertIn(self.producto.name, self._nombres_en_la_tienda())
+
+
 class KardexDesdeElFormularioDeProductoTests(CatalogAdminTestCase):
     """Editar el stock desde "Editar producto" debe dejar el mismo rastro
     en el kardex (`InventoryAdjustment`) que editarlo desde la pantalla de

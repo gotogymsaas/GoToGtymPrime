@@ -63,6 +63,11 @@ class RobotsYSitemapTests(TestCase):
         cls.producto = Product.objects.create(
             name='Producto seo', category=categoria, brand=marca, base_price=Decimal('90000'), stock=0,
         )
+        variante = ProductVariant.objects.create(product=cls.producto, sku='SEO-001-S-NEG', size='S', color='negro')
+        Inventory.objects.create(variant=variante, quantity_available=3)
+        cls.sin_variantes = Product.objects.create(
+            name='Producto seo sin variantes', category=categoria, brand=marca, base_price=Decimal('90000'), stock=0,
+        )
         autor = get_user_model().objects.create_user(email='seo@example.com', username='seo', password='x')
         cls.publicada = Post.objects.create(title='Entrada publica', author=autor, content='x', is_published=True)
         cls.borrador = Post.objects.create(title='Entrada borrador', author=autor, content='x', is_published=False)
@@ -88,6 +93,10 @@ class RobotsYSitemapTests(TestCase):
             self.assertIn(f'http://testserver{ruta}</loc>', xml, ruta)
         self.assertIn(f'/es/tienda/producto/{self.producto.pk}/</loc>', xml)
         self.assertIn(f'/es/blog/{self.publicada.slug}/</loc>', xml)
+
+    def test_sitemap_no_lista_productos_sin_variantes_activas(self):
+        xml = self.client.get('/sitemap.xml').content.decode()
+        self.assertNotIn(f'/es/tienda/producto/{self.sin_variantes.pk}/</loc>', xml)
 
     def test_sitemap_excluye_borradores_privado_politicas_y_otros_idiomas(self):
         xml = self.client.get('/sitemap.xml').content.decode()

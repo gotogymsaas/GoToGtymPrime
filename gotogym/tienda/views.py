@@ -8,6 +8,7 @@ from products.models import Product, ProductCategory, ProductMedia, ProductVaria
 
 from .catalog import (
     LOW_STOCK_THRESHOLD,
+    ORDEN_DEL_PANEL,
     available_filter_values,
     build_product_card,
     build_variant_matrix,
@@ -16,6 +17,7 @@ from .catalog import (
     product_features,
     product_gallery,
     size_guide_rows,
+    storefront_products,
     variant_stock,
 )
 
@@ -31,7 +33,7 @@ ORDER_OPTIONS = {
 
 def _catalog_queryset():
     return (
-        Product.objects
+        storefront_products()
         .select_related('category', 'brand')
         .prefetch_related(
             Prefetch('variants', queryset=catalog_variants_queryset()),
@@ -76,7 +78,10 @@ def producto_list(request):
     if precio_max:
         productos = productos.filter(base_price__lte=precio_max)
 
-    productos = productos.order_by(ORDER_OPTIONS.get(orden, 'id'))
+    if orden in ORDER_OPTIONS:
+        productos = productos.order_by(ORDER_OPTIONS[orden])
+    else:
+        productos = productos.order_by(*ORDEN_DEL_PANEL)
 
     paginator = Paginator(productos, PRODUCTS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get('page'))
@@ -143,7 +148,8 @@ def producto_detail(request, pk):
     related_products = (
         _catalog_queryset()
         .filter(category=producto.category)
-        .exclude(pk=producto.pk)[:4]
+        .exclude(pk=producto.pk)
+        .order_by(*ORDEN_DEL_PANEL)[:4]
     )
 
     context = {

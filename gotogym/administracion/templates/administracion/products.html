@@ -21,16 +21,40 @@
   </form>
 </div>
 {% endif %}
+{% if perms.inventory.change_inventory %}
+<div class="panel stat-form" style="margin-bottom: var(--space-4); display:flex; align-items:center; gap: var(--space-3); flex-wrap: wrap;">
+  <span>Inventario de todas las variantes</span>
+  <form method="post" action="{% url 'admin_inventory_bulk_set' %}" onsubmit="return confirm('¿Llevar a 0 el stock de todas las variantes? La tienda quedará sin unidades disponibles.');">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <input type="hidden" name="cantidad" value="0">
+    <button class="danger btn-sm" type="submit">Llevar todo a 0</button>
+  </form>
+  <form method="post" action="{% url 'admin_inventory_bulk_set' %}" onsubmit="return confirm('¿Dejar todas las variantes con 5 unidades? Se reemplaza el stock actual de cada una.');">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <input type="hidden" name="cantidad" value="5">
+    <button class="ghost btn-sm" type="submit">Precargar 5 unidades</button>
+  </form>
+</div>
+{% endif %}
 <form class="search" method="get">
   <input name="q" value="{{ query }}" placeholder="Buscar por nombre">
   <button type="submit">Buscar</button>
 </form>
+{% if puede_reordenar %}
+<p class="hint">Arrastra el asa <strong>⋮⋮</strong> de una fila para cambiar el orden en que aparecen los productos en la tienda.</p>
+<p class="hint" id="reorder-status" role="status" aria-live="polite"></p>
+{% elif query and perms.products.change_product %}
+<p class="hint">Quita la búsqueda para poder reordenar los productos.</p>
+{% endif %}
 <div class="panel">
   <table>
-    <thead><tr><th>Imagen</th><th>Producto</th><th>Categoría</th><th>Etiquetas</th><th>Precio</th><th>Stock</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
-    <tbody>
-      {% for product in page_obj %}
-      <tr>
+    <thead><tr>{% if puede_reordenar %}<th><span class="sr-only">Orden</span></th>{% endif %}<th>Imagen</th><th>Producto</th><th>Categoría</th><th>Etiquetas</th><th>Precio</th><th>Stock</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
+    <tbody id="products-body" data-reorder-url="{% url 'admin_products_reorder' %}" data-csrf="{{ csrf_token }}">
+      {% for product in products %}
+      <tr data-product-id="{{ product.pk }}">
+        {% if puede_reordenar %}<td class="drag-handle" draggable="true" title="Arrastrar para reordenar">⋮⋮</td>{% endif %}
         <td>{% if product.primary_image %}<img class="thumb" src="{{ product.primary_image.url }}" alt="{{ product.name }}">{% else %}<span class="empty-img">Sin imagen</span>{% endif %}</td>
         <td><strong>{{ product.name }}</strong><small>{{ product.brand.name|default:"Sin marca" }}</small></td>
         <td>{{ product.category.name }}</td>
@@ -61,9 +85,85 @@
           {% endif %}
         </td>
       </tr>
-      {% empty %}<tr><td colspan="8">No hay productos registrados.</td></tr>{% endfor %}
+      {% empty %}<tr><td colspan="9">No hay productos registrados.</td></tr>{% endfor %}
     </tbody>
   </table>
 </div>
-{% include "administracion/pagination.html" %}
+{% if puede_reordenar %}
+<script>
+(function () {
+  var body = document.getElementById('products-body');
+  var status = document.getElementById('reorder-status');
+  if (!body) return;
+  var dragged = null;
+  var before = [];
+  var dropped = false;
+
+  function rows() { return Array.from(body.querySelectorAll('tr[data-product-id]')); }
+  function say(text) { if (status) status.textContent = text; }
+  function restore(order) { order.forEach(function (row) { body.appendChild(row); }); }
+
+  body.addEventListener('dragstart', function (event) {
+    var handle = event.target.closest('.drag-handle');
+    if (!handle) return;
+    dragged = handle.closest('tr');
+    before = rows();
+    dropped = false;
+    dragged.classList.add('is-dragging');
+    event.dataTransfer.effectAllowed = 'move';
+    // Firefox no inicia el arrastre si no se fija algun dato.
+    event.dataTransfer.setData('text/plain', dragged.dataset.productId);
+    event.dataTransfer.setDragImage(dragged, 16, 16);
+  });
+
+  // La fila se mueve mientras se arrastra, hacia arriba o abajo de la fila
+  // sobre la que esta el cursor segun la mitad en que se encuentre.
+  body.addEventListener('dragover', function (event) {
+    if (!dragged) return;
+    event.preventDefault();
+    var target = event.target.closest('tr[data-product-id]');
+    if (!target || target === dragged) return;
+    var box = target.getBoundingClientRect();
+    var after = event.clientY > box.top + box.height / 2;
+    target.parentNode.insertBefore(dragged, after ? target.nextSibling : target);
+  });
+
+  body.addEventListener('drop', function (event) {
+    if (!dragged) return;
+    event.preventDefault();
+    dropped = true;
+  });
+
+  body.addEventListener('dragend', function () {
+    if (!dragged) return;
+    dragged.classList.remove('is-dragging');
+    dragged = null;
+    // Soltar fuera de la tabla o cancelar con Esc deja el orden como estaba.
+    if (!dropped) { restore(before); return; }
+    var now = rows();
+    if (now.every(function (row, i) { return row === before[i]; })) return;
+    save(now, before);
+  });
+
+  function save(order, previous) {
+    var data = new URLSearchParams();
+    order.forEach(function (row) { data.append('product_id', row.dataset.productId); });
+    say('Guardando el orden…');
+    fetch(body.dataset.reorderUrl, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'X-CSRFToken': body.dataset.csrf, 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: data.toString(),
+    }).then(function (response) {
+      // Una sesion vencida o sin permiso responde con una redireccion.
+      if (!response.ok || response.redirected) throw new Error('no guardado');
+      say('Orden guardado: la tienda ya lo muestra así.');
+    }).catch(function () {
+      restore(previous);
+      say('No se pudo guardar el orden; se restauró el anterior.');
+    });
+  }
+})();
+</script>
+{% endif %}
 {% endblock %}

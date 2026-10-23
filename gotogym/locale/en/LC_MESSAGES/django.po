@@ -3259,6 +3259,119 @@ msgstr ""
 "Set with a long-sleeve cropped jacket and leggings, blue-gray with a black "
 "stripe. For women, made of microfiber. Sizes S, M and L"
 
+msgid "Conjunto para caballero en negro con azul"
+msgstr "Men's black and blue set"
+
+msgid ""
+"Conjunto de chaqueta de cuello alto con paneles laterales azules, mas mallas"
+" negras con franjas azules en diagonal. Para caballero. Tallas S, M y L."
+msgstr ""
+"Set with a high-neck jacket with blue side panels, plus black tights with "
+"diagonal blue stripes. For men. Sizes S, M and L."
+
+msgid "Chaqueta gris con cremallera para caballero"
+msgstr "Men's gray zip jacket"
+
+msgid ""
+"Chaqueta gris para caballero con cierre de cremallera y paneles laterales "
+"negros. Cuello alto y manga larga. Tallas S, M y L."
+msgstr ""
+"Gray jacket for men with a zip closure and black side panels. High neck and "
+"long sleeves. Sizes S, M and L."
+
+msgid "Chaqueta blanca con estampado hexagonal para caballero"
+msgstr "Men's white jacket with hexagon print"
+
+msgid ""
+"Chaqueta blanca con estampado hexagonal, para caballero. Cierre de "
+"cremallera, cuello alto y manga larga. Hecha en licra con grafeno. Tallas S,"
+" M y L."
+msgstr ""
+"White jacket with a hexagon print, for men. Zip closure, high neck and long "
+"sleeves. Made of lycra with graphene. Sizes S, M and L."
+
+msgid "Conjunto negro con cuello mao para caballero"
+msgstr "Men's black Mao-collar set"
+
+msgid ""
+"Conjunto negro para caballero: chaqueta con cuello mao, cierre de botones, "
+"bolsillos y hombreras, mas pantalon negro. Tallas S, M y L."
+msgstr ""
+"Black set for men: jacket with a Mao collar, button closure, pockets and "
+"shoulder epaulettes, plus black trousers. Sizes S, M and L."
+
+msgid "Blazer negro para dama"
+msgstr "Black blazer for women"
+
+msgid ""
+"Blazer negro para dama con solapa, cierre de un boton y bolsillos laterales."
+" Manga larga con botones en el puno. Tallas S, M y L."
+msgstr ""
+"Black blazer for women with lapels, a one-button closure and side pockets. "
+"Long sleeves with buttons at the cuff. Sizes S, M and L."
+
+msgid "Chaqueta negra con paneles hexagonales para caballero"
+msgstr "Men's black jacket with hexagon panels"
+
+msgid ""
+"Chaqueta negra para caballero con cierre de cremallera con ribete blanco y "
+"paneles laterales con estampado hexagonal blanco. Cuello alto y manga larga."
+" Tallas S, M y L."
+msgstr ""
+"Black jacket for men with a zip closure with white piping and side panels "
+"with a white hexagon print. High neck and long sleeves. Sizes S, M and L."
+
+msgid "Top ombliguero naranja con estampado geometrico para dama"
+msgstr "Women's orange geometric print cropped top"
+
+msgid ""
+"Top ombliguero de manga larga con estampado geometrico naranja, cuello "
+"redondo y banda negra en la basta. Para dama. Tallas S, M y L."
+msgstr ""
+"Long-sleeve cropped top with an orange geometric print, round neck and a "
+"black band at the hem. For women. Sizes S, M and L."
+
+msgid "Top ombliguero blanco con estampado hexagonal para dama"
+msgstr "Women's white hexagon print cropped top"
+
+msgid ""
+"Top ombliguero blanco con estampado hexagonal, cuello alto con cierre de "
+"cremallera y manga corta. Para dama. Tallas S, M y L."
+msgstr ""
+"White cropped top with a hexagon print, high neck with a zip closure and "
+"short sleeves. For women. Sizes S, M and L."
+
+msgid "Top ombliguero gris con panel negro para dama"
+msgstr "Women's gray cropped top with black panel"
+
+msgid ""
+"Top ombliguero de manga larga en gris con panel negro en el busto y cuello "
+"redondo negro. Para dama. Tallas S, M y L."
+msgstr ""
+"Long-sleeve gray cropped top with a black bust panel and a black round neck."
+" For women. Sizes S, M and L."
+
+msgid "Camiseta blanca con estampado geometrico para caballero"
+msgstr "Men's white geometric print T-shirt"
+
+msgid ""
+"Camiseta blanca con estampado geometrico, para caballero. Manga corta, "
+"cuello alto, cierre de cremallera frontal y paneles laterales negros. Tallas"
+" S, M y L."
+msgstr ""
+"White T-shirt with a geometric print, for men. Short sleeves, high neck, "
+"front zip closure and black side panels. Sizes S, M and L."
+
+msgid "Chaqueta negra con mangas grises para dama"
+msgstr "Women's black jacket with gray sleeves"
+
+msgid ""
+"Chaqueta negra para dama con mangas grises, cierre de cremallera con ribete "
+"blanco y cuello alto. Tallas S, M y L."
+msgstr ""
+"Black jacket for women with gray sleeves, a zip closure with white piping "
+"and a high neck. Sizes S, M and L."
+
 msgid "Saco negro con gris para dama, talla S, elaborado en Microfibra."
 msgstr "Women's black and gray sweater, size S, made of microfiber."
 

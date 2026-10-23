@@ -233,3 +233,53 @@ class ImagenDeTarjetaTests(TiendaAutenticadaMixin, TestCase):
         card = next(c for c in response.context['cards'] if c['product'].pk == producto.pk)
         self.assertIsNone(card['image'])
         self.assertContains(response, 'placeholder.webp')
+
+
+class ProductoSinVariantesActivasTests(TiendaAutenticadaMixin, TestCase):
+    """El producto no tiene indicador de activo propio: lo que el panel
+    desactiva son sus variantes, y sin ninguna activa deja de mostrarse."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.categoria = ProductCategory.objects.create(name='Categoria inactivos')
+        cls.marca = Brand.objects.create(name='Marca inactivos')
+
+        cls.retirado = _crear_producto('Retirado de la tienda', cls.categoria, cls.marca)
+        _crear_variante(cls.retirado, 'INA-001-S-NEG', 'S', 'negro', 4)
+        ProductVariant.objects.filter(sku='INA-001-S-NEG').update(is_active=False)
+
+        cls.parcial = _crear_producto('Con una variante retirada', cls.categoria, cls.marca)
+        _crear_variante(cls.parcial, 'INA-002-S-NEG', 'S', 'negro', 4)
+        _crear_variante(cls.parcial, 'INA-002-M-NEG', 'M', 'negro', 4)
+        ProductVariant.objects.filter(sku='INA-002-M-NEG').update(is_active=False)
+
+    def test_el_listado_no_muestra_un_producto_sin_variantes_activas(self):
+        response = self.client.get(reverse('tienda:producto_list'))
+        nombres = [card['product'].name for card in response.context['cards']]
+        self.assertNotIn(self.retirado.name, nombres)
+        self.assertIn(self.parcial.name, nombres)
+
+    def test_la_busqueda_por_nombre_tampoco_lo_encuentra(self):
+        response = self.client.get(reverse('tienda:producto_list'), {'filtro': 'Retirado'})
+        self.assertEqual(response.context['total_resultados'], 0)
+
+    def test_la_ficha_responde_404(self):
+        response = self.client.get(reverse('tienda:producto_detail', args=[self.retirado.pk]))
+        self.assertEqual(response.status_code, 404)
+
+    def test_no_aparece_como_producto_relacionado(self):
+        response = self.client.get(reverse('tienda:producto_detail', args=[self.parcial.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['related_cards'], [])
+
+    def test_un_producto_con_alguna_variante_activa_sigue_visible(self):
+        response = self.client.get(reverse('tienda:producto_list'))
+        nombres = [card['product'].name for card in response.context['cards']]
+        self.assertIn(self.parcial.name, nombres)
+        ficha = self.client.get(reverse('tienda:producto_detail', args=[self.parcial.pk]))
+        self.assertEqual(ficha.status_code, 200)
+
+    def test_el_mapa_del_sitio_no_lo_lista(self):
+        xml = self.client.get('/sitemap.xml').content.decode()
+        self.assertNotIn(reverse('tienda:producto_detail', args=[self.retirado.pk]), xml)
+        self.assertIn(reverse('tienda:producto_detail', args=[self.parcial.pk]), xml)

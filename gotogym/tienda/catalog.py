@@ -4,7 +4,7 @@ Concentra el calculo de "que se muestra de un producto" (precio, tallas y
 colores con stock, imagen principal) para que las vistas de listado y de
 detalle partan de la misma fuente y no diverjan.
 """
-from django.db.models import Prefetch
+from django.db.models import Exists, OuterRef, Prefetch
 from django.utils.translation import gettext
 from products.models import Product, ProductMedia, ProductVariant
 
@@ -101,6 +101,25 @@ def catalog_variants_queryset():
     )
 
 
+# Orden en que el panel de Productos lista el catalogo y, sin otro criterio
+# elegido, la tienda: el que el admin define arrastrando filas.
+ORDEN_DEL_PANEL = ('sort_order', 'id')
+
+
+def storefront_products():
+    """Productos que la tienda puede mostrar: los que tienen al menos una
+    variante activa.
+
+    El producto no tiene un indicador de activo propio; lo que el panel
+    desactiva son sus variantes. Cuando todas quedan inactivas el producto
+    no tiene nada que vender y sale del listado, de la ficha y del mapa del
+    sitio. Se usa `Exists` y no un join para no duplicar filas ni forzar
+    `distinct()` en quien siga filtrando por variantes."""
+    return Product.objects.filter(
+        Exists(ProductVariant.objects.filter(product=OuterRef('pk'), is_active=True))
+    )
+
+
 def primary_image(product):
     return product.primary_image
 
@@ -187,7 +206,7 @@ def curated_product_cards(limit=4):
             variants__inventory__quantity_available__gt=0,
         )
         .distinct()
-        .order_by('-featured', 'id')[:limit]
+        .order_by('-featured', *ORDEN_DEL_PANEL)[:limit]
     )
     return [build_product_card(product) for product in products]
 

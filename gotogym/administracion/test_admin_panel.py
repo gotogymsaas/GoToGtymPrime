@@ -227,6 +227,46 @@ class InventarioAdminTests(PanelAdminBaseTestCase):
         self.assertContains(respuesta_valida, 'INV-001')
         self.assertNotContains(respuesta_valida, 'INV-002')
 
+    def test_llevar_todo_a_cero(self):
+        from inventory.models import InventoryAdjustment
+
+        respuesta = self.client.post(reverse('admin_inventory_bulk_set'), {'cantidad': '0'})
+
+        self.assertRedirects(respuesta, reverse('admin_products'))
+        self.assertFalse(Inventory.objects.exclude(quantity_available=0).exists())
+        ajuste = InventoryAdjustment.objects.get(inventory=self.inventario)
+        self.assertEqual((ajuste.delta, ajuste.quantity_after, ajuste.created_by), (-3, 0, self.staff))
+
+    def test_precargar_cinco_unidades_incluye_variantes_sin_inventario(self):
+        sin_inventario = ProductVariant.objects.create(
+            product=self.producto, sku='INV-003', size='S', color='Rojo',
+        )
+
+        self.client.post(reverse('admin_inventory_bulk_set'), {'cantidad': '5'})
+
+        self.assertFalse(Inventory.objects.exclude(quantity_available=5).exists())
+        self.assertTrue(Inventory.objects.filter(variant=sin_inventario).exists())
+
+    def test_ajuste_masivo_no_registra_variantes_que_ya_tenian_esa_cantidad(self):
+        from inventory.models import InventoryAdjustment
+
+        self.client.post(reverse('admin_inventory_bulk_set'), {'cantidad': '5'})
+        antes = InventoryAdjustment.objects.count()
+        self.client.post(reverse('admin_inventory_bulk_set'), {'cantidad': '5'})
+
+        self.assertEqual(InventoryAdjustment.objects.count(), antes)
+
+    def test_ajuste_masivo_rechaza_cantidades_fuera_de_las_permitidas(self):
+        self.client.post(reverse('admin_inventory_bulk_set'), {'cantidad': '999'})
+        self.inventario.refresh_from_db()
+        self.assertEqual(self.inventario.quantity_available, 3)
+
+    def test_usuario_sin_staff_no_puede_hacer_ajuste_masivo(self):
+        self.client.force_login(self.cliente)
+        self.client.post(reverse('admin_inventory_bulk_set'), {'cantidad': '0'})
+        self.inventario.refresh_from_db()
+        self.assertEqual(self.inventario.quantity_available, 3)
+
     def test_usuario_sin_staff_no_puede_actualizar_stock(self):
         self.client.force_login(self.cliente)
         respuesta = self.client.post(
