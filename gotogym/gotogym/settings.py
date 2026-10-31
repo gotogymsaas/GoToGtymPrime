@@ -109,6 +109,7 @@ TEMPLATES = [
                 'carrito.context_processors.cart_count',
                 'administracion.context_processors.compras_pausadas',
                 'administracion.context_processors.pagos_habilitados',
+                'blog.context_processors.journal_visibility',
             ],
         },
     },
@@ -335,6 +336,12 @@ ALEGRA_ITEM_GENERICO_ID = os.environ.get('ALEGRA_ITEM_GENERICO_ID', '')
 # Fecha (AAAA-MM-DD) desde la que `emitir_facturas_pendientes` factura pedidos
 # pagados que aun no tienen factura. Vacio: solo reintenta los ya intentados.
 ALEGRA_FACTURAR_DESDE = os.environ.get('ALEGRA_FACTURAR_DESDE', '')
+
+# Modo shadow del Journal: cuando está en False (por defecto), la sección no se
+# muestra en la navegación principal (menú superior, menú móvil) ni en enlaces
+# destacados del sitio, manteniéndose activa la app, sus rutas y su contenido en
+# segundo plano sin eliminar nada.
+JOURNAL_VISIBLE = _as_bool(os.environ.get('JOURNAL_VISIBLE'), False)
 
 # Monitoreo de errores (Sentry). La configuración de despliegue y el preflight
 # lo exigen en producción, pero su ausencia no debe impedir que la aplicación

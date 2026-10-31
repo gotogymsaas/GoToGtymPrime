@@ -263,7 +263,9 @@
       </div>
       <div class="science-cta__actions">
         <a class="editorial-action" href="{% url 'tienda:producto_list' %}">{% trans "Descubrir la colección" %}</a>
+        {% if journal_visible %}
         <a class="editorial-text-link" href="{% url 'blog:post_list' %}">{% trans "Leer el Journal" %}</a>
+        {% endif %}
       </div>
     </div>
   </section>

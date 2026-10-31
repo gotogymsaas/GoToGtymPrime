@@ -5,6 +5,7 @@ from pathlib import Path
 from blog.models import Category, Post
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from inventory.models import Inventory
 from products.models import Brand, Product, ProductCategory, ProductVariant
@@ -80,8 +81,14 @@ class LoggedHomeTests(TestCase):
         self.assertNotContains(response, self.post.title)
         self.assertNotContains(response, 'Historias para avanzar')
         self.assertContains(response, reverse('blog:post_list'))  # acceso desde el menu
+        self.assertNotContains(response, reverse('blog:post_list'))  # Journal en modo shadow
         self.assertContains(response, 'GoToGym Technology')
         self.assertNotContains(response, 'Vincularse como')
+
+    @override_settings(JOURNAL_VISIBLE=True)
+    def test_home_incluye_journal_en_menu_si_esta_habilitado(self):
+        response = self.client.get(reverse('home'))
+        self.assertContains(response, reverse('blog:post_list'))
 
     def test_home_limita_productos_y_prioriza_destacados(self):
         response = self.client.get(reverse('home'))

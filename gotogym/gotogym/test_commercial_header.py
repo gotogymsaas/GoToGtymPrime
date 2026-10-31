@@ -9,6 +9,7 @@ from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from inventory.models import Inventory
 from products.models import Brand, Product, ProductCategory, ProductVariant
@@ -52,7 +53,14 @@ class CommercialHeaderTests(TestCase):
                 navegacion = self._navegacion(self._html(url))
                 self.assertIn(reverse('tienda:producto_list'), navegacion)
                 self.assertIn(reverse('blog:post_list'), navegacion)
+                self.assertNotIn(reverse('blog:post_list'), navegacion)
                 self.assertIn(reverse('contacto'), navegacion)
+
+    @override_settings(JOURNAL_VISIBLE=True)
+    def test_journal_aparece_en_navegacion_cuando_esta_habilitado(self):
+        self.client.force_login(self.user)
+        navegacion = self._navegacion(self._html(reverse('home')))
+        self.assertIn(reverse('blog:post_list'), navegacion)
 
     def test_la_pagina_actual_se_marca_en_la_navegacion(self):
         self.client.force_login(self.user)

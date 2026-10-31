@@ -80,7 +80,9 @@
     {% endcomment %}
     <ul class="gtg-nav-links">
       <li><a href="{% url 'tienda:producto_list' %}"{% if request.resolver_match.url_name == 'producto_list' %} aria-current="page"{% endif %}>{% trans "Tienda" %}</a></li>
+      {% if journal_visible %}
       <li><a href="{% url 'blog:post_list' %}"{% if request.resolver_match.url_name == 'post_list' %} aria-current="page"{% endif %}>Journal</a></li>
+      {% endif %}
       <li><a href="{% url 'acerca_de' %}"{% if request.resolver_match.url_name == 'acerca_de' %} aria-current="page"{% endif %}>{% trans "Acerca de" %}</a></li>
       <li><a href="{% url 'contacto' %}"{% if request.resolver_match.url_name == 'contacto' %} aria-current="page"{% endif %}>{% trans "Contacto" %}</a></li>
     </ul>
@@ -191,7 +193,9 @@
       <button type="submit">{% trans "Buscar" %}</button>
     </form>
     <a href="{% url 'tienda:producto_list' %}">{% trans "Tienda" %}</a>
+    {% if journal_visible %}
     <a href="{% url 'blog:post_list' %}">Journal</a>
+    {% endif %}
     <a href="{% url 'acerca_de' %}">{% trans "Acerca de" %}</a>
     <a href="{% url 'contacto' %}">{% trans "Contacto" %}</a>
     {% if user.is_authenticated %}
