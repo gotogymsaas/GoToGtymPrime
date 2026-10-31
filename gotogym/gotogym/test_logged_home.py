@@ -4,7 +4,6 @@ from pathlib import Path
 
 from blog.models import Category, Post
 from django.contrib.auth import get_user_model
-from django.test import TestCase
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from inventory.models import Inventory
