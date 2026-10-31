@@ -231,6 +231,16 @@
     encolar('add_to_cart', (evento.detail || {}));
   });
 
+  // --- Asistente de compras ----------------------------------------------
+  // vendedor.js avisa con `gtg:track`. Solo se aceptan eventos del asistente,
+  // y sus propiedades son categorias y numeros: nunca el texto de un mensaje.
+  document.addEventListener('gtg:track', function (evento) {
+    var datos = evento.detail || {};
+    if (typeof datos.nombre === 'string' && datos.nombre.indexOf('vendedor_') === 0) {
+      encolar(datos.nombre, datos.propiedades || {});
+    }
+  });
+
   // --- Entrega final -----------------------------------------------------
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'hidden') enviar();

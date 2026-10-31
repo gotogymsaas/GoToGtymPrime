@@ -1,0 +1,12 @@
+{
+  "reply": "",
+  "ui_actions": [],
+  "product_cards": [],
+  "handoff": null,
+  "meta": {
+    "agents_used": [],
+    "evidence_refs": [],
+    "status": "error",
+    "retry_after_seconds": 20
+  }
+}

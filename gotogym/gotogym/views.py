@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils.translation import get_language, gettext
 from django.utils.translation import gettext as _
 from tienda.catalog import curated_product_cards
+from vendedor.exposicion import asistente_activo
 
 from . import politicas_contenido as politicas_es
 from . import politicas_contenido_en as politicas_en
@@ -105,11 +106,17 @@ def _policy_page(request, policy_key, nombre):
     (traduccion de cortesia)."""
     modulo = politicas_en if get_language() == 'en' else politicas_es
     politica = getattr(modulo, nombre)
+    secciones = list(politica['sections'])
+    # El asistente de IA envia datos a un servicio externo: mientras este
+    # apagado no hay nada que declarar, y al encenderlo la politica debe
+    # decirlo en el mismo momento.
+    if asistente_activo() and nombre in modulo.ASISTENTE_IA:
+        secciones.append(modulo.ASISTENTE_IA[nombre])
     return render(request, 'static_pages/policy_page.html', {
         'title': politica['title'],
         'policy_key': policy_key,
         'summary': politica['summary'],
-        'sections': politica['sections'],
+        'sections': secciones,
         'back_url': reverse('home'),
     })
 

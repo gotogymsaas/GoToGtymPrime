@@ -1,0 +1,52 @@
+{
+  "request_id": "3f1b9c5e-7a52-4c1d-9a38-0b6f2d4e8a10",
+  "conversation_id": "shop-8d2f6a4c-1b3e-4f7a-a5c9-2e0d7b9f1c34",
+  "locale": "es",
+  "message": "Busco leggins para entrenar, talla M, hasta 450 mil",
+  "visitor": {"subject": "shop_v_9c1e4a7b2d5f8031a6b4c7e9d2f50138", "authenticated": false},
+  "page": {"url_name": "tienda:producto_detail", "product_id": 12, "variant_id": 31, "filtro": ""},
+  "cart": {
+    "count": 1,
+    "subtotal": "400000.00",
+    "lines": [
+      {"variant_id": 31, "qty": 1, "sku": "LEG-GRIS-M", "unit_price": "400000.00", "available": 5}
+    ]
+  },
+  "shop_flags": {"purchases_paused": false, "payments_live": false, "currency": "COP"},
+  "evidence": {
+    "candidates": [
+      {
+        "product_id": 12,
+        "name": "Leggins Quantum",
+        "price": "400000.00",
+        "description": "Leggins color gris, tallas S, M y L. Hecho en microfibra.",
+        "url": "/es/tienda/producto/12/",
+        "variants": [
+          {"id": 30, "size": "S", "color": "gris", "price": "400000.00", "available": 2},
+          {"id": 31, "size": "M", "color": "gris", "price": "400000.00", "available": 5}
+        ]
+      }
+    ],
+    "policies": [
+      {
+        "key": "cambios",
+        "title": "Cambios",
+        "text": "Puedes solicitar el cambio de talla o color dentro de los 15 días calendario siguientes a la entrega.",
+        "version": "octubre de 2026",
+        "review_status": "validated"
+      },
+      {
+        "key": "devoluciones_reembolso",
+        "title": "Reembolso",
+        "text": "Texto del reembolso pendiente de revisión jurídica.",
+        "version": "octubre de 2026",
+        "review_status": "pending_review"
+      }
+    ],
+    "claims_policy": {
+      "version": "sha256:0f4a9c1e",
+      "prohibited": ["secado rápido", "protección solar", "antimicrobian"]
+    }
+  },
+  "timestamp": 1790000000
+}

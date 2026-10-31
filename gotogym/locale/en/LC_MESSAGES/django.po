@@ -3733,3 +3733,118 @@ msgstr "Go to the store →"
 msgid "Contactar soporte →"
 msgstr "Contact support →"
 
+# Quantum Coach, la IA de GoToGym (app vendedor).
+
+msgid "Abrir Quantum Coach, la IA de GoToGym"
+msgstr "Open Quantum Coach, GoToGym's AI"
+
+msgid "IA"
+msgstr "AI"
+
+msgid "La IA de GoToGym"
+msgstr "GoToGym's AI"
+
+msgid "Empezar una conversación nueva"
+msgstr "Start a new conversation"
+
+msgid "Cerrar Quantum Coach"
+msgstr "Close Quantum Coach"
+
+msgid "Soy una IA y puedo equivocarme: confirma el precio y la disponibilidad en la ficha del producto."
+msgstr "I'm an AI and I can make mistakes: please confirm the price and availability on the product page."
+
+msgid "Cómo tratamos tus datos"
+msgstr "How we handle your data"
+
+msgid "Entendido"
+msgstr "Got it"
+
+msgid "Conversación con Quantum Coach"
+msgstr "Conversation with Quantum Coach"
+
+msgid "Hola, soy Quantum Coach, la IA de GoToGym. Te ayudo a elegir prendas y tallas, y a resolver dudas sobre envíos y políticas de la tienda."
+msgstr "Hi, I'm Quantum Coach, GoToGym's AI. I help you choose items and sizes, and answer questions about shipping and store policies."
+
+msgid "Sugerencias para empezar"
+msgstr "Suggestions to get started"
+
+msgid "Quiero algo para entrenar"
+msgstr "I want something to train in"
+
+msgid "¿Qué talla me conviene?"
+msgstr "Which size suits me?"
+
+msgid "¿Cómo funcionan los envíos?"
+msgstr "How does shipping work?"
+
+msgid "Quantum Coach está pensando…"
+msgstr "Quantum Coach is thinking…"
+
+msgid "Reintentar"
+msgstr "Try again"
+
+msgid "Hablar con una persona"
+msgstr "Talk to a person"
+
+msgid "Escribe tu mensaje"
+msgstr "Write your message"
+
+msgid "Pregunta por productos, tallas o envíos"
+msgstr "Ask about products, sizes or shipping"
+
+msgid "Enviar"
+msgstr "Send"
+
+msgid "Tú"
+msgstr "You"
+
+msgid "Agregado"
+msgstr "Added"
+
+msgid "Agregado al carrito."
+msgstr "Added to your cart."
+
+msgid "No se pudo agregar al carrito."
+msgstr "Could not add it to your cart."
+
+msgid "Quantum Coach no está disponible en este momento. Puedes escribirnos desde Contacto."
+msgstr "Quantum Coach is not available right now. You can write to us from Contact."
+
+msgid "Quantum Coach tardó demasiado en responder. Intenta de nuevo."
+msgstr "Quantum Coach took too long to answer. Please try again."
+
+msgid "No pude responder esta vez. Intenta de nuevo."
+msgstr "I couldn't answer this time. Please try again."
+
+msgid "Espera unos segundos antes de enviar otro mensaje."
+msgstr "Wait a few seconds before sending another message."
+
+msgid "Llegaste al límite de mensajes de esta conversación. Empieza una nueva o habla con una persona."
+msgstr "You've reached the message limit for this conversation. Start a new one or talk to a person."
+
+msgid "Alcanzaste el límite de mensajes de hoy. Vuelve mañana o escríbenos desde Contacto."
+msgstr "You've reached today's message limit. Come back tomorrow or write to us from Contact."
+
+msgid "Tu mensaje está vacío o es demasiado largo."
+msgstr "Your message is empty or too long."
+
+msgid "No pude dar una respuesta confiable a esa pregunta. Reformúlala o habla con una persona."
+msgstr "I couldn't give a reliable answer to that question. Rephrase it or talk to a person."
+
+msgid "No hay conexión. Revisa tu internet e intenta de nuevo."
+msgstr "There's no connection. Check your internet and try again."
+
+msgid "Tu sesión de seguridad venció. Recarga la página e intenta de nuevo."
+msgstr "Your security session has expired. Reload the page and try again."
+
+#, python-format
+msgid "Agregar %(talla)s · %(color)s al carrito"
+msgstr "Add %(talla)s · %(color)s to cart"
+
+#, python-format
+msgid "Ver %(nombre)s"
+msgstr "View %(nombre)s"
+
+msgid "Ir al pago"
+msgstr "Go to checkout"
+

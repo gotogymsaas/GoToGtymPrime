@@ -52,6 +52,13 @@ Las lee `gotogym/gotogym/settings.py`. Con `DEBUG` apagado y sin `DJANGO_SECRET_
 | `TRUSTED_PROXY_HOPS` | Proxies de confianza delante de la aplicación (1 en producción) para obtener la IP real del cliente | Sin declarar (usa 1) |
 | `RATE_LIMIT_ENABLED` | Límite de intentos de acceso y de uso (por defecto activo) | Sin declarar |
 | `ORDER_PAYMENT_WINDOW_HOURS` | Horas antes de cancelar un pedido sin pagar (48) | Sin declarar |
+| `VENDEDOR_ENABLED` | Corte técnico de emergencia de Quantum Coach, la IA de GoToGym. Por defecto `true`: quien decide si se usa es el administrador, con el interruptor «Habilitar Coach» del panel. En `false` no hay botón, ni panel, ni ruta aunque el panel lo habilite. Ver [Quantum Coach](#quantum-coach-la-ia-de-gotogym) | Sin declarar (encendido) |
+| `COACH_API_URL`, `COACH_SERVICE_KEY_ID`, `COACH_SERVICE_SECRET` | Servicio de IA (Coach) al que la tienda envía los mensajes del asistente, y la credencial de servicio con la que los firma | Faltan |
+| `VENDEDOR_RATE_ANON`, `VENDEDOR_RATE_AUTH`, `VENDEDOR_MAX_TURNOS`, `VENDEDOR_MAX_MENSAJES_DIA` | Límites de uso del asistente: mensajes por minuto (anónimos y con sesión), por conversación y por día. Por defecto 6, 12, 30 y 100 | Sin declarar |
+| `VENDEDOR_TIMEOUT_SECONDS` | Espera máxima al Coach, en segundos (15). Cada turno ocupa un worker de gunicorn mientras tanto | Sin declarar |
+| `VENDEDOR_ROLLOUT_PERCENT` | Porcentaje de visitantes que ven el asistente, de 0 a 100 (100). Permite un piloto y un grupo de control | Sin declarar |
+| `VENDEDOR_POLITICAS_PENDIENTES` | Claves de política (`cambios`, `devoluciones`, `garantia`, `envios`, `pagos`) cuyo texto aún no valida la asesoría jurídica: el asistente no las cita. Por defecto `devoluciones` | Sin declarar |
+| `VENDEDOR_COACH_SIMULADO` | Responde con un Coach simulado y rotulado como tal. Solo vale por defecto en desarrollo y pruebas; **nunca** debe activarse en producción | Sin declarar |
 | `RECURSOS_AFILIADOS_ROOT` | Carpeta del material de marca de afiliados | Sin declarar |
 
 Plantilla completa: `environments/azure/.env.release.example`.
@@ -100,6 +107,30 @@ Los enlaces de los correos de pedidos y afiliados se arman con `SITIO_URL`; el d
 - La cancelación automática de pedidos sin pagar (y su correo) solo se ejecuta cuando alguien abre el checkout. Hasta que `cancelar_pedidos_vencidos` se programe cada hora (ver Tareas periódicas), el aviso puede salir mucho después de las 48 horas en una tienda con poco tráfico.
 - El dominio publica **dos registros SPF**; solo puede haber uno. Debe quedar el que incluye `spf.protection.outlook.com` y `spf.azurecomm.net`, y borrarse el que solo incluye `spf.protection.outlook.com`. Se corrige en GoDaddy.
 - Con `PAYMENT_PROVIDER` sin declarar el pago es simulado y `PAYMENTS_MOCK_UI_ENABLED` está apagado: en producción no hay forma de aprobar un pago, así que la confirmación de pedido no se puede ejercitar hasta configurar Mercado Pago (o encender el panel de simulación de forma temporal, que `security_checklist` marca como hallazgo mientras esté activo).
+
+## Quantum Coach, la IA de GoToGym
+
+La inteligencia de Quantum Coach vive en el Coach (otro servicio); en la tienda se ve como el botón «Coach» a la izquierda del buscador y un panel lateral. La tienda pone la interfaz y sigue siendo la única fuente de verdad de precios, existencias, cupones y políticas: por cada mensaje arma un paquete acotado con datos del servidor, lo firma, lo envía al Coach y valida lo que vuelve. El navegador nunca habla con el Coach, y el asistente solo propone acciones: es el navegador, con los permisos del propio visitante, quien las ejecuta con los endpoints existentes del carrito. El contrato y sus ejemplos están en `gotogym/vendedor/ejemplos/`.
+
+**Qué viaja al Coach:** el mensaje, la página que mira el visitante, su carrito (productos, cantidades, precios), hasta 8 productos con existencias reales, las políticas con su versión, la lista de afirmaciones prohibidas y un identificador seudonimizado. **No viaja** correo, teléfono, documento, dirección, datos de pago ni códigos de afiliado. Tope: 24 KB por solicitud.
+
+**Quién lo enciende o lo apaga:** el administrador, con el interruptor «Habilitar Coach» de la barra superior del panel (reemplaza al de «Compras activas», que ya no existe). Apagado, el botón desaparece de la tienda y la ruta responde 404 al instante, sin desplegar. Viene habilitado por defecto, pero el asistente solo aparece si además hay un servicio de IA configurado (`COACH_API_URL`): sin él un cliente vería un botón que solo dice «no disponible». Al desplegar, la migración `administracion.0007` agrega el ajuste y, si la base tenía las compras en pausa, las reanuda (el interruptor de pausa salió del panel y nadie podría reanudarlas).
+
+**Apagado de emergencia:** `VENDEDOR_ENABLED=false` en la configuración de la aplicación. Gana sobre el panel; no hace falta desplegar código, pero App Service reinicia la aplicación al cambiar la configuración. Si el Coach falla, el panel lo dice y ofrece reintentar o ir a Contacto; tras 5 fallos seguidos la tienda deja de llamarlo durante un minuto para no ocupar sus dos workers.
+
+**Firma:** cada solicitud lleva `X-Coach-Key-Id`, `X-Coach-Timestamp` y `X-Coach-Signature` (HMAC-SHA256 de `marca.cuerpo`). El Coach rechaza marcas con más de 60 segundos de diferencia, así que ambos servidores deben tener la hora sincronizada. Para rotar el secreto, cambiarlo en el Coach y en `COACH_SERVICE_SECRET`; mientras difieran, el panel mostrará un error y el registro mostrará `el Coach respondio HTTP 401`.
+
+**Probar sin el Coach real:** `python gotogym/manage.py vendedor_simular_coach` levanta un Coach simulado en el puerto 8002 (el 8001 queda libre para el real) que verifica la firma y el contrato. Apuntar `COACH_API_URL=http://127.0.0.1:8002/api/commerce/agent/message/` con la misma clave y secreto. Modos: `--modo ok|error|malicioso|lento|caido`. Sin `COACH_API_URL`, en desarrollo el asistente responde con un Coach simulado interno, rotulado como tal.
+
+**Medición:** los eventos `vendedor_open`, `vendedor_message`, `vendedor_product_click`, `vendedor_add_to_cart`, `vendedor_handoff` y `vendedor_error` solo se registran con consentimiento de cookies y nunca llevan el texto de un mensaje. El grupo de cada visitante (con asistente o de control) se calcula a partir de su hash de visitante, el mismo que llevan los demás eventos, incluido `order_created`; la fórmula está en `gotogym/vendedor/exposicion.py`.
+
+**Antes de configurar `COACH_API_URL` en producción** (es lo que hace visible el asistente a visitantes reales):
+
+1. El Coach publicado, con su rol de comercio, y probado contra los ejemplos de `gotogym/vendedor/ejemplos/`.
+2. Un canal de atención con número de radicado, fecha y hora para el traspaso a una persona; hoy la página de Contacto solo ofrece correo y teléfono.
+3. La asesoría jurídica ha revisado el texto del asistente en las políticas de privacidad y de tratamiento de datos, y el plazo de reembolso de la política de devoluciones. Mientras ese plazo no se valide, `VENDEDOR_POLITICAS_PENDIENTES` debe incluir `devoluciones`.
+4. Decidido cuánto tiempo conserva el Coach las conversaciones, y reflejado en la política de tratamiento de datos.
+5. Empezar con `VENDEDOR_ROLLOUT_PERCENT` bajo y revisar transcripciones, latencia y errores antes de subirlo.
 
 ## Registro de errores
 

@@ -291,3 +291,35 @@ COOKIES = {
         ]},
     ],
 }
+
+# Seccion que se suma a la politica de tratamiento de datos y a la de
+# privacidad solo cuando Quantum Coach esta activo (`asistente_activo`): hasta
+# entonces no existe y no hay nada que explicar. Lo que dice aqui describe lo
+# que el codigo hace (ver `vendedor/paquete.py`); el plazo que el servicio de
+# IA conserva las conversaciones aun no esta decidido, y este texto debe
+# revisarlo la asesoria juridica antes de abrir Coach al publico.
+ASISTENTE_IA = {
+    'TRATAMIENTO_DATOS': {'title': 'Quantum Coach, la inteligencia artificial de GoToGym', 'paragraphs': [
+        'La tienda ofrece Quantum Coach, una inteligencia artificial de GoToGym que te ayuda a elegir '
+        'productos y a resolver dudas. Usarla es opcional: puedes explorar y comprar sin ella.',
+        'Cuando le escribes, se envía a un servicio de inteligencia artificial de GoToGym el texto de '
+        'tu mensaje, la página que estás viendo, el contenido de tu carrito (productos, cantidades y '
+        'precios), información pública del catálogo y de nuestras políticas, y un identificador '
+        'seudonimizado que no permite reconocerte directamente.',
+        'No se envían tu correo electrónico, teléfono, documento de identidad, dirección ni datos de '
+        'pago. Tampoco los escribas en el chat: Coach no los necesita.',
+        'La tienda no guarda el texto de tus mensajes en su base de datos. El historial que ves en el '
+        'panel se conserva solo en tu navegador mientras la pestaña esté abierta. El servicio de '
+        'inteligencia artificial procesa la conversación para poder responderte y continuarla.',
+        'Coach solo propone acciones, como agregar un producto al carrito; tú decides si las '
+        'ejecutas. Puede equivocarse: confirma siempre el precio y la disponibilidad en la ficha del '
+        'producto.',
+        f'Para ejercer tus derechos sobre estos datos escribe a {CORREO_PRIVACIDAD}.',
+    ]},
+    'PRIVACIDAD': {'title': 'Quantum Coach', 'paragraphs': [
+        'Si usas Quantum Coach, la inteligencia artificial de GoToGym, tus mensajes y el contenido de tu '
+        'carrito se procesan en un servicio de inteligencia artificial de GoToGym, sin tu correo, '
+        'teléfono, documento ni dirección. El detalle está en la política de tratamiento de datos '
+        'personales.',
+    ]},
+}

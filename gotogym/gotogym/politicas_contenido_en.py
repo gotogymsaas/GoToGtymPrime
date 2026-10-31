@@ -287,3 +287,31 @@ COOKIES = {
         ]},
     ],
 }
+
+# Section added to the data processing and privacy policies only when
+# Quantum Coach is active (`asistente_activo`). Courtesy translation of
+# `politicas_contenido.ASISTENTE_IA`; the Spanish text prevails.
+ASISTENTE_IA = {
+    'TRATAMIENTO_DATOS': {'title': "Quantum Coach, GoToGym's artificial intelligence", 'paragraphs': [
+        'The store offers Quantum Coach, a GoToGym artificial intelligence that helps you choose '
+        'products and answers your questions. Using it is optional: you can browse and buy without it.',
+        'When you write to it, the following is sent to a GoToGym artificial intelligence service: the '
+        'text of your message, the page you are viewing, the contents of your cart (products, '
+        'quantities and prices), public catalog and policy information, and a pseudonymized identifier '
+        'that does not identify you directly.',
+        'Your email, phone number, ID document, address and payment details are not sent. Please do not '
+        'type them in the chat either: Coach does not need them.',
+        'The store does not keep the text of your messages in its database. The history you see in the '
+        'panel is kept only in your browser while the tab stays open. The artificial intelligence '
+        'service processes the conversation so it can answer you and continue it.',
+        'Coach only suggests actions, such as adding a product to your cart; you decide whether '
+        'to carry them out. It can be wrong: always confirm the price and availability on the product '
+        'page.',
+        f'To exercise your rights over this data, write to {CORREO_PRIVACIDAD}.',
+    ]},
+    'PRIVACIDAD': {'title': 'Quantum Coach', 'paragraphs': [
+        "If you use Quantum Coach, GoToGym's artificial intelligence, your messages and the contents of "
+        'your cart are processed by a GoToGym artificial intelligence service, without your email, phone '
+        'number, ID document or address. The details are in the personal data processing policy.',
+    ]},
+}

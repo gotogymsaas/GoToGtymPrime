@@ -1,5 +1,5 @@
 from django.db import models
-from gotogym.ajustes_tienda import compras_pausadas, pagos_habilitados
+from gotogym.ajustes_tienda import coach_habilitado, compras_pausadas, pagos_habilitados
 
 
 class PanelSettings(models.Model):
@@ -27,6 +27,10 @@ class PanelSettings(models.Model):
         default=True,
         help_text="Si está desactivado, el checkout no abre pagos nuevos con Mercado Pago. Los pagos ya iniciados se siguen confirmando.",
     )
+    coach_enabled = models.BooleanField(
+        default=True,
+        help_text="Si está desactivado, Quantum Coach (la IA de GoToGym) no se muestra en la tienda.",
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -52,3 +56,8 @@ class PanelSettings(models.Model):
         """Igual que `compras_pausadas`: sin fila todavia, los pagos estan
         habilitados (el valor por defecto)."""
         return pagos_habilitados()
+
+    @classmethod
+    def coach_habilitado(cls):
+        """Igual que las anteriores: sin fila todavia, el Coach esta habilitado."""
+        return coach_habilitado()

@@ -1,9 +1,11 @@
-"""Pausa de compras: el interruptor del panel bloquea carrito y checkout sin
-tocar el stock, y reanudar deja la tienda vendiendo con lo que habia."""
+"""Pausa de compras: con el ajuste activo, carrito y checkout se bloquean sin tocar
+el stock. El interruptor ya no esta en el panel (lo reemplazo el del Coach); estas
+pruebas fijan las protecciones, que siguen vigentes si el ajuste se activa."""
 from decimal import Decimal
 
 from django.urls import reverse
-from inventory.models import Inventory, InventoryAdjustment
+from django.utils import timezone
+from inventory.models import Inventory
 from orders.services import CheckoutError, create_order_from_cart
 from products.models import Product, ProductCategory, ProductVariant
 
@@ -21,34 +23,12 @@ class PausaDeComprasTests(PanelAdminBaseTestCase):
         cls.inventario = Inventory.objects.create(variant=cls.variante, quantity_available=7)
 
     def _pausar(self, valor='1'):
-        return self.client.post(reverse('admin_store_pause_toggle'), {'pausar': valor})
+        ajustes = PanelSettings.load()
+        ajustes.purchases_paused = valor == '1'
+        ajustes.purchases_paused_at = timezone.now() if valor == '1' else None
+        ajustes.save()
 
     def test_por_defecto_las_compras_estan_activas(self):
-        self.assertFalse(PanelSettings.compras_pausadas())
-
-    def test_pausar_y_reanudar_no_modifica_el_stock_ni_el_kardex(self):
-        self._pausar('1')
-        self.assertTrue(PanelSettings.compras_pausadas())
-        self.assertIsNotNone(PanelSettings.load().purchases_paused_at)
-        self._pausar('0')
-        self.assertFalse(PanelSettings.compras_pausadas())
-        self.assertIsNone(PanelSettings.load().purchases_paused_at)
-        self.inventario.refresh_from_db()
-        self.assertEqual(self.inventario.quantity_available, 7)
-        self.assertFalse(InventoryAdjustment.objects.exists())
-
-    def test_el_panel_muestra_el_interruptor_con_su_confirmacion(self):
-        respuesta = self.client.get(reverse('admin_dashboard'))
-        self.assertContains(respuesta, 'Compras activas')
-        self.assertContains(respuesta, '¿Pausar las compras?')
-        self._pausar('1')
-        respuesta = self.client.get(reverse('admin_dashboard'))
-        self.assertContains(respuesta, 'Compras en pausa')
-        self.assertContains(respuesta, '¿Reanudar las compras?')
-
-    def test_cliente_no_puede_pausar_las_compras(self):
-        self.client.force_login(self.cliente)
-        self._pausar('1')
         self.assertFalse(PanelSettings.compras_pausadas())
 
     def test_pausadas_no_se_puede_agregar_al_carrito(self):

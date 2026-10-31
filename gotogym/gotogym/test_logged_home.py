@@ -79,7 +79,6 @@ class LoggedHomeTests(TestCase):
         self.assertContains(response, 'Campo', count=0)
         self.assertNotContains(response, self.post.title)
         self.assertNotContains(response, 'Historias para avanzar')
-        self.assertContains(response, reverse('blog:post_list'))  # acceso desde el menu
         self.assertNotContains(response, reverse('blog:post_list'))  # Journal en modo shadow
         self.assertContains(response, 'GoToGym Technology')
         self.assertNotContains(response, 'Vincularse como')

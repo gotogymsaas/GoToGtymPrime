@@ -1,0 +1,707 @@
+/* Quantum Coach, la IA de GoToGym: orbe, boton de la barra y panel lateral.
+ *
+ * Solo usa los tokens de style.css y tokens.css; no define colores nuevos.
+ * Las mezclas translucidas se hacen con color-mix() sobre esos tokens, y cada
+ * una lleva antes un valor de respaldo para navegadores sin color-mix().
+ *
+ * Lenguaje visual: el del lente gravitacional Quantum del sitio (ver
+ * quantum_lens.css). Un nucleo oscuro con halo turquesa, un anillo punteado
+ * que gira despacio y una particula en orbita. El dorado queda para la
+ * etiqueta "IA" y los precios, como en el resto de la tienda.
+ *
+ * Capas: el panel (80) y su velo (79) van por encima de la barra (50), del menu
+ * movil (60) y del mini-carrito (70). Por eso la confirmacion de "agregado al
+ * carrito" la muestra el propio panel: el mini-carrito quedaria debajo.
+ *
+ * Movimiento: la regla global de style.css para prefers-reduced-motion reduce
+ * a nada las animaciones y transiciones de esta hoja; el orbe queda quieto.
+ */
+
+/* Ancho del panel en escritorio: un tercio de la pantalla. El minimo evita que
+ * en pantallas chicas se vuelva angosto; el maximo, que en pantallas enormes
+ * las lineas de texto se hagan ilegibles. Lo usa tambien la regla que acomoda
+ * el banner de cookies junto al panel. */
+:root {
+  --coach-ancho: clamp(380px, 33.333vw, 960px);
+}
+
+/* --- Orbe ------------------------------------------------------------------ */
+
+.coach-orb {
+  --orb: 28px;
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: var(--orb);
+  height: var(--orb);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--color-bg-base) 0 26%,
+    var(--color-zafiro) 56%,
+    var(--color-accent-soft) 80%,
+    transparent 100%
+  );
+  box-shadow: 0 0 calc(var(--orb) * 0.45) var(--color-accent-soft);
+  animation: coach-respira 6s ease-in-out infinite;
+}
+
+/* Anillo punteado: el arco del lente. */
+.coach-orb::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px dashed var(--color-accent);
+  border-radius: 50%;
+  opacity: 0.85;
+  animation: coach-orbita 28s linear infinite;
+}
+
+/* Particula en orbita: un punto claro sobre el anillo que da la vuelta. */
+.coach-orb::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 0, var(--color-premium-white) 0 1.5px, transparent 2.6px);
+  filter: drop-shadow(0 0 3px var(--color-accent));
+  animation: coach-orbita 9s linear infinite;
+}
+
+.coach-orb--sm { --orb: 24px; }
+.coach-orb--md { --orb: 30px; }
+.coach-orb--lg { --orb: 44px; }
+
+/* Mientras el Coach piensa, todo gira mas rapido. */
+.coach-orb--busy,
+.coach-orb--busy::before,
+.coach-orb--busy::after {
+  animation-duration: 2.4s;
+}
+
+/* Borde luminoso: el "horizonte" del lente, mas intenso que el respaldo. */
+@supports (background: color-mix(in srgb, red, blue)) {
+  .coach-orb {
+    background: radial-gradient(
+      circle,
+      var(--color-bg-base) 0 24%,
+      color-mix(in srgb, var(--color-zafiro) 80%, var(--color-accent)) 52%,
+      color-mix(in srgb, var(--color-accent) 70%, transparent) 76%,
+      transparent 100%
+    );
+    box-shadow: 0 0 calc(var(--orb) * 0.55) color-mix(in srgb, var(--color-accent) 50%, transparent);
+  }
+}
+
+@keyframes coach-orbita { to { transform: rotate(360deg); } }
+
+@keyframes coach-respira {
+  0%, 100% { box-shadow: 0 0 calc(var(--orb) * 0.35) var(--color-accent-soft); }
+  50% { box-shadow: 0 0 calc(var(--orb) * 0.75) var(--color-accent-soft); }
+}
+
+@supports (background: color-mix(in srgb, red, blue)) {
+  @keyframes coach-respira {
+    0%, 100% { box-shadow: 0 0 calc(var(--orb) * 0.4) color-mix(in srgb, var(--color-accent) 40%, transparent); }
+    50% { box-shadow: 0 0 calc(var(--orb) * 0.85) color-mix(in srgb, var(--color-accent) 62%, transparent); }
+  }
+}
+
+/* --- Boton de la barra ---------------------------------------------------------- */
+
+.gtg-vendedor-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 44px;
+  min-height: 44px;
+  margin-right: var(--space-3);
+  padding: 0 var(--space-3) 0 var(--space-2);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+@supports (background: color-mix(in srgb, red, blue)) {
+  .gtg-vendedor-toggle {
+    border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+    background: linear-gradient(
+      120deg,
+      color-mix(in srgb, var(--color-zafiro) 65%, transparent),
+      color-mix(in srgb, var(--color-accent) 10%, transparent)
+    );
+  }
+}
+
+.gtg-vendedor-toggle:hover,
+.gtg-vendedor-toggle[aria-expanded="true"] {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft), 0 0 18px var(--color-accent-soft);
+}
+
+.gtg-vendedor-toggle:focus-visible,
+.gtg-vendedor :focus-visible,
+.gtg-vendedor-menu-item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Etiqueta "IA": el dorado de la marca, como el boton de crear cuenta. */
+.gtg-vendedor-toggle__badge {
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-gold);
+  color: var(--color-zafiro);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+}
+
+/* display: inline-flex gana al display: none del atributo hidden. */
+.gtg-vendedor-toggle[hidden],
+.gtg-mobile-menu .gtg-vendedor-menu-item[hidden] {
+  display: none;
+}
+
+/* Entrada del menu movil: mismo orbe y etiqueta, a ancho completo. */
+.gtg-mobile-menu .gtg-vendedor-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  font-weight: 800;
+}
+
+/* En anchos medios la barra va justa: solo orbe y etiqueta "IA". */
+@media (max-width: 1180px) {
+  .gtg-vendedor-toggle__label {
+    display: none;
+  }
+}
+
+/* Mas estrecho aun, el buscador se quedaria sin sitio: solo el orbe. */
+@media (min-width: 901px) and (max-width: 1060px) {
+  .gtg-vendedor-toggle__badge {
+    display: none;
+  }
+
+  .gtg-vendedor-toggle {
+    padding: 0 var(--space-2);
+    margin-right: var(--space-2);
+  }
+}
+
+/* --- Panel --------------------------------------------------------------------- */
+
+.gtg-vendedor__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 79;
+  background: var(--color-bg-overlay);
+  backdrop-filter: blur(3px);
+}
+
+.gtg-vendedor {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  width: var(--coach-ancho);
+  height: 100vh;
+  height: 100dvh;
+  border-left: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-card);
+  animation: gtg-vendedor-entrar var(--motion-ui) var(--motion-easing);
+}
+
+@supports (background: color-mix(in srgb, red, blue)) {
+  .gtg-vendedor {
+    border-left-color: color-mix(in srgb, var(--color-accent) 30%, var(--color-border));
+    background:
+      radial-gradient(120% 55% at 100% 0%, color-mix(in srgb, var(--color-zafiro) 75%, transparent), transparent 70%),
+      var(--color-bg-elevated);
+  }
+}
+
+@keyframes gtg-vendedor-entrar {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: none; }
+}
+
+.gtg-vendedor[hidden],
+.gtg-vendedor__scrim[hidden],
+.gtg-vendedor [hidden] {
+  display: none !important;
+}
+
+/* El panel es modal: mientras esta abierto, la pagina de fondo no se desplaza. */
+html.gtg-vendedor-abierto {
+  overflow: hidden;
+}
+
+/* --- Encabezado ------------------------------------------------------------------- */
+
+.gtg-vendedor__head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: max(var(--space-4), env(safe-area-inset-top)) var(--space-3) var(--space-4) var(--space-4);
+}
+
+/* Linea turquesa que se desvanece: el borde inferior del encabezado. */
+.gtg-vendedor__head::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  opacity: 0.7;
+}
+
+.gtg-vendedor__identity {
+  flex: 1;
+  min-width: 0;
+}
+
+.gtg-vendedor__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+}
+
+.gtg-vendedor__tagline {
+  margin: 2px 0 0;
+  color: var(--color-gold);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gtg-vendedor__icon-button {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.gtg-vendedor__icon-button svg {
+  width: 22px;
+  height: 22px;
+}
+
+.gtg-vendedor__icon-button:hover {
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.gtg-vendedor__notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-accent-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.gtg-vendedor__notice p {
+  flex: 1 1 220px;
+}
+
+.gtg-vendedor__notice .gtg-vendedor__button {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  font-size: 12px;
+}
+
+.gtg-vendedor__notice p {
+  margin: 0;
+}
+
+.gtg-vendedor__notice a,
+.gtg-vendedor__link {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* --- Conversacion --------------------------------------------------------------------- */
+
+.gtg-vendedor__log {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+  padding: var(--space-4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Cada respuesta del Coach lleva su orbe a un lado. */
+.gtg-vendedor__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  max-width: 100%;
+}
+
+.gtg-vendedor__row .coach-orb {
+  margin-top: 4px;
+}
+
+.gtg-vendedor__msg {
+  min-width: 0;
+  max-width: 92%;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.gtg-vendedor__msg p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.gtg-vendedor__msg--bot {
+  flex: 1;
+  max-width: none;
+  border: 1px solid var(--color-border);
+  border-left: 2px solid var(--color-accent);
+  border-radius: 2px var(--radius-md) var(--radius-md) var(--radius-md);
+  background: var(--color-bg-card);
+}
+
+.gtg-vendedor__msg--user {
+  align-self: flex-end;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md) 2px var(--radius-md) var(--radius-md);
+  background: var(--color-accent-soft);
+}
+
+@supports (background: color-mix(in srgb, red, blue)) {
+  .gtg-vendedor__msg--user {
+    border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+    background: linear-gradient(135deg, var(--color-zafiro), color-mix(in srgb, var(--color-zafiro) 55%, var(--color-bg-base)));
+  }
+}
+
+/* Sugerencias para empezar: dan a entender que se le puede preguntar en libre. */
+.gtg-vendedor__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-left: calc(24px + var(--space-2));
+}
+
+.gtg-vendedor__chip {
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.gtg-vendedor__chip:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.gtg-vendedor__cards {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gtg-vendedor__card {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-base);
+  transition: border-color 0.2s ease;
+}
+
+.gtg-vendedor__card:hover {
+  border-color: var(--color-accent);
+}
+
+.gtg-vendedor__card-img {
+  flex: none;
+  width: 64px;
+  height: 80px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+.gtg-vendedor__card-body {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  align-content: start;
+}
+
+.gtg-vendedor__card-body p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.gtg-vendedor__card-price {
+  color: var(--color-gold);
+  font-weight: 800;
+}
+
+.gtg-vendedor__card-price s {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.gtg-vendedor__card-reason {
+  color: var(--color-text-secondary);
+}
+
+.gtg-vendedor__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.gtg-vendedor__actions .gtg-vendedor__button {
+  flex: 1 1 100%;
+  justify-content: flex-start;
+  padding: var(--space-2) var(--space-4);
+  font-size: 13px;
+  letter-spacing: 0;
+  line-height: 1.3;
+  text-align: left;
+  text-transform: none;
+}
+
+.gtg-vendedor__action-note {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+/* --- Estados ----------------------------------------------------------------------------- */
+
+.gtg-vendedor__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 var(--space-4) var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.gtg-vendedor__error {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-gold);
+  background: var(--color-bg-card);
+}
+
+.gtg-vendedor__error p {
+  margin: 0 0 var(--space-3);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.gtg-vendedor__error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* --- Formulario ------------------------------------------------------------------------------ */
+
+.gtg-vendedor__form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) max(var(--space-4), env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-border);
+}
+
+.gtg-vendedor__form textarea {
+  min-height: 44px;
+  max-height: 140px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font: inherit;
+  /* 16 px evita el zoom automatico de iOS al enfocar el campo. */
+  font-size: 16px;
+  line-height: 1.4;
+  resize: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gtg-vendedor__form textarea:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+  outline: none;
+}
+
+.gtg-vendedor__form textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.gtg-vendedor__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-bg-base);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.gtg-vendedor__button:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+.gtg-vendedor__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gtg-vendedor__send {
+  border-radius: var(--radius-pill);
+}
+
+.gtg-vendedor__button--quiet {
+  border-color: var(--color-border);
+  background: transparent;
+  color: var(--color-text-primary);
+}
+
+.gtg-vendedor__button--quiet:hover:not(:disabled) {
+  border-color: var(--color-text-primary);
+  background: transparent;
+}
+
+/* --- Banner de cookies ------------------------------------------------------------------------
+ *
+ * El banner (z-index 1200) es el consentimiento y no se esconde. En escritorio,
+ * mientras el panel esta abierto, se acomoda a la izquierda del panel para no
+ * tapar el campo de escritura. En movil el panel ocupa toda la pantalla y pasa
+ * por encima; el banner sigue ahi al cerrarlo.
+ */
+@media (min-width: 901px) {
+  html.gtg-vendedor-abierto .gtg-cookies {
+    left: var(--space-3);
+    width: max(320px, calc(100vw - var(--coach-ancho) - var(--space-3) * 2));
+    transform: none;
+    animation: none;
+  }
+}
+
+/* Con el panel abierto en anchos medios al banner le queda poco sitio: usa la
+   disposicion de tableta (acciones debajo del texto) que ya trae su hoja. */
+@media (min-width: 901px) and (max-width: 1100px) {
+  html.gtg-vendedor-abierto .gtg-cookies__principal {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  html.gtg-vendedor-abierto .gtg-cookies__acciones {
+    justify-content: flex-end;
+  }
+}
+
+/* --- Pantallas pequenas ------------------------------------------------------------------------ */
+
+@media (max-width: 900px) {
+  .gtg-vendedor {
+    z-index: 1300;
+  }
+
+  /* En movil el Coach es solo el orbe, como los demas iconos de la barra: sin
+     etiqueta, sin marca "IA" y sin el contorno de pastilla. Sigue siendo un
+     objetivo tactil de 44 px y conserva el nombre accesible del boton. */
+  .gtg-vendedor-toggle {
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-right: 0;
+    padding: 0;
+    border-color: transparent;
+    border-radius: 50%;
+    background: transparent;
+  }
+
+  .gtg-vendedor-toggle .coach-orb {
+    --orb: 32px;
+  }
+
+  .gtg-vendedor-toggle__label,
+  .gtg-vendedor-toggle__badge {
+    display: none;
+  }
+
+  .gtg-vendedor {
+    width: 100vw;
+    border-left: 0;
+  }
+
+  .gtg-vendedor__scrim {
+    display: none;
+  }
+}

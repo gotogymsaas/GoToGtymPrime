@@ -43,14 +43,14 @@
       </div>
       <div class="topbar-actions">
         {% if perms.administracion.change_panelsettings %}
-          <button type="button" class="pause-switch{% if compras_pausadas %} is-paused{% endif %}" role="switch"
-                  aria-checked="{% if compras_pausadas %}true{% else %}false{% endif %}"
-                  aria-haspopup="dialog" data-pause-open>
+          <button type="button" class="pause-switch{% if not coach_habilitado %} is-paused{% endif %}" role="switch"
+                  aria-checked="{% if coach_habilitado %}true{% else %}false{% endif %}"
+                  aria-haspopup="dialog" data-coach-open>
             <span class="pause-switch__track" aria-hidden="true"><span class="pause-switch__thumb"></span></span>
-            <span class="pause-switch__label">{% if compras_pausadas %}Compras en pausa{% else %}Compras activas{% endif %}</span>
+            <span class="pause-switch__label">Habilitar Coach</span>
           </button>
-        {% elif compras_pausadas %}
-          <span class="pause-badge">Compras en pausa</span>
+        {% elif not coach_habilitado %}
+          <span class="pause-badge">Coach deshabilitado</span>
         {% endif %}
         {% if perms.administracion.change_panelsettings %}
           <button type="button" class="pause-switch{% if not pagos_habilitados %} is-paused{% endif %}" role="switch"
@@ -69,30 +69,30 @@
         </form>
       </div>
     </header>
-    {% if compras_pausadas %}
-      <p class="pause-notice" role="status">Las compras están en pausa: la tienda no acepta carritos ni pedidos nuevos. El stock está intacto.</p>
+    {% if not coach_habilitado %}
+      <p class="pause-notice" role="status">Quantum Coach está deshabilitado: no se muestra en la tienda.</p>
     {% endif %}
     {% if not pagos_habilitados %}
       <p class="pause-notice" role="status">Los pagos en línea están deshabilitados: la tienda no abre pagos nuevos con Mercado Pago. Los pagos en curso se siguen confirmando.</p>
     {% endif %}
     {% block content %}{% endblock %}
     {% if perms.administracion.change_panelsettings %}
-      <dialog class="pause-dialog" id="pause-dialog" aria-labelledby="pause-dialog-title">
-        <form method="post" action="{% url 'admin_store_pause_toggle' %}">
+      <dialog class="pause-dialog" id="coach-dialog" aria-labelledby="coach-dialog-title">
+        <form method="post" action="{% url 'admin_coach_toggle' %}">
           {% csrf_token %}
           <input type="hidden" name="next" value="{{ request.get_full_path }}">
-          <input type="hidden" name="pausar" value="{% if compras_pausadas %}0{% else %}1{% endif %}">
-          {% if compras_pausadas %}
-            <h2 id="pause-dialog-title">¿Reanudar las compras?</h2>
-            <p>La tienda volverá a aceptar carritos y pedidos de inmediato, con el stock que hay ahora.</p>
+          <input type="hidden" name="habilitar" value="{% if coach_habilitado %}0{% else %}1{% endif %}">
+          {% if coach_habilitado %}
+            <h2 id="coach-dialog-title">¿Deshabilitar el Coach?</h2>
+            <p>Quantum Coach, la IA de GoToGym, dejará de mostrarse en la tienda de inmediato y no responderá más mensajes. Las conversaciones en curso terminan.</p>
+            <p>No cambia nada del carrito, los pedidos ni el stock.</p>
           {% else %}
-            <h2 id="pause-dialog-title">¿Pausar las compras?</h2>
-            <p>Los clientes no podrán agregar productos al carrito ni crear pedidos nuevos. Los carritos se conservan y los pagos que ya están en curso se pueden confirmar.</p>
-            <p>El stock no se modifica: al reanudar, todo queda exactamente como estaba.</p>
+            <h2 id="coach-dialog-title">¿Habilitar el Coach?</h2>
+            <p>Quantum Coach volverá a mostrarse en la tienda a los visitantes, siempre que el servicio de IA esté configurado en este entorno.</p>
           {% endif %}
           <div class="pause-dialog__actions">
-            <button type="button" class="ghost btn-sm" data-pause-cancel>Cancelar</button>
-            <button type="submit" class="{% if compras_pausadas %}button{% else %}danger{% endif %} btn-sm">{% if compras_pausadas %}Reanudar compras{% else %}Pausar compras{% endif %}</button>
+            <button type="button" class="ghost btn-sm" data-coach-cancel>Cancelar</button>
+            <button type="submit" class="{% if coach_habilitado %}danger{% else %}button{% endif %} btn-sm">{% if coach_habilitado %}Deshabilitar Coach{% else %}Habilitar Coach{% endif %}</button>
           </div>
         </form>
       </dialog>
@@ -143,7 +143,7 @@
         boton.setAttribute('aria-expanded', abierto ? 'true' : 'false');
       });
     })();
-    // Pausar las compras o dejar de recibir pagos siempre pasa por una
+    // Deshabilitar el Coach o dejar de recibir pagos siempre pasa por una
     // confirmacion.
     function conectarDialogo(idDialogo, atributoAbrir, atributoCancelar) {
       var dialogo = document.getElementById(idDialogo);
@@ -153,7 +153,7 @@
       dialogo.querySelector('[' + atributoCancelar + ']').addEventListener('click', function () { dialogo.close(); });
       dialogo.addEventListener('click', function (evento) { if (evento.target === dialogo) dialogo.close(); });
     }
-    conectarDialogo('pause-dialog', 'data-pause-open', 'data-pause-cancel');
+    conectarDialogo('coach-dialog', 'data-coach-open', 'data-coach-cancel');
     conectarDialogo('payments-dialog', 'data-payments-open', 'data-payments-cancel');
     // Un panel con tabla ancha desplaza su contenido: sin foco no se puede
     // recorrer con el teclado.

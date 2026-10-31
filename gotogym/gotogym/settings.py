@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'carrito',
     'administracion',
     'analitica',
+    'vendedor',
 ]
 
 MIDDLEWARE = [
@@ -109,7 +110,9 @@ TEMPLATES = [
                 'carrito.context_processors.cart_count',
                 'administracion.context_processors.compras_pausadas',
                 'administracion.context_processors.pagos_habilitados',
+                'administracion.context_processors.coach_habilitado',
                 'blog.context_processors.journal_visibility',
+                'vendedor.context_processors.vendedor',
             ],
         },
     },
@@ -342,6 +345,45 @@ ALEGRA_FACTURAR_DESDE = os.environ.get('ALEGRA_FACTURAR_DESDE', '')
 # destacados del sitio, manteniéndose activa la app, sus rutas y su contenido en
 # segundo plano sin eliminar nada.
 JOURNAL_VISIBLE = _as_bool(os.environ.get('JOURNAL_VISIBLE'), False)
+
+# Vendedor de IA (app `vendedor`). La inteligencia vive en el servicio del
+# Coach; esta tienda arma un paquete acotado, lo firma y valida la respuesta.
+# VENDEDOR_ENABLED es el corte tecnico de emergencia (encendido por defecto):
+# apagado, el boton no se muestra y la ruta responde 404. La decision de
+# negocio la toma el administrador con el interruptor "Habilitar Coach" del
+# panel. Aun encendidos los dos, el asistente solo aparece si hay un servicio
+# de IA configurado (COACH_API_URL); ver vendedor/exposicion.py.
+VENDEDOR_ENABLED = _as_bool(os.environ.get('VENDEDOR_ENABLED'), True)
+# URL del endpoint de mensajes del Coach. Vacia, el vendedor solo responde con
+# el Coach simulado en desarrollo y pruebas; en produccion dice que no esta
+# disponible (nunca se muestran respuestas simuladas a clientes reales).
+COACH_API_URL = os.environ.get('COACH_API_URL', '').strip()
+COACH_SERVICE_KEY_ID = os.environ.get('COACH_SERVICE_KEY_ID', '')
+COACH_SERVICE_SECRET = os.environ.get('COACH_SERVICE_SECRET', '')
+# Mensajes por minuto y visitante. Los anonimos tienen menos margen.
+VENDEDOR_RATE_ANON = int(os.environ.get('VENDEDOR_RATE_ANON', '6'))
+VENDEDOR_RATE_AUTH = int(os.environ.get('VENDEDOR_RATE_AUTH', '12'))
+# Espera maxima al Coach. Cada turno ocupa un worker de gunicorn (hay 2,
+# sincronos), asi que este tiempo es capacidad que el resto del sitio pierde.
+VENDEDOR_TIMEOUT_SECONDS = float(os.environ.get('VENDEDOR_TIMEOUT_SECONDS', '15'))
+# Responder con el Coach simulado (sin red, rotulado como tal) en lugar de
+# decir que el asistente no esta disponible. Solo debe valer en desarrollo y
+# pruebas: un cliente real nunca debe recibir una respuesta simulada.
+VENDEDOR_COACH_SIMULADO = _as_bool(os.environ.get('VENDEDOR_COACH_SIMULADO'), _EN_DESARROLLO or _EN_PRUEBAS)
+# Tope de mensajes por conversacion y por visitante y dia. Acotan el costo del
+# modelo; al llegar al tope el visitante puede empezar otra conversacion o
+# escribir a una persona.
+VENDEDOR_MAX_TURNOS = int(os.environ.get('VENDEDOR_MAX_TURNOS', '30'))
+VENDEDOR_MAX_MENSAJES_DIA = int(os.environ.get('VENDEDOR_MAX_MENSAJES_DIA', '100'))
+# Politicas cuyo texto aun no ha validado la asesoria juridica (claves de
+# vendedor/evidencia.py). Viajan al Coach sin su texto, solo con un aviso, para
+# que el agente no repita un plazo que la tienda no ha confirmado. Hoy la de
+# devoluciones: su plazo de reembolso (30 dias) puede no coincidir con la Ley
+# 2439 de 2024. Cuando se valide, se quita de esta lista.
+VENDEDOR_POLITICAS_PENDIENTES = _split_csv(os.environ.get('VENDEDOR_POLITICAS_PENDIENTES', 'devoluciones'))
+# Porcentaje de visitantes que ven el vendedor (0-100). El grupo se deriva del
+# hash del visitante, asi que es estable y permite comparar contra un control.
+VENDEDOR_ROLLOUT_PERCENT = max(0, min(100, int(os.environ.get('VENDEDOR_ROLLOUT_PERCENT', '100'))))
 
 # Monitoreo de errores (Sentry). La configuración de despliegue y el preflight
 # lo exigen en producción, pero su ausencia no debe impedir que la aplicación

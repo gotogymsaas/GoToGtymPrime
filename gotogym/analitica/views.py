@@ -42,6 +42,13 @@ EVENTOS_PERMITIDOS = frozenset({
     'journal_post_click',
     'journal_read_complete',
     'reference_click',
+    # Asistente de compras (app vendedor). Sin el texto de los mensajes.
+    'vendedor_open',
+    'vendedor_message',
+    'vendedor_product_click',
+    'vendedor_add_to_cart',
+    'vendedor_handoff',
+    'vendedor_error',
 })
 
 MAX_EVENTOS_POR_LOTE = 40

@@ -11,3 +11,9 @@ def pagos_habilitados(request):
     """Expone a las plantillas si se reciben pagos en linea: la tienda oculta
     el boton de pago y el panel pinta el interruptor "Recibir pagos"."""
     return {'pagos_habilitados': PanelSettings.pagos_habilitados()}
+
+
+def coach_habilitado(request):
+    """Expone al panel si el asistente (Coach) esta habilitado: pinta el
+    interruptor "Habilitar Coach" de la barra superior."""
+    return {'coach_habilitado': PanelSettings.coach_habilitado()}

@@ -36,6 +36,7 @@ from afiliados.services import (
     ultima_actividad,
 )
 from afiliados.terminos import COMISION_GLOBAL_EN_TERMINOS
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
@@ -693,22 +694,27 @@ def inventory_threshold_update(request):
 
 @require_perms("administracion.change_panelsettings")
 @require_POST
-def store_pause_toggle(request):
-    """Interruptor de pausa de compras (barra superior del panel).
+def coach_toggle(request):
+    """Interruptor "Habilitar Coach" (barra superior del panel).
 
-    Bloquea carrito y checkout sin tocar `Inventory`: el stock queda como
-    esta, asi que reanudar no necesita "restaurar" nada, y un pago que ya
-    estaba en curso todavia puede confirmarse contra su stock."""
-    pausar = request.POST.get("pausar") == "1"
+    Decide si la tienda muestra Quantum Coach (la IA de GoToGym). No toca el
+    carrito, el checkout ni el stock. Apagarlo oculta el boton y la ruta del
+    Coach responde 404 desde el siguiente mensaje."""
+    habilitar = request.POST.get("habilitar") == "1"
     ajustes = PanelSettings.load()
-    if ajustes.purchases_paused != pausar:
-        ajustes.purchases_paused = pausar
-        ajustes.purchases_paused_at = timezone.now() if pausar else None
-        ajustes.save(update_fields=["purchases_paused", "purchases_paused_at", "updated_at"])
-    if pausar:
-        messages.warning(request, "Compras en pausa: la tienda no acepta carritos ni pedidos nuevos. El stock no se modificó.")
+    if ajustes.coach_enabled != habilitar:
+        ajustes.coach_enabled = habilitar
+        ajustes.save(update_fields=["coach_enabled", "updated_at"])
+    if not habilitar:
+        messages.warning(request, "Coach deshabilitado: Quantum Coach ya no se muestra en la tienda.")
+    elif not (settings.COACH_API_URL or settings.VENDEDOR_COACH_SIMULADO):
+        messages.warning(
+            request,
+            "Coach habilitado, pero este entorno no tiene el servicio de IA configurado (COACH_API_URL): "
+            "Quantum Coach no se mostrará hasta que lo tenga.",
+        )
     else:
-        messages.success(request, "Compras reanudadas: la tienda vuelve a vender con el stock que ya tenía.")
+        messages.success(request, "Coach habilitado: Quantum Coach se muestra en la tienda.")
     return _safe_redirect(request, "admin_dashboard")
 
 

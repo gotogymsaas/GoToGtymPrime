@@ -71,7 +71,7 @@ precision = 1
 root_packages = [
     "accounts", "administracion", "analitica", "blog", "carrito", "contabilidad",
     "gotogym", "afiliados", "inventory", "orders", "payments", "products",
-    "shipping", "tienda",
+    "shipping", "tienda", "vendedor",
 ]
 include_external_packages = false
 
@@ -87,7 +87,7 @@ layers = [
     "gotogym.urls",
     "gotogym.views | gotogym.sitemaps",
     # Paneles internos: leen de casi todo, nadie depende de ellos.
-    "administracion | contabilidad",
+    "administracion | contabilidad | vendedor",
     "accounts | payments | afiliados",
     "orders",
     "carrito",
@@ -130,5 +130,5 @@ type = "forbidden"
 source_modules = ["gotogym.seo", "gotogym.ratelimit", "gotogym.tasks", "gotogym.correo", "gotogym.ajustes_tienda"]
 forbidden_modules = [
     "accounts", "administracion", "analitica", "blog", "carrito", "contabilidad",
-    "afiliados", "inventory", "orders", "payments", "products", "shipping", "tienda",
+    "afiliados", "inventory", "orders", "payments", "products", "shipping", "tienda", "vendedor",
 ]

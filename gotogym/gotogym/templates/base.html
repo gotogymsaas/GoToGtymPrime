@@ -31,6 +31,7 @@
   <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261019-pausa">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
   <link rel="stylesheet" href="{% static 'css/cookie_banner.css' %}?v=20261017-responsive">
+  {% if vendedor_visible %}<link rel="stylesheet" href="{% static 'css/vendedor.css' %}?v=20261031-coach5">{% endif %}
   {% block extra_head %}{% endblock %}
   {% comment %}
   Tailwind compilado. Sustituye a cdn.tailwindcss.com, que era el
@@ -88,6 +89,22 @@
     </ul>
 
     <div class="gtg-nav-actions">
+      {% if vendedor_visible %}
+      {% comment %}
+      Quantum Coach, la IA de GoToGym. Va a la izquierda del buscador: es la
+      forma de preguntar en lenguaje natural, y el buscador la de filtrar por
+      palabra. Nace oculto: vendedor.js lo muestra al cargar; sin JavaScript no
+      puede abrirse y un boton muerto solo estorbaria.
+      {% endcomment %}
+      <button type="button" class="gtg-vendedor-toggle" hidden data-vendedor-toggle
+              aria-haspopup="dialog" aria-expanded="false" aria-controls="vendedor-panel"
+              aria-label="{% trans 'Abrir Quantum Coach, la IA de GoToGym' %}" data-track="vendedor_open" data-track-origen="barra">
+        <span class="coach-orb coach-orb--md" aria-hidden="true"></span>
+        <span class="gtg-vendedor-toggle__label">Coach</span>
+        <span class="gtg-vendedor-toggle__badge" aria-hidden="true">{% trans "IA" %}</span>
+      </button>
+      {% endif %}
+
       {% comment %}
       La busqueda reutiliza el parametro `filtro` del panel de filtros de la
       PLP, asi que no necesita vista propia y cae en la misma pagina de
@@ -192,6 +209,14 @@
       <input id="mobile-search" type="search" name="filtro" placeholder="{% trans 'Buscar' %}">
       <button type="submit">{% trans "Buscar" %}</button>
     </form>
+    {% if vendedor_visible %}
+    <button type="button" class="gtg-vendedor-menu-item" hidden data-vendedor-toggle aria-haspopup="dialog" aria-expanded="false"
+            aria-controls="vendedor-panel" data-track="vendedor_open" data-track-origen="menu_movil">
+      <span class="coach-orb coach-orb--md" aria-hidden="true"></span>
+      <span>Quantum Coach</span>
+      <span class="gtg-vendedor-toggle__badge" aria-hidden="true">{% trans "IA" %}</span>
+    </button>
+    {% endif %}
     <a href="{% url 'tienda:producto_list' %}">{% trans "Tienda" %}</a>
     {% if journal_visible %}
     <a href="{% url 'blog:post_list' %}">Journal</a>
@@ -219,6 +244,7 @@
   </div>
 </nav>
 {% endblock %}
+  {% if vendedor_visible %}{% include "partials/_vendedor_panel.html" %}{% endif %}
 
   <main class="gtg-page" id="main-content">
     {% if compras_pausadas %}
@@ -284,7 +310,8 @@
   <script id="gtg-analytics-config" type="application/json">{"endpoint": "{% url 'analitica:registrar_eventos' %}", "csrf": "{{ csrf_token }}"}</script>
   <script src="{% static 'js/commerce_header.js' %}" defer></script>
   <script src="{% static 'js/cookies.js' %}?v=20261015-compacto" defer></script>
-  <script src="{% static 'js/analytics.js' %}?v=20261014-cookies" defer></script>
+  <script src="{% static 'js/analytics.js' %}?v=20261031-vendedor" defer></script>
+  {% if vendedor_visible %}<script src="{% static 'js/vendedor.js' %}?v=20261031-coach5" defer></script>{% endif %}
   {% block extra_scripts %}{% endblock %}
 </body>
 </html>

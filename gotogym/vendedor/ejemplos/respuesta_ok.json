@@ -1,0 +1,17 @@
+{
+  "reply": "Para entrenar tienes el Leggins Quantum en gris, talla M, a $400.000. Hay 5 unidades disponibles. La guía de tallas es una referencia general; confirma precio y disponibilidad en la ficha.",
+  "ui_actions": [
+    {"type": "add_to_cart", "variant_id": 31},
+    {"type": "open_product", "product_id": 12}
+  ],
+  "product_cards": [
+    {"product_id": 12, "reason": "Está en tu talla M, dentro de tu presupuesto y con unidades disponibles."}
+  ],
+  "handoff": null,
+  "meta": {
+    "agents_used": ["discovery", "fit"],
+    "evidence_refs": ["commerce.product:12@v1"],
+    "status": "ok",
+    "retry_after_seconds": null
+  }
+}

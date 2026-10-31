@@ -30,3 +30,9 @@ def compras_pausadas():
 
 def pagos_habilitados():
     return _ajuste('online_payments_enabled', True)
+
+
+def coach_habilitado():
+    """Decision del administrador de mostrar o no el asistente de compras con
+    IA. Sin fila todavia vale el valor por defecto: habilitado."""
+    return _ajuste('coach_enabled', True)

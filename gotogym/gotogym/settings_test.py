@@ -29,6 +29,11 @@ RECURSOS_AFILIADOS_ROOT = str(Path(tempfile.gettempdir()) / 'gotogym_pruebas_rec
 
 RATE_LIMIT_ENABLED = False
 
+# El asistente de compras agrega boton, panel y estilos a todas las paginas.
+# Las pruebas que lo ejercitan lo encienden con override_settings; las demas
+# no deben depender de el.
+VENDEDOR_ENABLED = False
+
 # La migracion administracion.0006 carga el catalogo ampliado en las bases reales. La base de
 # pruebas parte del catalogo base y cada prueba arma lo que necesita: con esta bandera apagada
 # la migracion no hace nada y no altera productos, orden, visibilidad ni inventario.

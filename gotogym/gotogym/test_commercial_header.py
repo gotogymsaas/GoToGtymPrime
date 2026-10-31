@@ -51,7 +51,6 @@ class CommercialHeaderTests(TestCase):
             with self.subTest(url=url):
                 navegacion = self._navegacion(self._html(url))
                 self.assertIn(reverse('tienda:producto_list'), navegacion)
-                self.assertIn(reverse('blog:post_list'), navegacion)
                 self.assertNotIn(reverse('blog:post_list'), navegacion)
                 self.assertIn(reverse('contacto'), navegacion)
 

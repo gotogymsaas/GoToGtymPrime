@@ -76,6 +76,7 @@ urlpatterns += i18n_patterns(
     path('carrito/', include('carrito.urls', namespace='carrito')),
     path('pedidos-tienda/', include('orders.urls', namespace='orders')),
     path('pagos/', include('payments.urls', namespace='payments')),
+    path('vendedor/', include('vendedor.urls', namespace='vendedor')),
 )
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
