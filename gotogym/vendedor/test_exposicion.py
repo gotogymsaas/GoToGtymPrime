@@ -102,3 +102,18 @@ class ContextoDePlantillaTests(TestCase):
         respuesta = self.client.get(reverse('home'))
 
         self.assertTrue(respuesta.context['vendedor_visible'])
+        self.assertTrue(respuesta.context['vendedor_disponible'])
+
+    @override_settings(VENDEDOR_ENABLED=True, COACH_API_URL='', VENDEDOR_COACH_SIMULADO=False)
+    def test_sin_servicio_se_muestra_pero_no_esta_disponible(self):
+        respuesta = self.client.get(reverse('home'))
+
+        self.assertTrue(respuesta.context['vendedor_visible'])
+        self.assertFalse(respuesta.context['vendedor_disponible'])
+
+    @override_settings(VENDEDOR_ENABLED=False, COACH_API_URL='https://c.example/')
+    def test_apagado_no_esta_ni_visible_ni_disponible(self):
+        respuesta = self.client.get(reverse('home'))
+
+        self.assertFalse(respuesta.context['vendedor_visible'])
+        self.assertFalse(respuesta.context['vendedor_disponible'])

@@ -3807,8 +3807,8 @@ msgstr "Added to your cart."
 msgid "No se pudo agregar al carrito."
 msgstr "Could not add it to your cart."
 
-msgid "Quantum Coach no está disponible en este momento. Puedes escribirnos desde Contacto."
-msgstr "Quantum Coach is not available right now. You can write to us from Contact."
+msgid "En este momento la IA de GoToGym no está disponible. Vuelve más tarde."
+msgstr "GoToGym's AI isn't available right now. Please come back later."
 
 msgid "Quantum Coach tardó demasiado en responder. Intenta de nuevo."
 msgstr "Quantum Coach took too long to answer. Please try again."

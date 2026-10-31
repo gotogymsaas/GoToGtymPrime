@@ -166,9 +166,21 @@ class VendedorViewTests(TestCase):
     # --- el Coach no esta o falla -------------------------------------------
 
     @override_settings(COACH_API_URL='', VENDEDOR_COACH_SIMULADO=False)
-    def test_sin_coach_configurado_la_ruta_no_existe(self):
-        # Sin a quien preguntar el asistente no se ofrece: ni boton ni ruta.
-        self.assertEqual(self._enviar().status_code, 404)
+    def test_sin_coach_configurado_dice_que_la_ia_no_esta_disponible(self):
+        # El Coach se muestra aunque no haya IA; la ruta contesta que no esta disponible.
+        respuesta = self._enviar()
+
+        self.assertEqual(respuesta.status_code, 503)
+        cuerpo = respuesta.json()
+        self.assertEqual(cuerpo['error'], 'no_disponible')
+        self.assertEqual(cuerpo['contact_url'], '/es/contacto/')
+        self.assertNotIn('reply', cuerpo)
+
+    @override_settings(COACH_API_URL='', VENDEDOR_COACH_SIMULADO=False)
+    def test_sin_coach_configurado_no_gasta_turnos_ni_limites(self):
+        self._enviar()
+
+        self.assertNotIn(conversacion.CLAVE_SESION, self.client.session)
 
     def test_si_el_cliente_desaparece_a_mitad_dice_que_no_esta_disponible(self):
         self._con_coach(None)

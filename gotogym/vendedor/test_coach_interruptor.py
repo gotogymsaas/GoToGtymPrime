@@ -71,11 +71,30 @@ class InterruptorDelCoachTests(TestCase):
         self.assertFalse(cache.get('vendedor:dia:ip:127.0.0.1'))
 
     @override_settings(COACH_API_URL='', VENDEDOR_COACH_SIMULADO=False)
-    def test_habilitado_pero_sin_servicio_configurado_no_se_muestra(self):
+    def test_habilitado_pero_sin_servicio_se_muestra_y_dice_que_la_ia_no_esta_disponible(self):
         self.assertTrue(_ajustes().coach_enabled)
+
+        html = self._tienda()
+
+        self.assertIn('data-vendedor-toggle', html)
+        self.assertIn('"disponible": false', html)
+        self.assertIn('En este momento la IA de GoToGym no está disponible. Vuelve más tarde.', html)
+        respuesta = self._mensaje()
+        self.assertEqual(respuesta.status_code, 503)
+        self.assertEqual(respuesta.json()['error'], 'no_disponible')
+
+    @override_settings(COACH_API_URL='', VENDEDOR_COACH_SIMULADO=False)
+    def test_sin_servicio_el_administrador_igual_puede_apagarlo(self):
+        self._desde_el_panel('0')
 
         self.assertNotIn('data-vendedor', self._tienda())
         self.assertEqual(self._mensaje().status_code, 404)
+
+    @override_settings(COACH_API_URL='', VENDEDOR_COACH_SIMULADO=False)
+    def test_sin_servicio_las_politicas_no_declaran_envios_que_no_ocurren(self):
+        pagina = self.client.get('/es/politica-tratamiento-datos/').content.decode()
+
+        self.assertNotIn('Quantum Coach, la inteligencia artificial de GoToGym', pagina)
 
     @override_settings(COACH_API_URL='https://coach.example/api/', VENDEDOR_COACH_SIMULADO=False)
     def test_habilitado_y_con_servicio_configurado_se_muestra(self):
@@ -99,31 +118,36 @@ class InterruptorDelCoachTests(TestCase):
 
 class AsistenteActivoTests(TestCase):
     @override_settings(VENDEDOR_ENABLED=True)
-    def test_las_tres_condiciones(self):
+    def test_se_muestra_con_el_corte_tecnico_y_el_administrador(self):
         casos = [
-            # (corte tecnico, hay servicio, administrador, esperado)
-            (True, True, True, True),
-            (False, True, True, False),
-            (True, False, True, False),
-            (True, True, False, False),
+            # (corte tecnico, administrador, esperado)
+            (True, True, True),
+            (False, True, False),
+            (True, False, False),
+            (False, False, False),
         ]
-        for corte, servicio, administrador, esperado in casos:
-            with self.subTest(corte=corte, servicio=servicio, administrador=administrador), \
-                    override_settings(
-                        VENDEDOR_ENABLED=corte, COACH_API_URL='https://c.example/' if servicio else '',
-                        VENDEDOR_COACH_SIMULADO=False,
-                    ):
+        for corte, administrador, esperado in casos:
+            with self.subTest(corte=corte, administrador=administrador), override_settings(VENDEDOR_ENABLED=corte):
                 ajustes = _ajustes()
                 ajustes.coach_enabled = administrador
                 ajustes.save()
                 self.assertEqual(exposicion.asistente_activo(), esperado)
 
+    @override_settings(VENDEDOR_ENABLED=True, COACH_API_URL='', VENDEDOR_COACH_SIMULADO=False)
+    def test_sin_servicio_se_muestra_pero_no_esta_en_servicio(self):
+        self.assertTrue(exposicion.asistente_activo())
+        self.assertFalse(exposicion.coach_configurado())
+        self.assertFalse(exposicion.coach_en_servicio())
+
+    @override_settings(VENDEDOR_ENABLED=True, COACH_API_URL='https://c.example/', VENDEDOR_COACH_SIMULADO=False)
+    def test_con_servicio_esta_en_servicio(self):
+        self.assertTrue(exposicion.coach_en_servicio())
+
+    @override_settings(VENDEDOR_ENABLED=True, COACH_API_URL='', VENDEDOR_COACH_SIMULADO=True)
+    def test_el_coach_simulado_cuenta_como_servicio(self):
+        self.assertTrue(exposicion.coach_en_servicio())
+
     @override_settings(VENDEDOR_ENABLED=False)
     def test_con_el_corte_apagado_no_consulta_la_base(self):
-        with self.assertNumQueries(0):
-            exposicion.asistente_activo()
-
-    @override_settings(VENDEDOR_ENABLED=True, COACH_API_URL='', VENDEDOR_COACH_SIMULADO=False)
-    def test_sin_servicio_no_consulta_la_base(self):
         with self.assertNumQueries(0):
             exposicion.asistente_activo()

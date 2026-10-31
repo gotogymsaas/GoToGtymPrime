@@ -125,6 +125,7 @@ class MarcadoTests(TestCase):
 
         self.assertEqual(configuracion['endpoint'], reverse('vendedor:mensaje'))
         self.assertEqual(configuracion['maxLength'], 600)
+        self.assertIs(configuracion['disponible'], True)
         self.assertEqual(configuracion['cartUrl'], reverse('carrito:cart_detail'))
         self.assertTrue(configuracion['csrf'])
         # Ningun script ejecutable en linea dentro del panel.
@@ -204,6 +205,53 @@ class MarcadoTests(TestCase):
     def test_en_el_panel_no_hay_colores_hexadecimales(self):
         # La gobernanza de diseno del CI cuenta los hex de las plantillas.
         self.assertNotRegex(PLANTILLA.read_text(encoding='utf-8'), r'#[0-9A-Fa-f]{3,6}')
+
+
+@override_settings(
+    VENDEDOR_ENABLED=True, VENDEDOR_ROLLOUT_PERCENT=100, COACH_API_URL='', VENDEDOR_COACH_SIMULADO=False,
+)
+class SinIATests(TestCase):
+    """Sin servicio de IA el Coach se muestra y avisa que no esta disponible."""
+
+    def _html(self, idioma='es'):
+        return self.client.get(f'/{idioma}/').content.decode()
+
+    def test_el_boton_y_el_panel_siguen_estando(self):
+        html = self._html()
+
+        self.assertIn('data-vendedor-toggle', html)
+        self.assertIn('id="vendedor-panel"', html)
+        self.assertIn('vendedor.js', html)
+
+    def test_la_configuracion_dice_que_no_hay_ia(self):
+        html = self._html()
+        configuracion = json.loads(re.search(r'id="vendedor-config" type="application/json">(.*?)</script>', html, re.S).group(1))
+
+        self.assertIs(configuracion['disponible'], False)
+        self.assertEqual(configuracion['endpoint'], '/es/vendedor/mensaje/')
+
+    def test_la_bienvenida_es_el_aviso_con_el_camino_a_una_persona(self):
+        html = self._html()
+        bienvenida = html[html.index('data-vendedor-bienvenida'):]
+        bienvenida = bienvenida[:bienvenida.index('data-vendedor-status')]
+
+        self.assertIn('En este momento la IA de GoToGym no está disponible. Vuelve más tarde.', bienvenida)
+        self.assertIn('href="/es/contacto/"', bienvenida)
+        self.assertNotIn('Hola, soy Quantum Coach', bienvenida)
+
+    def test_no_hay_sugerencias_ni_aviso_de_ia(self):
+        html = self._html()
+
+        self.assertNotIn('data-sugerencia', html)
+        self.assertNotIn('data-vendedor-sugerencias', html)
+        self.assertNotIn('data-vendedor-notice', html)
+
+    def test_en_ingles_el_aviso_esta_traducido(self):
+        html = self._html('en')
+
+        self.assertIn("GoToGym's AI isn't available right now. Please come back later.", html)
+        panel = html[html.index('class="gtg-vendedor__scrim"'):html.index('</aside>')]
+        self.assertIsNone(re.search(r'[áéíóúñ¿¡]', ' '.join(re.findall(r'>([^<]+)<', panel))))
 
 
 class SinVendedorTests(TestCase):

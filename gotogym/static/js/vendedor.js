@@ -13,6 +13,8 @@
  *    comprueban aqui contra una lista de rutas internas. El modelo no decide
  *    ninguna URL.
  *  - El navegador solo habla con la propia tienda, nunca con el Coach.
+ *  - Si la tienda dice que no hay IA (`disponible: false`), el panel responde
+ *    desde aqui que no esta disponible y no llama al servidor.
  *  - Los textos visibles viven en el panel (ya traducidos); aqui no hay
  *    cadenas en un idioma concreto.
  *  - Al medir se envian categorias y numeros, nunca el texto de los mensajes.
@@ -407,6 +409,19 @@
     });
   }
 
+  // Sin IA configurada no hay a quien preguntar: se responde aqui mismo, como
+  // un mensaje del Coach, con el aviso y el camino a una persona.
+  function responderQueNoHayIA() {
+    var entrada = { r: 'b', t: texto('no_disponible_ia'), c: [], a: [] };
+    if (RUTA_ENLACE.test(configuracion.contactUrl || '')) {
+      entrada.a.push({ type: 'open_contact', label: texto('hablar_con_persona'), url: configuracion.contactUrl });
+    }
+    historial.push(entrada);
+    guardarHistorial();
+    pintarAsistente(entrada);
+    medir('vendedor_error', { codigo: 'no_disponible' });
+  }
+
   function enviarDesdeElCampo() {
     // Enter no pasa por el boton deshabilitado: sin esto el mensaje se
     // pintaria sin llegar a enviarse.
@@ -419,6 +434,10 @@
     historial.push({ r: 'u', t: mensaje });
     guardarHistorial();
     pintarUsuario(mensaje);
+    if (configuracion.disponible === false) {
+      responderQueNoHayIA();
+      return;
+    }
     enviar(mensaje);
   }
 

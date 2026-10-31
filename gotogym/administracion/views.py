@@ -711,7 +711,7 @@ def coach_toggle(request):
         messages.warning(
             request,
             "Coach habilitado, pero este entorno no tiene el servicio de IA configurado (COACH_API_URL): "
-            "Quantum Coach no se mostrará hasta que lo tenga.",
+            "Quantum Coach se mostrará y responderá que la IA no está disponible por ahora.",
         )
     else:
         messages.success(request, "Coach habilitado: Quantum Coach se muestra en la tienda.")

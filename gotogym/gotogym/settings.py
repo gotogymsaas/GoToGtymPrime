@@ -351,12 +351,14 @@ JOURNAL_VISIBLE = _as_bool(os.environ.get('JOURNAL_VISIBLE'), False)
 # VENDEDOR_ENABLED es el corte tecnico de emergencia (encendido por defecto):
 # apagado, el boton no se muestra y la ruta responde 404. La decision de
 # negocio la toma el administrador con el interruptor "Habilitar Coach" del
-# panel. Aun encendidos los dos, el asistente solo aparece si hay un servicio
-# de IA configurado (COACH_API_URL); ver vendedor/exposicion.py.
+# panel. Se muestre o no, que haya una IA detras depende de COACH_API_URL: sin
+# ella Quantum Coach se ve igual y responde que la IA no esta disponible por
+# ahora; ver vendedor/exposicion.py.
 VENDEDOR_ENABLED = _as_bool(os.environ.get('VENDEDOR_ENABLED'), True)
 # URL del endpoint de mensajes del Coach. Vacia, el vendedor solo responde con
-# el Coach simulado en desarrollo y pruebas; en produccion dice que no esta
-# disponible (nunca se muestran respuestas simuladas a clientes reales).
+# el Coach simulado en desarrollo y pruebas; en produccion el panel dice que la
+# IA no esta disponible (nunca se muestran respuestas simuladas a clientes
+# reales).
 COACH_API_URL = os.environ.get('COACH_API_URL', '').strip()
 COACH_SERVICE_KEY_ID = os.environ.get('COACH_SERVICE_KEY_ID', '')
 COACH_SERVICE_SECRET = os.environ.get('COACH_SERVICE_SECRET', '')
@@ -367,7 +369,7 @@ VENDEDOR_RATE_AUTH = int(os.environ.get('VENDEDOR_RATE_AUTH', '12'))
 # sincronos), asi que este tiempo es capacidad que el resto del sitio pierde.
 VENDEDOR_TIMEOUT_SECONDS = float(os.environ.get('VENDEDOR_TIMEOUT_SECONDS', '15'))
 # Responder con el Coach simulado (sin red, rotulado como tal) en lugar de
-# decir que el asistente no esta disponible. Solo debe valer en desarrollo y
+# decir que la IA no esta disponible. Solo debe valer en desarrollo y
 # pruebas: un cliente real nunca debe recibir una respuesta simulada.
 VENDEDOR_COACH_SIMULADO = _as_bool(os.environ.get('VENDEDOR_COACH_SIMULADO'), _EN_DESARROLLO or _EN_PRUEBAS)
 # Tope de mensajes por conversacion y por visitante y dia. Acotan el costo del

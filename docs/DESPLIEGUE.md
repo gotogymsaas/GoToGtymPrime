@@ -114,7 +114,9 @@ La inteligencia de Quantum Coach vive en el Coach (otro servicio); en la tienda 
 
 **Qué viaja al Coach:** el mensaje, la página que mira el visitante, su carrito (productos, cantidades, precios), hasta 8 productos con existencias reales, las políticas con su versión, la lista de afirmaciones prohibidas y un identificador seudonimizado. **No viaja** correo, teléfono, documento, dirección, datos de pago ni códigos de afiliado. Tope: 24 KB por solicitud.
 
-**Quién lo enciende o lo apaga:** el administrador, con el interruptor «Habilitar Coach» de la barra superior del panel (reemplaza al de «Compras activas», que ya no existe). Apagado, el botón desaparece de la tienda y la ruta responde 404 al instante, sin desplegar. Viene habilitado por defecto, pero el asistente solo aparece si además hay un servicio de IA configurado (`COACH_API_URL`): sin él un cliente vería un botón que solo dice «no disponible». Al desplegar, la migración `administracion.0007` agrega el ajuste y, si la base tenía las compras en pausa, las reanuda (el interruptor de pausa salió del panel y nadie podría reanudarlas).
+**Quién lo enciende o lo apaga:** el administrador, con el interruptor «Habilitar Coach» de la barra superior del panel (reemplaza al de «Compras activas», que ya no existe). Apagado, el botón desaparece de la tienda y la ruta responde 404 al instante, sin desplegar. Viene habilitado por defecto.
+
+**Sin IA configurada:** si no hay `COACH_API_URL`, Quantum Coach se muestra igual y el propio panel responde, desde el navegador y sin llamar al servidor, «En este momento la IA de GoToGym no está disponible. Vuelve más tarde.», con el camino a «Hablar con una persona». En ese estado no se envía ningún dato a un servicio externo, así que las políticas de privacidad no incluyen la sección del Coach hasta que haya una IA en servicio. Al desplegar, la migración `administracion.0007` agrega el ajuste y, si la base tenía las compras en pausa, las reanuda (el interruptor de pausa salió del panel y nadie podría reanudarlas).
 
 **Apagado de emergencia:** `VENDEDOR_ENABLED=false` en la configuración de la aplicación. Gana sobre el panel; no hace falta desplegar código, pero App Service reinicia la aplicación al cambiar la configuración. Si el Coach falla, el panel lo dice y ofrece reintentar o ir a Contacto; tras 5 fallos seguidos la tienda deja de llamarlo durante un minuto para no ocupar sus dos workers.
 
@@ -124,7 +126,7 @@ La inteligencia de Quantum Coach vive en el Coach (otro servicio); en la tienda 
 
 **Medición:** los eventos `vendedor_open`, `vendedor_message`, `vendedor_product_click`, `vendedor_add_to_cart`, `vendedor_handoff` y `vendedor_error` solo se registran con consentimiento de cookies y nunca llevan el texto de un mensaje. El grupo de cada visitante (con asistente o de control) se calcula a partir de su hash de visitante, el mismo que llevan los demás eventos, incluido `order_created`; la fórmula está en `gotogym/vendedor/exposicion.py`.
 
-**Antes de configurar `COACH_API_URL` en producción** (es lo que hace visible el asistente a visitantes reales):
+**Antes de configurar `COACH_API_URL` en producción** (es lo que pone una IA real a responder a visitantes):
 
 1. El Coach publicado, con su rol de comercio, y probado contra los ejemplos de `gotogym/vendedor/ejemplos/`.
 2. Un canal de atención con número de radicado, fecha y hora para el traspaso a una persona; hoy la página de Contacto solo ofrece correo y teléfono.

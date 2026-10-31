@@ -13,6 +13,11 @@ bloque JSON. Lo unico que viaja como JSON es la configuracion que no es texto.
 
 Nada de lo que escribe el modelo se inserta como HTML: vendedor.js lo pinta
 con textContent.
+
+`vendedor_disponible` dice si hay una IA que responda. Sin ella el Coach se
+muestra igual, pero el panel avisa de entrada que no esta disponible, no ofrece
+sugerencias ni el aviso de IA, y cualquier mensaje se contesta desde el front
+con ese mismo aviso, sin llamar al servidor.
 {% endcomment %}
 <div class="gtg-vendedor__scrim" data-vendedor-scrim hidden></div>
 <aside id="vendedor-panel" class="gtg-vendedor" role="dialog" aria-modal="true"
@@ -33,11 +38,13 @@ con textContent.
     </button>
   </header>
 
+  {% if vendedor_disponible %}
   <div class="gtg-vendedor__notice" data-vendedor-notice>
     <p>{% trans "Soy una IA y puedo equivocarme: confirma el precio y la disponibilidad en la ficha del producto." %}
       <a href="{% url 'politica_tratamiento_datos' %}">{% trans "Cómo tratamos tus datos" %}</a>.</p>
     <button type="button" class="gtg-vendedor__button gtg-vendedor__button--quiet" data-vendedor-notice-ok>{% trans "Entendido" %}</button>
   </div>
+  {% endif %}
 
   <div class="gtg-vendedor__log" data-vendedor-log role="log" aria-live="polite" aria-relevant="additions" tabindex="0"
        aria-label="{% trans 'Conversación con Quantum Coach' %}">
@@ -45,14 +52,21 @@ con textContent.
       <span class="coach-orb coach-orb--sm" aria-hidden="true"></span>
       <div class="gtg-vendedor__msg gtg-vendedor__msg--bot">
         <span class="sr-only">Quantum Coach: </span>
+        {% if vendedor_disponible %}
         <p>{% trans "Hola, soy Quantum Coach, la IA de GoToGym. Te ayudo a elegir prendas y tallas, y a resolver dudas sobre envíos y políticas de la tienda." %}</p>
+        {% else %}
+        <p>{% trans "En este momento la IA de GoToGym no está disponible. Vuelve más tarde." %}</p>
+        <p><a class="gtg-vendedor__link" href="{% url 'contacto' %}">{% trans "Hablar con una persona" %}</a></p>
+        {% endif %}
       </div>
     </div>
+    {% if vendedor_disponible %}
     <div class="gtg-vendedor__chips" data-vendedor-sugerencias role="group" aria-label="{% trans 'Sugerencias para empezar' %}">
       <button type="button" class="gtg-vendedor__chip" data-sugerencia>{% trans "Quiero algo para entrenar" %}</button>
       <button type="button" class="gtg-vendedor__chip" data-sugerencia>{% trans "¿Qué talla me conviene?" %}</button>
       <button type="button" class="gtg-vendedor__chip" data-sugerencia>{% trans "¿Cómo funcionan los envíos?" %}</button>
     </div>
+    {% endif %}
   </div>
 
   <p class="gtg-vendedor__status" data-vendedor-status role="status" hidden>
@@ -84,7 +98,9 @@ con textContent.
     <span data-texto="agregado">{% trans "Agregado" %}</span>
     <span data-texto="agregado_aviso">{% trans "Agregado al carrito." %}</span>
     <span data-texto="no_se_pudo_agregar">{% trans "No se pudo agregar al carrito." %}</span>
-    <span data-texto="error_no_disponible">{% trans "Quantum Coach no está disponible en este momento. Puedes escribirnos desde Contacto." %}</span>
+    <span data-texto="error_no_disponible">{% trans "En este momento la IA de GoToGym no está disponible. Vuelve más tarde." %}</span>
+    <span data-texto="no_disponible_ia">{% trans "En este momento la IA de GoToGym no está disponible. Vuelve más tarde." %}</span>
+    <span data-texto="hablar_con_persona">{% trans "Hablar con una persona" %}</span>
     <span data-texto="error_timeout">{% trans "Quantum Coach tardó demasiado en responder. Intenta de nuevo." %}</span>
     <span data-texto="error_error">{% trans "No pude responder esta vez. Intenta de nuevo." %}</span>
     <span data-texto="error_espera">{% trans "Espera unos segundos antes de enviar otro mensaje." %}</span>
@@ -96,5 +112,5 @@ con textContent.
     <span data-texto="error_sesion">{% trans "Tu sesión de seguridad venció. Recarga la página e intenta de nuevo." %}</span>
   </div>
 
-  <script id="vendedor-config" type="application/json">{"endpoint": "{% url 'vendedor:mensaje' %}", "csrf": "{{ csrf_token }}", "maxLength": 600, "cartUrl": "{% url 'carrito:cart_detail' %}", "contactUrl": "{% url 'contacto' %}"}</script>
+  <script id="vendedor-config" type="application/json">{"endpoint": "{% url 'vendedor:mensaje' %}", "csrf": "{{ csrf_token }}", "maxLength": 600, "disponible": {% if vendedor_disponible %}true{% else %}false{% endif %}, "cartUrl": "{% url 'carrito:cart_detail' %}", "contactUrl": "{% url 'contacto' %}"}</script>
 </aside>
