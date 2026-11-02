@@ -128,7 +128,7 @@ def validate_id_token(id_token, nonce, metadata):
             audience=conf.get('CLIENT_ID'),
             issuer=conf.get('ISSUER'),
             leeway=conf.get('CLOCK_SKEW_SECONDS'),
-            options={'require': ['exp', 'iat', 'iss', 'aud']},
+            options={'require': ['exp', 'iat', 'iss', 'aud', 'sub']},
         )
     except jwt.PyJWTError as exc:
         raise OIDCError(f'id_token_invalid_{type(exc).__name__}') from exc

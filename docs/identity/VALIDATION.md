@@ -4,7 +4,7 @@
 
 | Área | Prueba ejecutada | Resultado |
 |---|---|---|
-| Núcleo Django | manage_tests.py test tests | 42 aprobadas |
+| Núcleo Django | manage_tests.py test tests | 43 aprobadas |
 | Prime | manage.py test accounts | 128 aprobadas después de aislar el caché de RegistroTests |
 | Developers backend | npm test -- --runInBand | 42 aprobadas; 2 PostgreSQL omitidas localmente por falta de servidor |
 | Developers frontend | npm test -- --runInBand | 18 aprobadas, incluidas 5 de identidad |
@@ -16,7 +16,7 @@
 | Prime suite esencial de despliegue | 224 casos, settings_test, incluye accounts.test_oidc | 221 aprobados y 3 omitidos por la suite existente |
 | PDFs | Render de las 12 páginas y revisión visual | Cuatro PDFs legibles de tres páginas |
 
-Los cinco conjuntos de identidad, cuentas y frontend suman 242 pruebas aprobadas; dos casos PostgreSQL no se ejecutaron localmente. Además se ejecutó la suite esencial de Prime (224 casos: 221 aprobados y 3 omitidos), que comparte casos con accounts; no sumar ambos como pruebas únicas ni sumar reejecuciones o línea base.
+Los cinco conjuntos de identidad, cuentas y frontend suman 243 pruebas aprobadas; dos casos PostgreSQL no se ejecutaron localmente. Además se ejecutó la suite esencial de Prime (224 casos: 221 aprobados y 3 omitidos), que comparte casos con accounts; no sumar ambos como pruebas únicas ni sumar reejecuciones o línea base.
 
 ## Línea base de Prime
 
@@ -38,3 +38,9 @@ backend/tests/identity.postgres.test.ts de Developers contiene dos pruebas de oc
 - Entrar a las tres aplicaciones con la misma identidad y verificar que sus roles y datos no se trasladan.
 - Definir revocación global y step-up de 2FA local. El SSO no invalida por sí mismo los JWT emitidos en otras apps.
 - Revisar CI y PR antes de integración. Esta evidencia local no equivale a despliegue Azure.
+
+## Evidencia adicional observada en GitHub Actions
+
+Developers ejecutó PostgreSQL 16 real y aprobó los 44 casos del backend, incluidos los dos de consumo concurrente (ocho intentos y un solo éxito). Ejecución: https://github.com/gotogymsaas/gotogymdevelopers/actions/runs/41499164682 . El frontend también se construyó correctamente. Esto valida concurrencia en el entorno CI, no en Azure ni con Entra.
+
+Los workflows del núcleo y del puente del Coach también completaron ejecuciones satisfactorias. Consultar los checks del último commit en cada PR para el estado más reciente.
