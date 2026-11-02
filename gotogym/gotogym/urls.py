@@ -42,6 +42,9 @@ urlpatterns: list[URLPattern | URLResolver] = [
     # Fuera de i18n_patterns a proposito: un webhook real no antepone un
     # prefijo de idioma a la URL.
     path('pagos/webhook/mercadopago/', payments_views.mercadopago_webhook, name='mercadopago_webhook'),
+    # Tambien fuera de i18n_patterns: la URL de retorno registrada en el
+    # proveedor de identidad debe ser una sola, sin prefijo de idioma.
+    path('accounts/oidc/', include('gotogym_oidc.urls')),
 ]
 
 urlpatterns += i18n_patterns(

@@ -1,0 +1,46 @@
+{% extends "accounts/auth_base.html" %}
+{% load i18n %}
+
+{% block title %}GoToGym - {% trans "Términos y condiciones" %}{% endblock %}
+
+{% block auth_kicker %}{% trans "Un último paso" %}{% endblock %}
+{% block auth_title %}{% blocktrans %}Acepta los <em>términos</em>{% endblocktrans %}{% endblock %}
+
+{% block auth_lede %}
+<p class="commercial-auth__lede">{% trans "Entraste con tu cuenta GoToGym. Para comprar en la tienda necesitamos que aceptes sus términos." %}</p>
+{% endblock %}
+
+{% block auth_body %}
+{% for message in messages %}
+{% if message.level_tag == 'error' %}<p class="commercial-auth__field-error" role="alert">{{ message }}</p>{% endif %}
+{% endfor %}
+<form method="post" class="commercial-auth__form" novalidate>
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
+  <label class="commercial-auth__checkbox">
+    <input type="checkbox" name="accepted_terms" id="accepted_terms" required>
+    <span>{% trans "Acepto los" %} <button type="button" id="show-terms">{% trans "términos y condiciones" %}</button></span>
+  </label>
+  <button type="submit" class="commercial-auth__button">{% trans "Continuar" %}</button>
+</form>
+{% endblock %}
+
+{% block auth_after %}
+<div id="terms-modal" class="commercial-auth__modal" hidden>
+  <div class="commercial-auth__modal-panel">
+    <button type="button" id="close-terms" class="commercial-auth__modal-close" aria-label="{% trans 'Cerrar' %}">×</button>
+    <h2>{% trans "Términos y Condiciones de GoToGym para Usuarios (Clientes)" %}</h2>
+    {% include 'accounts/_terminos.html' %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var modal = document.getElementById('terms-modal');
+    document.getElementById('show-terms').addEventListener('click', function () { modal.hidden = false; });
+    document.getElementById('close-terms').addEventListener('click', function () { modal.hidden = true; });
+  });
+</script>
+{% endblock %}

@@ -44,6 +44,12 @@
   </button>
 </form>
 
+{% if oidc_habilitado %}
+<div class="commercial-auth__alt">
+  <a class="commercial-auth__button commercial-auth__button--secondary" href="{% url 'gotogym_oidc:start' %}{% if next %}?next={{ next|urlencode }}{% endif %}">{% trans "Continuar con GoToGym" %}</a>
+  <p class="commercial-auth__hint">{% trans "Usa la misma cuenta en todas las aplicaciones de GoToGym. Tus datos de bienestar no se comparten con la tienda sin tu autorización." %}</p>
+</div>
+{% endif %}
 <p class="commercial-auth__aside">
   <a class="commercial-auth__forgot" href="{% url 'password_reset_form' %}">{% trans "¿Olvidaste tu contraseña?" %}</a>
 </p>

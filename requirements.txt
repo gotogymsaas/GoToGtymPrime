@@ -8,3 +8,5 @@ cryptography==50.0.2
 mercadopago==3.6.0
 sentry-sdk==2.72.0
 redis==5.2.1
+
+PyJWT[crypto]>=2.8,<3

@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from gotogym.ratelimit import rate_limit
 
-from . import views
+from . import oidc, views
 
 # El correo de recuperacion sale en espanol y con el enlace al sitio publico
 # (`SITIO_URL`), no con el dominio que traiga la peticion.
@@ -22,6 +22,7 @@ urlpatterns = [
     path('acceso/', views.commercial_login_view, name='commercial_login'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('terminos/aceptar/', oidc.accept_terms, name='accept_terms'),
     path('register/', views.register_view, name='register'),
     path('password_reset/', recuperar_contrasena, name='password_reset_form'),
     path('password_reset/', recuperar_contrasena, name='password_reset'),
