@@ -1,0 +1,18 @@
+{
+  "source": "gotogymsaas/login/packages/django/gotogym_oidc",
+  "baseline": "4131277891a5666cad35ae52d51288eaee3cbcd0",
+  "changes": "hardening and DB one-use gate in accompanying login PR",
+  "sha256": {
+    "models.py": "3a2651b23b63066520dbeff284e3897f9c59fd5f289bd6d73ba1f3a2fdff7aa8",
+    "__init__.py": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "urls.py": "35bff6f0b72851130fe041060eb52d7e2701f84bbdc4c2348731f2a0e6366e4e",
+    "client.py": "a3aeb7c334cbd5e2f615c08b39e12e98e9ccd5e828ea34beaf4bca1f5de9e93d",
+    "apps.py": "d9492bc61b50d3689b4c68af57a7c16261883728f5340454060c1b6c5aa86494",
+    "views.py": "3c6a17a4d4b9345615b140443137673082272c8f96b69fd52ab262da81a24562",
+    "conf.py": "6c193a32df3d578af81cc7fc80b719894e1c102baebf9aa759ac1755c6e4eaaa",
+    "adapter.py": "dea76073e41cc8c08b78de394cf44ce0787c201f0d740a57d40cf36fd3ec634c",
+    "migrations/__init__.py": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "migrations/0001_initial.py": "2cbd99bf2eeb88397369d91a70adbb68c9ce096b831c291bd91a12756ed2db53",
+    "migrations/0002_authorizationflow.py": "111c133cd9151ba8f868a2cd1b7010f3d7ce9da1111f2b8cdba034fe9a83bacc"
+  }
+}

@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'widget_tweaks',
     'accounts',
+    'gotogym_oidc',
     'blog',
     'products',
     'inventory',
@@ -84,6 +85,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'accounts.oidc.RequireOIDCTermsMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'afiliados.middleware.ReferralTrackingMiddleware',
@@ -108,6 +110,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'carrito.context_processors.cart_count',
+                'accounts.oidc.oidc_habilitado',
                 'administracion.context_processors.compras_pausadas',
                 'administracion.context_processors.pagos_habilitados',
                 'administracion.context_processors.coach_habilitado',
@@ -459,3 +462,22 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'GoToGym <no-reply@got
 
 # Direccion publica del sitio, para los enlaces que viajan en correos.
 SITIO_URL = os.environ.get('SITIO_URL', 'https://gotogym.store').rstrip('/')
+
+# Inicio de sesion unificado con la cuenta GoToGym (OIDC). Sin OIDC_ISSUER la
+# tienda funciona solo con su login propio, como hasta ahora.
+OIDC_HABILITADO = bool(os.environ.get('OIDC_ISSUER'))
+# Con True, "Iniciar sesion" lleva directo a la pantalla de GoToGym (sin el
+# clic extra). El acceso propio sigue en /accounts/acceso/?legacy=1.
+OIDC_SOLO_GOTOGYM = OIDC_HABILITADO and _as_bool(os.environ.get('OIDC_SOLO_GOTOGYM'), False)
+GOTOGYM_OIDC = {
+    'ENABLED': OIDC_HABILITADO,
+    'ISSUER': os.environ.get('OIDC_ISSUER', ''),
+    'DISCOVERY_URL': os.environ.get('OIDC_DISCOVERY_URL') or None,
+    'CLIENT_ID': os.environ.get('OIDC_CLIENT_ID', ''),
+    'CLIENT_SECRET': os.environ.get('OIDC_CLIENT_SECRET', ''),
+    'REDIRECT_URI': os.environ.get('OIDC_REDIRECT_URI') or None,
+    'POST_LOGOUT_REDIRECT_URI': os.environ.get('OIDC_POST_LOGOUT_REDIRECT_URI') or None,
+    # En Entra External ID `sub` es distinto por aplicacion; `oid` es estable.
+    'SUBJECT_CLAIM': os.environ.get('OIDC_SUBJECT_CLAIM', 'oid'),
+    'ADAPTER': 'accounts.oidc.PrimeAdapter',
+}
