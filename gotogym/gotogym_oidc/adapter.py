@@ -17,6 +17,12 @@ def get_adapter():
 
 
 class DefaultAdapter:
+    def validate_claims(self, request, claims):
+        """Provider claims never grant local roles; subclasses may gate a canary."""
+
+    def prepare_user(self, request, user, claims):
+        """Apply explicit local registration consent to a newly created user only."""
+
     def validate_user(self, request, user):
         if not user.is_active:
             raise OIDCError('user_inactive')
@@ -73,4 +79,5 @@ class DefaultAdapter:
             suffix = f'-{n}'
             candidate = base[:limit - len(suffix)] + suffix
         return candidate
+
 
