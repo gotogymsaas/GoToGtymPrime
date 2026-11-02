@@ -36,3 +36,11 @@ class AuthorizationFlow(models.Model):
 
     def __str__(self):
         return self.digest
+
+
+
+class LinkAttemptWindow(models.Model):
+    """Rate-limit metadata only; never copies or changes the local password."""
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True)
+    attempts = models.PositiveIntegerField(default=0)
+    expires_at = models.DateTimeField(db_index=True)
