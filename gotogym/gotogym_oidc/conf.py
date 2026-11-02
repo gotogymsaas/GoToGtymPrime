@@ -18,6 +18,7 @@ DEFAULTS = {
     'CLIENT_ID': None,
     # Vacio solo si el cliente se registra como publico (PKCE sin secreto).
     'CLIENT_SECRET': '',
+    'REQUIRE_CLIENT_SECRET': False,
     'SCOPES': 'openid profile email',
     # URL absoluta registrada en el IdP. Si falta se arma con la peticion.
     'REDIRECT_URI': None,
@@ -55,4 +56,5 @@ def get(name):
     if name in REQUIRED and not value:
         raise ImproperlyConfigured(f'GOTOGYM_OIDC["{name}"] es obligatorio.')
     return value
+
 

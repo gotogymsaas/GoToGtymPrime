@@ -47,6 +47,8 @@ def _redirect_uri(request):
 
 def _fail(request, reason, user_message='No se pudo iniciar sesion con GoToGym. Intentalo de nuevo.'):
     logger.warning('oidc flow failed: %s', reason)
+    from .telemetry import record
+    record('authentication', 'failure')
     try:
         messages.error(request, user_message)
     except MessageFailure:
@@ -55,7 +57,9 @@ def _fail(request, reason, user_message='No se pudo iniciar sesion con GoToGym. 
     destino = resolve_url(conf.get('ERROR_REDIRECT_URL') or settings.LOGIN_URL)
     # Marca el regreso por error: una pagina de login que redirige sola al IdP
     # debe mostrarse tal cual aqui, o el fallo se volveria un bucle.
-    return redirect(destino + ('&' if '?' in destino else '?') + 'oidc_error=1')
+    public_reasons = {'identity_terms_required', 'local_mfa_use_password_login', 'identity_canary_not_allowed', 'client_secret_unavailable'}
+    suffix = '&identity_error=' + reason if reason in public_reasons else ''
+    return redirect(destino + ('&' if '?' in destino else '?') + 'oidc_error=1' + suffix)
 
 
 @never_cache
@@ -86,7 +90,9 @@ def callback(request):
     if not flow or time.time() - flow.get('created', 0) > conf.get('FLOW_TTL_SECONDS'):
         return _fail(request, 'flow_missing_or_expired')
     if request.GET.get('error'):
-        return _fail(request, 'idp_error:' + request.GET['error'][:60])
+        error = request.GET['error']
+        error = error if error in {'access_denied', 'server_error', 'temporarily_unavailable'} else 'provider_error'
+        return _fail(request, 'idp_error:' + error)
     if not hmac.compare_digest(request.GET.get('state', ''), flow['state']):
         return _fail(request, 'state_mismatch')
     deleted, _ = AuthorizationFlow.objects.filter(digest=hashlib.sha256(flow['state'].encode()).hexdigest(), expires_at__gt=timezone.now()).delete()
@@ -115,10 +121,11 @@ def _complete_login(request, claims, next_url):
     if not subject:
         return _fail(request, 'subject_claim_missing')
     verified = claims.get('email_verified')
-    if verified is False or (verified is None and conf.get('REQUIRE_EMAIL_VERIFIED_CLAIM')):
+    if (verified is not None and verified is not True) or (verified is None and conf.get('REQUIRE_EMAIL_VERIFIED_CLAIM')):
         return _fail(request, 'email_not_verified')
 
     adapter = get_adapter()
+    adapter.validate_claims(request, claims)
     link = ExternalIdentityLink.objects.select_related('user').filter(issuer=issuer, subject=str(subject)).first()
     if link:
         if not link.user.is_active:
@@ -141,6 +148,8 @@ def _complete_login(request, claims, next_url):
     try:
         with transaction.atomic():
             user = adapter.create_user(claims, email)
+            adapter.validate_user(request, user)
+            adapter.prepare_user(request, user, claims)
             link = ExternalIdentityLink.objects.create(
                 user=user, issuer=issuer, subject=str(subject), email_at_link=email,
             )
@@ -154,6 +163,8 @@ def _finish(request, adapter, user, link, created, next_url):
     login(request, user, backend=conf.get('AUTH_BACKEND'))
     request.session[VIA_OIDC_KEY] = True
     ExternalIdentityLink.objects.filter(pk=link.pk).update(last_login_at=timezone.now())
+    from .telemetry import record
+    record('authentication', 'success')
     target = adapter.post_login_redirect(request, user, created, _safe_next(request, next_url))
     return HttpResponseRedirect(target)
 
@@ -191,6 +202,10 @@ def link_account(request):
             request.session.pop(PENDING_KEY, None)
             return _fail(request, 'link_too_many_attempts', 'Demasiados intentos. Intentalo mas tarde.')
         if user.check_password(request.POST.get('password', '')):
+            try:
+                adapter.validate_user(request, user)
+            except client.OIDCError as exc:
+                return _fail(request, str(exc))
             try:
                 with transaction.atomic():
                     link = ExternalIdentityLink.objects.create(
@@ -230,4 +245,5 @@ def logout_view(request):
             return redirect(url)
     from django.conf import settings
     return redirect(_safe_next(request, request.POST.get('next')) or settings.LOGIN_URL)
+
 

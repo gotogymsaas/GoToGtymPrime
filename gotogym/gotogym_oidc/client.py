@@ -84,8 +84,11 @@ def exchange_code(metadata, code, verifier, redirect_uri):
         'client_id': conf.get('CLIENT_ID'),
         'code_verifier': verifier,
     }
-    if conf.get('CLIENT_SECRET'):
-        data['client_secret'] = conf.get('CLIENT_SECRET')
+    secret = conf.get('CLIENT_SECRET')
+    if conf.get('REQUIRE_CLIENT_SECRET') and (not secret or secret.startswith('@Microsoft.KeyVault')):
+        raise OIDCError('client_secret_unavailable')
+    if secret:
+        data['client_secret'] = secret
     response = requests.post(metadata['token_endpoint'], data=data, timeout=conf.get('HTTP_TIMEOUT_SECONDS'))
     if response.status_code != 200:
         # Solo el codigo de error del IdP: el cuerpo puede traer datos sensibles.
@@ -93,6 +96,8 @@ def exchange_code(metadata, code, verifier, redirect_uri):
             reason = response.json().get('error', 'unknown')
         except ValueError:
             reason = 'unknown'
+        allowed = {'invalid_grant', 'invalid_client', 'temporarily_unavailable', 'server_error'}
+        reason = reason if reason in allowed else 'provider_error'
         raise OIDCError(f'token_endpoint_{response.status_code}_{reason}')
     id_token = response.json().get('id_token')
     if not id_token:
@@ -150,4 +155,5 @@ def end_session_url(post_logout_redirect_uri=None):
     if redirect:
         params['post_logout_redirect_uri'] = redirect
     return endpoint + ('&' if '?' in endpoint else '?') + urlencode(params)
+
 
