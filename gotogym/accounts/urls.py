@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from gotogym.ratelimit import rate_limit
 
-from . import oidc, views
+from . import identity_status, oidc, views
 
 # El correo de recuperacion sale en espanol y con el enlace al sitio publico
 # (`SITIO_URL`), no con el dominio que traiga la peticion.
@@ -19,6 +19,7 @@ recuperar_contrasena = rate_limit('password_reset', limit=5, period_seconds=600,
 )
 
 urlpatterns = [
+    path('identity/status/', identity_status.status, name='prime_identity_status'),
     path('acceso/', views.commercial_login_view, name='commercial_login'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
