@@ -1,0 +1,18 @@
+name: QAF shadow integration contracts
+on:
+  pull_request:
+    paths: ['.github/qaf/**', '.github/workflows/qaf-shadow*', 'tests/qaf_shadow/**']
+  push:
+    branches: [main]
+    paths: ['.github/qaf/**', '.github/workflows/qaf-shadow*', 'tests/qaf_shadow/**']
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: python3 -m pip install PyYAML==6.0.3
+      - run: python3 -m unittest discover -s tests/qaf_shadow -v

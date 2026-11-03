@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "repository": "gotogymsaas/GoToGtymPrime",
+  "project_id": "GoToGtymPrime",
+  "mode": "SHADOW",
+  "authority": "READ_ONLY",
+  "tooling_ref": "03900cf91f81ccb001fffaefa079ebd13e50ad18",
+  "status": "PENDING_RUNNER_ATTESTATION",
+  "tools": {
+    "semgrep": {
+      "version": null,
+      "version_stdout_sha256": null,
+      "feed_reference": null,
+      "allowed_command": [
+        "semgrep",
+        "scan",
+        "--config",
+        "auto",
+        "--exclude",
+        "QAF-Cyber",
+        "--exclude",
+        "1_FaseAnalisis",
+        "--json",
+        "--output",
+        "{report}",
+        "."
+      ],
+      "configuration": {
+        "source": "central qaf_cyber.scanners.COMMANDS",
+        "tooling_ref": "03900cf91f81ccb001fffaefa079ebd13e50ad18"
+      },
+      "output_format": "json"
+    },
+    "osv-scanner": {
+      "version": null,
+      "version_stdout_sha256": null,
+      "feed_reference": null,
+      "allowed_command": [
+        "osv-scanner",
+        "scan",
+        "source",
+        "-r",
+        ".",
+        "--format",
+        "json",
+        "--output",
+        "{report}"
+      ],
+      "configuration": {
+        "source": "central qaf_cyber.scanners.COMMANDS",
+        "tooling_ref": "03900cf91f81ccb001fffaefa079ebd13e50ad18"
+      },
+      "output_format": "json"
+    },
+    "gitleaks": {
+      "version": null,
+      "version_stdout_sha256": null,
+      "feed_reference": null,
+      "allowed_command": [
+        "gitleaks",
+        "dir",
+        ".",
+        "--redact",
+        "--report-format",
+        "json",
+        "--report-path",
+        "{report}",
+        "--exit-code",
+        "0"
+      ],
+      "configuration": {
+        "source": "central qaf_cyber.scanners.COMMANDS",
+        "tooling_ref": "03900cf91f81ccb001fffaefa079ebd13e50ad18"
+      },
+      "output_format": "json"
+    },
+    "trivy": {
+      "version": null,
+      "version_stdout_sha256": null,
+      "feed_reference": null,
+      "allowed_command": [
+        "trivy",
+        "fs",
+        "--scanners",
+        "vuln,misconfig",
+        "--skip-dirs",
+        "QAF-Cyber,1_FaseAnalisis",
+        "--format",
+        "json",
+        "--output",
+        "{report}",
+        "."
+      ],
+      "configuration": {
+        "source": "central qaf_cyber.scanners.COMMANDS",
+        "tooling_ref": "03900cf91f81ccb001fffaefa079ebd13e50ad18"
+      },
+      "output_format": "json"
+    },
+    "syft": {
+      "version": null,
+      "version_stdout_sha256": null,
+      "feed_reference": null,
+      "allowed_command": [
+        "syft",
+        "dir:.",
+        "-o",
+        "cyclonedx-json={report}"
+      ],
+      "configuration": {
+        "source": "central qaf_cyber.scanners.COMMANDS",
+        "tooling_ref": "03900cf91f81ccb001fffaefa079ebd13e50ad18"
+      },
+      "output_format": "cyclonedx-json"
+    }
+  }
+}

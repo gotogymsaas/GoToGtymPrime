@@ -1,0 +1,33 @@
+name: QAF Cyber SHADOW
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: qaf-shadow
+  cancel-in-progress: false
+jobs:
+  preflight:
+    if: github.ref == 'refs/heads/main' && github.repository == 'gotogymsaas/GoToGtymPrime'
+    runs-on: ubuntu-latest
+    environment: qaf-shadow
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Require reviewed operational scanner profile
+        run: python3 .github/qaf/validate.py --operational
+  emit:
+    needs: preflight
+    if: github.ref == 'refs/heads/main' && github.repository == 'gotogymsaas/GoToGtymPrime'
+    permissions:
+      contents: read
+      id-token: write
+    uses: gotogymsaas/cybersecurity/.github/workflows/qaf-emitter.yml@03900cf91f81ccb001fffaefa079ebd13e50ad18
+    with:
+      project_id: GoToGtymPrime
+      tooling_ref: 03900cf91f81ccb001fffaefa079ebd13e50ad18
+      scanner_profile: .github/qaf/scanner-profile.json
+    secrets:
+      QAF_TOOLING_READ_TOKEN: ${{ secrets.QAF_TOOLING_READ_TOKEN }}
