@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import URLPattern, URLResolver, include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from accounts import identity_status
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
@@ -25,7 +26,6 @@ from django.views.generic import RedirectView
 from django.views.i18n import set_language
 from django.views.static import serve
 from payments import views as payments_views
-from accounts import identity_status
 
 from . import views
 from .sitemaps import SITEMAPS
