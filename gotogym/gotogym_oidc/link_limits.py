@@ -1,8 +1,10 @@
 """A password-link limit shared by every worker, independent of optional caches."""
 from datetime import timedelta
+
 from django.contrib.auth import get_user_model
 from django.db import DatabaseError, transaction
 from django.utils import timezone
+
 from . import conf
 from .models import LinkAttemptWindow
 

@@ -44,3 +44,6 @@ class LinkAttemptWindow(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True)
     attempts = models.PositiveIntegerField(default=0)
     expires_at = models.DateTimeField(db_index=True)
+
+    def __str__(self):
+        return f'Intentos de vinculación del usuario {self.user_id}'
