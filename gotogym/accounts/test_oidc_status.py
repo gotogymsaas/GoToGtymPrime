@@ -114,7 +114,7 @@ class PrimeIdentityAdminPreflightTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertNotIn('checks', response.content.decode())
 
-    @override_settings(GOTOGYM_OIDC=CONFIG, OIDC_GLOBAL=False, OIDC_CANARY=False)
+    @override_settings(GOTOGYM_OIDC={**CONFIG, 'CLIENT_SECRET': 'private-sentinel-secret-57392'}, OIDC_GLOBAL=False, OIDC_CANARY=False)
     def test_staff_sees_failed_checks_while_login_stays_disabled(self):
         self.client.force_login(self.staff)
         with mock.patch('gotogym_oidc.client.get_metadata', return_value=METADATA):
@@ -126,7 +126,7 @@ class PrimeIdentityAdminPreflightTests(TestCase):
         self.assertTrue(any(x['check'] == 'migraciones_aplicadas' for x in data['checks']))
         self.assertTrue(any(x['check'] == 'client_secret_resuelto' for x in data['checks']))
         self.assertTrue(all('detail' not in x for x in data['checks']))
-        self.assertNotIn(CONFIG['CLIENT_SECRET'], response.content.decode())
+        self.assertNotIn('private-sentinel-secret-57392', response.content.decode())
         self.assertIn('no-store', response['Cache-Control'])
 
     @override_settings(
