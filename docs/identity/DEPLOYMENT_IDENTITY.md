@@ -16,12 +16,26 @@ OIDC_ISSUER (exacto del discovery), OIDC_DISCOVERY_URL si corresponde, OIDC_CLIE
 
 ## Prime
 
-OIDC_SUBJECT_CLAIM=oid; OIDC_SOLO_GOTOGYM=false inicialmente. OIDC_POST_LOGOUT_REDIRECT_URI debe estar registrado. El módulo está incluido en gotogym/gotogym_oidc para evitar depender de credenciales de un repositorio privado durante build.
+Registrar en Entra una aplicación propia de Prime (no reutilizar el cliente ni el secreto del Coach) con la callback de la tabla. Variables: OIDC_ISSUER, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET (referencia a Key Vault), OIDC_REDIRECT_URI, OIDC_POST_LOGOUT_REDIRECT_URI y OIDC_SUBJECT_CLAIM=oid. El módulo está incluido en gotogym/gotogym_oidc para evitar depender de credenciales de un repositorio privado durante build.
+
+Configurar el proveedor no enciende nada. Los interruptores son independientes y llevan los mismos nombres que en el Coach:
+
+| Variable | Efecto |
+|---|---|
+| UNIVERSAL_IDENTITY_CANARY_ENABLED + OIDC_CANARY_OBJECT_IDS | Solo entran los oid de la lista. El botón no se muestra; se abre con /accounts/acceso/?sso=1. |
+| UNIVERSAL_IDENTITY_ENABLED | Abre el inicio de sesión a todos. Con OIDC_SOLO_GOTOGYM=false se conserva la pantalla propia con el botón. |
+| OIDC_ALLOW_AUTO_CREATE (false) | Alta de cuentas nuevas con Entra. Cerrada por defecto; abrirla es decisión de producto. |
+| OIDC_REQUIRE_EMAIL_VERIFIED_CLAIM (true) | Exige que el proveedor verifique el correo. Desactivarlo solo si el flujo de Entra lo verifica y el token no trae email_verified. |
+
+Ni el secreto obligatorio ni el correo verificado dependen ya del valor por defecto del módulo: están fijados en settings.py.
 
 ```bash
 python manage.py migrate gotogym_oidc
-python manage.py test accounts.test_oidc
+python manage.py test accounts.test_oidc accounts.test_oidc_despliegue
+python manage.py oidc_preflight --discovery --audit-preservation --strict
 ```
+
+oidc_preflight es de solo lectura y no imprime secretos ni datos de personas. Comprueba issuer, secreto resuelto (no una referencia de Key Vault sin resolver), callback HTTPS, migraciones, lista del canary y, con --discovery, que el issuer del documento coincide con OIDC_ISSUER. --audit-preservation entrega una huella con clave de los campos protegidos de las cuentas: tomarla antes de encender y repetirla después. Ver ACTIVACION_PRIME.md.
 
 ## Developers
 

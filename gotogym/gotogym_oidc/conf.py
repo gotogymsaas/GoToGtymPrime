@@ -9,7 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 REQUIRED = ('ISSUER', 'CLIENT_ID')
 
 DEFAULTS = {
-    'ENABLED': True,
+    'ENABLED': False,
     # Emisor exacto de los tokens. Se compara tal cual con el `issuer` del
     # documento de discovery y con el claim `iss` de cada ID token.
     'ISSUER': None,
@@ -18,7 +18,7 @@ DEFAULTS = {
     'CLIENT_ID': None,
     # Vacio solo si el cliente se registra como publico (PKCE sin secreto).
     'CLIENT_SECRET': '',
-    'REQUIRE_CLIENT_SECRET': False,
+    'REQUIRE_CLIENT_SECRET': True,
     'SCOPES': 'openid profile email',
     # URL absoluta registrada en el IdP. Si falta se arma con la peticion.
     'REDIRECT_URI': None,
@@ -31,10 +31,10 @@ DEFAULTS = {
     'METADATA_TTL_SECONDS': 3600,
     # Cuanto puede tardar la persona en volver del IdP.
     'FLOW_TTL_SECONDS': 600,
-    'ALLOW_AUTO_CREATE': True,
+    'ALLOW_AUTO_CREATE': False,
     # Si el IdP emite `email_verified` y es falso, se rechaza siempre. Con
     # True tambien se rechaza cuando el claim no viene.
-    'REQUIRE_EMAIL_VERIFIED_CLAIM': False,
+    'REQUIRE_EMAIL_VERIFIED_CLAIM': True,
     'LINK_MAX_ATTEMPTS': 5,
     'LINK_ATTEMPTS_WINDOW_SECONDS': 900,
     'ADAPTER': 'gotogym_oidc.adapter.DefaultAdapter',

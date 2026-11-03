@@ -465,10 +465,24 @@ SITIO_URL = os.environ.get('SITIO_URL', 'https://gotogym.store').rstrip('/')
 
 # Inicio de sesion unificado con la cuenta GoToGym (OIDC). Sin OIDC_ISSUER la
 # tienda funciona solo con su login propio, como hasta ahora.
-OIDC_HABILITADO = bool(os.environ.get('OIDC_ISSUER'))
+#
+# Configurar el proveedor no lo enciende. Hay dos interruptores independientes,
+# con los mismos nombres que usa el Coach para operarlos igual en las dos apps:
+# * UNIVERSAL_IDENTITY_CANARY_ENABLED + OIDC_CANARY_OBJECT_IDS: solo entran las
+#   personas cuyo identificador (`oid`) esta en la lista. El boton no se
+#   muestra; quien prueba lo abre con `?sso=1` en la pantalla de acceso.
+# * UNIVERSAL_IDENTITY_ENABLED: abre el inicio de sesion a todo el mundo.
+# Apagar ambos (o quitar OIDC_ISSUER) devuelve la tienda a su login propio sin
+# tocar cuentas, vinculos ni migraciones.
+OIDC_CONFIGURADO = bool(os.environ.get('OIDC_ISSUER'))
+OIDC_GLOBAL = OIDC_CONFIGURADO and _as_bool(os.environ.get('UNIVERSAL_IDENTITY_ENABLED'), False)
+OIDC_CANARY = OIDC_CONFIGURADO and _as_bool(os.environ.get('UNIVERSAL_IDENTITY_CANARY_ENABLED'), False)
+OIDC_CANARY_OBJECT_IDS = frozenset(_split_csv(os.environ.get('OIDC_CANARY_OBJECT_IDS', '')))
+OIDC_HABILITADO = OIDC_GLOBAL or OIDC_CANARY
 # Con True, "Iniciar sesion" lleva directo a la pantalla de GoToGym (sin el
-# clic extra). El acceso propio sigue en /accounts/acceso/?legacy=1.
-OIDC_SOLO_GOTOGYM = OIDC_HABILITADO and _as_bool(os.environ.get('OIDC_SOLO_GOTOGYM'), False)
+# clic extra). El acceso propio sigue en /accounts/acceso/?legacy=1. Solo
+# aplica con el inicio de sesion abierto a todos, nunca en el canary.
+OIDC_SOLO_GOTOGYM = OIDC_GLOBAL and _as_bool(os.environ.get('OIDC_SOLO_GOTOGYM'), False)
 GOTOGYM_OIDC = {
     'ENABLED': OIDC_HABILITADO,
     'ISSUER': os.environ.get('OIDC_ISSUER', ''),
@@ -480,4 +494,9 @@ GOTOGYM_OIDC = {
     # En Entra External ID `sub` es distinto por aplicacion; `oid` es estable.
     'SUBJECT_CLAIM': os.environ.get('OIDC_SUBJECT_CLAIM', 'oid'),
     'ADAPTER': 'accounts.oidc.PrimeAdapter',
+    # Valores que fallan cerrados y que ya no dependen del valor por defecto
+    # del modulo compartido. Una cuenta nueva solo se crea si se pide.
+    'REQUIRE_CLIENT_SECRET': True,
+    'ALLOW_AUTO_CREATE': _as_bool(os.environ.get('OIDC_ALLOW_AUTO_CREATE'), False),
+    'REQUIRE_EMAIL_VERIFIED_CLAIM': _as_bool(os.environ.get('OIDC_REQUIRE_EMAIL_VERIFIED_CLAIM'), True),
 }

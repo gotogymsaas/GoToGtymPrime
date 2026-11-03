@@ -306,6 +306,31 @@
   }
 }
 
+/* Rejilla de productos: con el panel abierto la pagina mide dos tercios, y
+ * cuatro columnas dejan tarjetas de ~120 px. Hasta 1700 px de ventana
+ * (pagina de ~1130 px) pasa a tres. */
+@media (min-width: 901px) and (max-width: 1700px) {
+  html.gtg-vendedor-abierto .gtg-product-grid--wide {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Con la pagina de ~850 px o menos (ventana de 1280 px o menos) la columna de
+ * filtros de 260 px deja la rejilla en ~500 px y las tarjetas en ~140 px: se
+ * apilan, como en movil, y los productos usan todo el ancho. En las ventanas
+ * mas angostas, dos columnas. */
+@media (min-width: 901px) and (max-width: 1280px) {
+  html.gtg-vendedor-abierto .shop-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 999px) {
+  html.gtg-vendedor-abierto .gtg-product-grid--wide {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* Si aun asi no caben, la barra pasa a la disposicion de movil: hamburguesa
  * con enlaces, cuenta e idioma dentro del menu. Es el mismo menu que ya usa la
  * tienda por debajo de 900 px, asi que no hay nada nuevo que mantener. */

@@ -30,6 +30,9 @@ CONFIG = {
     'ENABLED': True, 'ISSUER': ISSUER, 'CLIENT_ID': CLIENT_ID, 'CLIENT_SECRET': 'x',
     'REDIRECT_URI': 'https://shop.example/accounts/oidc/callback/',
     'SUBJECT_CLAIM': 'oid', 'ADAPTER': 'accounts.oidc.PrimeAdapter',
+    # Las pruebas de la tienda parten de un entorno donde el alta nueva esta
+    # permitida; el valor por defecto del despliegue es cerrado.
+    'ALLOW_AUTO_CREATE': True,
 }
 KEY = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 User = get_user_model()
@@ -39,12 +42,12 @@ def token(nonce, **extra):
     now = int(time.time())
     claims = {'iss': ISSUER, 'aud': CLIENT_ID, 'iat': now, 'exp': now + 300, 'nonce': nonce,
               'sub': 'sub-de-la-tienda', 'oid': 'oid-777', 'email': 'laura@example.com',
-              'given_name': 'Laura', 'family_name': 'Pérez'}
+              'given_name': 'Laura', 'family_name': 'Pérez', 'email_verified': True}
     claims.update(extra)
     return jwt.encode(claims, KEY, algorithm='RS256', headers={'kid': 'k'})
 
 
-@override_settings(GOTOGYM_OIDC=CONFIG, OIDC_HABILITADO=True)
+@override_settings(GOTOGYM_OIDC=CONFIG, OIDC_HABILITADO=True, OIDC_GLOBAL=True)
 class EntrarConGoToGymTests(TestCase):
     def setUp(self):
         cache.clear()
@@ -153,7 +156,7 @@ class EntrarConGoToGymTests(TestCase):
         self.assertRedirects(respuesta, reverse('home'), fetch_redirect_response=False)
 
 
-@override_settings(GOTOGYM_OIDC=CONFIG, OIDC_HABILITADO=True, OIDC_SOLO_GOTOGYM=True)
+@override_settings(GOTOGYM_OIDC=CONFIG, OIDC_HABILITADO=True, OIDC_GLOBAL=True, OIDC_SOLO_GOTOGYM=True)
 class IrDirectoAGoToGymTests(TestCase):
     """Con OIDC_SOLO_GOTOGYM no hay pantalla intermedia con el boton."""
 

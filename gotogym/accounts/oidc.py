@@ -16,12 +16,25 @@ from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext
 from django.views.decorators.csrf import csrf_protect
+from gotogym_oidc import conf
 from gotogym_oidc.adapter import DefaultAdapter
+from gotogym_oidc.client import OIDCError
 
 from .views import TERMS_PATH
 
 
 class PrimeAdapter(DefaultAdapter):
+    def validate_claims(self, request, claims):
+        """Mientras el inicio de sesion no este abierto a todos, solo entra quien
+        figura en la lista del canary. Se comprueba antes de buscar el vinculo o
+        la cuenta, de modo que una identidad fuera de la lista no toca ninguna
+        cuenta, ni siquiera una ya vinculada."""
+        if getattr(settings, 'OIDC_GLOBAL', False):
+            return
+        subject = claims.get(conf.get('SUBJECT_CLAIM'))
+        if not subject or str(subject) not in getattr(settings, 'OIDC_CANARY_OBJECT_IDS', frozenset()):
+            raise OIDCError('canary_not_allowed')
+
     def post_login_redirect(self, request, user, created, next_url):
         if user.accepted_terms:
             return next_url
@@ -30,8 +43,12 @@ class PrimeAdapter(DefaultAdapter):
 
 def oidc_habilitado(request):
     """Context processor: la plantilla muestra "Continuar con GoToGym" solo si
-    el inicio de sesion unificado esta configurado en este entorno."""
-    return {'oidc_habilitado': settings.OIDC_HABILITADO}
+    el inicio de sesion unificado esta abierto a todos. En el canary el boton
+    queda oculto y quien prueba lo ve con `?sso=1`."""
+    visible = settings.OIDC_HABILITADO and (
+        getattr(settings, 'OIDC_GLOBAL', False) or request.GET.get('sso') == '1'
+    )
+    return {'oidc_habilitado': visible}
 
 
 @login_required
