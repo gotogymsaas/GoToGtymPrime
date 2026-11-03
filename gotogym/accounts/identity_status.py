@@ -6,6 +6,7 @@ The legacy password login remains available regardless of this endpoint.
 import hashlib
 
 from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.views.decorators.cache import never_cache
@@ -68,3 +69,36 @@ def status(request):
         'canary': mode == 'canary' and ready,
         'ready': ready,
     })
+
+
+# Only publish known, coarse check identifiers to an authenticated staff member.
+# Do not forward preflight 'detail': provider errors and migration diagnostics
+# belong in the private deployment runbook, not a public HTTP response.
+SAFE_CHECKS = frozenset({
+    'issuer_configurado', 'client_id_configurado',
+    'client_secret_presente', 'client_secret_resuelto',
+    'redirect_uri_valida', 'subject_claim_oid', 'migraciones_aplicadas',
+    'canary_con_lista', 'secreto_exigido', 'correo_verificado_exigido',
+    'alta_nueva_cerrada', 'discovery_accesible',
+    'issuer_coincide_con_el_discovery', 'cierre_de_sesion_disponible',
+})
+
+
+@never_cache
+@staff_member_required
+@require_GET
+def admin_preflight(request):
+    """Privileged, read-only diagnosis even while SSO rollout is disabled."""
+    try:
+        checks = verificaciones_de_configuracion() + verificar_discovery()
+        safe = [
+            {'check': c['check'], 'ok': bool(c['ok']), 'blocking': bool(c['blocking'])}
+            for c in checks if c['check'] in SAFE_CHECKS
+        ]
+        ready = all(c['ok'] for c in safe if c['blocking'])
+        result = {'ready': ready, 'mode': _modo(), 'checks': safe}
+    except Exception:
+        # Never send exception messages or any settings to the browser.
+        result = {'ready': False, 'mode': _modo(), 'checks': [],
+                  'diagnostic': 'unavailable'}
+    return JsonResponse(result)
