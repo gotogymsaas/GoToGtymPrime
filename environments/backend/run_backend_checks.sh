@@ -50,6 +50,7 @@ if [[ "${FULL_TEST_SUITE:-false}" == "true" ]]; then
 else
   test_labels=(
     accounts.tests
+    accounts.test_oidc
     carrito.tests
     inventory.tests
     orders.tests

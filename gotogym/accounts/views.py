@@ -1,6 +1,6 @@
 import hashlib
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlencode, urlparse
 
 from carrito.services import (
     CART_VERSION,
@@ -8,6 +8,7 @@ from carrito.services import (
     SESSION_VERSION_KEY,
     build_cart_context,
 )
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import (
     get_user_model,
@@ -28,6 +29,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_POST
 from gotogym.ratelimit import rate_limit
 from orders.documentos import error_de_documento, limpiar_numero
 from orders.models import DocumentType
@@ -43,9 +45,22 @@ TERMS_PATH = Path(__file__).resolve().parent / 'templates' / 'accounts' / 'terms
 # nada lo usara).
 User = get_user_model()
 
+@require_POST
+@csrf_protect
 def logout_view(request):
     next_url = request.POST.get('next') or request.GET.get('next')
+    entro_por_oidc = request.session.get('gotogym_oidc_via')
     logout(request)
+    if entro_por_oidc:
+        # Quien entro con su cuenta GoToGym tambien cierra la sesion alli; si
+        # no, "Continuar con GoToGym" lo volveria a dejar dentro sin pedir nada.
+        from gotogym_oidc.client import end_session_url
+        try:
+            url_idp = end_session_url()
+        except Exception:
+            url_idp = None
+        if url_idp:
+            return redirect(url_idp)
     if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
         return redirect(next_url)
     return redirect('home')
@@ -67,6 +82,27 @@ def _safe_next_url(request, fallback):
     ):
         return next_url
     return fallback
+
+
+def _ir_directo_a_gotogym(request):
+    """Con `OIDC_SOLO_GOTOGYM`, "Iniciar sesion" y "Crear cuenta" llevan directo
+    a la pantalla de la cuenta GoToGym, sin pasar por la de la tienda.
+
+    No redirige si: ya hay sesion, la peticion no es un GET (el formulario
+    propio sigue funcionando), se pidio el acceso propio con `?legacy=1`, o se
+    vuelve de un fallo (`?oidc_error=1`); sin esa excepcion, un fallo del
+    proveedor dejaria a la persona en un bucle de redirecciones."""
+    if not (settings.OIDC_HABILITADO and settings.OIDC_SOLO_GOTOGYM):
+        return None
+    if request.method != 'GET' or request.user.is_authenticated:
+        return None
+    if request.GET.get('legacy') or request.GET.get('oidc_error'):
+        return None
+    destino = reverse('gotogym_oidc:start')
+    siguiente = _safe_next_url(request, '')
+    if siguiente:
+        destino += '?' + urlencode({'next': siguiente})
+    return redirect(destino)
 
 
 def _errores_de_contrasena(password):
@@ -97,6 +133,9 @@ def _resumen_carrito(request):
 @rate_limit('register', limit=10, period_seconds=3600, metodos=('POST',))
 @csrf_protect
 def register_view(request):
+    directo = _ir_directo_a_gotogym(request)
+    if directo:
+        return directo
     valores = {}
     if request.method == 'POST':
         first_name = request.POST.get('first_name', '').strip()
@@ -152,12 +191,18 @@ def register_view(request):
 @rate_limit('login', limit=10, period_seconds=300, metodos=('POST',))
 @csrf_protect
 def login_view(request):
+    directo = _ir_directo_a_gotogym(request)
+    if directo:
+        return directo
     return _login_response(request, 'accounts/commercial_login.html')
 
 
 @rate_limit('login', limit=10, period_seconds=300, metodos=('POST',))
 @csrf_protect
 def commercial_login_view(request):
+    directo = _ir_directo_a_gotogym(request)
+    if directo:
+        return directo
     return _login_response(request, 'accounts/commercial_login.html')
 
 

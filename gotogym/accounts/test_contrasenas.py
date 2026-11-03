@@ -37,6 +37,12 @@ class ValidadorTests(TestCase):
 
 
 class RegistroTests(TestCase):
+    def setUp(self):
+        # Rate-limit counters survive DB rollback; isolate these validation cases.
+        from django.core.cache import cache
+        cache.clear()
+        self.addCleanup(cache.clear)
+
     url = property(lambda self: reverse('register'))
 
     def test_el_formulario_explica_las_reglas(self):
