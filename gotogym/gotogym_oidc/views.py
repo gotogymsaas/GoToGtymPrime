@@ -8,7 +8,6 @@ import requests
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.messages.api import MessageFailure
-from django.core.cache import cache
 from django.db import IntegrityError, transaction
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import redirect, render, resolve_url
@@ -19,7 +18,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from . import client, conf
+from . import client, conf, link_limits
 from .adapter import get_adapter
 from .models import AuthorizationFlow, ExternalIdentityLink
 
@@ -169,10 +168,6 @@ def _finish(request, adapter, user, link, created, next_url):
     return HttpResponseRedirect(target)
 
 
-def _attempts_key(user):
-    return f'gotogym_oidc:link_attempts:{user.pk}'
-
-
 @never_cache
 @csrf_protect
 @require_http_methods(['GET', 'POST'])
@@ -196,9 +191,7 @@ def link_account(request):
 
     error = None
     if request.method == 'POST':
-        key = _attempts_key(user)
-        cache.add(key, 0, conf.get('LINK_ATTEMPTS_WINDOW_SECONDS'))
-        if cache.get(key, 0) >= conf.get('LINK_MAX_ATTEMPTS'):
+        if not link_limits.consume_attempt(user):
             request.session.pop(PENDING_KEY, None)
             return _fail(request, 'link_too_many_attempts', 'Demasiados intentos. Intentalo mas tarde.')
         if user.check_password(request.POST.get('password', '')):
@@ -215,16 +208,12 @@ def link_account(request):
             except IntegrityError:
                 request.session.pop(PENDING_KEY, None)
                 return _fail(request, 'identity_conflict')
-            cache.delete(key)
+            link_limits.reset_attempts(user)
             request.session.pop(PENDING_KEY, None)
             try:
                 return _finish(request, adapter, user, link, False, pending['next'])
             except client.OIDCError as exc:
                 return _fail(request, str(exc))
-        try:
-            cache.incr(key)
-        except ValueError:
-            cache.set(key, 1, conf.get('LINK_ATTEMPTS_WINDOW_SECONDS'))
         error = 'Contrasena incorrecta.'
     return render(request, 'gotogym_oidc/link_account.html', {'email': pending['email'], 'error': error})
 

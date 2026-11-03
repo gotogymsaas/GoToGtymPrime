@@ -1,6 +1,6 @@
 {
   "source": "gotogymsaas/login/packages/django/gotogym_oidc",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "sha256": {
     "conf.py": "51430c0c032e8e1ce8ea2a3be8756f748d4959c845cbcdfe3331abf9db30d4f1",
     "client.py": "35dd702e9220ae6d3fbc1885da5ee92a8f6b42a0c66d743bc415ae82d4aaa804",
@@ -9,10 +9,12 @@
     "apps.py": "d9492bc61b50d3689b4c68af57a7c16261883728f5340454060c1b6c5aa86494",
     "telemetry.py": "a11eac6a778061083290a9c90b1eabdae1e1f6a20fc5d8b56d87b94abc32537e",
     "urls.py": "35bff6f0b72851130fe041060eb52d7e2701f84bbdc4c2348731f2a0e6366e4e",
-    "models.py": "377a764e0f1d08ad8e877c109401bcc9b52a6223d5caaf965bf830cbc34c8812",
-    "views.py": "c4ed6e3e76d21fcaae2f2b88a508cb7e18c9e204da7cbc5231df95347cbce42f",
+    "models.py": "222c14555fbffa2ccb5afd007f1ca0284345c03a09e61ae6264471cdb31bf24a",
+    "link_limits.py": "9e4917356f1be0f8754f4455d639bfc02820a9550e8de724486ce801d6cb8362",
+    "views.py": "a55989155bbab7b60498d7acf2c0ad49097c4c0e288eff71386565e7e483d4de",
     "migrations/__init__.py": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
     "migrations/0002_authorizationflow.py": "a3a09c70a74914defff9203456932b67fc7fea0220d680c2e1fe8fe94768f1cc",
-    "migrations/0001_initial.py": "2cbd99bf2eeb88397369d91a70adbb68c9ce096b831c291bd91a12756ed2db53"
+    "migrations/0001_initial.py": "2cbd99bf2eeb88397369d91a70adbb68c9ce096b831c291bd91a12756ed2db53",
+    "migrations/0003_linkattemptwindow.py": "54fbea6e491871b141dee39be96b097da78affe9b6be8cbed6f703bb550c43fe"
   }
 }
