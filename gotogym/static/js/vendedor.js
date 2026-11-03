@@ -470,10 +470,20 @@
     });
   }
 
+  // En escritorio el panel va junto a la pagina, que sigue en uso: no es modal ni
+  // atrapa el foco. En movil ocupa toda la pantalla y si lo es. Debe coincidir
+  // con el corte de vendedor.css.
+  var consultaEscritorio = window.matchMedia ? window.matchMedia('(min-width: 901px)') : null;
+
+  function esModal() {
+    return !(consultaEscritorio && consultaEscritorio.matches);
+  }
+
   function abrir(origen) {
     if (abierto) return;
     disparador = origen || null;
     cerrarMenuMovil();
+    panel.setAttribute('aria-modal', esModal() ? 'true' : 'false');
     panel.hidden = false;
     if (velo) velo.hidden = false;
     document.documentElement.classList.add('gtg-vendedor-abierto');
@@ -517,7 +527,7 @@
   }
 
   function atraparElFoco(evento) {
-    if (evento.key !== 'Tab') return;
+    if (evento.key !== 'Tab' || !esModal()) return;
     var lista = enfocables();
     if (!lista.length) { evento.preventDefault(); return; }
     var primero = lista[0];

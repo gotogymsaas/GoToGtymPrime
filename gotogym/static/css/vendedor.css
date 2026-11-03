@@ -9,9 +9,9 @@
  * que gira despacio y una particula en orbita. El dorado queda para la
  * etiqueta "IA" y los precios, como en el resto de la tienda.
  *
- * Capas: el panel (80) y su velo (79) van por encima de la barra (50), del menu
- * movil (60) y del mini-carrito (70). Por eso la confirmacion de "agregado al
- * carrito" la muestra el propio panel: el mini-carrito quedaria debajo.
+ * Capas: el panel (80) va por encima de la barra (50), del menu movil (60) y
+ * del mini-carrito (70). Por eso la confirmacion de "agregado al carrito" la
+ * muestra el propio panel: el mini-carrito quedaria debajo.
  *
  * Movimiento: la regla global de style.css para prefers-reduced-motion reduce
  * a nada las animaciones y transiciones de esta hoja; el orbe queda quieto.
@@ -248,9 +248,95 @@
   display: none !important;
 }
 
-/* El panel es modal: mientras esta abierto, la pagina de fondo no se desplaza. */
-html.gtg-vendedor-abierto {
-  overflow: hidden;
+/* En escritorio el panel va en paralelo a la pagina, no encima: la pagina se
+ * encoge al ancho que queda y sigue siendo navegable y desplazable. El velo
+ * no se usa. Como la barra es sticky, se ajusta sola al nuevo ancho del body;
+ * lo que se posiciona con 100vw (menu movil y mini-carrito) se recalcula
+ * sobre el ancho de la barra. La barra de desplazamiento de la ventana se
+ * oculta para que el panel quede pegado al borde; se sigue desplazando con
+ * rueda, teclado y tactil. */
+@media (min-width: 901px) {
+  .gtg-vendedor__scrim {
+    display: none !important;
+  }
+
+  html.gtg-vendedor-abierto {
+    scrollbar-width: none;
+  }
+
+  html.gtg-vendedor-abierto::-webkit-scrollbar {
+    display: none;
+  }
+
+  html.gtg-vendedor-abierto body.gtg-theme {
+    width: calc(100% - var(--coach-ancho));
+  }
+
+  html.gtg-vendedor-abierto .gtg-mobile-menu {
+    left: max(16px, calc((100% - 1280px) / 2));
+  }
+
+  html.gtg-vendedor-abierto .gtg-minicart {
+    right: max(16px, calc((100% - 1280px) / 2));
+  }
+
+  /* La barra se calcula con el ancho de la ventana, pero la pagina ya no lo
+   * tiene: con el panel abierto los enlaces del centro se quedaban sin sitio y
+   * se montaban sobre la marca. Primero se le quita lo prescindible: el
+   * buscador (sigue en el menu de hamburguesa y en la tienda), la palabra
+   * "Coach" del boton, que ya esta abierto, y holguras de los enlaces. */
+  html.gtg-vendedor-abierto .gtg-nav-search,
+  html.gtg-vendedor-abierto .gtg-vendedor-toggle__label,
+  html.gtg-vendedor-abierto .gtg-mobile-menu .gtg-vendedor-menu-item {
+    display: none;
+  }
+
+  html.gtg-vendedor-abierto .gtg-nav-wrap {
+    gap: var(--space-3);
+  }
+
+  html.gtg-vendedor-abierto .gtg-nav-links {
+    gap: 14px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  html.gtg-vendedor-abierto .gtg-auth-links a {
+    padding: 0 var(--space-2);
+  }
+}
+
+/* Si aun asi no caben, la barra pasa a la disposicion de movil: hamburguesa
+ * con enlaces, cuenta e idioma dentro del menu. Es el mismo menu que ya usa la
+ * tienda por debajo de 900 px, asi que no hay nada nuevo que mantener. */
+@media (min-width: 901px) and (max-width: 1340px) {
+  html.gtg-vendedor-abierto .gtg-nav-links,
+  html.gtg-vendedor-abierto .gtg-auth-links,
+  html.gtg-vendedor-abierto .gtg-lang--menu,
+  html.gtg-vendedor-abierto .gtg-user-email-label {
+    display: none;
+  }
+
+  html.gtg-vendedor-abierto .gtg-menu-toggle {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+  }
+
+  html.gtg-vendedor-abierto .gtg-user-button {
+    width: 44px;
+    min-width: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+}
+
+/* En movil el panel ocupa toda la pantalla y es modal: la pagina de fondo no
+ * se desplaza. */
+@media (max-width: 900px) {
+  html.gtg-vendedor-abierto {
+    overflow: hidden;
+  }
 }
 
 /* --- Encabezado ------------------------------------------------------------------- */
