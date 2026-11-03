@@ -47,6 +47,7 @@ urlpatterns: list[URLPattern | URLResolver] = [
     # proveedor de identidad debe ser una sola, sin prefijo de idioma.
     path('accounts/oidc/', include('gotogym_oidc.urls')),
     path('accounts/identity/status/', identity_status.status, name='prime_identity_status'),
+    path('accounts/identity/preflight/', identity_status.admin_preflight, name='prime_identity_admin_preflight'),
 ]
 
 urlpatterns += i18n_patterns(
