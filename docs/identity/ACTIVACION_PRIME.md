@@ -58,3 +58,33 @@ GET https://shop.gotogym.store/accounts/identity/status/
 Respuesta mínima: `{"enabled":false,"canary":false,"ready":false}` (los booleanos dependen de la configuración real). La comprobación exige cliente OIDC y secreto resuelto, callback, `oid`, migraciones aplicadas y discovery válido con issuer exacto. Para el canario exige identificadores autorizados. Es un sondeo público limitado a booleanos; no devuelve emails, IDs, tokens, contraseñas ni motivos internos de error. Su caché interna dura 15 segundos y falla cerrado si el proveedor o la base de datos no responden.
 
 `ready=true` significa preparación técnica, **no** que ya se probó el login real con Entra. `enabled=true` solo corresponde a modo global configurado **y** listo; `canary=true` indica canario acotado sin abrir el acceso global. Mantener el login heredado mientras se ejecutan pruebas E2E con usuarios autorizados y se comprueba la preservación del carrito y las cuentas. Este endpoint no crea usuarios ni ejecuta migraciones.
+
+
+## Diagnóstico administrativo de bloqueos (sin Azure RBAC)
+
+Una persona con sesión vigente de **personal autorizado de Prime** (`is_active=True` e `is_staff=True`) puede consultar:
+
+```text
+GET https://shop.gotogym.store/accounts/identity/preflight/
+```
+
+Un cliente o visitante no puede acceder a los resultados; es redirigido al login administrativo.
+La ruta funciona incluso con los flags OIDC global y canario apagados y no altera
+cuentas, planes, sesiones, migraciones, credenciales ni la configuración de Azure.
+
+La respuesta incluye `mode`, `ready` y una lista de comprobaciones conocidas
+`{check,ok,blocking}`, sin campos `detail`, variables de entorno, tokens,
+identificadores personales ni errores internos. Para diagnosticar `ready:false`:
+si falla `issuer_configurado`/`client_id_configurado` o `client_secret_presente`,
+comprobar que el registro **Prime** de Entra existe y que Azure tiene sus ajustes;
+si falla `client_secret_resuelto`, revisar identidad administrada, permisos de
+Key Vault y estado de referencia `Resolved` sin leer el secreto; si falla
+`migraciones_aplicadas`, revisar el plan de migraciones con el administrador
+de despliegues antes de tocar PostgreSQL; si falla `discovery_accesible` o
+`issuer_coincide_con_el_discovery`, comprobar endpoints y respuesta real
+del proveedor. `ready:true` **no prueba** una autenticación E2E real.
+
+Esta ruta facilita el diagnóstico cuando el workflow de GitHub solo recibe
+`AuthorizationFailed` en el RG de Prime. No elimina la necesidad de corregir
+los permisos mínimos, validar los registros de aplicaciones en el tenant External
+ID y realizar un canario real con usuarios de prueba.
