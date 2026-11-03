@@ -45,3 +45,16 @@ No borrar vínculos ni revertir migraciones: las tablas son aditivas y apagarlas
 - El cierre de sesión en Prime cierra la sesión de Prime y pide la del proveedor; no invalida lo emitido por el Coach ni por Developers.
 - Prime no tiene planes ni suscripciones: lo que se preserva son las cuentas, contraseñas, permisos, afiliación, pedidos y direcciones.
 - El flujo completo contra Entra está sin probar. Las pruebas usan un proveedor simulado.
+
+
+## Estado de preparación sin activar el login
+
+La tienda expone una ruta de solo lectura **no localizada**:
+
+```text
+GET https://shop.gotogym.store/accounts/identity/status/
+```
+
+Respuesta mínima: `{"enabled":false,"canary":false,"ready":false}` (los booleanos dependen de la configuración real). La comprobación exige cliente OIDC y secreto resuelto, callback, `oid`, migraciones aplicadas y discovery válido con issuer exacto. Para el canario exige identificadores autorizados. Es un sondeo público limitado a booleanos; no devuelve emails, IDs, tokens, contraseñas ni motivos internos de error. Su caché interna dura 15 segundos y falla cerrado si el proveedor o la base de datos no responden.
+
+`ready=true` significa preparación técnica, **no** que ya se probó el login real con Entra. `enabled=true` solo corresponde a modo global configurado **y** listo; `canary=true` indica canario acotado sin abrir el acceso global. Mantener el login heredado mientras se ejecutan pruebas E2E con usuarios autorizados y se comprueba la preservación del carrito y las cuentas. Este endpoint no crea usuarios ni ejecuta migraciones.
