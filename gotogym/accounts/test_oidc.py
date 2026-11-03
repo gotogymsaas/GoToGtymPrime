@@ -80,6 +80,18 @@ class EntrarConGoToGymTests(TestCase):
         for nombre in ('commercial_login', 'register'):
             self.assertNotIn('Continuar con GoToGym', self.client.get(reverse(nombre)).content.decode(), nombre)
 
+    def test_existing_account_link_page_explains_preservation(self):
+        User.objects.create_user(email='laura@example.com', username='laura', password='Local-Only-Test-123!')
+        response = self.entrar()
+        self.assertEqual(response.status_code, 302)
+        page = self.client.get(reverse('gotogym_oidc:link'))
+        self.assertContains(page, 'Continúa con tu cuenta de siempre')
+        self.assertContains(page, 'Contraseña actual de GoToGym')
+        self.assertContains(page, 'Solo debes vincular esta cuenta una vez por aplicación')
+        self.assertContains(page, 'csrfmiddlewaretoken')
+        self.assertEqual(User.objects.count(), 1)
+        self.assertFalse(ExternalIdentityLink.objects.exists())
+
     # -- primera vez ------------------------------------------------------
     def test_primera_vez_crea_cuenta_y_pide_terminos_antes_de_seguir(self):
         respuesta = self.entrar(next_url='/pedidos/checkout/')
