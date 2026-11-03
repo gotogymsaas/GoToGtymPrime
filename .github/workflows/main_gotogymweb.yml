@@ -184,10 +184,32 @@ jobs:
           assert all(type(response.get(key)) is bool for key in ('enabled','ready','canary')), 'invalid identity status schema'
           print('OIDC status endpoint: HTTP 200, boolean fields validated (values withheld)')
           PY
-          echo "Comprobando que el diagnóstico administrativo no es público..."
-          ADMIN_STATUS=$(curl -sS --max-time 30 -o /dev/null -w "%{http_code}" \
-            "https://shop.gotogym.store/accounts/identity/preflight/" || echo "000")
-          case "$ADMIN_STATUS" in
-            302|303|403) echo "Diagnóstico administrativo protegido: HTTP $ADMIN_STATUS";;
-            *) echo "ERROR: diagnóstico administrativo expuesto o no disponible (HTTP $ADMIN_STATUS)"; exit 1;;
-          esac
+          # Kudu zipdeploy can complete before all Gunicorn workers restart.
+          # 404 here can be an old worker still serving the previous routes.
+          echo "Esperando la nueva ruta protegida de diagnóstico (sin sesiones ni secretos)..."
+          PROTECTED_READY=0
+          for _ in $(seq 1 18); do
+            ADMIN_STATUS=$(curl -sS --max-time 15 -o /dev/null -w "%{http_code}" \
+              "https://shop.gotogym.store/accounts/identity/preflight/" || echo "000")
+            case "$ADMIN_STATUS" in
+              302|303|403)
+                echo "Diagnóstico administrativo protegido: HTTP $ADMIN_STATUS"
+                PROTECTED_READY=1
+                break
+                ;;
+              200)
+                echo "ERROR DE SEGURIDAD: la ruta administrativa respondió HTTP 200 sin sesión."
+                exit 1
+                ;;
+              *)
+                echo "La ruta aún no está disponible (HTTP $ADMIN_STATUS); reintentando..."
+                sleep 10
+                ;;
+            esac
+          done
+          if [[ "$PROTECTED_READY" -ne 1 ]]; then
+            echo "ERROR: la ruta administrativa no apareció después de esperar el reinicio."
+            echo "Comprobar imagen/código publicado, startup real y logs de Gunicorn, sin activar Universal Identity."
+            exit 1
+          fi
+          echo "Smokes OIDC posteriores al despliegue: correctos."
