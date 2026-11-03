@@ -169,3 +169,25 @@ jobs:
             exit 1
           fi
           echo "Despliegue verificado."
+          echo "Verificando preparación OIDC pública sin revelar configuración..."
+          ID_STATUS=$(curl -sS --max-time 30 -o /tmp/prime-identity-status.json -w "%{http_code}" \
+            "https://shop.gotogym.store/accounts/identity/status/" || echo "000")
+          if [[ "$ID_STATUS" != "200" ]]; then
+            echo "ERROR: /accounts/identity/status/ no respondió 200 (HTTP $ID_STATUS)"
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json
+          with open('/tmp/prime-identity-status.json', encoding='utf-8') as fh:
+              response = json.load(fh)
+          assert isinstance(response, dict), 'identity status must be a JSON object'
+          assert all(type(response.get(key)) is bool for key in ('enabled','ready','canary')), 'invalid identity status schema'
+          print('OIDC status endpoint: HTTP 200, boolean fields validated (values withheld)')
+          PY
+          echo "Comprobando que el diagnóstico administrativo no es público..."
+          ADMIN_STATUS=$(curl -sS --max-time 30 -o /dev/null -w "%{http_code}" \
+            "https://shop.gotogym.store/accounts/identity/preflight/" || echo "000")
+          case "$ADMIN_STATUS" in
+            302|303|403) echo "Diagnóstico administrativo protegido: HTTP $ADMIN_STATUS";;
+            *) echo "ERROR: diagnóstico administrativo expuesto o no disponible (HTTP $ADMIN_STATUS)"; exit 1;;
+          esac
