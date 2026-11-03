@@ -25,6 +25,7 @@ from django.views.generic import RedirectView
 from django.views.i18n import set_language
 from django.views.static import serve
 from payments import views as payments_views
+from accounts import identity_status
 
 from . import views
 from .sitemaps import SITEMAPS
@@ -45,6 +46,7 @@ urlpatterns: list[URLPattern | URLResolver] = [
     # Tambien fuera de i18n_patterns: la URL de retorno registrada en el
     # proveedor de identidad debe ser una sola, sin prefijo de idioma.
     path('accounts/oidc/', include('gotogym_oidc.urls')),
+    path('accounts/identity/status/', identity_status.status, name='prime_identity_status'),
 ]
 
 urlpatterns += i18n_patterns(
