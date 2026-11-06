@@ -243,6 +243,35 @@ class PreflightTests(TestCase):
         with mock.patch('gotogym_oidc.client.get_metadata', return_value={**METADATA, 'issuer': 'https://otro.example/v2.0'}):
             self.assertFalse(self.estado(self.ejecutar('--discovery'))['issuer_coincide_con_el_discovery'])
 
+    @override_settings(PRODUCCION=True, GOTOGYM_OIDC={
+        **CONFIG,
+        'ISSUER': 'https://fe3cd367-0570-48e7-8a35-a777b62cc6f9.ciamlogin.com/fe3cd367-0570-48e7-8a35-a777b62cc6f9/v2.0',
+        'CLIENT_ID': 'cliente-prime-independiente',
+        'REDIRECT_URI': 'https://shop.gotogym.store/accounts/oidc/callback/',
+    })
+    def test_configuracion_prime_produccion_separa_tenant_cliente_y_callback(self):
+        checks = self.estado(self.ejecutar())
+        self.assertTrue(checks['cliente_prime_independiente'])
+        self.assertTrue(checks['tenant_externo_correcto'])
+        self.assertTrue(checks['callback_prime_exacta'])
+
+    @override_settings(PRODUCCION=True, GOTOGYM_OIDC={
+        **CONFIG, 'CLIENT_ID': '4fd1c894-78fa-496e-aaf2-5361da0dc430',
+        'REDIRECT_URI': 'https://shop.gotogym.store/accounts/oidc/callback/',
+    })
+    def test_reutilizar_cliente_coach_se_bloquea_en_produccion(self):
+        checks = self.estado(self.ejecutar())
+        self.assertFalse(checks['cliente_prime_independiente'])
+        self.assertFalse(checks['tenant_externo_correcto'])
+
+    @override_settings(PRODUCCION=True, GOTOGYM_OIDC={
+        **CONFIG, 'CLIENT_ID': 'cliente-prime-independiente',
+        'ISSUER': 'https://fe3cd367-0570-48e7-8a35-a777b62cc6f9.ciamlogin.com/fe3cd367-0570-48e7-8a35-a777b62cc6f9/v2.0',
+        'REDIRECT_URI': 'https://other.example/accounts/oidc/callback/',
+    })
+    def test_callback_fuera_del_dominio_shop_se_bloquea_en_produccion(self):
+        self.assertFalse(self.estado(self.ejecutar())['callback_prime_exacta'])
+
     def test_la_huella_no_cambia_si_nada_cambia_y_cambia_con_una_contrasena(self):
         usuario = User.objects.create_user(email='a@example.com', username='a', password=CLAVE, is_staff=True)
         primera = self.ejecutar('--audit-preservation')['preservation']
