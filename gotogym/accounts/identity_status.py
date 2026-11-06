@@ -76,6 +76,7 @@ def status(request):
 # belong in the private deployment runbook, not a public HTTP response.
 SAFE_CHECKS = frozenset({
     'issuer_configurado', 'client_id_configurado',
+    'cliente_prime_independiente', 'tenant_externo_correcto', 'callback_prime_exacta',
     'client_secret_presente', 'client_secret_resuelto',
     'redirect_uri_valida', 'subject_claim_oid', 'migraciones_aplicadas',
     'canary_con_lista', 'secreto_exigido', 'correo_verificado_exigido',
