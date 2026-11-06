@@ -1,0 +1,64 @@
+name: Universal Identity Prime production readiness
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/identity-prime-readiness.yml'
+      - 'scripts/identity/**'
+      - 'gotogym/accounts/management/commands/oidc_preflight.py'
+      - 'gotogym/accounts/identity_status.py'
+      - 'gotogym/accounts/test_oidc_despliegue.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/identity-prime-readiness.yml'
+      - 'scripts/identity/**'
+      - 'gotogym/accounts/management/commands/oidc_preflight.py'
+      - 'gotogym/accounts/identity_status.py'
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    name: Offline security checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 -m unittest discover -s scripts/identity -p 'test*.py' -v
+      - run: python3 -m py_compile scripts/identity/prime_readiness_audit.py
+
+  public-readiness:
+    name: Live public status (no secrets)
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Query public Prime readiness (read only; do not assert SSO login)
+        run: python3 scripts/identity/prime_readiness_audit.py
+
+  azure-readiness:
+    name: Authorized Azure inspection (read only)
+    needs: unit-tests
+    if: >-
+      github.event_name != 'pull_request' &&
+      vars.AZURE_CLIENT_ID != '' &&
+      vars.AZURE_TENANT_ID != '' &&
+      vars.AZURE_SUBSCRIPTION_ID != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Inspect Prime identity settings and Key Vault reference without revealing secrets
+        run: python3 scripts/identity/prime_readiness_audit.py --azure
