@@ -36,6 +36,12 @@ CAMPOS_PROTEGIDOS = (
     'document_type', 'document_number', 'phone',
 )
 RUTA_CALLBACK = '/accounts/oidc/callback/'
+# En producción Prime es otra aplicación Web en el MISMO tenant External ID.
+# Estos son identificadores públicos, nunca valores secretos.
+TENANT_ID = 'fe3cd367-0570-48e7-8a35-a777b62cc6f9'
+ISSUER_ESPERADO = f'https://{TENANT_ID}.ciamlogin.com/{TENANT_ID}/v2.0'
+CALLBACK_PRIME = 'https://shop.gotogym.store/accounts/oidc/callback/'
+CLIENT_ID_COACH = '4fd1c894-78fa-496e-aaf2-5361da0dc430'
 
 
 def _modo():
@@ -67,6 +73,26 @@ def verificaciones_de_configuracion():
     return [
         _verificar('issuer_configurado', emisor.startswith('https://'), 'OIDC_ISSUER debe ser https y exacto al discovery'),
         _verificar('client_id_configurado', bool(settings.GOTOGYM_OIDC.get('CLIENT_ID'))),
+        # En la puesta en producción no basta un client_id presente: un
+        # error copiando el cliente de Quantum Coach puede romper aud/redirect
+        # y comprometer la separación de clientes.
+        _verificar(
+            'cliente_prime_independiente',
+            not getattr(settings, 'PRODUCCION', False)
+            or (bool(settings.GOTOGYM_OIDC.get('CLIENT_ID'))
+                and settings.GOTOGYM_OIDC.get('CLIENT_ID') != CLIENT_ID_COACH),
+            'Prime requiere su propia aplicacion Entra distinta de Quantum Coach',
+        ),
+        _verificar(
+            'tenant_externo_correcto',
+            not getattr(settings, 'PRODUCCION', False) or emisor == ISSUER_ESPERADO,
+            'Comprobar el issuer exacto del tenant GoToGym Universal Identity',
+        ),
+        _verificar(
+            'callback_prime_exacta',
+            not getattr(settings, 'PRODUCCION', False) or retorno == CALLBACK_PRIME,
+            'La callback de Prime debe ser la registrada en Entra para shop.gotogym.store',
+        ),
         _verificar('client_secret_presente', bool(secreto)),
         # App Service sustituye las referencias a Key Vault antes de arrancar el
         # proceso; si llega el texto de la referencia, no se pudo resolver.
