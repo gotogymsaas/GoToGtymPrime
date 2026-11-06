@@ -45,10 +45,17 @@ def oidc_habilitado(request):
     """Context processor: la plantilla muestra "Continuar con GoToGym" solo si
     el inicio de sesion unificado esta abierto a todos. En el canary el boton
     queda oculto y quien prueba lo ve con `?sso=1`."""
+    solicitada_prueba = request.GET.get('sso') == '1'
     visible = settings.OIDC_HABILITADO and (
-        getattr(settings, 'OIDC_GLOBAL', False) or request.GET.get('sso') == '1'
+        getattr(settings, 'OIDC_GLOBAL', False) or solicitada_prueba
     )
-    return {'oidc_habilitado': visible}
+    # ?sso=1 muestra el enlace SOLO si el servidor habilito OIDC.
+    # Cuando no esta disponible, explicar la situacion sin simular
+    # un inicio de sesion ni revelar secretos o ajustes internos.
+    return {
+        'oidc_habilitado': visible,
+        'oidc_prueba_no_disponible': solicitada_prueba and not settings.OIDC_HABILITADO,
+    }
 
 
 @login_required

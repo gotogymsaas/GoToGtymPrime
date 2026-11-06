@@ -16,6 +16,19 @@
 {% endblock %}
 
 {% block auth_body %}
+{% if oidc_habilitado %}
+<div class="commercial-auth__alt commercial-auth__alt--identity" aria-label="{% trans 'Acceso con la cuenta GoToGym' %}">
+  <a class="commercial-auth__button commercial-auth__button--identity" href="{% url 'gotogym_oidc:start' %}{% if next %}?next={{ next|urlencode }}{% endif %}">{% trans "Continuar con GoToGym" %}</a>
+  <p class="commercial-auth__identity-description">{% trans "Si ya utilizas Quantum Coach, usa tu misma identidad. Si ya tenías cuenta de tienda, podrás vincularla de forma segura sin perder tus pedidos." %}</p>
+  <p class="commercial-auth__hint">{% trans "La tienda no accede a tus datos de bienestar sin tu autorización." %}</p>
+</div>
+<p class="commercial-auth__divider">{% trans "O entra con tu contraseña habitual de la tienda" %}</p>
+{% elif oidc_prueba_no_disponible %}
+<div class="commercial-auth__identity-unavailable" role="status">
+  <strong>{% trans "Acceso GoToGym en preparación para esta tienda." %}</strong>
+  <p>{% trans "La prueba de acceso unificado aún no está habilitada. Puedes ingresar con tu cuenta habitual de Shop; tus pedidos y carrito no cambian." %}</p>
+</div>
+{% endif %}
 <form method="post" class="commercial-auth__form" id="commercial-auth-form" novalidate>
   {% csrf_token %}
   <input type="hidden" name="next" value="{{ next }}">
@@ -44,12 +57,6 @@
   </button>
 </form>
 
-{% if oidc_habilitado %}
-<div class="commercial-auth__alt">
-  <a class="commercial-auth__button commercial-auth__button--secondary" href="{% url 'gotogym_oidc:start' %}{% if next %}?next={{ next|urlencode }}{% endif %}">{% trans "Continuar con GoToGym" %}</a>
-  <p class="commercial-auth__hint">{% trans "Usa la misma cuenta en todas las aplicaciones de GoToGym. Tus datos de bienestar no se comparten con la tienda sin tu autorización." %}</p>
-</div>
-{% endif %}
 <p class="commercial-auth__aside">
   <a class="commercial-auth__forgot" href="{% url 'password_reset_form' %}">{% trans "¿Olvidaste tu contraseña?" %}</a>
 </p>
