@@ -108,6 +108,53 @@
   color: var(--auth-mint);
 }
 
+/* --- Inicio universal: la identidad GoToGym es principal cuando este lista.
+   Nunca ocultar el formulario local: usuarios actuales y recuperacion lo usan. --- */
+.commercial-auth__alt--identity {
+  margin-top: var(--space-6);
+}
+.commercial-auth__button--identity {
+  background: var(--auth-mint);
+  color: var(--auth-ink);
+  border-radius: 3px;
+  text-decoration: none;
+}
+.commercial-auth__button--identity:hover,
+.commercial-auth__button--identity:focus-visible {
+  background: var(--auth-paper);
+}
+.commercial-auth__identity-description {
+  color: var(--auth-paper);
+  font-size: 0.94rem;
+  line-height: 1.6;
+  margin: var(--space-4) 0 var(--space-3);
+}
+.commercial-auth__alt--identity .commercial-auth__hint {
+  margin: 0;
+}
+.commercial-auth__divider {
+  margin: var(--space-6) 0 0;
+  color: var(--auth-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+.commercial-auth__identity-unavailable {
+  margin-top: var(--space-6);
+  padding: 14px 17px;
+  border: 1px solid rgba(99, 221, 209, 0.38);
+  background: rgba(99, 221, 209, 0.07);
+  border-radius: 8px;
+  color: var(--auth-paper);
+  line-height: 1.55;
+}
+.commercial-auth__identity-unavailable p {
+  margin: var(--space-2) 0 0;
+  color: var(--auth-muted);
+}
+@media (prefers-reduced-motion: reduce) {
+  .commercial-auth__button--identity { transition: none; }
+}
+
 /* --- Formulario ------------------------------------------------------- */
 .commercial-auth__form {
   margin-top: var(--space-6);
