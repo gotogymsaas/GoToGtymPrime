@@ -17,3 +17,4 @@ jobs:
         working-directory: gotogym
       - run: python manage.py test accounts --settings=gotogym.settings_test
         working-directory: gotogym
+      - run: python3 -m unittest discover -s scripts/identity -p 'test*.py' -v
