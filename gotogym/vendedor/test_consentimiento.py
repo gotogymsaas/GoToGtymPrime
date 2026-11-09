@@ -54,7 +54,7 @@ class CommerceConsentTests(TestCase):
         self.assertFalse(revoked["scopes"]["tailoring.measurements"])
         self.assertEqual(revoked["version"], 3)
         self.assertEqual(
-            list(CommerceConsentAuditEvent.objects.values_list("allowed", flat=True)),
+            list(CommerceConsentAuditEvent.objects.order_by("pk").values_list("allowed", flat=True)),
             [True, False],
         )
         self.assertEqual(CommercePersonalizationConsent.objects.count(), 1)
@@ -68,6 +68,13 @@ class CommerceConsentTests(TestCase):
         own = other_client.get(URL).json()
         self.assertFalse(own["scopes"]["profile.basic"])
         self.assertEqual(CommercePersonalizationConsent.objects.count(), 1)
+
+    def test_idempotent_grant_does_not_duplicate_audit(self):
+        self.link()
+        first = self.post("profile.basic", True).json()
+        second = self.post("profile.basic", True).json()
+        self.assertEqual(first["version"], second["version"])
+        self.assertEqual(CommerceConsentAuditEvent.objects.count(), 1)
 
     def test_reject_unknown_scope_and_non_boolean(self):
         self.link()
