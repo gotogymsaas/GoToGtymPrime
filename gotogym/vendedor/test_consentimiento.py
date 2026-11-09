@@ -3,7 +3,6 @@ import json
 
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
-
 from gotogym_oidc.models import ExternalIdentityLink
 
 from .models import CommerceConsentAuditEvent, CommercePersonalizationConsent
