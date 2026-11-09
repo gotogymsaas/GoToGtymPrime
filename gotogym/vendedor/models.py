@@ -18,6 +18,9 @@ class CommercePersonalizationConsent(models.Model):
     version = models.PositiveIntegerField(default=1)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"Commerce consent for user {self.user_id} (v{self.version})"
+
 
 class CommerceConsentAuditEvent(models.Model):
     user = models.ForeignKey(
@@ -28,3 +31,6 @@ class CommerceConsentAuditEvent(models.Model):
     allowed = models.BooleanField()
     consent_version = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Commerce consent event {self.pk} for user {self.user_id}"
