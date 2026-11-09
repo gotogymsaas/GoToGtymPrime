@@ -120,8 +120,13 @@ def _complete_login(request, claims, next_url):
     if not subject:
         return _fail(request, 'subject_claim_missing')
     verified = claims.get('email_verified')
-    if (verified is not None and verified is not True) or (verified is None and conf.get('REQUIRE_EMAIL_VERIFIED_CLAIM')):
+    # A claim explicitly marked unverified is never accepted.
+    if verified is not None and verified is not True:
         return _fail(request, 'email_not_verified')
+    # Entra External ID can omit email_verified. In that case only an
+    # already linked subject or a locally password-verified existing user
+    # may proceed. Never auto-create a user based on an unverified email.
+    email_proof_missing = verified is None and conf.get('REQUIRE_EMAIL_VERIFIED_CLAIM')
 
     adapter = get_adapter()
     adapter.validate_claims(request, claims)
@@ -142,6 +147,8 @@ def _complete_login(request, claims, next_url):
             'next': next_url, 'created': time.time(),
         }
         return redirect('gotogym_oidc:link')
+    if email_proof_missing:
+        return _fail(request, 'email_not_verified')
     if not conf.get('ALLOW_AUTO_CREATE'):
         return _fail(request, 'auto_create_disabled')
     try:
