@@ -11,7 +11,6 @@ from django.http import JsonResponse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_http_methods
-
 from gotogym_oidc.models import ExternalIdentityLink
 
 from .models import CommerceConsentAuditEvent, CommercePersonalizationConsent
