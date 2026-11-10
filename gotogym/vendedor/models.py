@@ -70,3 +70,57 @@ class CommerceConsentAuditEvent(models.Model):
 
     def __str__(self):
         return f"Commerce consent event {self.pk} for user {self.user_id}"
+
+
+# Medidas corporales que el cliente escribe en su perfil, solo para sugerir
+# tallas. Nunca se derivan de estatura, peso, fotos ni datos de salud. Viven en
+# Prime y se borran al revocar `tailoring.measurements`.
+MEASUREMENT_FIELDS = {
+    "chest_cm": ("chest_circumference_cm", 50, 200),
+    "waist_cm": ("waist_cm", 40, 200),
+    "hip_cm": ("hip_cm", 50, 220),
+    "inseam_cm": ("inseam_cm", 40, 120),
+}
+MEASUREMENT_MAX_AGE = timedelta(days=180)
+
+
+class TailoringMeasurement(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="tailoring_measurement",
+    )
+    chest_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    waist_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    hip_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    inseam_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    captured_at = models.DateTimeField()
+
+    def __str__(self):
+        return f"Tailoring measurement for user {self.user_id}"
+
+    def is_current(self, now=None):
+        return (now or timezone.now()) - self.captured_at <= MEASUREMENT_MAX_AGE
+
+
+# Memoria comercial: solo lo que el cliente confirma con "Recordar" en el panel.
+# Vocabulario cerrado; nada se guarda por inferencia del modelo.
+MEMORY_KINDS = ("size", "fit", "color", "activity")
+MEMORY_TTL = timedelta(days=90)
+MAX_MEMORY_ITEMS = 8
+
+
+class CommerceMemoryItem(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="commerce_memory_items",
+    )
+    kind = models.CharField(max_length=16)
+    value = models.CharField(max_length=40)
+    confirmed_at = models.DateTimeField()
+    expires_at = models.DateTimeField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "kind"], name="vendedor_memory_one_per_kind"),
+        ]
+
+    def __str__(self):
+        return f"Commerce memory {self.kind} for user {self.user_id}"

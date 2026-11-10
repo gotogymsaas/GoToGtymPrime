@@ -28,10 +28,10 @@
   hay: al editar style.css o tokens.css hay que subirlo o el navegador
   seguira sirviendo la copia vieja.
   {% endcomment %}
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261019-pausa">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261109-sinbuscador">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
   <link rel="stylesheet" href="{% static 'css/cookie_banner.css' %}?v=20261017-responsive">
-  {% if vendedor_visible %}<link rel="stylesheet" href="{% static 'css/vendedor.css' %}?v=20261102-coach10">{% endif %}
+  {% if vendedor_visible %}<link rel="stylesheet" href="{% static 'css/vendedor.css' %}?v=20261109-coach12">{% endif %}
   {% block extra_head %}{% endblock %}
   {% comment %}
   Tailwind compilado. Sustituye a cdn.tailwindcss.com, que era el
@@ -91,38 +91,18 @@
     <div class="gtg-nav-actions">
       {% if vendedor_visible %}
       {% comment %}
-      Quantum Coach, la IA de GoToGym. Va a la izquierda del buscador: es la
-      forma de preguntar en lenguaje natural, y el buscador la de filtrar por
-      palabra. Nace oculto: vendedor.js lo muestra al cargar; sin JavaScript no
-      puede abrirse y un boton muerto solo estorbaria.
+      Quantum Coach, la IA de GoToGym: la forma de preguntar en lenguaje
+      natural por el catalogo. Nace oculto: vendedor.js lo muestra al cargar;
+      sin JavaScript no puede abrirse y un boton muerto solo estorbaria.
       {% endcomment %}
       <button type="button" class="gtg-vendedor-toggle" hidden data-vendedor-toggle
               aria-haspopup="dialog" aria-expanded="false" aria-controls="vendedor-panel"
               aria-label="{% trans 'Abrir Quantum Coach, la IA de GoToGym' %}" data-track="vendedor_open" data-track-origen="barra">
         <span class="coach-orb coach-orb--md" aria-hidden="true"></span>
-        <span class="gtg-vendedor-toggle__label">Coach</span>
+        <span class="gtg-vendedor-toggle__label">Quantum Coach</span>
         <span class="gtg-vendedor-toggle__badge" aria-hidden="true">{% trans "IA" %}</span>
       </button>
       {% endif %}
-
-      {% comment %}
-      La busqueda reutiliza el parametro `filtro` del panel de filtros de la
-      PLP, asi que no necesita vista propia y cae en la misma pagina de
-      resultados que el resto de los filtros.
-      {% endcomment %}
-      {% comment %}
-      Campo siempre visible. Enter envia el formulario; el boton visible sobraba.
-      {% endcomment %}
-      <form class="gtg-nav-search" role="search" method="get" action="{% url 'tienda:producto_list' %}">
-        <div class="gtg-nav-search__field">
-          <label class="gtg-nav-search__icon" for="nav-search">
-            <span class="material-icons-outlined" aria-hidden="true">search</span>
-            <span class="sr-only">{% trans "Buscar productos" %}</span>
-          </label>
-          <input id="nav-search" type="search" name="filtro" value="{{ filtro|default:'' }}" placeholder="{% trans 'Buscar' %}">
-        </div>
-        <button type="submit" class="sr-only">{% trans "Buscar" %}</button>
-      </form>
 
       {% include "partials/_selector_idioma.html" with variante="menu" %}
 

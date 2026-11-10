@@ -1492,22 +1492,22 @@ msgid ""
 "ropa que parece técnica. Hacemos ropa que lo es."
 msgstr ""
 "GoToGym is a high-tech sports tailoring brand. We develop garments with "
-"next-generation materials, tested, certified and designed to respond to the"
-" body in motion. We don't make clothes that look technical. We make clothes "
+"next-generation materials, tested, certified and designed to respond to the "
+"body in motion. We don't make clothes that look technical. We make clothes "
 "that are."
 
 msgid ""
 "La tecnología adquiere valor cuando se integra con naturalidad a la vida. "
 "Por eso cada prenda comienza con una necesidad humana y termina en una "
 "experiencia clara, útil y propia. Creemos que cada persona puede liderar su "
-"propia revolución interna, y estamos aquí para acompañarla con la prenda, "
-"la tecnología y la comunidad que eso requiere."
+"propia revolución interna, y estamos aquí para acompañarla con la prenda, la"
+" tecnología y la comunidad que eso requiere."
 msgstr ""
 "Technology gains value when it blends naturally into life. That is why every"
 " garment starts with a human need and ends in a clear, useful and personal "
-"experience. We believe everyone can lead their own inner revolution, and we"
-" are here to support them with the garment, the technology and the community"
-" that takes."
+"experience. We believe everyone can lead their own inner revolution, and we "
+"are here to support them with the garment, the technology and the community "
+"that takes."
 
 msgid "Hacer el bienestar personalizado universalmente accesible."
 msgstr "To make personalized wellbeing universally accessible."
@@ -1558,8 +1558,8 @@ msgid ""
 "con sus referencias."
 msgstr ""
 "Start with the collection or go deeper in the Journal: textile science, "
-"technology applied to movement and everything behind each garment, with its"
-" references."
+"technology applied to movement and everything behind each garment, with its "
+"references."
 
 msgid ""
 "Mínimo 8 caracteres, con una mayúscula, una minúscula, un número y un "
@@ -2640,8 +2640,8 @@ msgid ""
 "Cada prenda se desarrolla pensando en cómo se usa de verdad: en el gym, en "
 "la calle, en tu día completo."
 msgstr ""
-"Every garment is developed with real use in mind: at the gym, on the "
-"street, throughout your whole day."
+"Every garment is developed with real use in mind: at the gym, on the street,"
+" throughout your whole day."
 
 msgid "Bienestar en movimiento"
 msgstr "Wellbeing in motion"
@@ -3634,8 +3634,6 @@ msgstr "Tracking number"
 msgid "Transportadora: %(transportadora)s · Guía: %(guia)s"
 msgstr "Carrier: %(transportadora)s · Tracking number: %(guia)s"
 
-
-
 #, python-format
 msgid "Recibimos tu pedido %(numero)s"
 msgstr "We received your order %(numero)s"
@@ -3644,13 +3642,19 @@ msgstr "We received your order %(numero)s"
 msgid "Recibimos tu pedido %(numero)s y está pendiente de pago."
 msgstr "We received your order %(numero)s and it is pending payment."
 
-msgid "Si ya pagaste, te enviaremos la confirmación en cuanto se acredite el pago."
-msgstr "If you have already paid, we will send you the confirmation as soon as the payment is credited."
+msgid ""
+"Si ya pagaste, te enviaremos la confirmación en cuanto se acredite el pago."
+msgstr ""
+"If you have already paid, we will send you the confirmation as soon as the "
+"payment is credited."
 
 #, python-format
-msgid "Si el pago no se completa en %(horas)s horas, el pedido se cancelará automáticamente y no se hará ningún cobro."
-msgstr "If the payment is not completed within %(horas)s hours, the order will be cancelled automatically and you will not be charged."
-
+msgid ""
+"Si el pago no se completa en %(horas)s horas, el pedido se cancelará "
+"automáticamente y no se hará ningún cobro."
+msgstr ""
+"If the payment is not completed within %(horas)s hours, the order will be "
+"cancelled automatically and you will not be charged."
 
 msgid "Recibes este correo porque hiciste un pedido en GoToGym."
 msgstr "You are receiving this email because you placed an order at GoToGym."
@@ -3673,29 +3677,39 @@ msgstr "View my order"
 msgid "Transportadora"
 msgstr "Carrier"
 
-msgid "Si tienes dudas, escríbenos a support@gotogym.store con tu número de pedido."
-msgstr "If you have any questions, write to us at support@gotogym.store with your order number."
+msgid ""
+"Si tienes dudas, escríbenos a support@gotogym.store con tu número de pedido."
+msgstr ""
+"If you have any questions, write to us at support@gotogym.store with your "
+"order number."
 
-
-msgid "Las compras están en pausa temporalmente. Vuelve pronto: tu carrito se conserva."
+msgid ""
+"Las compras están en pausa temporalmente. Vuelve pronto: tu carrito se "
+"conserva."
 msgstr "Purchases are temporarily paused. Come back soon: your cart is kept."
 
-msgid "Las compras están en pausa temporalmente. Puedes seguir explorando el catálogo."
+msgid ""
+"Las compras están en pausa temporalmente. Puedes seguir explorando el "
+"catálogo."
 msgstr "Purchases are temporarily paused. You can keep browsing the catalog."
-
 
 # Paginas de error
 msgid "Solicitud no válida"
 msgstr "Invalid request"
 
-msgid "No pudimos entender lo que se envió. Revisa los datos e inténtalo de nuevo."
+msgid ""
+"No pudimos entender lo que se envió. Revisa los datos e inténtalo de nuevo."
 msgstr "We could not understand what was sent. Check the data and try again."
 
 msgid "Acceso denegado"
 msgstr "Access denied"
 
-msgid "No tienes permiso para ver esta página. Si crees que es un error, escríbenos."
-msgstr "You do not have permission to view this page. If you think this is a mistake, write to us."
+msgid ""
+"No tienes permiso para ver esta página. Si crees que es un error, "
+"escríbenos."
+msgstr ""
+"You do not have permission to view this page. If you think this is a "
+"mistake, write to us."
 
 msgid "Página no encontrada"
 msgstr "Page not found"
@@ -3712,14 +3726,19 @@ msgstr "This page does not support the action you tried to perform."
 msgid "Demasiadas solicitudes"
 msgstr "Too many requests"
 
-msgid "Hiciste muchas solicitudes seguidas. Espera unos segundos e inténtalo de nuevo."
-msgstr "You made too many requests in a row. Wait a few seconds and try again."
+msgid ""
+"Hiciste muchas solicitudes seguidas. Espera unos segundos e inténtalo de "
+"nuevo."
+msgstr ""
+"You made too many requests in a row. Wait a few seconds and try again."
 
 msgid "Algo salió mal"
 msgstr "Something went wrong"
 
-msgid "Tuvimos un problema de nuestro lado. Ya quedó registrado y lo revisaremos."
-msgstr "We had a problem on our side. It has been recorded and we will look into it."
+msgid ""
+"Tuvimos un problema de nuestro lado. Ya quedó registrado y lo revisaremos."
+msgstr ""
+"We had a problem on our side. It has been recorded and we will look into it."
 
 msgid "Error"
 msgstr "Error"
@@ -3734,7 +3753,6 @@ msgid "Contactar soporte →"
 msgstr "Contact support →"
 
 # Quantum Coach, la IA de GoToGym (app vendedor).
-
 msgid "Abrir Quantum Coach, la IA de GoToGym"
 msgstr "Open Quantum Coach, GoToGym's AI"
 
@@ -3750,8 +3768,12 @@ msgstr "Start a new conversation"
 msgid "Cerrar Quantum Coach"
 msgstr "Close Quantum Coach"
 
-msgid "Soy una IA y puedo equivocarme: confirma el precio y la disponibilidad en la ficha del producto."
-msgstr "I'm an AI and I can make mistakes: please confirm the price and availability on the product page."
+msgid ""
+"Soy una IA y puedo equivocarme: confirma el precio y la disponibilidad en la"
+" ficha del producto."
+msgstr ""
+"I'm an AI and I can make mistakes: please confirm the price and availability"
+" on the product page."
 
 msgid "Cómo tratamos tus datos"
 msgstr "How we handle your data"
@@ -3762,8 +3784,12 @@ msgstr "Got it"
 msgid "Conversación con Quantum Coach"
 msgstr "Conversation with Quantum Coach"
 
-msgid "Hola, soy Quantum Coach, la IA de GoToGym. Te ayudo a elegir prendas y tallas, y a resolver dudas sobre envíos y políticas de la tienda."
-msgstr "Hi, I'm Quantum Coach, GoToGym's AI. I help you choose items and sizes, and answer questions about shipping and store policies."
+msgid ""
+"Hola, soy Quantum Coach, la IA de GoToGym. Te ayudo a elegir prendas y "
+"tallas, y a resolver dudas sobre envíos y políticas de la tienda."
+msgstr ""
+"Hi, I'm Quantum Coach, GoToGym's AI. I help you choose items and sizes, and "
+"answer questions about shipping and store policies."
 
 msgid "Sugerencias para empezar"
 msgstr "Suggestions to get started"
@@ -3819,17 +3845,29 @@ msgstr "I couldn't answer this time. Please try again."
 msgid "Espera unos segundos antes de enviar otro mensaje."
 msgstr "Wait a few seconds before sending another message."
 
-msgid "Llegaste al límite de mensajes de esta conversación. Empieza una nueva o habla con una persona."
-msgstr "You've reached the message limit for this conversation. Start a new one or talk to a person."
+msgid ""
+"Llegaste al límite de mensajes de esta conversación. Empieza una nueva o "
+"habla con una persona."
+msgstr ""
+"You've reached the message limit for this conversation. Start a new one or "
+"talk to a person."
 
-msgid "Alcanzaste el límite de mensajes de hoy. Vuelve mañana o escríbenos desde Contacto."
-msgstr "You've reached today's message limit. Come back tomorrow or write to us from Contact."
+msgid ""
+"Alcanzaste el límite de mensajes de hoy. Vuelve mañana o escríbenos desde "
+"Contacto."
+msgstr ""
+"You've reached today's message limit. Come back tomorrow or write to us from"
+" Contact."
 
 msgid "Tu mensaje está vacío o es demasiado largo."
 msgstr "Your message is empty or too long."
 
-msgid "No pude dar una respuesta confiable a esa pregunta. Reformúlala o habla con una persona."
-msgstr "I couldn't give a reliable answer to that question. Rephrase it or talk to a person."
+msgid ""
+"No pude dar una respuesta confiable a esa pregunta. Reformúlala o habla con "
+"una persona."
+msgstr ""
+"I couldn't give a reliable answer to that question. Rephrase it or talk to a"
+" person."
 
 msgid "No hay conexión. Revisa tu internet e intenta de nuevo."
 msgstr "There's no connection. Check your internet and try again."
@@ -3848,3 +3886,161 @@ msgstr "View %(nombre)s"
 msgid "Ir al pago"
 msgstr "Go to checkout"
 
+msgid ""
+"Si quieres que use lo que ya sabe de ti en Quantum Coach, puedes activarlo "
+"en"
+msgstr ""
+"If you want me to use what Quantum Coach already knows about you, you can "
+"turn it on in"
+
+msgid "Recordar esta talla"
+msgstr "Remember this size"
+
+msgid "Recordaré tu talla:"
+msgstr "I'll remember your size:"
+
+msgid "No pude guardar esa preferencia."
+msgstr "I couldn't save that preference."
+
+msgid "Quantum Coach"
+msgstr "Quantum Coach"
+
+msgid "Personalización con Quantum Coach"
+msgstr "Personalization with Quantum Coach"
+
+msgid ""
+"Elige qué puede usar Quantum Coach para recomendarte en la tienda. Todo "
+"empieza desactivado, puedes cambiarlo cuando quieras y cada permiso vence a "
+"los 12 meses."
+msgstr ""
+"Choose what Quantum Coach can use to make recommendations in the store. "
+"Everything starts turned off, you can change it any time and each permission"
+" expires after 12 months."
+
+msgid ""
+"Para activar la personalización, entra con tu cuenta GoToGym (la misma de "
+"Quantum Coach) y vincúlala con esta tienda."
+msgstr ""
+"To turn on personalization, sign in with your GoToGym account (the same one "
+"you use for Quantum Coach) and link it to this store."
+
+msgid "Permisos de personalización"
+msgstr "Personalization permissions"
+
+#, python-format
+msgid "Vence el %(fecha)s"
+msgstr "Expires on %(fecha)s"
+
+msgid "Guardar permisos"
+msgstr "Save permissions"
+
+msgid "Mis medidas para tallas"
+msgstr "My measurements for sizing"
+
+msgid ""
+"Mídete sobre ropa ligera con una cinta métrica. Son privadas: solo se usan "
+"para comparar con las medidas de cada prenda, nunca se muestran en el chat."
+msgstr ""
+"Measure yourself over light clothing with a tape measure. They are private: "
+"they are only used to compare with each garment's measurements and are never"
+" shown in the chat."
+
+msgid ""
+"Tus medidas tienen más de 6 meses. Actualízalas para que sigan sirviendo."
+msgstr ""
+"Your measurements are more than 6 months old. Update them so they stay "
+"useful."
+
+#, python-format
+msgid "Guardadas el %(fecha)s"
+msgstr "Saved on %(fecha)s"
+
+msgid "Guardar medidas"
+msgstr "Save measurements"
+
+msgid "Borrar mis medidas"
+msgstr "Delete my measurements"
+
+msgid "Lo que Quantum Coach recuerda de tus compras"
+msgstr "What Quantum Coach remembers about your purchases"
+
+#, python-format
+msgid "hasta el %(fecha)s"
+msgstr "until %(fecha)s"
+
+msgid "Olvidar todo"
+msgstr "Forget everything"
+
+msgid "Perfil deportivo básico"
+msgstr "Basic sports profile"
+
+msgid ""
+"Tu deporte favorito, tu horario de entrenamiento y tu nivel de actividad."
+msgstr "Your favorite sport, your training schedule and your activity level."
+
+msgid "Preferencias de entrenamiento"
+msgstr "Training preferences"
+
+msgid "Lo que confirmaste en Quantum Coach: actividad, metas y horarios."
+msgstr "What you confirmed in Quantum Coach: activity, goals and schedules."
+
+msgid "Experiencias deportivas"
+msgstr "Sports experiences"
+
+msgid "Qué agentes deportivos has completado, sin sus resultados."
+msgstr "Which sports agents you have completed, without their results."
+
+msgid "Medidas para tallas"
+msgstr "Measurements for sizing"
+
+msgid "Las medidas que escribas aquí, solo para sugerirte tallas."
+msgstr "The measurements you enter here, only to suggest sizes."
+
+msgid "Recordar mis elecciones"
+msgstr "Remember my choices"
+
+msgid "La talla y el estilo que confirmes en el chat, durante 90 días."
+msgstr "The size and style you confirm in the chat, for 90 days."
+
+msgid "Pecho (cm)"
+msgstr "Chest (cm)"
+
+msgid "Cintura (cm)"
+msgstr "Waist (cm)"
+
+msgid "Cadera (cm)"
+msgstr "Hips (cm)"
+
+msgid "Tiro / entrepierna (cm)"
+msgstr "Inseam (cm)"
+
+msgid "Ajuste"
+msgstr "Fit"
+
+msgid "Actividad"
+msgstr "Activity"
+
+msgid "Para personalizar con Quantum Coach primero vincula tu cuenta GoToGym."
+msgstr "To personalize with Quantum Coach, first link your GoToGym account."
+
+msgid "Guardamos tus preferencias de personalización."
+msgstr "We saved your personalization preferences."
+
+msgid "Activa «Medidas para tallas» antes de guardar tus medidas."
+msgstr "Turn on “Measurements for sizing” before saving your measurements."
+
+msgid "Borramos tus medidas."
+msgstr "We deleted your measurements."
+
+#, python-format
+msgid "Revisa %(campo)s: debe estar entre %(min)s y %(max)s cm."
+msgstr "Check %(campo)s: it must be between %(min)s and %(max)s cm."
+
+msgid "Escribe al menos una medida."
+msgstr "Enter at least one measurement."
+
+msgid "Guardamos tus medidas. Solo se usan para sugerirte tallas."
+msgstr "We saved your measurements. They are only used to suggest sizes."
+
+msgid "Olvidamos tus elecciones guardadas."
+msgstr "We forgot your saved choices."

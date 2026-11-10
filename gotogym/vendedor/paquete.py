@@ -25,11 +25,13 @@ from carrito.services import (
 )
 from django.conf import settings
 from django.urls import Resolver404, resolve
+from django.utils import timezone
 from django.utils.translation import get_language
 from gotogym.ajustes_tienda import compras_pausadas, pagos_habilitados
 from inventory.services import get_available_quantity
 
-from . import contrato, evidencia, identidad
+from . import contrato, evidencia, identidad, talla
+from .models import CommerceMemoryItem, CommercePersonalizationConsent
 
 MAX_LARGO_FILTRO = 100
 
@@ -120,6 +122,29 @@ def pagos_en_vivo():
     )
 
 
+def contexto_del_cliente(user):
+    """Datos que solo Prime tiene y que el cliente autorizo: orientacion de
+    talla (sin centimetros) y elecciones que confirmo con "Recordar". Vacio
+    si no hay permisos vigentes. El Coach vuelve a exigir los scopes de la
+    asercion antes de usarlos."""
+    consent = CommercePersonalizationConsent.objects.filter(user=user).first()
+    if consent is None:
+        return {}
+    contexto = {}
+    if consent.is_active('tailoring.measurements'):
+        guia = talla.orientacion(user)
+        if guia:
+            contexto['size_hint'] = guia
+    if consent.is_active('conversation.commerce_memory'):
+        recuerdos = [
+            {'kind': item.kind, 'value': item.value}
+            for item in CommerceMemoryItem.objects.filter(user=user, expires_at__gt=timezone.now()).order_by('kind')
+        ]
+        if recuerdos:
+            contexto['memory'] = recuerdos
+    return contexto
+
+
 def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=None):
     """Solicitud lista para firmar y enviar.
 
@@ -160,6 +185,9 @@ def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=No
         bloque = identidad.emitir(request.user, ahora=ahora)
         if bloque is not None:
             solicitud['identity'] = bloque
+            contexto = contexto_del_cliente(request.user)
+            if contexto:
+                solicitud['customer_context'] = contexto
 
     candidatos = solicitud['evidence']['candidates']
     while candidatos and contrato.tamano_en_bytes(solicitud) > contrato.MAX_BYTES_SOLICITUD:

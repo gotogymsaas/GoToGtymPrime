@@ -54,6 +54,10 @@ con ese mismo aviso, sin llamar al servidor.
         <span class="sr-only">Quantum Coach: </span>
         {% if vendedor_disponible %}
         <p>{% trans "Hola, soy Quantum Coach, la IA de GoToGym. Te ayudo a elegir prendas y tallas, y a resolver dudas sobre envíos y políticas de la tienda." %}</p>
+        {% if vendedor_invitar_personalizar %}
+        <p class="gtg-vendedor__hint" data-vendedor-invitacion>{% trans "Si quieres que use lo que ya sabe de ti en Quantum Coach, puedes activarlo en" %}
+          <a class="gtg-vendedor__link" href="{% url 'edit_profile' %}#personalizacion">{% trans "Mi cuenta" %}</a>.</p>
+        {% endif %}
         {% else %}
         <p>{% trans "En este momento la IA de GoToGym no está disponible. Vuelve más tarde." %}</p>
         <p><a class="gtg-vendedor__link" href="{% url 'contacto' %}">{% trans "Hablar con una persona" %}</a></p>
@@ -110,7 +114,10 @@ con ese mismo aviso, sin llamar al servidor.
     <span data-texto="error_respuesta_rechazada">{% trans "No pude dar una respuesta confiable a esa pregunta. Reformúlala o habla con una persona." %}</span>
     <span data-texto="error_red">{% trans "No hay conexión. Revisa tu internet e intenta de nuevo." %}</span>
     <span data-texto="error_sesion">{% trans "Tu sesión de seguridad venció. Recarga la página e intenta de nuevo." %}</span>
+    <span data-texto="recordar_talla">{% trans "Recordar esta talla" %}</span>
+    <span data-texto="recordado">{% trans "Recordaré tu talla:" %}</span>
+    <span data-texto="no_se_pudo_recordar">{% trans "No pude guardar esa preferencia." %}</span>
   </div>
 
-  <script id="vendedor-config" type="application/json">{"endpoint": "{% url 'vendedor:mensaje' %}", "csrf": "{{ csrf_token }}", "maxLength": 600, "disponible": {% if vendedor_disponible %}true{% else %}false{% endif %}, "cartUrl": "{% url 'carrito:cart_detail' %}", "contactUrl": "{% url 'contacto' %}"}</script>
+  <script id="vendedor-config" type="application/json">{"endpoint": "{% url 'vendedor:mensaje' %}", "csrf": "{{ csrf_token }}", "maxLength": 600, "disponible": {% if vendedor_disponible %}true{% else %}false{% endif %}, "cartUrl": "{% url 'carrito:cart_detail' %}", "contactUrl": "{% url 'contacto' %}", "puedeRecordar": {% if vendedor_puede_recordar %}true{% else %}false{% endif %}, "recordarUrl": "{% url 'vendedor:personalizacion_recordar' %}"}</script>
 </aside>

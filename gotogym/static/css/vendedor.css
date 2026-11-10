@@ -109,42 +109,35 @@
 
 /* --- Boton de la barra ---------------------------------------------------------- */
 
+/* Misma lectura que la cabecera de la app del Coach: orbe y el nombre
+ * "Quantum Coach" en blanco y negrita, sin contorno de pastilla ni fondo,
+ * seguido de la etiqueta dorada "IA". La fuente de la marca solo trae 400 y
+ * 800, por eso la negrita se pide en 800.
+ * El estado activo lo marca el color de acento, no una caja alrededor. */
 .gtg-vendedor-toggle {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 10px;
   min-width: 44px;
   min-height: 44px;
   margin-right: var(--space-3);
-  padding: 0 var(--space-3) 0 var(--space-2);
-  border: 1px solid var(--color-accent);
+  padding: 0 var(--space-2) 0 0;
+  border: 0;
   border-radius: var(--radius-pill);
-  background: var(--color-bg-elevated);
-  color: var(--color-text-primary);
+  background: transparent;
+  color: var(--color-premium-white);
   font: inherit;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
   cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-}
-
-@supports (background: color-mix(in srgb, red, blue)) {
-  .gtg-vendedor-toggle {
-    border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
-    background: linear-gradient(
-      120deg,
-      color-mix(in srgb, var(--color-zafiro) 65%, transparent),
-      color-mix(in srgb, var(--color-accent) 10%, transparent)
-    );
-  }
+  transition: color 0.2s ease;
 }
 
 .gtg-vendedor-toggle:hover,
 .gtg-vendedor-toggle[aria-expanded="true"] {
-  border-color: var(--color-accent);
   color: var(--color-accent);
-  box-shadow: 0 0 0 3px var(--color-accent-soft), 0 0 18px var(--color-accent-soft);
 }
 
 .gtg-vendedor-toggle:focus-visible,
@@ -186,17 +179,22 @@
   .gtg-vendedor-toggle__label {
     display: none;
   }
+
+  .gtg-vendedor-toggle {
+    gap: var(--space-2);
+    margin-right: var(--space-2);
+  }
 }
 
-/* Mas estrecho aun, el buscador se quedaria sin sitio: solo el orbe. */
+/* Mas estrecho aun: solo el orbe. */
 @media (min-width: 901px) and (max-width: 1060px) {
   .gtg-vendedor-toggle__badge {
     display: none;
   }
 
   .gtg-vendedor-toggle {
-    padding: 0 var(--space-2);
-    margin-right: var(--space-2);
+    justify-content: center;
+    padding: 0;
   }
 }
 
@@ -283,9 +281,8 @@
   /* La barra se calcula con el ancho de la ventana, pero la pagina ya no lo
    * tiene: con el panel abierto los enlaces del centro se quedaban sin sitio y
    * se montaban sobre la marca. Primero se le quita lo prescindible: el
-   * buscador (sigue en el menu de hamburguesa y en la tienda), la palabra
-   * "Coach" del boton, que ya esta abierto, y holguras de los enlaces. */
-  html.gtg-vendedor-abierto .gtg-nav-search,
+   * nombre "Quantum Coach" del boton, que ya esta abierto, y holguras de
+   * los enlaces. */
   html.gtg-vendedor-abierto .gtg-vendedor-toggle__label,
   html.gtg-vendedor-abierto .gtg-mobile-menu .gtg-vendedor-menu-item {
     display: none;
@@ -503,6 +500,14 @@
 .gtg-vendedor__msg p {
   margin: 0;
   white-space: pre-wrap;
+}
+
+/* Invitacion discreta a activar la personalizacion (solo cuentas vinculadas). */
+.gtg-vendedor__msg p.gtg-vendedor__hint {
+  margin-top: 8px;
+  font-size: 0.85em;
+  opacity: 0.85;
+  white-space: normal;
 }
 
 .gtg-vendedor__msg--bot {
@@ -784,27 +789,29 @@
     z-index: 1300;
   }
 
-  /* En movil el Coach es solo el orbe, como los demas iconos de la barra: sin
-     etiqueta, sin marca "IA" y sin el contorno de pastilla. Sigue siendo un
-     objetivo tactil de 44 px y conserva el nombre accesible del boton. */
+  /* En movil la barra lleva el orbe y la etiqueta dorada "IA", para que se
+     reconozca como la IA de un vistazo; el nombre completo va en el menu de
+     hamburguesa. Sigue siendo un objetivo tactil de 44 px de alto y conserva
+     el nombre accesible del boton. */
   .gtg-vendedor-toggle {
     justify-content: center;
-    width: 44px;
+    gap: 6px;
+    min-width: 44px;
     height: 44px;
     margin-right: 0;
-    padding: 0;
-    border-color: transparent;
-    border-radius: 50%;
-    background: transparent;
+    padding: 0 4px;
   }
 
   .gtg-vendedor-toggle .coach-orb {
-    --orb: 32px;
+    --orb: 30px;
   }
 
-  .gtg-vendedor-toggle__label,
-  .gtg-vendedor-toggle__badge {
+  .gtg-vendedor-toggle .gtg-vendedor-toggle__label {
     display: none;
+  }
+
+  .gtg-vendedor-toggle .gtg-vendedor-toggle__badge {
+    display: inline-block;
   }
 
   .gtg-vendedor {

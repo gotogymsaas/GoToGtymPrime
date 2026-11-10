@@ -112,7 +112,11 @@
 .account-address-list { list-style: none; margin: 0 0 var(--space-5); padding: 0; }
 .account-address-list > li { border-bottom: 1px solid rgba(0,0,0,.08); padding: var(--space-4) 0; }
 .account-address-list label { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
-.account-address-list input[type="radio"] { width: 16px; height: 16px; min-height: 0; margin-top: 3px; flex: 0 0 auto; }
+.account-address-list input[type="radio"],
+.account-address-list input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; margin-top: 3px; flex: 0 0 auto; }
+.account-address-list input:disabled + span { opacity: .55; }
+.account-personalizacion { border: 0; margin: 0; padding: 0; min-width: 0; }
+.account-link-button { background: none; border: none; cursor: pointer; padding: 0; font: inherit; }
 .account-address-list label small { display: block; color: var(--ed-muted); margin-top: 2px; }
 .account-address-list .account-security { margin: var(--space-3) 0 0 26px; }
 .account-address-list .account-actions { margin: var(--space-2) 0 0 26px; justify-content: flex-start; }

@@ -20,7 +20,9 @@ from .models import (
     CONSENT_VALIDITY,
     SCOPE_FIELDS,
     CommerceConsentAuditEvent,
+    CommerceMemoryItem,
     CommercePersonalizationConsent,
+    TailoringMeasurement,
 )
 
 SCOPES = SCOPE_FIELDS
@@ -87,19 +89,27 @@ def consentimiento(request):
     scope, allowed = data["scope"], data["allowed"]
     if allowed and not linked:
         return _response({"linked": False, **_projection(None)}, 403)
-
     now = timezone.now()
+    row = aplicar(request.user, scope, allowed, now)
+    return _response({"linked": linked, **_projection(row, now)})
+
+
+def aplicar(user, scope, allowed, now=None):
+    """Concede o revoca un scope y devuelve la fila (o None si no habia nada
+    que revocar). Quien llama ya comprobo el enlace para conceder.
+
+    Revocar borra los datos que solo existian por ese permiso: las medidas y
+    la memoria comercial no sobreviven a su consentimiento."""
+    now = now or timezone.now()
     with transaction.atomic():
         if allowed:
-            row, _ = CommercePersonalizationConsent.objects.select_for_update().get_or_create(
-                user=request.user,
-            )
+            row, _ = CommercePersonalizationConsent.objects.select_for_update().get_or_create(user=user)
         else:
-            row = CommercePersonalizationConsent.objects.select_for_update().filter(
-                user=request.user,
-            ).first()
-            if row is None:
-                return _response({"linked": linked, **_projection(None)})
+            row = CommercePersonalizationConsent.objects.select_for_update().filter(user=user).first()
+        if not allowed:
+            _borrar_datos_del_scope(user, scope)
+        if row is None:
+            return None
         field = SCOPES[scope]
         # Conceder renueva un permiso caducado; revocar apaga aunque ya hubiera caducado.
         changed = (not row.is_active(scope, now)) if allowed else getattr(row, field)
@@ -114,6 +124,13 @@ def consentimiento(request):
             row.version += 1
             row.save(update_fields=[field, "granted_at", "version", "updated_at"])
             CommerceConsentAuditEvent.objects.create(
-                user=request.user, scope=scope, allowed=allowed, consent_version=row.version,
+                user=user, scope=scope, allowed=allowed, consent_version=row.version,
             )
-    return _response({"linked": linked, **_projection(row, now)})
+    return row
+
+
+def _borrar_datos_del_scope(user, scope):
+    if scope == "tailoring.measurements":
+        TailoringMeasurement.objects.filter(user=user).delete()
+    elif scope == "conversation.commerce_memory":
+        CommerceMemoryItem.objects.filter(user=user).delete()

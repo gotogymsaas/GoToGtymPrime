@@ -1,0 +1,76 @@
+{% load i18n %}{% if mostrar %}
+<div class="editorial-shell account-layout" id="personalizacion">
+  <div class="account-panel account-field--full">
+    <p class="editorial-kicker">{% trans "Quantum Coach" %}</p>
+    <h2>{% trans "Personalización con Quantum Coach" %}</h2>
+    <p class="account-address-hint">{% trans "Elige qué puede usar Quantum Coach para recomendarte en la tienda. Todo empieza desactivado, puedes cambiarlo cuando quieras y cada permiso vence a los 12 meses." %}</p>
+
+    {% if not vinculado %}
+    <p>{% trans "Para activar la personalización, entra con tu cuenta GoToGym (la misma de Quantum Coach) y vincúlala con esta tienda." %}</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'vendedor:personalizacion_permisos' %}">
+      <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+      <fieldset class="account-personalizacion">
+        <legend class="sr-only">{% trans "Permisos de personalización" %}</legend>
+        <ul class="account-address-list">
+          {% for fila in filas %}
+          <li>
+            <label for="scope-{{ fila.id }}">
+              <input type="checkbox" name="scopes" value="{{ fila.scope }}" id="scope-{{ fila.id }}"
+                     {% if fila.activo %}checked{% endif %}{% if not vinculado and not fila.activo %} disabled{% endif %}
+                     aria-describedby="scope-{{ fila.id }}-ayuda">
+              <span>
+                <strong>{{ fila.etiqueta }}</strong>
+                <small id="scope-{{ fila.id }}-ayuda">{{ fila.descripcion }}{% if fila.activo %} · {% blocktrans with fecha=fila.vence|date:"j M Y" %}Vence el {{ fecha }}{% endblocktrans %}{% endif %}</small>
+              </span>
+            </label>
+          </li>
+          {% endfor %}
+        </ul>
+      </fieldset>
+      <div class="account-actions">
+        <button type="submit" class="editorial-action">{% trans "Guardar permisos" %}</button>
+      </div>
+    </form>
+
+    {% if medidas_activo %}
+    <details class="account-security"{% if not medidas_fecha %} open{% endif %}>
+      <summary>{% trans "Mis medidas para tallas" %}</summary>
+      <p class="account-address-hint">{% trans "Mídete sobre ropa ligera con una cinta métrica. Son privadas: solo se usan para comparar con las medidas de cada prenda, nunca se muestran en el chat." %}</p>
+      {% if medidas_fecha and not medidas_vigentes %}
+      <p>{% trans "Tus medidas tienen más de 6 meses. Actualízalas para que sigan sirviendo." %}</p>
+      {% endif %}
+      <form method="post" action="{% url 'vendedor:personalizacion_medidas' %}" class="account-fields">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        {% for medida in medidas %}
+        <div class="account-field">
+          <label for="medida-{{ medida.campo }}">{{ medida.etiqueta }}</label>
+          <input type="number" inputmode="decimal" step="0.1" min="{{ medida.minimo }}" max="{{ medida.maximo }}"
+                 name="{{ medida.campo }}" id="medida-{{ medida.campo }}" value="{{ medida.valor|default_if_none:''|stringformat:'s' }}">
+        </div>
+        {% endfor %}
+        <div class="account-actions account-field--full">
+          {% if medidas_fecha %}<small>{% blocktrans with fecha=medidas_fecha|date:"j M Y" %}Guardadas el {{ fecha }}{% endblocktrans %}</small>{% endif %}
+          <button type="submit" class="editorial-action">{% trans "Guardar medidas" %}</button>
+          {% if medidas_fecha %}<button type="submit" name="accion" value="borrar" class="editorial-text-link account-link-button">{% trans "Borrar mis medidas" %}</button>{% endif %}
+        </div>
+      </form>
+    </details>
+    {% endif %}
+
+    {% if memoria %}
+    <details class="account-security">
+      <summary>{% trans "Lo que Quantum Coach recuerda de tus compras" %}</summary>
+      <ul>
+        {% for item in memoria %}<li>{{ item.etiqueta }}: {{ item.valor }} <small>· {% blocktrans with fecha=item.hasta|date:"j M Y" %}hasta el {{ fecha }}{% endblocktrans %}</small></li>{% endfor %}
+      </ul>
+      <form method="post" action="{% url 'vendedor:personalizacion_olvidar' %}">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <button type="submit" class="editorial-text-link account-link-button">{% trans "Olvidar todo" %}</button>
+      </form>
+    </details>
+    {% endif %}
+  </div>
+</div>
+{% endif %}

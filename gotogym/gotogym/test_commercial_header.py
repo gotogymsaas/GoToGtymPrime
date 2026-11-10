@@ -67,11 +67,11 @@ class CommercialHeaderTests(TestCase):
 
         self.assertIn('aria-current="page"', navegacion)
 
-    def test_el_buscador_apunta_a_la_tienda_con_el_parametro_de_la_plp(self):
+    def test_el_buscador_del_menu_movil_apunta_a_la_tienda_con_el_parametro_de_la_plp(self):
         self.client.force_login(self.user)
         html = self._html(reverse('home'))
 
-        self.assertIn('class="gtg-nav-search"', html)
+        self.assertIn('class="gtg-mobile-search"', html)
         url_tienda = reverse('tienda:producto_list')
         self.assertIn(f'action="{url_tienda}"', html)
         self.assertIn('name="filtro"', html)

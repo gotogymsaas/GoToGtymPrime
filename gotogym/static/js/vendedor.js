@@ -45,6 +45,7 @@
   var RUTA_ENLACE = /^\/[a-z]{2}\/(tienda|carrito|pedidos-tienda|contacto)\/[A-Za-z0-9\-_\/.%]*$/;
   var RUTA_IMAGEN = /^\/(media|static)\/[A-Za-z0-9\-_\/.%]+$/;
   var RUTA_AGREGAR = /^\/[a-z]{2}\/carrito\/add\/\d+\/$/;
+  var RUTA_RECORDAR = /^\/[a-z]{2}\/vendedor\/personalizacion\/recordar\/$/;
   var SIN_REINTENTO = { limite_turnos: true, limite_diario: true, mensaje_invalido: true };
 
   var botones = document.querySelectorAll('[data-vendedor-toggle]');
@@ -227,10 +228,44 @@
         }
       }));
       medir('vendedor_add_to_cart', { variante: accion.variant_id || 0 });
+      ofrecerRecordar(accion, caja);
     }).catch(function () {
       boton.disabled = false;
       avisoDeAccion(caja, texto('no_se_pudo_agregar'), false);
     });
+  }
+
+  // Memoria comercial: solo si el cliente la activo en Mi cuenta y solo
+  // cuando el pulsa "Recordar". El servidor deduce la talla de la variante.
+  function ofrecerRecordar(accion, caja) {
+    if (!configuracion.puedeRecordar || !RUTA_RECORDAR.test(configuracion.recordarUrl || '')) return;
+    if (typeof accion.variant_id !== 'number') return;
+    var boton = crear('button', 'gtg-vendedor__button gtg-vendedor__button--quiet', texto('recordar_talla'));
+    boton.type = 'button';
+    boton.addEventListener('click', function () {
+      boton.disabled = true;
+      fetch(configuracion.recordarUrl, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': configuracion.csrf || '', 'Accept': 'application/json' },
+        body: JSON.stringify({ variant_id: accion.variant_id })
+      }).then(function (respuesta) {
+        return respuesta.json().then(function (cuerpo) { return { ok: respuesta.ok, cuerpo: cuerpo }; });
+      }).then(function (resultado) {
+        if (!resultado.ok || !resultado.cuerpo || typeof resultado.cuerpo.value !== 'string') {
+          boton.disabled = false;
+          avisoDeAccion(caja, texto('no_se_pudo_recordar'), false);
+          return;
+        }
+        boton.remove();
+        avisoDeAccion(caja, texto('recordado') + ' ' + resultado.cuerpo.value, false);
+      }).catch(function () {
+        boton.disabled = false;
+        avisoDeAccion(caja, texto('no_se_pudo_recordar'), false);
+      });
+    });
+    caja.appendChild(boton);
+    desplazarAlFinal();
   }
 
   function pintarAccion(accion, caja) {

@@ -201,6 +201,34 @@ def _validar_politica(politica, ruta):
     _requerir(politica.get('review_status') in ESTADOS_REVISION, f'{ruta}.review_status')
 
 
+_TALLAS_GUIA = frozenset({'XS', 'S', 'M', 'L', 'XL', 'XXL', 'out_of_guide'})
+_COLUMNAS_GUIA = frozenset({'busto', 'cintura', 'cadera'})
+_TIPOS_MEMORIA = frozenset({'size', 'fit', 'color', 'activity'})
+
+
+def _validar_contexto_cliente(contexto):
+    """Forma cerrada del bloque v2 `customer_context` (ver paquete.contexto_del_cliente)."""
+    _requerir(isinstance(contexto, dict) and contexto and set(contexto) <= {'size_hint', 'memory'}, 'customer_context')
+    guia = contexto.get('size_hint')
+    if guia is not None:
+        _requerir(isinstance(guia, dict) and set(guia) == {'source', 'by_dimension', 'suggestion', 'measured_on'},
+                  'customer_context.size_hint')
+        _requerir(guia['source'] == 'general_size_guide', 'customer_context.size_hint')
+        por = guia['by_dimension']
+        _requerir(isinstance(por, dict) and por and set(por) <= _COLUMNAS_GUIA
+                  and all(v in _TALLAS_GUIA for v in por.values()), 'customer_context.size_hint')
+        _requerir(guia['suggestion'] is None or guia['suggestion'] in _TALLAS_GUIA - {'out_of_guide'},
+                  'customer_context.size_hint')
+        _requerir(re.fullmatch(r'\d{4}-\d{2}-\d{2}', str(guia['measured_on'])) is not None, 'customer_context.size_hint')
+    recuerdos = contexto.get('memory')
+    if recuerdos is not None:
+        _requerir(isinstance(recuerdos, list) and 0 < len(recuerdos) <= 8, 'customer_context.memory')
+        for item in recuerdos:
+            _requerir(isinstance(item, dict) and set(item) == {'kind', 'value'} and item['kind'] in _TIPOS_MEMORIA,
+                      'customer_context.memory')
+            _texto(item['value'], 'customer_context.memory', 40)
+
+
 def validar_solicitud(solicitud):
     """Comprueba que `solicitud` (un dict) cumple el contrato. No devuelve
     nada: lanza `ContratoInvalido` ante el primer incumplimiento."""
@@ -230,6 +258,10 @@ def validar_solicitud(solicitud):
         _requerir(re.fullmatch(r'[0-9a-f]{64}', str(identidad.get('signature'))) is not None,
                   'identity.signature')
         _requerir(visitante['authenticated'] and visitante['subject'].startswith('shop_u_'), 'identity')
+
+    if 'customer_context' in solicitud:
+        _requerir('identity' in solicitud, 'customer_context')
+        _validar_contexto_cliente(solicitud['customer_context'])
 
     pagina = solicitud.get('page')
     _requerir(isinstance(pagina, dict), 'page')

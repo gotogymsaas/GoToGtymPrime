@@ -51,17 +51,14 @@ class MarcadoTests(TestCase):
         self.assertEqual(respuesta.status_code, 200)
         return respuesta.content.decode()
 
-    def test_el_boton_esta_en_la_barra_justo_a_la_izquierda_del_buscador(self):
+    def test_el_boton_abre_las_acciones_de_la_barra_antes_del_idioma(self):
         html = self._html()
         acciones = html[html.index('class="gtg-nav-actions"'):]
         boton = acciones.index('class="gtg-vendedor-toggle"')
-        buscador = acciones.index('class="gtg-nav-search"')
-        fin_boton = acciones.index('</button>', boton)
 
-        self.assertLess(boton, buscador)
-        # Nada entre el boton y el buscador salvo comentarios y espacio.
-        entre = re.sub(r'\{#.*?#\}|<!--.*?-->|\s+', '', acciones[fin_boton + len('</button>'):buscador], flags=re.S)
-        self.assertRegex(entre, r'^<form$')
+        self.assertLess(boton, acciones.index('gtg-lang--menu'))
+        # La barra de escritorio ya no lleva buscador: el Coach ocupa ese papel.
+        self.assertNotIn('gtg-nav-search', acciones.split('</nav>')[0])
 
     def test_el_boton_muestra_el_orbe_el_nombre_y_la_etiqueta_ia(self):
         html = self._html()
@@ -69,7 +66,7 @@ class MarcadoTests(TestCase):
         boton = boton[:boton.index('</button>')]
 
         self.assertIn('coach-orb', boton)
-        self.assertIn('>Coach<', boton)
+        self.assertIn('>Quantum Coach<', boton)
         self.assertRegex(boton, r'gtg-vendedor-toggle__badge[^>]*>IA<')
 
     def test_el_boton_es_accesible_y_nace_oculto(self):
@@ -349,17 +346,18 @@ class ReglasDelCSSTests(SimpleTestCase):
         self.assertIn('calc(100vw - var(--coach-ancho)', css)
         self.assertNotIn('420px', css)
 
-    def test_en_movil_el_coach_es_solo_el_orbe_en_la_barra(self):
+    def test_en_movil_la_barra_muestra_el_orbe_y_la_etiqueta_ia(self):
         css = CSS.read_text(encoding='utf-8')
         inicio = css.rindex('@media (max-width: 900px) {')
         movil = css[inicio:]
 
-        # El boton no se oculta: se reduce al orbe, tactil de 44 px.
-        self.assertRegex(movil, r'\.gtg-vendedor-toggle \{[^}]*width: 44px;[^}]*height: 44px;')
+        # El boton no se oculta: orbe y etiqueta "IA", tactil de 44 px.
+        self.assertRegex(movil, r'\.gtg-vendedor-toggle \{[^}]*min-width: 44px;[^}]*height: 44px;')
         self.assertNotRegex(movil, r'\.gtg-vendedor-toggle \{[^}]*display:\s*none')
-        self.assertRegex(
-            movil, r'\.gtg-vendedor-toggle__label,\s*\.gtg-vendedor-toggle__badge \{[^}]*display: none',
-        )
+        self.assertRegex(movil, r'\.gtg-vendedor-toggle \.gtg-vendedor-toggle__label \{[^}]*display: none')
+        self.assertRegex(movil, r'\.gtg-vendedor-toggle \.gtg-vendedor-toggle__badge \{[^}]*display: inline-block')
+        # La regla de movil no esconde la etiqueta de la entrada del menu.
+        self.assertNotRegex(movil, r'(^|\n)\s*\.gtg-vendedor-toggle__badge[^{]*\{[^}]*display: none')
         # El panel ocupa toda la pantalla.
         self.assertRegex(movil, r'\.gtg-vendedor \{[^}]*width: 100vw')
 
@@ -378,7 +376,13 @@ class ReglasDelCSSTests(SimpleTestCase):
         css = CSS.read_text(encoding='utf-8')
 
         self.assertIn('@supports (background: color-mix(in srgb, red, blue))', css)
-        self.assertRegex(css, r'\.gtg-vendedor-toggle \{[^}]*border: 1px solid var\(--color-accent\)')
+        self.assertRegex(css, r'\.gtg-vendedor \{[^}]*border-left: 1px solid var\(--color-border\)')
+
+    def test_el_boton_de_la_barra_va_sin_contorno_de_pastilla(self):
+        css = CSS.read_text(encoding='utf-8')
+
+        self.assertRegex(css, r'\.gtg-vendedor-toggle \{[^}]*border: 0;[^}]*background: transparent;')
+        self.assertRegex(css, r'\.gtg-vendedor-toggle \{[^}]*color: var\(--color-premium-white\)')
 
     def test_la_etiqueta_ia_usa_el_dorado_de_la_marca(self):
         css = CSS.read_text(encoding='utf-8')
