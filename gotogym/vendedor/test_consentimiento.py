@@ -1,8 +1,10 @@
 """Regresiones del consentimiento omnicanal: nunca se comparten datos por defecto."""
 import json
+from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
+from django.utils import timezone
 from gotogym_oidc.models import ExternalIdentityLink
 
 from .models import CommerceConsentAuditEvent, CommercePersonalizationConsent
@@ -91,3 +93,46 @@ class CommerceConsentTests(TestCase):
                          content_type="application/json").status_code, 403,
         )
         self.assertFalse(CommercePersonalizationConsent.objects.exists())
+
+
+class CommerceConsentLifecycleTests(TestCase):
+    """Revocacion sin enlace, caducidad de 12 meses y memoria comercial."""
+
+    setUp = CommerceConsentTests.setUp
+    link = CommerceConsentTests.link
+    post = CommerceConsentTests.post
+
+    def test_revoke_works_after_unlinking(self):
+        link = self.link()
+        self.post("profile.basic", True)
+        link.delete()
+        response = self.post("profile.basic", False)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()["scopes"]["profile.basic"])
+        self.assertFalse(CommercePersonalizationConsent.objects.get().profile_basic)
+
+    def test_grant_still_requires_link(self):
+        self.assertEqual(self.post("conversation.commerce_memory", True).status_code, 403)
+
+    def test_commerce_memory_scope_is_opt_in(self):
+        self.link()
+        self.assertFalse(self.client.get(URL).json()["scopes"]["conversation.commerce_memory"])
+        granted = self.post("conversation.commerce_memory", True).json()
+        self.assertTrue(granted["scopes"]["conversation.commerce_memory"])
+        self.assertIn("conversation.commerce_memory", granted["expires_at"])
+
+    def test_grant_expires_after_twelve_months_and_can_be_renewed(self):
+        self.link()
+        self.post("sports.preferences", True)
+        row = CommercePersonalizationConsent.objects.get()
+        row.granted_at = {"sports.preferences": (timezone.now() - timedelta(days=366)).isoformat()}
+        row.save()
+        self.assertFalse(self.client.get(URL).json()["scopes"]["sports.preferences"])
+        renewed = self.post("sports.preferences", True).json()
+        self.assertTrue(renewed["scopes"]["sports.preferences"])
+        self.assertEqual(CommerceConsentAuditEvent.objects.filter(allowed=True).count(), 2)
+
+    def test_grant_without_date_is_never_active(self):
+        self.link()
+        CommercePersonalizationConsent.objects.create(user=self.user, profile_basic=True)
+        self.assertFalse(self.client.get(URL).json()["scopes"]["profile.basic"])

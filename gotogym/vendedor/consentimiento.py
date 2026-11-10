@@ -1,6 +1,8 @@
 """Consentimiento granular del vendedor. No lee datos del Coach.
 
-El enlace OIDC es condicion necesaria pero NO es consentimiento.
+El enlace OIDC es condicion necesaria para conceder, pero NO es consentimiento.
+Revocar no exige enlace: un permiso siempre se puede retirar, aunque la cuenta
+se haya desvinculado despues de concederlo.
 Los endpoints son same-origin; POST utiliza CSRF y sesion Django.
 """
 import json
@@ -8,19 +10,20 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import JsonResponse
+from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_http_methods
 from gotogym_oidc.models import ExternalIdentityLink
 
-from .models import CommerceConsentAuditEvent, CommercePersonalizationConsent
+from .models import (
+    CONSENT_VALIDITY,
+    SCOPE_FIELDS,
+    CommerceConsentAuditEvent,
+    CommercePersonalizationConsent,
+)
 
-SCOPES = {
-    "profile.basic": "profile_basic",
-    "sports.preferences": "sports_preferences",
-    "experiences.summary": "experiences_summary",
-    "tailoring.measurements": "tailoring_measurements",
-}
+SCOPES = SCOPE_FIELDS
 MAX_BODY_BYTES = 1024
 
 
@@ -30,14 +33,40 @@ def _response(payload, status=200):
     return response
 
 
-def _projection(consent):
+def _projection(consent, now=None):
+    now = now or timezone.now()
+    scopes, expires = {}, {}
+    for scope in SCOPES:
+        active = consent is not None and consent.is_active(scope, now)
+        scopes[scope] = active
+        if active:
+            granted = timezone.datetime.fromisoformat(consent.granted_at[scope])
+            expires[scope] = (granted + CONSENT_VALIDITY).isoformat()
     return {
         "version": consent.version if consent is not None else 0,
-        "scopes": {
-            scope: bool(getattr(consent, field)) if consent is not None else False
-            for scope, field in SCOPES.items()
-        },
+        "scopes": scopes,
+        "expires_at": expires,
     }
+
+
+def _read_body(request):
+    """`(data, None)` o `(None, respuesta_de_error)`."""
+    try:
+        declared = int(request.META.get("CONTENT_LENGTH") or 0)
+    except ValueError:
+        return None, _response({"error": "invalid_request"}, 400)
+    if declared > MAX_BODY_BYTES or len(request.body) > MAX_BODY_BYTES:
+        return None, _response({"error": "invalid_request"}, 413)
+    if request.content_type != "application/json":
+        return None, _response({"error": "invalid_request"}, 415)
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except (ValueError, UnicodeDecodeError):
+        return None, _response({"error": "invalid_request"}, 400)
+    if (not isinstance(data, dict) or set(data) != {"scope", "allowed"}
+            or data.get("scope") not in SCOPES or type(data.get("allowed")) is not bool):
+        return None, _response({"error": "invalid_scope"}, 400)
+    return data, None
 
 
 @never_cache
@@ -46,40 +75,45 @@ def _projection(consent):
 @require_http_methods(["GET", "POST"])
 def consentimiento(request):
     # Nunca se autoriza personalizar por mera coincidencia de correo.
-    if not ExternalIdentityLink.objects.filter(user=request.user).exists():
-        return _response({"linked": False, **_projection(None)}, 403)
+    linked = ExternalIdentityLink.objects.filter(user=request.user).exists()
 
     if request.method == "GET":
         row = CommercePersonalizationConsent.objects.filter(user=request.user).first()
-        return _response({"linked": True, **_projection(row)})
+        return _response({"linked": linked, **_projection(row)}, 200 if linked or row else 403)
 
-    try:
-        declared = int(request.META.get("CONTENT_LENGTH") or 0)
-    except ValueError:
-        return _response({"error": "invalid_request"}, 400)
-    if declared > MAX_BODY_BYTES or len(request.body) > MAX_BODY_BYTES:
-        return _response({"error": "invalid_request"}, 413)
-    if request.content_type != "application/json":
-        return _response({"error": "invalid_request"}, 415)
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except (ValueError, UnicodeDecodeError):
-        return _response({"error": "invalid_request"}, 400)
-    if (not isinstance(data, dict) or set(data) != {"scope", "allowed"}
-            or data.get("scope") not in SCOPES or type(data.get("allowed")) is not bool):
-        return _response({"error": "invalid_scope"}, 400)
-
+    data, error = _read_body(request)
+    if error is not None:
+        return error
     scope, allowed = data["scope"], data["allowed"]
+    if allowed and not linked:
+        return _response({"linked": False, **_projection(None)}, 403)
+
+    now = timezone.now()
     with transaction.atomic():
-        row, _ = CommercePersonalizationConsent.objects.select_for_update().get_or_create(
-            user=request.user,
-        )
+        if allowed:
+            row, _ = CommercePersonalizationConsent.objects.select_for_update().get_or_create(
+                user=request.user,
+            )
+        else:
+            row = CommercePersonalizationConsent.objects.select_for_update().filter(
+                user=request.user,
+            ).first()
+            if row is None:
+                return _response({"linked": linked, **_projection(None)})
         field = SCOPES[scope]
-        if getattr(row, field) != allowed:
+        # Conceder renueva un permiso caducado; revocar apaga aunque ya hubiera caducado.
+        changed = (not row.is_active(scope, now)) if allowed else getattr(row, field)
+        if changed:
             setattr(row, field, allowed)
+            granted = dict(row.granted_at or {})
+            if allowed:
+                granted[scope] = now.isoformat()
+            else:
+                granted.pop(scope, None)
+            row.granted_at = granted
             row.version += 1
-            row.save(update_fields=[field, "version", "updated_at"])
+            row.save(update_fields=[field, "granted_at", "version", "updated_at"])
             CommerceConsentAuditEvent.objects.create(
                 user=request.user, scope=scope, allowed=allowed, consent_version=row.version,
             )
-    return _response({"linked": True, **_projection(row)})
+    return _response({"linked": linked, **_projection(row, now)})

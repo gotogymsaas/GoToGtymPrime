@@ -29,7 +29,7 @@ from django.utils.translation import get_language
 from gotogym.ajustes_tienda import compras_pausadas, pagos_habilitados
 from inventory.services import get_available_quantity
 
-from . import contrato, evidencia
+from . import contrato, evidencia, identidad
 
 MAX_LARGO_FILTRO = 100
 
@@ -156,6 +156,11 @@ def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=No
 
     # Si no cabe, se pierden primero los candidatos del final (los que menos
     # tienen que ver con el visitante), nunca el producto en foco ni el carrito.
+    if settings.VENDEDOR_CONTRATO_V2 and autenticado:
+        bloque = identidad.emitir(request.user, ahora=ahora)
+        if bloque is not None:
+            solicitud['identity'] = bloque
+
     candidatos = solicitud['evidence']['candidates']
     while candidatos and contrato.tamano_en_bytes(solicitud) > contrato.MAX_BYTES_SOLICITUD:
         candidatos.pop()

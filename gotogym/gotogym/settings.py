@@ -365,6 +365,12 @@ VENDEDOR_ENABLED = _as_bool(os.environ.get('VENDEDOR_ENABLED'), True)
 COACH_API_URL = os.environ.get('COACH_API_URL', '').strip()
 COACH_SERVICE_KEY_ID = os.environ.get('COACH_SERVICE_KEY_ID', '')
 COACH_SERVICE_SECRET = os.environ.get('COACH_SERVICE_SECRET', '')
+# Contrato v2 (asercion de identidad para personalizar con contexto del Coach).
+# Apagado hasta que el Coach acepte la cabecera de contrato '2'. La credencial
+# de identidad es distinta de la de servicio: ver vendedor/identidad.py.
+VENDEDOR_CONTRATO_V2 = _as_bool(os.environ.get('VENDEDOR_CONTRATO_V2'), False)
+VENDEDOR_IDENTIDAD_CLAVE_ID = os.environ.get('VENDEDOR_IDENTIDAD_CLAVE_ID', '')
+VENDEDOR_IDENTIDAD_SECRETO = os.environ.get('VENDEDOR_IDENTIDAD_SECRETO', '')
 # Mensajes por minuto y visitante. Los anonimos tienen menos margen.
 VENDEDOR_RATE_ANON = int(os.environ.get('VENDEDOR_RATE_ANON', '6'))
 VENDEDOR_RATE_AUTH = int(os.environ.get('VENDEDOR_RATE_AUTH', '12'))
