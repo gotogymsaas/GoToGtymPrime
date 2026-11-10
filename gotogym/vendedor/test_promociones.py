@@ -13,6 +13,10 @@ from .test_utilidades import crear_producto
 
 
 class PromocionesTests(TestCase):
+    def setUp(self):
+        # Una migracion siembra el cupon heredado CUPON; cada prueba parte de cero.
+        Coupon.objects.all().delete()
+
     def cupon(self, code, **campos):
         return Coupon.objects.create(code=code, discount_type=campos.pop("discount_type", "percentage"),
                                      value=campos.pop("value", Decimal("10")), **campos)
@@ -29,6 +33,11 @@ class PromocionesTests(TestCase):
         self.assertEqual([f["code"] for f in filas], ["BIENVENIDA"])
         self.assertEqual(filas[0]["min_purchase"], "100000.00")
         self.assertEqual(filas[0]["ends_on"], timezone.localdate(ahora + timedelta(days=5)).isoformat())
+
+    def test_el_cupon_heredado_cupon_se_ofrece_si_esta_activo(self):
+        # Decision de negocio: todo cupon de libre acceso, incluido CUPON.
+        self.cupon("CUPON")
+        self.assertEqual([f["code"] for f in evidencia.promociones()], ["CUPON"])
 
     def test_cupon_de_afiliado_nunca_viaja(self):
         from afiliados.models import PerfilAfiliado
