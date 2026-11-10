@@ -108,7 +108,9 @@ class ClienteHttp:
             raise CoachNoDisponible('no_configurado') from None
         cabeceras['Content-Type'] = 'application/json; charset=utf-8'
         cabeceras['Accept'] = 'application/json'
-        cabeceras[firma.ENCABEZADO_CONTRATO] = contrato.VERSION_CONTRATO
+        cabeceras[firma.ENCABEZADO_CONTRATO] = (
+            contrato.VERSION_CONTRATO_V2 if 'identity' in solicitud else contrato.VERSION_CONTRATO
+        )
 
         try:
             respuesta = requests.post(

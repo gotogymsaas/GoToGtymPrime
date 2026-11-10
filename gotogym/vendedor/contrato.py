@@ -18,6 +18,11 @@ from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 
 VERSION_CONTRATO = '1'
+# v2 = v1 + bloque opcional `identity`. Solo se envia si el Coach lo soporta
+# (VENDEDOR_CONTRATO_V2) y hay asercion; si no, el paquete sale como v1.
+VERSION_CONTRATO_V2 = '2'
+CLAVES_IDENTIDAD = frozenset({'key_id', 'assertion', 'signature'})
+MAX_LARGO_ASERCION = 1024
 
 # Presupuesto de la solicitud. El proveedor del modelo ya rechazo con HTTP 429
 # solicitudes muy grandes, asi que el tope es duro: el paquete se recorta antes
@@ -214,6 +219,17 @@ def validar_solicitud(solicitud):
     _texto(visitante.get('subject'), 'visitor.subject', 80)
     _requerir(visitante['subject'].startswith(_PREFIJOS_SUJETO), 'visitor.subject')
     _requerir(isinstance(visitante.get('authenticated'), bool), 'visitor.authenticated')
+
+    # v2: asercion de identidad opcional (vendedor/identidad.py). Solo su
+    # forma; la firma y la vigencia las comprueba el Coach.
+    if 'identity' in solicitud:
+        identidad = solicitud['identity']
+        _requerir(isinstance(identidad, dict) and set(identidad) == CLAVES_IDENTIDAD, 'identity')
+        _texto(identidad.get('key_id'), 'identity.key_id', 40)
+        _texto(identidad.get('assertion'), 'identity.assertion', MAX_LARGO_ASERCION)
+        _requerir(re.fullmatch(r'[0-9a-f]{64}', str(identidad.get('signature'))) is not None,
+                  'identity.signature')
+        _requerir(visitante['authenticated'] and visitante['subject'].startswith('shop_u_'), 'identity')
 
     pagina = solicitud.get('page')
     _requerir(isinstance(pagina, dict), 'page')
