@@ -25,7 +25,9 @@ from decimal import Decimal
 from django.conf import settings
 from django.db.models import Prefetch
 from django.urls import reverse
+from django.utils import timezone
 from gotogym.afirmaciones import PROHIBIDAS
+from orders.models import Coupon
 from tienda.catalog import (
     ORDEN_DEL_PANEL,
     catalog_variants_queryset,
@@ -156,17 +158,49 @@ def _candidato(producto, incluir_agotadas=False):
         'price': precio_texto(min(v.effective_price for v in elegidas)),
         'description': descripcion_corta(producto.description),
         'url': reverse('tienda:producto_detail', args=[producto.id]),
-        'variants': [
-            {
-                'id': v.id,
-                'size': v.size,
-                'color': v.color,
-                'price': precio_texto(v.effective_price),
-                'available': variant_stock(v),
-            }
-            for v in elegidas
-        ],
+        'variants': [_variante(v) for v in elegidas],
     }
+
+
+def _variante(v):
+    datos = {
+        'id': v.id,
+        'size': v.size,
+        'color': v.color,
+        'price': precio_texto(v.effective_price),
+        'available': variant_stock(v),
+    }
+    # Solo si hay un descuento real y vigente: el agente puede decir "antes X,
+    # ahora Y" sin calcular nada.
+    if v.has_discount:
+        datos['list_price'] = precio_texto(v.list_price)
+    return datos
+
+
+MAX_PROMOCIONES = 5
+
+
+def promociones(momento=None):
+    """Cupones de libre acceso que el vendedor puede mencionar.
+
+    Libre acceso = activo, vigente, con usos disponibles, sin afiliado y sin
+    segmento de clientes. Los cupones de afiliados son de ellos y nunca viajan."""
+    momento = momento or timezone.now()
+    filas = []
+    for cupon in Coupon.objects.filter(is_active=True, afiliado__isnull=True, customer_segment__isnull=True).order_by('ends_at', 'code'):
+        # Un codigo fuera del formato del contrato se omite: nunca debe tumbar el turno.
+        if not cupon.is_usable(momento) or not re.fullmatch(r'[A-Z0-9_-]{1,30}', cupon.code or ''):
+            continue
+        filas.append({
+            'code': cupon.code,
+            'discount_type': cupon.discount_type,
+            'value': precio_texto(cupon.value),
+            'min_purchase': precio_texto(cupon.min_purchase) if cupon.min_purchase is not None else None,
+            'ends_on': timezone.localdate(cupon.ends_at).isoformat() if cupon.ends_at else None,
+        })
+        if len(filas) >= MAX_PROMOCIONES:
+            break
+    return filas
 
 
 def candidatos(mensaje, foco_id=None, ids_carrito=(), limite=contrato.MAX_CANDIDATOS):

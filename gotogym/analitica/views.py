@@ -48,6 +48,7 @@ EVENTOS_PERMITIDOS = frozenset({
     'vendedor_product_click',
     'vendedor_add_to_cart',
     'vendedor_handoff',
+    'vendedor_handoff_creado',
     'vendedor_error',
 })
 

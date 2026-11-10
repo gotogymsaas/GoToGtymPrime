@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import consentimiento, personalizacion, views
+from . import atencion_humana, consentimiento, personalizacion, views
 
 app_name = 'vendedor'
 
@@ -11,4 +11,5 @@ urlpatterns = [
     path('personalizacion/medidas/', personalizacion.guardar_medidas, name='personalizacion_medidas'),
     path('personalizacion/memoria/olvidar/', personalizacion.olvidar_memoria, name='personalizacion_olvidar'),
     path('personalizacion/recordar/', personalizacion.recordar, name='personalizacion_recordar'),
+    path('atencion/', atencion_humana.solicitar, name='atencion'),
 ]

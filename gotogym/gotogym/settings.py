@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'administracion',
     'analitica',
     'vendedor',
+    'atencion',
 ]
 
 MIDDLEWARE = [
@@ -369,6 +370,8 @@ COACH_SERVICE_SECRET = os.environ.get('COACH_SERVICE_SECRET', '')
 # Apagado hasta que el Coach acepte la cabecera de contrato '2'. La credencial
 # de identidad es distinta de la de servicio: ver vendedor/identidad.py.
 VENDEDOR_CONTRATO_V2 = _as_bool(os.environ.get('VENDEDOR_CONTRATO_V2'), False)
+# Buzon del equipo que recibe las solicitudes de atencion humana (app atencion).
+ATENCION_EMAIL = os.environ.get('ATENCION_EMAIL', 'support@gotogym.store')
 VENDEDOR_IDENTIDAD_CLAVE_ID = os.environ.get('VENDEDOR_IDENTIDAD_CLAVE_ID', '')
 VENDEDOR_IDENTIDAD_SECRETO = os.environ.get('VENDEDOR_IDENTIDAD_SECRETO', '')
 # Mensajes por minuto y visitante. Los anonimos tienen menos margen.

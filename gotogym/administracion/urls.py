@@ -1,9 +1,12 @@
 from django.urls import path
 
-from . import views
+from . import views, views_atencion
 
 urlpatterns = [
     path("", views.dashboard, name="admin_dashboard"),
+    path("atencion/", views_atencion.atencion_list, name="admin_atencion"),
+    path("atencion/<int:pk>/", views_atencion.atencion_detail, name="admin_atencion_detail"),
+    path("atencion/<int:pk>/estado/", views_atencion.atencion_update_estado, name="admin_atencion_estado"),
     path("analitica/", views.analytics, name="admin_analytics"),
     path("analitica/exportar/pedidos.csv", views.export_orders_csv, name="admin_export_orders"),
     path("productos/", views.products_list, name="admin_products"),

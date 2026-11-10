@@ -1,0 +1,29 @@
+{% extends "administracion/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow"><a href="{% url 'admin_atencion' %}">Atención al cliente</a></p>
+    <h1>{{ solicitud.radicado }}</h1>
+  </div>
+</section>
+<div class="panel">
+  <dl>
+    <dt>Motivo</dt><dd>{{ solicitud.get_motivo_display }}</dd>
+    <dt>Cliente</dt><dd>{{ solicitud.nombre }} &middot; <a href="mailto:{{ solicitud.email }}?subject={{ solicitud.radicado|urlencode }}">{{ solicitud.email }}</a>{% if solicitud.user %} &middot; <small>cuenta registrada</small>{% endif %}</dd>
+    <dt>Origen</dt><dd>{{ solicitud.get_origen_display }}</dd>
+    <dt>Creada</dt><dd>{{ solicitud.creada|date:"d/m/Y H:i" }}</dd>
+    <dt>Correos</dt><dd>Equipo: {{ solicitud.correo_equipo_enviado|yesno:"enviado,no se pudo enviar" }} &middot; Cliente: {{ solicitud.correo_cliente_enviado|yesno:"enviado,no se pudo enviar" }}</dd>
+    <dt>Autoriza que lo contacten</dt><dd>{{ solicitud.acepta_contacto|yesno:"Sí,No" }}</dd>
+  </dl>
+  <h2>Mensaje</h2>
+  <p style="white-space: pre-wrap;">{{ solicitud.mensaje }}</p>
+</div>
+<form class="panel" method="post" action="{% url 'admin_atencion_estado' solicitud.pk %}">
+  {% csrf_token %}
+  <label for="id_estado">Estado</label>
+  <select name="estado" id="id_estado">
+    {% for valor, etiqueta in estados %}<option value="{{ valor }}"{% if solicitud.estado == valor %} selected{% endif %}>{{ etiqueta }}</option>{% endfor %}
+  </select>
+  <button type="submit" class="button">Guardar estado</button>
+</form>
+{% endblock %}

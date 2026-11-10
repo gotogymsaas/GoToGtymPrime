@@ -23,6 +23,9 @@ VERSION_CONTRATO = '1'
 VERSION_CONTRATO_V2 = '2'
 CLAVES_IDENTIDAD = frozenset({'key_id', 'assertion', 'signature'})
 MAX_LARGO_ASERCION = 1024
+# Cupones de libre acceso (evidencia.promociones). Nunca los de afiliados.
+MAX_PROMOCIONES = 5
+CLAVES_PROMOCION = frozenset({'code', 'discount_type', 'value', 'min_purchase', 'ends_on'})
 
 # Presupuesto de la solicitud. El proveedor del modelo ya rechazo con HTTP 429
 # solicitudes muy grandes, asi que el tope es duro: el paquete se recorta antes
@@ -166,6 +169,8 @@ def _validar_variante(variante, ruta):
     _texto(variante.get('color'), f'{ruta}.color', 40, vacio=True)
     _decimal_texto(variante.get('price'), f'{ruta}.price')
     _requerir(_entero(variante.get('available')) and variante['available'] >= 0, f'{ruta}.available')
+    if 'list_price' in variante:
+        _decimal_texto(variante['list_price'], f'{ruta}.list_price')
 
 
 def _validar_candidato(candidato, ruta):
@@ -295,6 +300,18 @@ def validar_solicitud(solicitud):
     _requerir(isinstance(politicas, list) and len(politicas) <= MAX_POLITICAS, 'evidence.policies')
     for posicion, politica in enumerate(politicas):
         _validar_politica(politica, f'evidence.policies[{posicion}]')
+    promociones = evidencia.get('promotions', [])
+    _requerir(isinstance(promociones, list) and len(promociones) <= MAX_PROMOCIONES, 'evidence.promotions')
+    for posicion, promo in enumerate(promociones):
+        ruta = f'evidence.promotions[{posicion}]'
+        _requerir(isinstance(promo, dict) and set(promo) == CLAVES_PROMOCION, ruta)
+        _requerir(re.fullmatch(r'[A-Z0-9_-]{1,30}', str(promo['code'])) is not None, f'{ruta}.code')
+        _requerir(promo['discount_type'] in ('percentage', 'fixed'), f'{ruta}.discount_type')
+        _decimal_texto(promo['value'], f'{ruta}.value')
+        if promo['min_purchase'] is not None:
+            _decimal_texto(promo['min_purchase'], f'{ruta}.min_purchase')
+        _requerir(promo['ends_on'] is None or re.fullmatch(r'\d{4}-\d{2}-\d{2}', str(promo['ends_on'])),
+                  f'{ruta}.ends_on')
     afirmaciones = evidencia.get('claims_policy')
     _requerir(isinstance(afirmaciones, dict), 'evidence.claims_policy')
     _texto(afirmaciones.get('version'), 'evidence.claims_policy.version', 64)

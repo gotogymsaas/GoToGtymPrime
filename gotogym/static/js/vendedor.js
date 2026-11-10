@@ -281,9 +281,11 @@
     if (!RUTA_ENLACE.test(accion.url || '')) return null;
     var enlace = crear('a', 'gtg-vendedor__button gtg-vendedor__button--quiet', accion.label);
     enlace.href = accion.url;
-    enlace.addEventListener('click', function () {
-      if (accion.type === 'open_contact') medir('vendedor_handoff', { origen: 'accion' });
-      else if (accion.type === 'open_product') medir('vendedor_product_click', { origen: 'accion', producto: accion.product_id || 0 });
+    enlace.addEventListener('click', function (evento) {
+      if (accion.type === 'open_contact') {
+        medir('vendedor_handoff', { origen: 'accion' });
+        if (abrirAtencion()) evento.preventDefault();
+      } else if (accion.type === 'open_product') medir('vendedor_product_click', { origen: 'accion', producto: accion.product_id || 0 });
     });
     return enlace;
   }
@@ -625,9 +627,96 @@
     if (ultimoMensaje) enviar(ultimoMensaje);
   });
 
-  enlaceContacto.addEventListener('click', function () {
+  enlaceContacto.addEventListener('click', function (evento) {
     medir('vendedor_handoff', { origen: 'error' });
+    if (abrirAtencion()) evento.preventDefault();
   });
+
+  // --- Atencion humana con radicado (agente 7) ---------------------------
+  // El enlace a Contacto sigue siendo el respaldo: sin formulario o sin
+  // JavaScript, se navega a la pagina de contacto como antes.
+
+  var formAtencion = panel.querySelector('[data-vendedor-atencion]');
+  var errorAtencion = panel.querySelector('[data-vendedor-atencion-error]');
+  var RUTA_ATENCION = /^\/[a-z]{2}\/vendedor\/atencion\/$/;
+
+  function abrirAtencion() {
+    if (!formAtencion || !RUTA_ATENCION.test(configuracion.atencionUrl || '')) return false;
+    formAtencion.hidden = false;
+    errorAtencion.hidden = true;
+    var primero = formAtencion.querySelector('#atencion-nombre');
+    if (primero && primero.value) primero = formAtencion.querySelector('#atencion-mensaje');
+    if (primero) primero.focus();
+    return true;
+  }
+
+  function cerrarAtencion() {
+    if (!formAtencion) return;
+    formAtencion.hidden = true;
+    if (campo) campo.focus();
+  }
+
+  function errorDeAtencion(clave) {
+    errorAtencion.textContent = texto(clave);
+    errorAtencion.hidden = false;
+  }
+
+  if (formAtencion) {
+    panel.querySelectorAll('[data-vendedor-abrir-atencion]').forEach(function (enlace) {
+      enlace.addEventListener('click', function (evento) {
+        medir('vendedor_handoff', { origen: 'bienvenida' });
+        if (abrirAtencion()) evento.preventDefault();
+      });
+    });
+    formAtencion.querySelector('[data-vendedor-atencion-cancelar]').addEventListener('click', cerrarAtencion);
+    formAtencion.addEventListener('submit', function (evento) {
+      evento.preventDefault();
+      var boton = formAtencion.querySelector('[data-vendedor-atencion-enviar]');
+      var datos = {
+        nombre: formAtencion.elements.nombre.value.trim(),
+        email: formAtencion.elements.email.value.trim(),
+        motivo: formAtencion.elements.motivo.value,
+        mensaje: formAtencion.elements.mensaje.value.trim(),
+        acepta_contacto: formAtencion.elements.acepta_contacto.checked
+      };
+      if (!datos.nombre || !datos.email || datos.mensaje.length < 5 || !datos.acepta_contacto) {
+        errorDeAtencion('atencion_campos');
+        return;
+      }
+      boton.disabled = true;
+      fetch(configuracion.atencionUrl, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': configuracion.csrf || '', 'Accept': 'application/json' },
+        body: JSON.stringify(datos)
+      }).then(function (respuesta) {
+        return respuesta.json().then(function (cuerpo) { return { estado: respuesta.status, cuerpo: cuerpo }; },
+          function () { return { estado: respuesta.status, cuerpo: null }; });
+      }).then(function (resultado) {
+        boton.disabled = false;
+        var cuerpo = resultado.cuerpo || {};
+        // Solo un 201 con radicado cuenta como solicitud creada.
+        if (resultado.estado !== 201 || typeof cuerpo.radicado !== 'string' || !/^GTG-\d{4}-\d{6}$/.test(cuerpo.radicado)) {
+          errorDeAtencion(resultado.estado === 429 ? 'atencion_espera' : resultado.estado === 400 ? 'atencion_campos' : 'atencion_error');
+          return;
+        }
+        var mensaje = texto('atencion_creada') + ' ' + cuerpo.radicado + '. ' +
+          (cuerpo.correo_enviado ? texto('atencion_correo') + ' ' + String(cuerpo.email || '') + '.' : texto('atencion_sin_correo'));
+        var entrada = { r: 'b', t: mensaje };
+        historial.push(entrada);
+        guardarHistorial();
+        pintarAsistente(entrada);
+        formAtencion.elements.mensaje.value = '';
+        formAtencion.elements.acepta_contacto.checked = false;
+        cerrarAtencion();
+        desplazarAlFinal();
+        medir('vendedor_handoff_creado', { motivo: datos.motivo });
+      }).catch(function () {
+        boton.disabled = false;
+        errorDeAtencion('atencion_error');
+      });
+    });
+  }
 
   panel.addEventListener('keydown', atraparElFoco);
   document.addEventListener('keydown', function (evento) {

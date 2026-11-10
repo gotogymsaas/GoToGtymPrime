@@ -4044,3 +4044,110 @@ msgstr "We saved your measurements. They are only used to suggest sizes."
 
 msgid "Olvidamos tus elecciones guardadas."
 msgstr "We forgot your saved choices."
+
+msgid "Te responderá alguien del equipo GoToGym por correo."
+msgstr "Someone from the GoToGym team will reply by email."
+
+msgid "Correo"
+msgstr "Email"
+
+msgid "Tema"
+msgstr "Topic"
+
+msgid "Ayuda para comprar"
+msgstr "Help with a purchase"
+
+msgid "Talla o producto"
+msgstr "Size or product"
+
+msgid "Un pedido que ya hice"
+msgstr "An order I already placed"
+
+msgid "Cambio, devolución o garantía"
+msgstr "Exchange, return or warranty"
+
+msgid "Otro tema"
+msgstr "Something else"
+
+msgid "¿En qué te ayudamos?"
+msgstr "How can we help?"
+
+msgid ""
+"Autorizo que GoToGym me contacte por correo para atender esta solicitud."
+msgstr "I authorize GoToGym to contact me by email to handle this request."
+
+msgid "Tu solicitud quedó registrada con el radicado"
+msgstr "Your request was registered with reference number"
+
+msgid "Te escribiremos a"
+msgstr "We will write to"
+
+msgid ""
+"No pudimos enviarte la confirmación por correo, pero tu solicitud quedó "
+"registrada. Guarda el número."
+msgstr ""
+"We couldn't send you the confirmation email, but your request was "
+"registered. Keep the number."
+
+msgid ""
+"Revisa los campos: nombre, correo válido, un mensaje y la autorización de "
+"contacto."
+msgstr ""
+"Check the fields: name, a valid email, a message and the contact "
+"authorization."
+
+msgid ""
+"No se pudo registrar tu solicitud. Intenta de nuevo o escríbenos desde "
+"Contacto."
+msgstr ""
+"Your request could not be registered. Try again or write to us from Contact."
+
+msgid ""
+"Ya enviaste varias solicitudes. Intenta más tarde o escríbenos desde "
+"Contacto."
+msgstr ""
+"You have already sent several requests. Try again later or write to us from "
+"Contact."
+
+msgid "Radicado"
+msgstr "Reference number"
+
+msgid "Motivo"
+msgstr "Reason"
+
+msgid "Origen"
+msgstr "Source"
+
+msgid "Nueva solicitud de atención"
+msgstr "New support request"
+
+msgid "Ver en el panel"
+msgstr "View in the panel"
+
+#, python-format
+msgid "Recibimos tu solicitud %(radicado)s"
+msgstr "We received your request %(radicado)s"
+
+msgid "Recibimos tu solicitud"
+msgstr "We received your request"
+
+#, python-format
+msgid ""
+"Hola %(nombre)s, una persona del equipo GoToGym te responderá a este correo."
+msgstr ""
+"Hi %(nombre)s, someone from the GoToGym team will reply to this email."
+
+msgid "Guarda este número: con él podemos encontrar tu caso más rápido."
+msgstr "Keep this number: it helps us find your case faster."
+
+msgid "Abierta"
+msgstr "Open"
+
+msgid "En proceso"
+msgstr "In progress"
+
+msgid "Cerrada"
+msgstr "Closed"
+
+msgid "Página de contacto"
+msgstr "Contact page"

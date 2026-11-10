@@ -174,6 +174,7 @@ def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=No
                 mensaje, foco_id=pagina['product_id'], ids_carrito=productos_del_carrito,
             ),
             'policies': evidencia.politicas(idioma),
+            'promotions': evidencia.promociones(),
             'claims_policy': evidencia.afirmaciones_prohibidas(),
         },
         'timestamp': int(time.time() if ahora is None else ahora),

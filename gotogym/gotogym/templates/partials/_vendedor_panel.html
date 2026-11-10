@@ -60,7 +60,7 @@ con ese mismo aviso, sin llamar al servidor.
         {% endif %}
         {% else %}
         <p>{% trans "En este momento la IA de GoToGym no está disponible. Vuelve más tarde." %}</p>
-        <p><a class="gtg-vendedor__link" href="{% url 'contacto' %}">{% trans "Hablar con una persona" %}</a></p>
+        <p><a class="gtg-vendedor__link" href="{% url 'contacto' %}" data-vendedor-abrir-atencion>{% trans "Hablar con una persona" %}</a></p>
         {% endif %}
       </div>
     </div>
@@ -85,6 +85,38 @@ con ese mismo aviso, sin llamar al servidor.
       <a class="gtg-vendedor__button gtg-vendedor__button--quiet" href="{% url 'contacto' %}" data-vendedor-contacto>{% trans "Hablar con una persona" %}</a>
     </div>
   </div>
+
+  {# Traspaso a una persona (agente 7). El radicado solo se muestra si Prime lo crea. #}
+  <form class="gtg-vendedor__handoff" data-vendedor-atencion hidden novalidate aria-labelledby="vendedor-atencion-titulo">
+    <h3 id="vendedor-atencion-titulo" class="gtg-vendedor__handoff-title">{% trans "Hablar con una persona" %}</h3>
+    <p class="gtg-vendedor__handoff-hint">{% trans "Te responderá alguien del equipo GoToGym por correo." %}</p>
+    <label for="atencion-nombre">{% trans "Nombre" %}</label>
+    <input id="atencion-nombre" name="nombre" maxlength="120" autocomplete="name" required
+           value="{% if user.is_authenticated %}{{ user.get_full_name|default:'' }}{% endif %}">
+    <label for="atencion-email">{% trans "Correo" %}</label>
+    <input id="atencion-email" name="email" type="email" maxlength="254" autocomplete="email" required
+           value="{% if user.is_authenticated %}{{ user.email }}{% endif %}">
+    <label for="atencion-motivo">{% trans "Tema" %}</label>
+    <select id="atencion-motivo" name="motivo" required>
+      <option value="compra">{% trans "Ayuda para comprar" %}</option>
+      <option value="talla">{% trans "Talla o producto" %}</option>
+      <option value="pedido">{% trans "Un pedido que ya hice" %}</option>
+      <option value="cambio">{% trans "Cambio, devolución o garantía" %}</option>
+      <option value="otro">{% trans "Otro tema" %}</option>
+    </select>
+    <label for="atencion-mensaje">{% trans "¿En qué te ayudamos?" %}</label>
+    <textarea id="atencion-mensaje" name="mensaje" rows="3" maxlength="1000" minlength="5" required></textarea>
+    <label class="gtg-vendedor__handoff-check">
+      <input type="checkbox" name="acepta_contacto" required>
+      <span>{% trans "Autorizo que GoToGym me contacte por correo para atender esta solicitud." %}
+        <a class="gtg-vendedor__link" href="{% url 'politica_tratamiento_datos' %}">{% trans "Cómo tratamos tus datos" %}</a></span>
+    </label>
+    <p class="gtg-vendedor__handoff-error" data-vendedor-atencion-error role="alert" hidden></p>
+    <div class="gtg-vendedor__error-actions">
+      <button type="submit" class="gtg-vendedor__button" data-vendedor-atencion-enviar>{% trans "Enviar solicitud" %}</button>
+      <button type="button" class="gtg-vendedor__button gtg-vendedor__button--quiet" data-vendedor-atencion-cancelar>{% trans "Cancelar" %}</button>
+    </div>
+  </form>
 
   <form class="gtg-vendedor__form" data-vendedor-form novalidate>
     <label class="sr-only" for="vendedor-mensaje">{% trans "Escribe tu mensaje" %}</label>
@@ -117,7 +149,13 @@ con ese mismo aviso, sin llamar al servidor.
     <span data-texto="recordar_talla">{% trans "Recordar esta talla" %}</span>
     <span data-texto="recordado">{% trans "Recordaré tu talla:" %}</span>
     <span data-texto="no_se_pudo_recordar">{% trans "No pude guardar esa preferencia." %}</span>
+    <span data-texto="atencion_creada">{% trans "Tu solicitud quedó registrada con el radicado" %}</span>
+    <span data-texto="atencion_correo">{% trans "Te escribiremos a" %}</span>
+    <span data-texto="atencion_sin_correo">{% trans "No pudimos enviarte la confirmación por correo, pero tu solicitud quedó registrada. Guarda el número." %}</span>
+    <span data-texto="atencion_campos">{% trans "Revisa los campos: nombre, correo válido, un mensaje y la autorización de contacto." %}</span>
+    <span data-texto="atencion_error">{% trans "No se pudo registrar tu solicitud. Intenta de nuevo o escríbenos desde Contacto." %}</span>
+    <span data-texto="atencion_espera">{% trans "Ya enviaste varias solicitudes. Intenta más tarde o escríbenos desde Contacto." %}</span>
   </div>
 
-  <script id="vendedor-config" type="application/json">{"endpoint": "{% url 'vendedor:mensaje' %}", "csrf": "{{ csrf_token }}", "maxLength": 600, "disponible": {% if vendedor_disponible %}true{% else %}false{% endif %}, "cartUrl": "{% url 'carrito:cart_detail' %}", "contactUrl": "{% url 'contacto' %}", "puedeRecordar": {% if vendedor_puede_recordar %}true{% else %}false{% endif %}, "recordarUrl": "{% url 'vendedor:personalizacion_recordar' %}"}</script>
+  <script id="vendedor-config" type="application/json">{"endpoint": "{% url 'vendedor:mensaje' %}", "csrf": "{{ csrf_token }}", "maxLength": 600, "disponible": {% if vendedor_disponible %}true{% else %}false{% endif %}, "cartUrl": "{% url 'carrito:cart_detail' %}", "contactUrl": "{% url 'contacto' %}", "puedeRecordar": {% if vendedor_puede_recordar %}true{% else %}false{% endif %}, "recordarUrl": "{% url 'vendedor:personalizacion_recordar' %}", "atencionUrl": "{% url 'vendedor:atencion' %}"}</script>
 </aside>

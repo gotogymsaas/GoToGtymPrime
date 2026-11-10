@@ -823,3 +823,63 @@
     display: none;
   }
 }
+
+/* Traspaso a una persona (agente 7): formulario dentro del panel. */
+.gtg-vendedor__handoff {
+  display: grid;
+  gap: var(--space-2);
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-gold);
+  background: var(--color-bg-card);
+}
+
+.gtg-vendedor__handoff[hidden] {
+  display: none;
+}
+
+.gtg-vendedor__handoff-title {
+  margin: 0;
+  font-size: 16px;
+}
+
+.gtg-vendedor__handoff-hint,
+.gtg-vendedor__handoff-error {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.gtg-vendedor__handoff label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.gtg-vendedor__handoff input:not([type="checkbox"]),
+.gtg-vendedor__handoff select,
+.gtg-vendedor__handoff textarea {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font: inherit;
+  /* 16 px evita el zoom automatico de iOS al enfocar el campo. */
+  font-size: 16px;
+}
+
+.gtg-vendedor__handoff .gtg-vendedor__handoff-check {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  font-weight: 400;
+}
+
+.gtg-vendedor__handoff-check input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex: 0 0 auto;
+}
