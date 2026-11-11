@@ -1699,3 +1699,17 @@ msgstr "Ir para a loja →"
 msgid "Contactar soporte →"
 msgstr "Falar com o suporte →"
 
+
+#, python-format
+msgid "Estoy contigo, %(nombre)s."
+msgstr "Estou aqui com você, %(nombre)s."
+
+msgid "Estoy contigo."
+msgstr "Estou aqui com você."
+
+msgid ""
+"Veamos qué prenda te acompaña mejor. También podemos hablar de tallas o "
+"envíos."
+msgstr ""
+"Vamos encontrar a peça certa para você. Também podemos falar sobre tamanhos "
+"ou entregas."

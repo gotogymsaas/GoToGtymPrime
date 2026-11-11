@@ -1,4 +1,4 @@
-{% load i18n %}{% comment %}
+{% load i18n static %}{% comment %}
 Panel de Quantum Coach, la IA de GoToGym. Se incluye desde base.html solo si
 el Coach esta visible para este visitante (ver vendedor/exposicion.py).
 
@@ -23,14 +23,13 @@ con ese mismo aviso, sin llamar al servidor.
 <aside id="vendedor-panel" class="gtg-vendedor" role="dialog" aria-modal="true"
        aria-labelledby="vendedor-titulo" tabindex="-1" data-vendedor-panel hidden>
   <header class="gtg-vendedor__head">
-    <span class="coach-orb coach-orb--lg" aria-hidden="true"></span>
+    <img class="gtg-vendedor__mark" src="{% static 'images/logo-gotogym-symbol-transparent.png' %}" alt="" width="32" height="32">
     <div class="gtg-vendedor__identity">
-      <h2 id="vendedor-titulo" class="gtg-vendedor__title">Quantum Coach</h2>
-      <p class="gtg-vendedor__tagline">{% trans "La IA de GoToGym" %}</p>
+      <h2 id="vendedor-titulo" class="gtg-vendedor__title"><span class="gtg-vendedor__brand">GoToGym</span> <span aria-hidden="true">·</span> Quantum Coach</h2>
     </div>
     <button type="button" class="gtg-vendedor__icon-button" data-vendedor-nueva
             aria-label="{% trans 'Empezar una conversación nueva' %}" title="{% trans 'Empezar una conversación nueva' %}">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 5V2L8 6l4 4V7c3.31 0 6 2.69 6 6 0 2.97-2.17 5.43-5 5.91v2.02c3.95-.49 7-3.85 7-7.93 0-4.42-3.58-8-8-8zm-6 8c0-1.65.67-3.15 1.76-4.24L6.34 7.34A7.93 7.93 0 0 0 4 13c0 4.08 3.05 7.44 7 7.93v-2.02c-2.83-.48-5-2.94-5-5.91z"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
     </button>
     <button type="button" class="gtg-vendedor__icon-button" data-vendedor-close
             aria-label="{% trans 'Cerrar Quantum Coach' %}">
@@ -48,27 +47,35 @@ con ese mismo aviso, sin llamar al servidor.
 
   <div class="gtg-vendedor__log" data-vendedor-log role="log" aria-live="polite" aria-relevant="additions" tabindex="0"
        aria-label="{% trans 'Conversación con Quantum Coach' %}">
+    {% if vendedor_disponible %}
+    <div class="gtg-vendedor__welcome" data-vendedor-bienvenida>
+      <span class="gtg-vendedor__orbit" aria-hidden="true"></span>
+      <h3 class="gtg-vendedor__greeting">
+        {% if user.is_authenticated and user.first_name %}
+          {% blocktrans with nombre=user.first_name %}Estoy contigo, {{ nombre }}.{% endblocktrans %}
+        {% else %}
+          {% trans "Estoy contigo." %}
+        {% endif %}
+      </h3>
+      <p class="gtg-vendedor__intro">{% trans "Veamos qué prenda te acompaña mejor. También podemos hablar de tallas o envíos." %}</p>
+      <div class="gtg-vendedor__chips" data-vendedor-sugerencias role="group" aria-label="{% trans 'Sugerencias para empezar' %}">
+        <button type="button" class="gtg-vendedor__chip" data-sugerencia>{% trans "Quiero algo para entrenar" %}</button>
+        <button type="button" class="gtg-vendedor__chip" data-sugerencia>{% trans "¿Qué talla me conviene?" %}</button>
+        <button type="button" class="gtg-vendedor__chip" data-sugerencia>{% trans "¿Cómo funcionan los envíos?" %}</button>
+      </div>
+      {% if vendedor_invitar_personalizar %}
+      <p class="gtg-vendedor__hint" data-vendedor-invitacion>{% trans "Si quieres que use lo que ya sabe de ti en Quantum Coach, puedes activarlo en" %}
+        <a class="gtg-vendedor__link" href="{% url 'edit_profile' %}#personalizacion">{% trans "Mi cuenta" %}</a>.</p>
+      {% endif %}
+    </div>
+    {% else %}
     <div class="gtg-vendedor__row" data-vendedor-bienvenida>
       <span class="coach-orb coach-orb--sm" aria-hidden="true"></span>
       <div class="gtg-vendedor__msg gtg-vendedor__msg--bot">
         <span class="sr-only">Quantum Coach: </span>
-        {% if vendedor_disponible %}
-        <p>{% trans "Hola, soy Quantum Coach, la IA de GoToGym. Te ayudo a elegir prendas y tallas, y a resolver dudas sobre envíos y políticas de la tienda." %}</p>
-        {% if vendedor_invitar_personalizar %}
-        <p class="gtg-vendedor__hint" data-vendedor-invitacion>{% trans "Si quieres que use lo que ya sabe de ti en Quantum Coach, puedes activarlo en" %}
-          <a class="gtg-vendedor__link" href="{% url 'edit_profile' %}#personalizacion">{% trans "Mi cuenta" %}</a>.</p>
-        {% endif %}
-        {% else %}
         <p>{% trans "En este momento la IA de GoToGym no está disponible. Vuelve más tarde." %}</p>
         <p><a class="gtg-vendedor__link" href="{% url 'contacto' %}" data-vendedor-abrir-atencion>{% trans "Hablar con una persona" %}</a></p>
-        {% endif %}
       </div>
-    </div>
-    {% if vendedor_disponible %}
-    <div class="gtg-vendedor__chips" data-vendedor-sugerencias role="group" aria-label="{% trans 'Sugerencias para empezar' %}">
-      <button type="button" class="gtg-vendedor__chip" data-sugerencia>{% trans "Quiero algo para entrenar" %}</button>
-      <button type="button" class="gtg-vendedor__chip" data-sugerencia>{% trans "¿Qué talla me conviene?" %}</button>
-      <button type="button" class="gtg-vendedor__chip" data-sugerencia>{% trans "¿Cómo funcionan los envíos?" %}</button>
     </div>
     {% endif %}
   </div>
@@ -120,9 +127,13 @@ con ese mismo aviso, sin llamar al servidor.
 
   <form class="gtg-vendedor__form" data-vendedor-form novalidate>
     <label class="sr-only" for="vendedor-mensaje">{% trans "Escribe tu mensaje" %}</label>
-    <textarea id="vendedor-mensaje" name="mensaje" rows="2" maxlength="600" data-vendedor-mensaje
+    <div class="gtg-vendedor__composer">
+      <textarea id="vendedor-mensaje" name="mensaje" rows="1" maxlength="600" data-vendedor-mensaje
               placeholder="{% trans 'Pregunta por productos, tallas o envíos' %}"></textarea>
-    <button type="submit" class="gtg-vendedor__button gtg-vendedor__send" data-vendedor-enviar>{% trans "Enviar" %}</button>
+      <button type="submit" class="gtg-vendedor__button gtg-vendedor__send" data-vendedor-enviar aria-label="{% trans 'Enviar' %}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 19V5m-6 6 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
   </form>
 
   {# Textos que vendedor.js muestra segun el resultado. Van ocultos. #}
