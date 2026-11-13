@@ -321,13 +321,13 @@
     desplazarAlFinal();
   }
 
-  function ocultarSugerencias() {
-    if (sugerencias) sugerencias.hidden = true;
+  function ocultarBienvenida() {
+    if (sugerencias) bienvenida.hidden = true;
   }
 
   function restaurarHistorial() {
     historial = leerHistorial();
-    if (historial.length) ocultarSugerencias();
+    if (historial.length) ocultarBienvenida();
     historial.forEach(function (entrada) {
       if (!entrada || typeof entrada.t !== 'string') return;
       if (entrada.r === 'u') pintarUsuario(entrada.t);
@@ -352,6 +352,7 @@
   function actualizarControles() {
     var ocupado = enviando || temporizadorEspera !== null;
     botonEnviar.disabled = ocupado;
+    botonNueva.disabled = enviando;
     botonReintentar.disabled = ocupado;
   }
 
@@ -467,7 +468,7 @@
     if (!mensaje || mensaje.length > (configuracion.maxLength || 600)) return;
     campo.value = '';
     ultimoMensaje = mensaje;
-    ocultarSugerencias();
+    ocultarBienvenida();
     historial.push({ r: 'u', t: mensaje });
     guardarHistorial();
     pintarUsuario(mensaje);
@@ -482,13 +483,13 @@
     historial = [];
     guardarHistorial();
     Array.prototype.slice.call(registro.children).forEach(function (nodo) {
-      if (nodo !== bienvenida && nodo !== sugerencias) registro.removeChild(nodo);
+      if (nodo !== bienvenida) registro.removeChild(nodo);
     });
-    if (sugerencias) sugerencias.hidden = false;
+    bienvenida.hidden = false;
     nuevaConversacion = true;
     ultimoMensaje = '';
     ocultarError();
-    campo.focus();
+    registro.focus();
   }
 
   // --- Abrir y cerrar --------------------------------------------------------
@@ -528,7 +529,7 @@
     abierto = true;
     if (aviso) aviso.hidden = guardado(CLAVE_AVISO) === '1';
     desplazarAlFinal();
-    campo.focus();
+    panel.focus();
   }
 
   function devolverElFoco() {
@@ -597,7 +598,8 @@
   if (sugerencias) {
     sugerencias.addEventListener('click', function (evento) {
       var chip = evento.target.closest ? evento.target.closest('[data-sugerencia]') : null;
-      if (!chip) return;
+      if (!chip || enviando || temporizadorEspera !== null) return;
+      registro.focus();
       campo.value = chip.textContent.trim();
       enviarDesdeElCampo();
     });

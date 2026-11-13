@@ -78,7 +78,7 @@ class IdiomasTests(TestCase):
         texto = ' '.join(_textos(_fragmentos_del_asistente(html)))
 
         self.assertIn('Quantum Coach', texto)
-        self.assertIn('La IA de GoToGym', texto)
+        self.assertIn('Estoy contigo.', texto)
         self.assertIn('Soy una IA y puedo equivocarme', texto)
         self.assertIn('Reintentar', texto)
 
@@ -86,7 +86,7 @@ class IdiomasTests(TestCase):
         html = self.client.get('/en/').content.decode()
 
         for esperado in (
-            "Open Quantum Coach, GoToGym's AI", "GoToGym's AI", 'Try again', 'Talk to a person',
+            "Open Quantum Coach, GoToGym's AI", "I’m here with you.", 'Try again', 'Talk to a person',
             'Start a new conversation', 'Added to your cart.', 'Quantum Coach is thinking…',
             "I'm an AI and I can make mistakes", 'I want something to train in',
             'Which size suits me?', 'How does shipping work?',
