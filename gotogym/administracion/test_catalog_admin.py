@@ -287,6 +287,65 @@ class AltaCompletaDeProductoTests(CatalogAdminTestCase):
         self.assertEqual(nueva.sort_order, 2)
         self.assertEqual(producto.media.count(), 3)
 
+    def _producto_sin_galeria(self, nombre):
+        return Product.objects.create(
+            name=nombre, category=self.categoria, brand=self.marca,
+            base_price=Decimal('90000.0000'), stock=0,
+        )
+
+    def test_un_archivo_que_no_es_imagen_se_rechaza_aunque_se_llame_png(self):
+        producto = self._producto_sin_galeria('Producto archivo falso')
+        falso = SimpleUploadedFile('foto.png', b'esto no es una imagen', content_type='image/png')
+
+        self.client.post(reverse('admin_product_media_add', args=[producto.pk]), {'image': falso})
+
+        self.assertFalse(ProductMedia.objects.filter(product=producto).exists())
+
+    def test_una_imagen_demasiado_grande_se_rechaza(self):
+        from unittest.mock import patch
+
+        producto = self._producto_sin_galeria('Producto imagen pesada')
+
+        with patch('administracion.forms.MAX_BYTES_IMAGEN', 10):
+            self.client.post(reverse('admin_product_media_add', args=[producto.pk]), {'image': _imagen()})
+
+        self.assertFalse(ProductMedia.objects.filter(product=producto).exists())
+
+    def test_una_imagen_con_dimensiones_excesivas_se_rechaza(self):
+        from unittest.mock import patch
+
+        producto = self._producto_sin_galeria('Producto imagen enorme')
+
+        with patch('administracion.forms.MAX_LADO_IMAGEN', 0):
+            self.client.post(reverse('admin_product_media_add', args=[producto.pk]), {'image': _imagen()})
+
+        self.assertFalse(ProductMedia.objects.filter(product=producto).exists())
+
+    def test_una_imagen_con_demasiados_pixeles_da_un_aviso_y_no_un_error(self):
+        from unittest.mock import patch
+
+        from PIL import Image
+
+        producto = self._producto_sin_galeria('Producto bomba de pixeles')
+
+        with patch('PIL.Image.open', side_effect=Image.DecompressionBombError('demasiados pixeles')):
+            respuesta = self.client.post(
+                reverse('admin_product_media_add', args=[producto.pk]), {'image': _imagen()},
+            )
+
+        self.assertEqual(respuesta.status_code, 302)
+        self.assertFalse(ProductMedia.objects.filter(product=producto).exists())
+
+    def test_si_una_de_varias_falla_no_se_sube_ninguna(self):
+        producto = self._producto_sin_galeria('Producto lote mixto')
+        falso = SimpleUploadedFile('rota.png', b'no soy imagen', content_type='image/png')
+
+        self.client.post(
+            reverse('admin_product_media_add', args=[producto.pk]), {'image': [_imagen(), falso]},
+        )
+
+        self.assertFalse(ProductMedia.objects.filter(product=producto).exists())
+
     def test_eliminar_imagen(self):
         producto = Product.objects.create(
             name='Producto para borrar imagen', category=self.categoria, brand=self.marca,

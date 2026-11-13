@@ -3,6 +3,7 @@ import os
 import sys
 import urllib.parse
 from pathlib import Path
+from typing import Any
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -146,6 +147,12 @@ if _db_url:
             'HOST': _p.hostname,
             'PORT': str(_p.port or 5432),
             'OPTIONS': {'sslmode': 'require'},
+            # Reutiliza la conexion entre peticiones en vez de negociar TLS y
+            # autenticarse en cada una. Cada proceso (o hilo) conserva una
+            # conexion abierta: el total no debe pasar del limite del servidor.
+            # `DB_CONN_MAX_AGE=0` vuelve a una conexion por peticion.
+            'CONN_MAX_AGE': int(os.environ.get('DB_CONN_MAX_AGE', '60')),
+            'CONN_HEALTH_CHECKS': True,
         }
     }
 elif os.environ.get('MYSQL_HOST') or os.environ.get('MYSQL_DATABASE'):
@@ -252,6 +259,7 @@ SECURE_HSTS_PRELOAD = _as_bool(os.environ.get('SECURE_HSTS_PRELOAD'), False)
 # 3. Sin variables -> memoria local de cada proceso, suficiente en desarrollo
 #    y pruebas.
 REDIS_URL = os.environ.get('REDIS_URL', '')
+CACHES: dict[str, dict[str, Any]]
 if REDIS_URL:
     CACHES = {
         'default': {
@@ -265,6 +273,11 @@ elif _db_url:
         'default': {
             'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
             'LOCATION': 'django_cache',
+            # Por defecto la tabla se recorta a 300 entradas: con unos cientos
+            # de visitantes los contadores del limitador se borrarian antes de
+            # vencer y cada cliente recuperaria su cupo.
+            'TIMEOUT': 300,
+            'OPTIONS': {'MAX_ENTRIES': 20000},
         },
     }
 else:
@@ -421,7 +434,11 @@ if SENTRY_DSN:
             LoggingIntegration(level=logging.INFO, event_level=logging.ERROR),
         ],
         environment=os.environ.get('SENTRY_ENVIRONMENT', 'production'),
-        traces_sample_rate=float(os.environ.get('SENTRY_TRACES_SAMPLE_RATE', '0.2')),
+        # Commit desplegado: asocia cada error con la version que lo causo.
+        release=os.environ.get('SENTRY_RELEASE') or None,
+        # Las trazas cuestan segun el trafico y nadie las mira de continuo: se
+        # suben por variable cuando se investiga algo.
+        traces_sample_rate=float(os.environ.get('SENTRY_TRACES_SAMPLE_RATE', '0.05')),
         send_default_pii=False,
     )
 
@@ -445,7 +462,16 @@ LOGIN_URL = 'commercial_login'
 LOGIN_REDIRECT_URL = 'home'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# Las fotos subidas desde el panel se guardan aqui. En el App Service el disco
+# de la aplicacion se reemplaza en cada despliegue: apuntar `MEDIA_ROOT` a una
+# ruta bajo `/home` (almacenamiento persistente) evita perderlas.
+MEDIA_ROOT = Path(os.environ.get('MEDIA_ROOT') or BASE_DIR / 'media')
+
+# Valores por defecto de Django, declarados para que sean visibles. Ninguno
+# limita el tamano de un archivo subido: el tope de las fotos del panel
+# (5 MB) lo aplica `administracion.forms.validar_imagen`.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2_621_440  # cuerpo de la peticion sin archivos
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2_621_440  # por encima, el archivo pasa a disco
 
 # Material de marca para afiliados: fuera de MEDIA_ROOT, que se sirve a
 # cualquiera. Se descarga por una vista que exige ser afiliado aprobado.

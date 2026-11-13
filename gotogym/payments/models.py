@@ -19,7 +19,7 @@ class PaymentTransaction(models.Model):
         REJECTED = 'rejected', gettext_lazy('Rechazado')
         CANCELLED = 'cancelled', gettext_lazy('Cancelado')
 
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payment_transactions')
+    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name='payment_transactions')
 
     provider = models.CharField(max_length=30)
     preference_id = models.CharField(max_length=100, blank=True)
@@ -68,7 +68,7 @@ class Refund(models.Model):
         FAILED = 'failed', gettext_lazy('Fallido')
 
     payment_transaction = models.ForeignKey(
-        PaymentTransaction, on_delete=models.CASCADE, related_name='refunds',
+        PaymentTransaction, on_delete=models.PROTECT, related_name='refunds',
     )
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     status = models.CharField(max_length=12, choices=Status.choices, default=Status.PENDING)
@@ -77,6 +77,9 @@ class Refund(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='+',
     )
     error_message = models.TextField(blank=True)
+    # Se envia al proveedor para que reintentar una misma solicitud (por una
+    # respuesta perdida, por ejemplo) no devuelva el dinero dos veces.
+    idempotency_key = models.CharField(max_length=64, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

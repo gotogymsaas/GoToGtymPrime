@@ -247,6 +247,28 @@ class AfiliadosAdminTests(BaseAdminTests):
         self.client.post(reverse('admin_afiliado_delete', args=[self.perfil.pk]))
         self.assertFalse(PerfilAfiliado.objects.filter(pk=self.perfil.pk).exists())
 
+    def test_no_se_elimina_un_afiliado_con_solicitudes_de_retiro(self):
+        WithdrawalRequest.objects.create(afiliado=self.perfil, amount=Decimal('5000'))
+
+        respuesta = self.client.post(reverse('admin_afiliado_delete', args=[self.perfil.pk]))
+
+        self.assertTrue(PerfilAfiliado.objects.filter(pk=self.perfil.pk).exists())
+        self.assertEqual(WithdrawalRequest.objects.filter(afiliado=self.perfil).count(), 1)
+        self.assertIn('No se puede eliminar', _mensajes(respuesta)[-1])
+        self.assertRedirects(respuesta, reverse('admin_afiliados'), fetch_redirect_response=False)
+
+    def test_no_se_elimina_el_usuario_de_un_afiliado_con_retiros(self):
+        from django.contrib.auth import get_user_model
+
+        WithdrawalRequest.objects.create(afiliado=self.perfil, amount=Decimal('5000'))
+        usuario = self.perfil.user
+
+        respuesta = self.client.post(reverse('admin_user_delete', args=[usuario.pk]))
+
+        self.assertTrue(get_user_model().objects.filter(pk=usuario.pk).exists())
+        self.assertTrue(PerfilAfiliado.objects.filter(pk=self.perfil.pk).exists())
+        self.assertIn('Desactiva la cuenta', _mensajes(respuesta)[-1])
+
     def test_sin_permiso_no_se_puede_aprobar_ni_eliminar(self):
         self._como_personal_sin_permisos()
         self.client.post(reverse('admin_afiliado_approve', args=[self.perfil.pk]))

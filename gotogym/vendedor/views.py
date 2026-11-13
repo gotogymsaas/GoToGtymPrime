@@ -17,8 +17,9 @@ from django.conf import settings
 from django.core.cache import cache
 from django.http import Http404, JsonResponse
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.http import require_POST
-from gotogym.ratelimit import ip_del_cliente, rate_limit
+from gotogym.ratelimit import contar, ip_del_cliente, rate_limit
 
 from . import coach_client, contrato, conversacion, paquete, respuesta
 from .exposicion import visible_para
@@ -90,13 +91,9 @@ def _tope_diario_superado(request):
     """Cuenta este mensaje contra el tope del dia. True si ya se paso."""
     if not getattr(settings, 'RATE_LIMIT_ENABLED', True):
         return False
-    clave = f'vendedor:dia:{_clave_de_cliente(request)}'
-    cache.add(clave, 0, timeout=SEGUNDOS_DIA)
-    try:
-        usados = cache.incr(clave)
-    except ValueError:
-        cache.set(clave, 1, timeout=SEGUNDOS_DIA)
-        usados = 1
+    # El dia cuenta de medianoche a medianoche en la hora del sitio, no en UTC.
+    desfase = int(timezone.localtime().utcoffset().total_seconds())
+    usados = contar(f'vendedor:dia:{_clave_de_cliente(request)}', SEGUNDOS_DIA, desfase)
     return usados > settings.VENDEDOR_MAX_MENSAJES_DIA
 
 

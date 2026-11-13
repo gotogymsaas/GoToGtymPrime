@@ -6,8 +6,24 @@ except ImportError:  # pragma: no cover - mercadopago may not be installed
     mercadopago = None
 
 
+# Segundos que se espera una respuesta de Mercado Pago. El SDK espera 60 por
+# defecto: con pocos procesos atendiendo, una API lenta dejaria la tienda sin
+# nadie que responda.
+TIMEOUT_SEGUNDOS = 10.0
+
+# El SDK reintenta por defecto 3 veces: una consulta que agota el tiempo
+# esperaria 4 x 10 s. Un reintento mas basta para un fallo de red aislado.
+MAX_REINTENTOS = 1
+
+
 class MercadoPagoError(Exception):
-    """Mercado Pago respondio con un error (o no respondio lo esperado)."""
+    """Mercado Pago respondio con un error (o no respondio lo esperado).
+
+    `estado` es el codigo HTTP de la respuesta, si lo hubo."""
+
+    def __init__(self, mensaje, estado=None):
+        super().__init__(mensaje)
+        self.estado = estado
 
 
 def _respuesta_valida(resultado: dict, accion: str) -> dict:
@@ -21,7 +37,10 @@ def _respuesta_valida(resultado: dict, accion: str) -> dict:
     if estado is None or not 200 <= int(estado) < 300:
         detalle = resultado.get("response") or {}
         mensaje = detalle.get("message") if isinstance(detalle, dict) else detalle
-        raise MercadoPagoError(f"{accion}: HTTP {estado} {mensaje or ''}".strip())
+        raise MercadoPagoError(
+            f"{accion}: HTTP {estado} {mensaje or ''}".strip(),
+            estado=int(estado) if estado is not None else None,
+        )
     return resultado.get("response", {})
 
 
@@ -34,7 +53,12 @@ class MercadoPagoClient:
             raise RuntimeError("mercadopago package is required")
         if not self.access_token:
             raise RuntimeError("MERCADOPAGO_ACCESS_TOKEN no esta configurado")
-        self.sdk = mercadopago.SDK(self.access_token)
+        self.sdk = mercadopago.SDK(
+            self.access_token,
+            request_options=mercadopago.config.RequestOptions(
+                connection_timeout=TIMEOUT_SEGUNDOS, max_retries=MAX_REINTENTOS,
+            ),
+        )
 
     def create_preference(self, preference_data: dict) -> dict:
         """Create a payment preference and return the API response."""
@@ -48,8 +72,29 @@ class MercadoPagoClient:
         result = self.sdk.payment().get(payment_id)
         return _respuesta_valida(result, f"No se pudo consultar el pago {payment_id}")
 
-    def refund_payment(self, payment_id: str, amount: float | None = None) -> dict:
-        """Refund a payment, fully or partially, and return the API response."""
+    def refund_payment(
+        self, payment_id: str, amount: float | None = None, idempotency_key: str | None = None,
+    ) -> dict:
+        """Refund a payment, fully or partially, and return the API response.
+
+        With `idempotency_key` the same request can be repeated safely: the
+        provider returns the original refund instead of creating another."""
         refund_object = {"amount": amount} if amount is not None else None
-        result = self.sdk.refund().create(payment_id, refund_object)
+        if idempotency_key:
+            # Las opciones de una llamada reemplazan a las del SDK completas, no
+            # se suman: el tiempo de espera hay que repetirlo.
+            opciones = mercadopago.config.RequestOptions(
+                connection_timeout=TIMEOUT_SEGUNDOS,
+                max_retries=MAX_REINTENTOS,
+                custom_headers={"x-idempotency-key": idempotency_key},
+            )
+            result = self.sdk.refund().create(payment_id, refund_object, opciones)
+        else:
+            result = self.sdk.refund().create(payment_id, refund_object)
         return _respuesta_valida(result, f"No se pudo reembolsar el pago {payment_id}")
+
+    def list_refunds(self, payment_id: str) -> list[dict]:
+        """Reembolsos que Mercado Pago tiene registrados para un pago."""
+        result = self.sdk.refund().list_all(payment_id)
+        respuesta = _respuesta_valida(result, f"No se pudieron consultar los reembolsos del pago {payment_id}")
+        return respuesta if isinstance(respuesta, list) else []

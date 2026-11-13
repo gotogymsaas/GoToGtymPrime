@@ -1,5 +1,6 @@
 """Puente del vendedor: lo que ve el navegador y lo que protege al sitio."""
 import json
+from datetime import UTC
 from decimal import Decimal
 from pathlib import Path
 from unittest import mock
@@ -378,6 +379,24 @@ class VendedorViewTests(TestCase):
 
         self.assertEqual([r.status_code for r in resultados], [200, 200, 429])
         self.assertEqual(resultados[2].json()['error'], 'limite_diario')
+
+    @override_settings(RATE_LIMIT_ENABLED=True, VENDEDOR_RATE_ANON=100, VENDEDOR_MAX_MENSAJES_DIA=1)
+    def test_el_tope_diario_se_reinicia_a_la_medianoche_de_la_hora_del_sitio(self):
+        from datetime import datetime
+        from unittest import mock
+
+        # 23:59:30 en Bogota (UTC-5) es 04:59:30 UTC; la medianoche local llega
+        # a las 05:00 UTC, no a las 00:00 UTC.
+        antes = datetime(2026, 11, 13, 4, 59, 30, tzinfo=UTC).timestamp()
+        despues = datetime(2026, 11, 13, 5, 0, 0, tzinfo=UTC).timestamp()
+
+        with mock.patch('gotogym.ratelimit._ahora', return_value=antes):
+            primera = self._enviar().status_code
+            segunda = self._enviar().status_code
+        with mock.patch('gotogym.ratelimit._ahora', return_value=despues):
+            tercera = self._enviar().status_code
+
+        self.assertEqual([primera, segunda, tercera], [200, 429, 200])
 
     @override_settings(RATE_LIMIT_ENABLED=True, VENDEDOR_RATE_ANON=1)
     def test_el_limite_responde_aunque_la_peticion_sea_ajax(self):

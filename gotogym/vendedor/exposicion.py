@@ -52,10 +52,11 @@ def coach_configurado():
     return bool(settings.COACH_API_URL) or settings.VENDEDOR_COACH_SIMULADO
 
 
-def asistente_activo():
+def asistente_activo(request=None):
     """El Coach se muestra en la tienda, sin mirar a cada visitante. La
-    condicion barata va primero: la otra consulta la base de datos."""
-    return bool(settings.VENDEDOR_ENABLED) and coach_habilitado()
+    condicion barata va primero: la otra consulta la base de datos (una vez
+    por peticion si se pasa `request`)."""
+    return bool(settings.VENDEDOR_ENABLED) and coach_habilitado(request)
 
 
 def coach_en_servicio():
@@ -66,7 +67,7 @@ def coach_en_servicio():
 
 
 def visible_para(request):
-    if not asistente_activo():
+    if not asistente_activo(request):
         return False
     porcentaje = settings.VENDEDOR_ROLLOUT_PERCENT
     if porcentaje >= 100:

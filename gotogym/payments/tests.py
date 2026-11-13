@@ -241,6 +241,117 @@ class RefundServiceTests(TestCase):
         self.assertEqual(reembolso.amount, transaccion.amount)
         self.assertEqual(reembolso.requested_by, self.admin)
 
+    def test_un_rechazo_del_proveedor_deja_un_reembolso_fallido(self):
+        from unittest.mock import patch
+
+        from .providers.base import RefundRejected
+        from .services import RefundError, refund_order_payment
+
+        transaccion = self._transaccion_aprobada()
+        with patch(
+            'payments.providers.mock.MockPaymentProvider.refund_payment',
+            side_effect=RefundRejected('saldo insuficiente'),
+        ):
+            with self.assertRaises(RefundError):
+                refund_order_payment(self.pedido, self.admin)
+
+        reembolso = transaccion.refunds.get()
+        self.assertEqual(reembolso.status, Refund.Status.FAILED)
+        self.assertIn('saldo insuficiente', reembolso.error_message)
+
+    def test_tras_un_rechazo_se_puede_volver_a_intentar(self):
+        from unittest.mock import patch
+
+        from .providers.base import RefundRejected
+        from .services import RefundError, refund_order_payment
+
+        transaccion = self._transaccion_aprobada()
+        with patch(
+            'payments.providers.mock.MockPaymentProvider.refund_payment',
+            side_effect=RefundRejected('rechazado'),
+        ):
+            with self.assertRaises(RefundError):
+                refund_order_payment(self.pedido, self.admin)
+
+        reembolso = refund_order_payment(self.pedido, self.admin)
+
+        self.assertEqual(reembolso.status, Refund.Status.APPROVED)
+        self.assertEqual(transaccion.refunds.count(), 2)
+
+    def test_un_estado_rechazado_del_proveedor_queda_como_fallido(self):
+        from unittest.mock import patch
+
+        from .services import RefundError, refund_order_payment
+
+        transaccion = self._transaccion_aprobada()
+        with patch(
+            'payments.providers.mock.MockPaymentProvider.refund_payment',
+            return_value={'provider_refund_id': 'r-1', 'status': 'rejected'},
+        ):
+            with self.assertRaises(RefundError):
+                refund_order_payment(self.pedido, self.admin)
+
+        self.assertEqual(transaccion.refunds.get().status, Refund.Status.FAILED)
+
+    def test_un_error_ambiguo_deja_el_reembolso_pendiente_y_bloquea_otro(self):
+        from unittest.mock import patch
+
+        from .services import RefundError, refund_order_payment
+
+        transaccion = self._transaccion_aprobada()
+        with patch(
+            'payments.providers.mock.MockPaymentProvider.refund_payment',
+            side_effect=TimeoutError('tiempo agotado'),
+        ):
+            with self.assertRaises(RefundError):
+                refund_order_payment(self.pedido, self.admin)
+
+        reembolso = transaccion.refunds.get()
+        self.assertEqual(reembolso.status, Refund.Status.PENDING)
+        self.assertIn('tiempo agotado', reembolso.error_message)
+        with self.assertRaises(RefundError):
+            refund_order_payment(self.pedido, self.admin)
+        self.assertEqual(transaccion.refunds.count(), 1)
+
+    def test_un_reembolso_pendiente_impide_pedir_otro(self):
+        from unittest.mock import patch
+
+        from .services import RefundError, refund_order_payment
+
+        transaccion = self._transaccion_aprobada()
+        Refund.objects.create(
+            payment_transaction=transaccion, amount=transaccion.amount, status=Refund.Status.PENDING,
+        )
+        with patch('payments.providers.mock.MockPaymentProvider.refund_payment') as llamada:
+            with self.assertRaises(RefundError):
+                refund_order_payment(self.pedido, self.admin)
+        llamada.assert_not_called()
+
+    def test_la_llamada_al_proveedor_ocurre_fuera_de_la_transaccion_y_con_clave(self):
+        from unittest.mock import patch
+
+        from django.db import connection
+
+        from .services import refund_order_payment
+
+        self._transaccion_aprobada()
+        vistos = {}
+
+        def espia(self_provider, transaccion, amount=None, idempotency_key=None):
+            # La prueba ya corre dentro de una transaccion; un `atomic` propio
+            # del servicio abriria un punto de guardado encima.
+            vistos['puntos_de_guardado'] = len(connection.savepoint_ids)
+            vistos['clave'] = idempotency_key
+            return {'provider_refund_id': 'r-1', 'status': 'approved'}
+
+        base = len(connection.savepoint_ids)
+        with patch('payments.providers.mock.MockPaymentProvider.refund_payment', espia):
+            reembolso = refund_order_payment(self.pedido, self.admin)
+
+        self.assertEqual(vistos['puntos_de_guardado'], base)
+        self.assertTrue(vistos['clave'])
+        self.assertEqual(vistos['clave'], reembolso.idempotency_key)
+
     def test_no_se_puede_reembolsar_sin_pago_aprobado(self):
         from .services import RefundError, refund_order_payment
 
@@ -279,3 +390,132 @@ class RefundServiceTests(TestCase):
         )
         with self.assertRaises(RefundError):
             refund_order_payment(self.pedido, self.admin)
+
+class ConciliarReembolsoTests(TestCase):
+    """Un reembolso pendiente se resuelve preguntando al proveedor."""
+
+    def setUp(self):
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        self.pedido = _crear_pedido()
+        self.transaccion = PaymentTransaction.objects.create(
+            order=self.pedido, provider='mock', payment_id='mock-pay-c',
+            external_reference=self.pedido.order_number,
+            status=PaymentTransaction.Status.APPROVED, amount=self.pedido.total,
+            idempotency_key='idem-conciliar',
+        )
+        self.reembolso = Refund.objects.create(
+            payment_transaction=self.transaccion, amount=self.transaccion.amount,
+            status=Refund.Status.PENDING,
+        )
+        Refund.objects.filter(pk=self.reembolso.pk).update(created_at=timezone.now() - timedelta(minutes=30))
+        self.reembolso.refresh_from_db()
+
+    def _conciliar(self, registrados):
+        from unittest.mock import patch
+
+        from .services import conciliar_reembolso
+
+        with patch('payments.providers.mock.MockPaymentProvider.list_refunds', return_value=registrados, create=True):
+            return conciliar_reembolso(self.reembolso)
+
+    def test_si_el_proveedor_lo_tiene_aprobado_queda_aprobado(self):
+        resultado = self._conciliar([
+            {'provider_refund_id': 'r-9', 'status': 'approved', 'amount': self.transaccion.amount},
+        ])
+        self.assertEqual(resultado.status, Refund.Status.APPROVED)
+        self.assertEqual(resultado.provider_refund_id, 'r-9')
+
+    def test_si_el_proveedor_no_lo_tiene_queda_fallido_y_se_puede_reintentar(self):
+        from .services import refund_order_payment
+
+        resultado = self._conciliar([])
+        self.assertEqual(resultado.status, Refund.Status.FAILED)
+
+        nuevo = refund_order_payment(self.pedido, None)
+        self.assertEqual(nuevo.status, Refund.Status.APPROVED)
+
+    def test_en_proceso_en_el_proveedor_sigue_pendiente_sin_tocarlo(self):
+        Refund.objects.filter(pk=self.reembolso.pk).update(provider_refund_id='r-9')
+        self.reembolso.refresh_from_db()
+
+        resultado = self._conciliar([
+            {'provider_refund_id': 'r-9', 'status': 'in_process', 'amount': self.transaccion.amount},
+        ])
+
+        self.assertEqual(resultado.status, Refund.Status.PENDING)
+        self.assertEqual(resultado.error_message, '')
+
+    def test_sin_id_un_reembolso_en_proceso_por_el_mismo_monto_sigue_pendiente(self):
+        resultado = self._conciliar([
+            {'provider_refund_id': 'r-9', 'status': 'in_process', 'amount': self.transaccion.amount},
+        ])
+
+        self.assertEqual(resultado.status, Refund.Status.PENDING)
+        self.assertEqual(resultado.provider_refund_id, 'r-9')
+
+    def test_con_id_se_empareja_por_el_id_y_no_por_el_monto(self):
+        Refund.objects.filter(pk=self.reembolso.pk).update(provider_refund_id='r-1')
+        self.reembolso.refresh_from_db()
+
+        resultado = self._conciliar([
+            {'provider_refund_id': 'r-otro', 'status': 'approved', 'amount': self.transaccion.amount},
+            {'provider_refund_id': 'r-1', 'status': 'cancelled', 'amount': self.transaccion.amount},
+        ])
+
+        self.assertEqual(resultado.status, Refund.Status.FAILED)
+
+    def test_con_id_ausente_de_la_lista_queda_fallido(self):
+        Refund.objects.filter(pk=self.reembolso.pk).update(provider_refund_id='r-1')
+        self.reembolso.refresh_from_db()
+
+        resultado = self._conciliar([])
+
+        self.assertEqual(resultado.status, Refund.Status.FAILED)
+
+    def test_un_reembolso_del_proveedor_ya_reclamado_por_otro_registro_no_cuenta(self):
+        Refund.objects.create(
+            payment_transaction=self.transaccion, amount=self.transaccion.amount,
+            status=Refund.Status.FAILED, provider_refund_id='r-9',
+        )
+        resultado = self._conciliar([
+            {'provider_refund_id': 'r-9', 'status': 'approved', 'amount': self.transaccion.amount},
+        ])
+        self.assertEqual(resultado.status, Refund.Status.FAILED)
+
+    def test_un_reembolso_reciente_no_se_concilia(self):
+        from django.utils import timezone
+
+        from .services import RefundError
+
+        Refund.objects.filter(pk=self.reembolso.pk).update(created_at=timezone.now())
+        self.reembolso.refresh_from_db()
+        with self.assertRaises(RefundError):
+            self._conciliar([])
+        self.reembolso.refresh_from_db()
+        self.assertEqual(self.reembolso.status, Refund.Status.PENDING)
+
+    def test_si_el_proveedor_no_puede_consultarse_sigue_pendiente(self):
+        from .services import RefundError, conciliar_reembolso
+
+        with self.assertRaises(RefundError):
+            conciliar_reembolso(self.reembolso)  # el mock no implementa list_refunds
+        self.reembolso.refresh_from_db()
+        self.assertEqual(self.reembolso.status, Refund.Status.PENDING)
+
+    def test_el_comando_resuelve_los_pendientes(self):
+        from io import StringIO
+        from unittest.mock import patch
+
+        from django.core.management import call_command
+
+        salida = StringIO()
+        with patch('payments.providers.mock.MockPaymentProvider.list_refunds', return_value=[], create=True):
+            call_command('conciliar_reembolsos', stdout=salida)
+
+        self.reembolso.refresh_from_db()
+        self.assertEqual(self.reembolso.status, Refund.Status.FAILED)
+        self.assertIn(self.pedido.order_number, salida.getvalue())
+

@@ -111,7 +111,17 @@ class PaginasDeErrorTests(TestCase):
     def test_readiness_confirma_la_base_de_datos(self):
         r = self.cliente.get('/readyz')
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.json(), {'status': 'ready', 'database': 'available'})
+        self.assertEqual(r.json(), {'status': 'ready', 'database': 'available', 'cache': 'available'})
+
+    def test_readiness_informa_la_cache_caida_sin_responder_503(self):
+        from unittest.mock import patch
+
+        with patch('gotogym.views.cache.set', side_effect=OSError('cache caida')):
+            with self.assertLogs('gotogym.views', level='ERROR'):
+                r = self.cliente.get('/readyz')
+
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['cache'], 'unavailable')
 
     def test_fallo_csrf_muestra_403_y_se_registra(self):
         cliente = Client(enforce_csrf_checks=True)

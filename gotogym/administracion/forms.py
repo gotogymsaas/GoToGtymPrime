@@ -454,3 +454,36 @@ class RecursoMarcaForm(forms.ModelForm):
         if archivo.size > TAMANO_MAXIMO_DE_RECURSO:
             raise forms.ValidationError("El archivo supera los 25 MB.")
         return archivo
+
+
+# Subidas de fotos desde el panel.
+MAX_BYTES_IMAGEN = 5 * 1024 * 1024
+MAX_LADO_IMAGEN = 6000
+FORMATOS_DE_IMAGEN = {'JPEG', 'PNG', 'WEBP'}
+
+
+def validar_imagen(archivo):
+    """Comprueba que lo subido es una foto aceptable y lanza `ValidationError`
+    si no: tamano maximo, formato real (se abre con Pillow; la extension o el
+    tipo que declara el navegador no cuentan) y dimensiones maximas."""
+    from django.core.exceptions import ValidationError
+    from PIL import Image, UnidentifiedImageError
+
+    if archivo.size > MAX_BYTES_IMAGEN:
+        raise ValidationError(
+            f'"{archivo.name}" pesa más de {MAX_BYTES_IMAGEN // (1024 * 1024)} MB.',
+        )
+    try:
+        archivo.seek(0)
+        with Image.open(archivo) as imagen:
+            formato = imagen.format
+            ancho, alto = imagen.size
+            imagen.verify()
+    except (UnidentifiedImageError, Image.DecompressionBombError, OSError, ValueError, SyntaxError):
+        raise ValidationError(f'"{archivo.name}" no es una imagen válida.') from None
+    finally:
+        archivo.seek(0)
+    if formato not in FORMATOS_DE_IMAGEN:
+        raise ValidationError(f'"{archivo.name}" debe ser JPG, PNG o WebP.')
+    if max(ancho, alto) > MAX_LADO_IMAGEN:
+        raise ValidationError(f'"{archivo.name}" supera los {MAX_LADO_IMAGEN} px de lado.')

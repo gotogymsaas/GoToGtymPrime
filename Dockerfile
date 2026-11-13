@@ -3,7 +3,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 WORKDIR /app
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt gunicorn
+RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 EXPOSE 8000
 # Mismo arranque que produccion (App Service): migrar, recolectar estaticos y

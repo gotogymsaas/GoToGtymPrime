@@ -344,6 +344,11 @@ class CircuitoTests(SimpleTestCase):
     def setUp(self):
         cache.clear()
         self.addCleanup(cache.clear)
+        # Reloj fijo: los fallos se cuentan por ventana de reloj y una prueba
+        # que cruzara el cambio de minuto se partiria en dos ventanas.
+        reloj = mock.patch('gotogym.ratelimit._ahora', return_value=1_000_020.0)
+        reloj.start()
+        self.addCleanup(reloj.stop)
 
     def test_empieza_cerrado(self):
         self.assertFalse(coach_client.circuito_abierto())

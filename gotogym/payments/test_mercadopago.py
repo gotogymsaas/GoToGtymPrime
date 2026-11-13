@@ -17,10 +17,11 @@ from django.urls import reverse
 from integrations.mercadopago.mercadopago_client import MercadoPagoError
 from inventory.models import Inventory
 from orders.models import OrderStatus
-from orders.services import create_order_from_cart
+from orders.services import confirm_payment, create_order_from_cart
 from products.models import Brand, Product, ProductCategory, ProductVariant
 
-from .models import PaymentTransaction
+from .models import PaymentTransaction, Refund
+from .providers.base import RefundRejected
 from .providers.mercadopago import MercadoPagoPaymentProvider
 from .signature import (
     build_signature_template,
@@ -64,8 +65,10 @@ class FakeMercadoPagoClient:
         self.llamadas.append(preference_data)
         return self.response
 
-    def refund_payment(self, payment_id, amount=None):
-        self.llamadas_refund.append({'payment_id': payment_id, 'amount': amount})
+    def refund_payment(self, payment_id, amount=None, idempotency_key=None):
+        self.llamadas_refund.append(
+            {'payment_id': payment_id, 'amount': amount, 'idempotency_key': idempotency_key},
+        )
         return self.refund_response
 
 
@@ -279,6 +282,92 @@ class HandleCallbackTests(TestCase):
         transaccion = self.provider.handle_callback(self._payload('approved', payment_id='pay-2'))
         self.assertEqual(transaccion.status, PaymentTransaction.Status.APPROVED)
         self.assertEqual(transaccion.payment_id, 'pay-2')
+
+    def _aprobar_y_confirmar(self):
+        transaccion = self.provider.handle_callback(self._payload('approved'))
+        confirm_payment(self.pedido, transaccion)
+        self.pedido.refresh_from_db()
+        return transaccion
+
+    def test_un_contracargo_anota_el_pedido_y_registra_un_error_sin_cambiar_su_estado(self):
+        self._aprobar_y_confirmar()
+        estado_antes = (self.pedido.order_status, self.pedido.payment_status)
+
+        with self.assertLogs('orders.services', level='ERROR') as registros:
+            transaccion = self.provider.handle_callback(self._payload('charged_back'))
+
+        self.assertEqual(transaccion.status, PaymentTransaction.Status.CANCELLED)
+        self.pedido.refresh_from_db()
+        self.assertEqual((self.pedido.order_status, self.pedido.payment_status), estado_antes)
+        self.assertIn('contracargo', self.pedido.internal_note)
+        self.assertIn(self.pedido.order_number, registros.output[0])
+
+    def test_un_reembolso_hecho_en_el_panel_de_mercado_pago_tambien_se_anota(self):
+        self._aprobar_y_confirmar()
+
+        with self.assertLogs('orders.services', level='ERROR'):
+            self.provider.handle_callback(self._payload('refunded'))
+
+        self.pedido.refresh_from_db()
+        self.assertIn('reembolsó', self.pedido.internal_note)
+
+    def test_un_contracargo_anula_la_comision_del_afiliado(self):
+        from unittest import mock
+
+        self._aprobar_y_confirmar()
+
+        with mock.patch('orders.services.revert_order_commission') as revertir:
+            with self.assertLogs('orders.services', level='ERROR'):
+                self.provider.handle_callback(self._payload('charged_back'))
+
+        revertir.assert_called_once()
+        self.assertEqual(revertir.call_args.args[0].pk, self.pedido.pk)
+
+    def test_el_aviso_repetido_de_un_contracargo_no_se_anota_dos_veces(self):
+        self._aprobar_y_confirmar()
+        with self.assertLogs('orders.services', level='ERROR'):
+            self.provider.handle_callback(self._payload('charged_back'))
+        self.pedido.refresh_from_db()
+        nota = self.pedido.internal_note
+
+        self.provider.handle_callback(self._payload('charged_back'))
+
+        self.pedido.refresh_from_db()
+        self.assertEqual(self.pedido.internal_note, nota)
+
+    def test_si_el_aviso_falla_el_estado_no_queda_guardado_y_el_reintento_lo_repite(self):
+        from unittest import mock
+
+        self._aprobar_y_confirmar()
+
+        with mock.patch(
+            'payments.providers.mercadopago.registrar_pago_revertido', side_effect=OSError('sin base'),
+        ):
+            with self.assertRaises(OSError):
+                self.provider.handle_callback(self._payload('charged_back'))
+        self.transaccion.refresh_from_db()
+        self.assertEqual(self.transaccion.status, PaymentTransaction.Status.APPROVED)
+
+        with self.assertLogs('orders.services', level='ERROR'):
+            self.provider.handle_callback(self._payload('charged_back'))
+        self.pedido.refresh_from_db()
+        self.assertIn('contracargo', self.pedido.internal_note)
+
+    def test_un_reembolso_pedido_por_la_tienda_no_genera_aviso(self):
+        transaccion = self._aprobar_y_confirmar()
+        Refund.objects.create(
+            payment_transaction=transaccion, amount=transaccion.amount, status=Refund.Status.APPROVED,
+        )
+
+        with self.assertNoLogs('orders.services', level='ERROR'):
+            self.provider.handle_callback(self._payload('refunded'))
+
+        self.pedido.refresh_from_db()
+        self.assertEqual(self.pedido.internal_note, '')
+
+    def test_un_pago_cancelado_que_nunca_se_aprobo_no_genera_aviso(self):
+        with self.assertNoLogs('orders.services', level='ERROR'):
+            self.provider.handle_callback(self._payload('cancelled'))
 
     def test_notificacion_sin_id_de_pago_lanza_does_not_exist(self):
         with self.assertRaises(PaymentTransaction.DoesNotExist):
@@ -631,6 +720,15 @@ class MercadoPagoRefundTestCase(TestCase):
         self.assertEqual(resultado['status'], 'approved')
         self.assertEqual(resultado['provider_refund_id'], 'refund-fake-1')
 
+    def test_refund_envia_la_clave_de_idempotencia(self):
+        transaccion = self._transaccion_aprobada()
+        cliente_falso = FakeMercadoPagoClient()
+        provider = MercadoPagoPaymentProvider(client=cliente_falso)
+
+        provider.refund_payment(transaccion, idempotency_key='clave-1')
+
+        self.assertEqual(cliente_falso.llamadas_refund[0]['idempotency_key'], 'clave-1')
+
     def test_refund_parcial_envia_el_monto(self):
         transaccion = self._transaccion_aprobada()
         cliente_falso = FakeMercadoPagoClient()
@@ -649,5 +747,47 @@ class MercadoPagoRefundTestCase(TestCase):
         )
         provider = MercadoPagoPaymentProvider(client=FakeMercadoPagoClient())
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(RefundRejected):
             provider.refund_payment(transaccion)
+
+    def _proveedor_que_responde_con(self, estado):
+        class ClienteConError(FakeMercadoPagoClient):
+            def refund_payment(self, payment_id, amount=None, idempotency_key=None):
+                raise MercadoPagoError(f'HTTP {estado}', estado=estado)
+
+        return MercadoPagoPaymentProvider(client=ClienteConError())
+
+    def test_un_4xx_de_mercado_pago_es_un_rechazo(self):
+        transaccion = self._transaccion_aprobada('pay-4xx')
+        with self.assertRaises(RefundRejected):
+            self._proveedor_que_responde_con(400).refund_payment(transaccion)
+
+    def test_un_5xx_de_mercado_pago_no_se_trata_como_rechazo(self):
+        transaccion = self._transaccion_aprobada('pay-5xx')
+        with self.assertRaises(MercadoPagoError):
+            self._proveedor_que_responde_con(503).refund_payment(transaccion)
+
+    def test_un_408_o_409_no_se_trata_como_rechazo(self):
+        transaccion = self._transaccion_aprobada('pay-ambiguo')
+        for estado in (408, 409):
+            with self.subTest(estado=estado):
+                with self.assertRaises(MercadoPagoError):
+                    self._proveedor_que_responde_con(estado).refund_payment(transaccion)
+
+    def test_un_429_es_un_rechazo(self):
+        transaccion = self._transaccion_aprobada('pay-429')
+        with self.assertRaises(RefundRejected):
+            self._proveedor_que_responde_con(429).refund_payment(transaccion)
+
+    def test_lista_los_reembolsos_del_pago(self):
+        transaccion = self._transaccion_aprobada('pay-lista')
+
+        class ClienteConLista(FakeMercadoPagoClient):
+            def list_refunds(self, payment_id):
+                return [{'id': 7, 'status': 'approved', 'amount': 1500.5}]
+
+        reembolsos = MercadoPagoPaymentProvider(client=ClienteConLista()).list_refunds(transaccion)
+
+        self.assertEqual(reembolsos, [
+            {'provider_refund_id': '7', 'status': 'approved', 'amount': Decimal('1500.5')},
+        ])

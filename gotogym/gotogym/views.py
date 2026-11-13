@@ -1,5 +1,8 @@
+import logging
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.db import connection
 from django.db.utils import OperationalError
 from django.http import HttpResponse, HttpResponsePermanentRedirect, JsonResponse
@@ -14,6 +17,8 @@ from vendedor.exposicion import coach_en_servicio
 from . import politicas_contenido as politicas_es
 from . import politicas_contenido_en as politicas_en
 from .seo import contexto_seo
+
+logger = logging.getLogger(__name__)
 
 
 def home(request):
@@ -63,7 +68,19 @@ def readyz(request):
         connection.ensure_connection()
     except OperationalError:
         return JsonResponse({'status': 'unavailable', 'database': 'unavailable'}, status=503)
-    return JsonResponse({'status': 'ready', 'database': 'available'})
+    # La cache sostiene el limite de tasa y el circuito del Coach. Si falla, el
+    # sitio sigue atendiendo: se informa y se registra, pero no se responde 503
+    # (un health check que reinicia la aplicacion por la cache la tumbaria).
+    try:
+        cache.set('readyz', 1, 30)
+        cache_disponible = cache.get('readyz') == 1
+    except Exception:
+        logger.exception('readyz: la cache no responde.')
+        cache_disponible = False
+    return JsonResponse({
+        'status': 'ready', 'database': 'available',
+        'cache': 'available' if cache_disponible else 'unavailable',
+    })
 
 
 def acerca_de(request):

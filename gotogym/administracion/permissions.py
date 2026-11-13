@@ -16,12 +16,15 @@ Anadir un permiso nuevo en el futuro (por ejemplo para un modulo nuevo del
 panel) es agregar una tupla aqui y decorar la vista correspondiente con
 `require_perms`; no hace falta tocar el esquema de nuevo.
 """
+import logging
 from functools import wraps
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect
 from django.views.decorators.cache import never_cache
+
+logger = logging.getLogger(__name__)
 
 ADMIN_PERM_SPECS = [
     ('products', 'add_product'),
@@ -35,9 +38,12 @@ ADMIN_PERM_SPECS = [
     ('products', 'add_brand'),
     ('products', 'delete_brand'),
     ('inventory', 'change_inventory'),
+    ('orders', 'view_order'),
+    ('orders', 'change_order'),
     ('orders', 'add_coupon'),
     ('orders', 'change_coupon'),
     ('orders', 'delete_coupon'),
+    ('accounts', 'view_user'),
     ('accounts', 'change_user'),
     ('accounts', 'delete_user'),
     ('auth', 'add_group'),
@@ -145,6 +151,23 @@ def require_perms(*perms):
             if not any(request.user.has_perm(perm) for perm in perms):
                 messages.error(request, "No tienes permisos para esta acción.")
                 return redirect('admin_dashboard')
-            return view_func(request, *args, **kwargs)
+            respuesta = view_func(request, *args, **kwargs)
+            if request.method == 'POST' and respuesta.status_code < 400:
+                _registrar_accion(request, view_func.__name__, kwargs, respuesta.status_code)
+            return respuesta
         return wrapped
     return decorator
+
+
+def _registrar_accion(request, vista, argumentos, codigo_estado):
+    """Deja constancia de una accion del panel. Un fallo al escribir la
+    bitacora no debe deshacer ni ocultar lo que la persona acaba de hacer."""
+    from .models import AccionDePanel
+
+    try:
+        AccionDePanel.objects.create(
+            usuario=request.user, vista=vista[:100],
+            argumentos={k: str(v) for k, v in argumentos.items()}, codigo_estado=codigo_estado,
+        )
+    except Exception:
+        logger.exception('No se pudo registrar la acción del panel (%s).', vista)

@@ -7,6 +7,12 @@ implementar una pasarela real con esta misma forma sin tocar `checkout`,
 from abc import ABC, abstractmethod
 
 
+class RefundRejected(Exception):
+    """El proveedor respondio y rechazo el reembolso: se sabe que el dinero no
+    salio. Cualquier otro error (red, tiempo agotado, fallo del servidor) deja
+    el resultado sin saber y no debe tratarse como rechazo."""
+
+
 class PaymentProvider(ABC):
 
     @abstractmethod
@@ -24,9 +30,19 @@ class PaymentProvider(ABC):
         devuelve el `PaymentTransaction` actualizado."""
 
     @abstractmethod
-    def refund_payment(self, payment_transaction, amount=None):
+    def refund_payment(self, payment_transaction, amount=None, idempotency_key=None):
         """Reembolsa un pago ya aprobado, total o parcialmente.
+
+        `idempotency_key` identifica la solicitud: repetirla con la misma clave
+        no debe devolver el dinero otra vez.
 
         Devuelve un dict con al menos `provider_refund_id` y `status`. No
         cambia el estado logistico del pedido: eso lo decide quien llama
-        (ver `payments.services.refund_order_payment`)."""
+        (ver `payments.services.refund_order_payment`). Lanza `RefundRejected`
+        si el proveedor rechaza la solicitud."""
+
+    def list_refunds(self, payment_transaction):
+        """Reembolsos que el proveedor tiene registrados para el pago, como
+        lista de dicts con `provider_refund_id`, `status` y `amount`. Sirve
+        para conciliar un reembolso cuyo resultado no se llego a saber."""
+        raise NotImplementedError

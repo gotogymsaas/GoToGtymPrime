@@ -74,28 +74,36 @@ Archivos:
 
 ## Suite de pruebas del backend
 
-El pipeline ejecuta por defecto la suite esencial, centrada en autenticación,
-checkout, inventario, pedidos, pagos, integraciones, permisos y seguridad:
+`run_backend_checks.sh` es lo mismo que ejecuta el CI (`.github/workflows/ci.yml`)
+en cada pull request y antes de cada despliegue. Corre, en orden: ruff,
+import-linter, mypy, `manage.py check`, migraciones pendientes
+(`makemigrations --check`), `check --deploy` con la configuración de producción
+simulada y la suite completa con cobertura:
 
 ```bash
 bash environments/backend/run_backend_checks.sh
 ```
 
-La suite rápida usa módulos explícitos para evitar que el descubridor de Django
-incluya clases importadas varias veces. En la medición actual ejecuta 204 tests
-en aproximadamente 22 segundos de ejecución. La suite completa de referencia
-ejecuta 292 tests y se conserva para regresiones.
+Variables útiles:
 
-Para una regresión completa antes de un release mayor o en una ejecución
-programada:
+- `TEST_PARALLEL`: procesos de la suite. Por defecto 2 en local y uno por núcleo
+  cuando `CI=true`. En una máquina con poca CPU conviene dejarlo bajo.
+- `COVERAGE_FAIL_UNDER`: piso de cobertura. Si no se define, el reporte no falla.
+  Se fija con el valor medido en una corrida completa del CI y solo se sube
+  cuando sube la cobertura.
+
+El CI ejecuta además un segundo job contra PostgreSQL 16 con las apps que mueven
+dinero e inventario (`orders`, `payments`, `inventory`, `afiliados`) y el
+limitador de tasa. SQLite ignora `select_for_update`, de modo que las pruebas de
+concurrencia (`test_concurrencia.py` en `orders` y `payments`, y las de última
+unidad de inventario) solo se ejercitan allí. Para repetirlo en local hace falta
+un PostgreSQL desechable y las variables `POSTGRES_*`:
 
 ```bash
-FULL_TEST_SUITE=true bash environments/backend/run_backend_checks.sh
+cd gotogym
+python manage.py test orders payments inventory afiliados \
+  --settings=gotogym.settings_test_postgres
 ```
-
-No se eliminaron suites de funcionalidad secundaria sin evidencia de que sean
-obsoletas; quedan fuera del camino rápido, pero siguen disponibles para la
-regresión completa.
 
 Uso seguro (dry-run por defecto):
 

@@ -4,6 +4,7 @@ El pedido se crea antes de involucrar a ningun proveedor de pago, y todos
 los importes se recalculan aqui desde la base de datos: nunca se confia en
 un precio que venga de la sesion o del formulario.
 """
+import logging
 from datetime import timedelta
 from decimal import Decimal
 
@@ -16,7 +17,7 @@ from afiliados.services import (
 from carrito.services import build_cart_context
 from django.conf import settings
 from django.db import IntegrityError, transaction
-from django.db.models import F
+from django.db.models import F, Q
 from django.utils import timezone
 from django.utils.translation import get_language, gettext
 from gotogym.ajustes_tienda import MENSAJE_COMPRAS_PAUSADAS, compras_pausadas
@@ -41,6 +42,8 @@ from .models import (
     PaymentStatus,
 )
 
+logger = logging.getLogger(__name__)
+
 # Intentos para resolver la colision de dos pedidos creados a la vez.
 MAX_INTENTOS_NUMERO = 5
 
@@ -51,9 +54,8 @@ def get_usable_coupon(coupon_code, user=None):
     Centraliza la busqueda para que el formulario (validacion) y el
     servicio de creacion del pedido (aplicacion real) usen exactamente el
     mismo criterio de "utilizable". Si `user` es el propio afiliado dueño
-    del cupon, se trata como no utilizable: control de autorreferencia
-    (RF-F11), para que nadie se autoaplique el descuento ni se genere
-    comision sobre su propia compra.
+    del cupon, se trata como no utilizable (autorreferencia): nadie debe
+    autoaplicarse el descuento ni generar comision sobre su propia compra.
     """
     codigo = (coupon_code or '').strip().upper()
     if not codigo:
@@ -92,6 +94,26 @@ def es_cupon_propio(coupon_code, user):
 def _anotar(nota_actual, texto):
     """Agrega `texto` a la nota interna sin pisar lo que ya tenia."""
     return f'{nota_actual}\n{texto}' if nota_actual else texto
+
+
+def registrar_pago_revertido(order, motivo):
+    """Deja constancia de un pago aprobado que el proveedor revirtio por su
+    cuenta (contracargo, o un reembolso hecho desde su propio panel).
+
+    Anota el pedido, anula la comision del afiliado y registra un error para
+    que llegue a quien monitorea (Sentry). No cambia el estado logistico ni el
+    de pago del pedido: un contracargo puede disputarse y el paquete puede
+    estar ya entregado, asi que decide una persona."""
+    order.internal_note = _anotar(
+        order.internal_note,
+        f'{motivo} Revisar con el proveedor de pago antes de actuar sobre el pedido.',
+    )
+    order.save(update_fields=['internal_note', 'updated_at'])
+    revert_order_commission(order, motivo)
+    logger.error(
+        'Pago revertido por el proveedor en el pedido %s (estado %s): %s',
+        order.order_number, order.order_status, motivo,
+    )
 
 
 def release_coupon(order):
@@ -250,6 +272,12 @@ def apply_order_status_transition(order, nuevo_estado, tracking_code=None, chang
     `tracking_code` se guarda en la misma operacion, de modo que el correo de
     envio, que se arma despues de confirmar la transaccion, ya la incluya.
     """
+    # Se relee el pedido con la fila bloqueada: la instancia que llega pudo
+    # leerse antes de que otra operacion (por ejemplo la confirmacion del pago)
+    # cambiara el estado, y validar la transicion sobre ese estado viejo
+    # cancelaria un pedido ya confirmado sin devolver su stock.
+    Order.objects.select_for_update().only('pk').get(pk=order.pk)
+    order.refresh_from_db()
     if nuevo_estado not in valid_next_statuses(order):
         raise InvalidOrderTransitionError(order, nuevo_estado)
 
@@ -358,6 +386,17 @@ def create_order_from_cart(user, cart, datos):
     descuento = cupon.compute_discount(subtotal) if cupon else Decimal('0.00')
     total = subtotal + envio - descuento
 
+    if cupon is not None:
+        # El uso se toma con un UPDATE condicional: `get_usable_coupon` leyo el
+        # contador antes, y dos compras simultaneas verian ambas un cupo libre.
+        # Si no actualiza ninguna fila, el cupon se agoto entre tanto y la
+        # transaccion entera (incluido el pedido) se revierte.
+        tomado = Coupon.objects.filter(pk=cupon.pk).filter(
+            Q(max_uses__isnull=True) | Q(times_used__lt=F('max_uses')),
+        ).update(times_used=F('times_used') + 1)
+        if not tomado:
+            raise CheckoutError(gettext('El cupón ya no está disponible.'))
+
     pedido = None
     for intento in range(MAX_INTENTOS_NUMERO):
         try:
@@ -384,9 +423,6 @@ def create_order_from_cart(user, cart, datos):
             if intento == MAX_INTENTOS_NUMERO - 1:
                 raise
             continue
-
-    if cupon is not None:
-        Coupon.objects.filter(pk=cupon.pk).update(times_used=F('times_used') + 1)
 
     for item in items:
         variante = item['variant']

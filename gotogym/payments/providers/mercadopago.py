@@ -13,12 +13,18 @@ import logging
 import uuid
 from decimal import Decimal, InvalidOperation
 
+import sentry_sdk
 from django.conf import settings
+from django.db import transaction as db_transaction
 from django.urls import reverse
-from integrations.mercadopago.mercadopago_client import MercadoPagoClient
+from integrations.mercadopago.mercadopago_client import MercadoPagoClient, MercadoPagoError
+from orders.services import registrar_pago_revertido
 
-from ..models import PaymentTransaction
-from .base import PaymentProvider
+from ..models import PaymentTransaction, Refund
+from .base import PaymentProvider, RefundRejected
+
+# Respuestas 4xx que no aseguran que el reembolso no se hizo.
+_ESTADOS_AMBIGUOS = {408, 409}
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +40,12 @@ _MAPA_ESTADOS_MP = {
     'cancelled': PaymentTransaction.Status.CANCELLED,
     'refunded': PaymentTransaction.Status.CANCELLED,
     'charged_back': PaymentTransaction.Status.CANCELLED,
+}
+
+# Estados con los que Mercado Pago revierte por su cuenta un pago ya aprobado.
+_ESTADOS_DE_REVERSION = {
+    'refunded': 'Mercado Pago reembolsó el pago por fuera de la tienda.',
+    'charged_back': 'El comprador abrió un contracargo sobre el pago.',
 }
 
 # Un intento en uno de estos estados ya esta cerrado: un nuevo intento de
@@ -138,21 +150,46 @@ class MercadoPagoPaymentProvider(PaymentProvider):
     def get_status(self, payment_transaction):
         return payment_transaction.status
 
-    def refund_payment(self, payment_transaction, amount=None):
+    def refund_payment(self, payment_transaction, amount=None, idempotency_key=None):
         """Reembolsa el pago real en Mercado Pago.
 
         Requiere `payment_id` (el pago ya debe estar aprobado): no tiene
-        sentido reembolsar una preferencia que nunca se pago."""
+        sentido reembolsar una preferencia que nunca se pago.
+
+        Un 4xx de Mercado Pago es un rechazo (`RefundRejected`): el dinero no
+        salio. Se exceptuan el 408 (tiempo agotado en el servidor) y el 409
+        (conflicto: con clave de idempotencia puede significar que ya hay una
+        solicitud igual en curso). Esos, un 5xx, un tiempo agotado o un fallo
+        de red se propagan tal cual, porque no se sabe si el reembolso llego a
+        hacerse."""
         if not payment_transaction.payment_id:
-            raise ValueError('No hay payment_id: este pago nunca fue aprobado por Mercado Pago.')
-        respuesta = self.client.refund_payment(
-            payment_transaction.payment_id,
-            amount=float(amount) if amount is not None else None,
-        )
+            raise RefundRejected('No hay payment_id: este pago nunca fue aprobado por Mercado Pago.')
+        try:
+            respuesta = self.client.refund_payment(
+                payment_transaction.payment_id,
+                amount=float(amount) if amount is not None else None,
+                idempotency_key=idempotency_key,
+            )
+        except MercadoPagoError as error:
+            if error.estado is not None and 400 <= error.estado < 500 and error.estado not in _ESTADOS_AMBIGUOS:
+                raise RefundRejected(str(error)) from error
+            raise
         return {
             'provider_refund_id': str(respuesta.get('id', '')),
             'status': respuesta.get('status', ''),
         }
+
+    def list_refunds(self, payment_transaction):
+        if not payment_transaction.payment_id:
+            return []
+        return [
+            {
+                'provider_refund_id': str(reembolso.get('id', '')),
+                'status': reembolso.get('status', ''),
+                'amount': Decimal(str(reembolso.get('amount', 0))),
+            }
+            for reembolso in self.client.list_refunds(payment_transaction.payment_id)
+        ]
 
     def checkout_url(self, payment_transaction):
         """URL del sitio de Mercado Pago donde el comprador paga, o '' si la
@@ -190,6 +227,9 @@ class MercadoPagoPaymentProvider(PaymentProvider):
                 f'No se encontró una transacción para el pago '
                 f'(payment_id={payment_id!r}, external_reference={external_reference!r}).'
             )
+        # Permite buscar en Sentry todos los eventos de un pedido (sin datos
+        # personales: solo el numero).
+        sentry_sdk.set_tag('order_number', transaction.external_reference)
 
         if not self._coincide_con_lo_cobrado(pago, transaction):
             logger.error(
@@ -209,13 +249,33 @@ class MercadoPagoPaymentProvider(PaymentProvider):
         if ya_procesada:
             return transaction
 
+        estado_previo = transaction.status
         transaction.payment_id = payment_id
         transaction.status = nuevo_estado
         # La preferencia (con su `init_point`) se conserva: el comprador puede
         # volver a pagar con ella tras un rechazo.
         transaction.raw_payload = {**(transaction.raw_payload or {}), 'payment': pago}
-        transaction.save(update_fields=['payment_id', 'status', 'raw_payload', 'updated_at'])
+        # Estado y aviso van juntos: si el aviso falla, el estado nuevo no queda
+        # guardado y el reintento del proveedor vuelve a intentarlo. Guardado
+        # el estado, el reintento lo daria por procesado y el aviso se perderia.
+        with db_transaction.atomic():
+            transaction.save(update_fields=['payment_id', 'status', 'raw_payload', 'updated_at'])
+            self._avisar_si_se_revirtio(transaction, estado_previo, pago.get('status', ''))
         return transaction
+
+    @staticmethod
+    def _avisar_si_se_revirtio(transaction, estado_previo, estado_mp):
+        """Un pago que estaba aprobado y el proveedor revirtio por su cuenta
+        deja nota en el pedido, anula la comision y registra un error. No se
+        avisa si el reembolso lo pidio la tienda: ya queda en `Refund`."""
+        motivo = _ESTADOS_DE_REVERSION.get(estado_mp)
+        if motivo is None or estado_previo != PaymentTransaction.Status.APPROVED:
+            return
+        if transaction.refunds.filter(
+            status__in=[Refund.Status.APPROVED, Refund.Status.PENDING],
+        ).exists():
+            return
+        registrar_pago_revertido(transaction.order, motivo)
 
     @staticmethod
     def _coincide_con_lo_cobrado(pago, transaction):

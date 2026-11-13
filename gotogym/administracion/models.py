@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from gotogym.ajustes_tienda import coach_habilitado, compras_pausadas, pagos_habilitados
 
@@ -61,3 +62,33 @@ class PanelSettings(models.Model):
     def coach_habilitado(cls):
         """Igual que las anteriores: sin fila todavia, el Coach esta habilitado."""
         return coach_habilitado()
+
+
+class AccionDePanel(models.Model):
+    """Bitacora de las acciones que el equipo hace en el panel.
+
+    Se escribe desde `require_perms` por cada peticion POST que el permiso
+    deja pasar y que no termina en error del servidor o del cliente (4xx/5xx).
+    Registra el intento, no su desenlace: muchas vistas rechazan una accion
+    con un aviso y una redireccion, y eso tambien queda como una fila. Hoy solo
+    se consulta en la base de datos. Guarda quien, que vista y sobre que objeto (los argumentos de la
+    URL, como un numero de pedido o un id); no guarda el contenido del
+    formulario ni correos, telefonos o documentos, para que la bitacora no
+    sea otra copia de datos personales."""
+
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='+',
+    )
+    vista = models.CharField(max_length=100)
+    argumentos = models.JSONField(default=dict, blank=True)
+    codigo_estado = models.PositiveSmallIntegerField()
+    creada = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-creada']
+        verbose_name = 'Acción del panel'
+        verbose_name_plural = 'Acciones del panel'
+        indexes = [models.Index(fields=['-creada'], name='accionpanel_creada_idx')]
+
+    def __str__(self):
+        return f'{self.vista} {self.argumentos} ({self.creada:%Y-%m-%d %H:%M})'

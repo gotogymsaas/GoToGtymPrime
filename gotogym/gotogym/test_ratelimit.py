@@ -1,10 +1,14 @@
 """Limitador de tasa: bloquea tras superar el limite, aisla por cliente."""
+from datetime import UTC
+from unittest import mock
+
 from django.core.cache import cache
+from django.core.management import call_command
 from django.http import HttpResponse
-from django.test import RequestFactory, SimpleTestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.test.utils import override_settings
 
-from .ratelimit import ip_del_cliente, rate_limit
+from .ratelimit import contar, ip_del_cliente, olvidar, rate_limit
 
 
 class _AnonUser:
@@ -18,14 +22,33 @@ class _RealUser:
         self.pk = pk
 
 
-@override_settings(
-    RATE_LIMIT_ENABLED=True,
-    CACHES={'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}},
-)
-class RateLimitTests(SimpleTestCase):
+class _Reloj:
+    """Reloj controlable: el limitador cuenta por ventanas de reloj y una
+    prueba que cruzara el cambio de minuto se partiria en dos."""
+
+    def __init__(self, ahora=1_000_020.0):  # multiplo de 60
+        self.ahora = ahora
+
+    def __call__(self):
+        return self.ahora
+
+    def avanzar(self, segundos):
+        self.ahora += segundos
+
+
+class _PruebasDelLimitador:
+    """Se ejecutan sobre cada backend de cache: el limitador tiene que
+    comportarse igual en memoria local, en tabla y en Redis."""
+
     def setUp(self):
+        super().setUp()
         cache.clear()
+        self.addCleanup(cache.clear)
         self.factory = RequestFactory()
+        self.reloj = _Reloj()
+        parche = mock.patch('gotogym.ratelimit._ahora', self.reloj)
+        parche.start()
+        self.addCleanup(parche.stop)
 
     def _request(self, user=None, ip='10.0.0.1'):
         request = self.factory.post('/algun-endpoint/')
@@ -78,25 +101,39 @@ class RateLimitTests(SimpleTestCase):
         # Un endpoint distinto no deberia consumir el mismo contador.
         self.assertEqual(vista_b(request).status_code, 200)
 
-    def test_la_ventana_es_fija_y_no_se_prolonga_con_cada_peticion(self):
-        # Con la versión anterior cada petición renovaba el vencimiento: quien
-        # insistía cada pocos segundos nunca recuperaba el acceso.
-        from unittest.mock import patch
+    def test_la_ventana_termina_a_los_segundos_indicados(self):
+        vista = rate_limit('test-ventana', limit=2, period_seconds=60)(lambda r: HttpResponse('ok'))
+        self.assertEqual(vista(self._request()).status_code, 200)
+        self.assertEqual(vista(self._request()).status_code, 200)
+        self.assertEqual(vista(self._request()).status_code, 429)
 
-        vista = rate_limit('test-ventana', limit=1, period_seconds=60)(lambda r: HttpResponse('ok'))
-        with patch.object(cache, 'set', wraps=cache.set) as set_cache:
-            vista(self._request())
-            vista(self._request())
-            vista(self._request())
-        set_cache.assert_not_called()  # el vencimiento lo fija solo el primer `add`
+        self.reloj.avanzar(60)
 
-    def test_si_la_clave_caduca_entre_dos_pasos_empieza_otra_ventana(self):
-        from unittest.mock import patch
+        self.assertEqual(vista(self._request()).status_code, 200)
 
-        vista = rate_limit('test-caduca', limit=1, period_seconds=60)(lambda r: HttpResponse('ok'))
-        with patch.object(cache, 'incr', side_effect=ValueError('Key not found')):
-            self.assertEqual(vista(self._request()).status_code, 200)
+    def test_insistir_no_prolonga_la_ventana(self):
+        # Quien sigue enviando dentro de la ventana no debe quedar bloqueado
+        # mas alla de ella, aunque el backend renueve el vencimiento al escribir.
+        vista = rate_limit('test-insiste', limit=1, period_seconds=60)(lambda r: HttpResponse('ok'))
+        self.assertEqual(vista(self._request()).status_code, 200)
+        for _ in range(5):
+            self.reloj.avanzar(10)
+            self.assertEqual(vista(self._request()).status_code, 429)
 
+        self.reloj.avanzar(10)
+
+        self.assertEqual(vista(self._request()).status_code, 200)
+
+    def test_contar_devuelve_el_total_de_la_ventana(self):
+        self.assertEqual([contar('c', 60) for _ in range(3)], [1, 2, 3])
+        self.reloj.avanzar(60)
+        self.assertEqual(contar('c', 60), 1)
+
+    def test_olvidar_pone_a_cero_la_ventana_actual(self):
+        contar('o', 60)
+        contar('o', 60)
+        olvidar('o', 60)
+        self.assertEqual(contar('o', 60), 1)
 
     def test_solo_cuenta_los_metodos_indicados(self):
         vista = rate_limit('test-metodos', limit=1, period_seconds=60, metodos=('POST',))(lambda r: HttpResponse('ok'))
@@ -113,6 +150,56 @@ class RateLimitTests(SimpleTestCase):
         vista = rate_limit('test-apagado', limit=1, period_seconds=60)(lambda r: HttpResponse('ok'))
         for _ in range(5):
             self.assertEqual(vista(self._request()).status_code, 200)
+
+
+_LOCMEM = {'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}}
+_EN_TABLA = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache_del_limitador',
+        'TIMEOUT': 300,
+    },
+}
+
+
+@override_settings(RATE_LIMIT_ENABLED=True, CACHES=_LOCMEM)
+class RateLimitTests(_PruebasDelLimitador, SimpleTestCase):
+    pass
+
+
+@override_settings(RATE_LIMIT_ENABLED=True, CACHES=_EN_TABLA)
+class RateLimitCacheEnTablaTests(_PruebasDelLimitador, TestCase):
+    """Produccion sin Redis usa la cache en tabla, cuyo `incr` reescribe la
+    clave con el vencimiento por defecto en vez del de la ventana."""
+
+    def setUp(self):
+        call_command('createcachetable', verbosity=0)
+        super().setUp()
+
+    def _vence_en(self, clave_base, periodo):
+        from django.db import connection
+
+        from .ratelimit import _clave_de_ventana
+        clave = cache.make_key(_clave_de_ventana(clave_base, periodo))
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT expires FROM cache_del_limitador WHERE cache_key = %s', [clave])
+            return cursor.fetchone()[0]
+
+    def test_un_tope_largo_conserva_su_vencimiento_al_seguir_contando(self):
+        from datetime import datetime, timedelta
+
+        contar('tope-dia', 86400)
+        contar('tope-dia', 86400)
+        contar('tope-dia', 86400)
+
+        vence = self._vence_en('tope-dia', 86400)
+        if isinstance(vence, str):
+            vence = datetime.fromisoformat(vence)
+        if vence.tzinfo is None:
+            vence = vence.replace(tzinfo=UTC)
+        restante = vence - datetime.now(UTC)
+        # Con la cache en tabla y `incr` quedaria en 300 s.
+        self.assertGreater(restante, timedelta(hours=23))
 
 
 @override_settings(TRUSTED_PROXY_HOPS=1)

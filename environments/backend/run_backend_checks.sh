@@ -38,31 +38,32 @@ cd "${ROOT_DIR}/gotogym"
 echo "[backend] Ejecutando django check (settings_local)..."
 python manage.py check --settings=gotogym.settings_local
 
-echo "[backend] Ejecutando test suite con cobertura (settings_test)..."
-# La validacion de despliegue cubre el camino que puede causar perdida de
-# dinero o acceso: autenticacion, checkout, inventario, pedidos, pagos,
-# integraciones, permisos y configuracion de seguridad. La suite completa
-# permanece disponible para regresion (`FULL_TEST_SUITE=true`) y no se borra
-# por el solo hecho de no ser necesaria en cada deploy.
-if [[ "${FULL_TEST_SUITE:-false}" == "true" ]]; then
-  test_labels=(. administracion)
-  echo "[backend] FULL_TEST_SUITE=true: ejecutando todos los tests descubiertos."
-else
-  test_labels=(
-    accounts.tests
-    accounts.test_oidc
-    carrito.tests
-    inventory.tests
-    orders.tests
-    payments.tests
-    products.tests
-    shipping.tests
-    integrations.test_clients
-    gotogym.test_errores
-  )
-  echo "[backend] Suite esencial: ${#test_labels[@]} modulos criticos sin descubrimiento recursivo."
+echo "[backend] Comprobando migraciones pendientes..."
+python manage.py makemigrations --check --dry-run --settings=gotogym.settings_test
+
+echo "[backend] Ejecutando django check --deploy con la configuracion de produccion simulada..."
+# Sin DEBUG y con una clave secreta y una base de datos declaradas, que es
+# lo que ve `settings.py` en el App Service. Los avisos HSTS que el sitio
+# decidio no activar estan silenciados en el modulo de verificacion.
+DJANGO_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(60))')" \
+DATABASE_URL="postgresql://usuario:clave@localhost:5432/gotogym" \
+  python manage.py check --deploy --fail-level WARNING \
+  --settings=gotogym.settings_verificacion_despliegue
+
+echo "[backend] Ejecutando la suite completa con cobertura (settings_test)..."
+# Todo lo que el descubrimiento encuentra: un cambio en cualquier app se
+# prueba antes de llegar a main. `TEST_PARALLEL` fija los procesos: 2 en
+# local (la maquina de desarrollo tiene poca CPU) y uno por nucleo en el CI.
+if [[ -z "${TEST_PARALLEL:-}" ]]; then
+  if [[ "${CI:-}" == "true" ]]; then TEST_PARALLEL=auto; else TEST_PARALLEL=2; fi
 fi
-coverage run --rcfile="${ROOT_DIR}/pyproject.toml" manage.py test "${test_labels[@]}" --settings=gotogym.settings_test
-coverage report --rcfile="${ROOT_DIR}/pyproject.toml"
+coverage erase --rcfile="${ROOT_DIR}/pyproject.toml"
+coverage run --rcfile="${ROOT_DIR}/pyproject.toml" manage.py test . \
+  --parallel "${TEST_PARALLEL}" --settings=gotogym.settings_test
+coverage combine --rcfile="${ROOT_DIR}/pyproject.toml"
+# `COVERAGE_FAIL_UNDER` es el piso de cobertura. Se fija con el valor medido
+# en una corrida completa y solo se sube cuando sube la cobertura.
+coverage report --rcfile="${ROOT_DIR}/pyproject.toml" \
+  ${COVERAGE_FAIL_UNDER:+--fail-under="${COVERAGE_FAIL_UNDER}"}
 
 echo "[backend] Validaciones finalizadas."

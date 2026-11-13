@@ -1,6 +1,6 @@
 [tool.ruff]
 line-length = 99
-target-version = "py311"
+target-version = "py312"
 extend-exclude = [
     "*/migrations/*",
     "GoToGymAdmin",
@@ -24,9 +24,11 @@ ignore = [
 # aqui, no un error real.
 "gotogym/gotogym/settings_local.py" = ["F403", "F405"]
 "gotogym/gotogym/settings_test.py" = ["F403", "F405"]
+"gotogym/gotogym/settings_test_postgres.py" = ["F403", "F405"]
+"gotogym/gotogym/settings_verificacion_despliegue.py" = ["F403", "F405"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 plugins = ["mypy_django_plugin.main"]
 # manage.py vive en gotogym/ (no en la raiz del repo, donde esta este
 # pyproject.toml): los imports reales -- "import products",
@@ -47,6 +49,12 @@ check_untyped_defs = false
 django_settings_module = "gotogym.settings_test"
 
 [tool.coverage.run]
+# La suite se ejecuta con `--parallel` (un proceso por nucleo): cada proceso
+# escribe su propio archivo de datos y `coverage combine` los junta. Sin
+# `sigterm`, el pool de Django termina los procesos antes de que guarden.
+parallel = true
+concurrency = ["multiprocessing"]
+sigterm = true
 # "." y no "gotogym": coverage corre con cwd=gotogym/ (ahi vive manage.py,
 # ver run_backend_checks.sh), no en la raiz del repo donde esta este
 # archivo. "gotogym" aqui apuntaria a gotogym/gotogym/ -- el paquete de
@@ -105,6 +113,7 @@ ignore_imports = [
     "tienda.tests -> inventory.models",
     "tienda.test_pdp -> inventory.models",
     "tienda.test_imagen_producto -> inventory.models",
+    "tienda.test_consultas -> inventory.models",
     "orders.tests -> payments.models",
     "orders.tests -> payments.providers.mock",
     "orders.tests -> accounts.models",

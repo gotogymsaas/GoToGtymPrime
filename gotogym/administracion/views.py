@@ -40,9 +40,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import Count, Max, Prefetch, Q, Sum
+from django.db.models import Count, Max, Prefetch, ProtectedError, Q, Sum
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -86,6 +87,7 @@ from .forms import (
     RecursoMarcaForm,
     SalesGoalForm,
     TerminacionAfiliadoForm,
+    validar_imagen,
 )
 from .models import PanelSettings
 from .permissions import (
@@ -224,7 +226,7 @@ def _celda_segura(valor):
     return valor
 
 
-@staff_required
+@require_perms("orders.view_order")
 def export_orders_csv(request):
     """Pedidos del rango en CSV, para analizarlos fuera del panel. No incluye
     correo ni telefono: el cliente va como identificador interno."""
@@ -429,13 +431,13 @@ def product_edit(request, pk=None):
 
 
 @require_perms("products.change_product")
+@require_POST
 def product_media_delete(request, pk, media_id):
     media = get_object_or_404(ProductMedia, pk=media_id, product_id=pk)
-    if request.method == "POST":
-        if media.image:
-            media.image.delete(save=False)
-        media.delete()
-        messages.success(request, "Imagen eliminada.")
+    if media.image:
+        media.image.delete(save=False)
+    media.delete()
+    messages.success(request, "Imagen eliminada.")
     return redirect("admin_product_edit", pk=pk)
 
 
@@ -461,6 +463,7 @@ def product_media_reorder(request, pk):
 
 
 @require_perms("products.change_product")
+@require_POST
 def product_media_add(request, pk):
     """Agrega una o varias imagenes a la galeria en una sola operacion.
 
@@ -474,20 +477,29 @@ def product_media_add(request, pk):
     casilla aparte era la misma decision expresada dos veces.
     """
     product = get_object_or_404(Product, pk=pk)
-    if request.method == "POST":
-        imagenes = request.FILES.getlist("image")
-        if not imagenes:
-            messages.error(request, "Selecciona al menos una imagen.")
-        else:
-            ultimo_orden = product.media.aggregate(maximo=Max("sort_order"))["maximo"]
-            orden_base = 0 if ultimo_orden is None else ultimo_orden + 1
-            for indice, imagen in enumerate(imagenes):
-                ProductMedia.objects.create(
-                    product=product,
-                    image=imagen,
-                    sort_order=orden_base + indice,
-                )
-            messages.success(request, f"{len(imagenes)} imagen(es) agregada(s).")
+    imagenes = request.FILES.getlist("image")
+    errores = []
+    for imagen in imagenes:
+        try:
+            validar_imagen(imagen)
+        except ValidationError as error:
+            errores.extend(error.messages)
+    if not imagenes:
+        messages.error(request, "Selecciona al menos una imagen.")
+    elif errores:
+        # Si una falla no se sube ninguna: asi no queda la galeria a medias.
+        for mensaje in errores:
+            messages.error(request, mensaje)
+    else:
+        ultimo_orden = product.media.aggregate(maximo=Max("sort_order"))["maximo"]
+        orden_base = 0 if ultimo_orden is None else ultimo_orden + 1
+        for indice, imagen in enumerate(imagenes):
+            ProductMedia.objects.create(
+                product=product,
+                image=imagen,
+                sort_order=orden_base + indice,
+            )
+        messages.success(request, f"{len(imagenes)} imagen(es) agregada(s).")
     return redirect("admin_product_edit", pk=pk)
 
 
@@ -754,7 +766,7 @@ def sales_goal_update(request):
     return _safe_redirect(request, "admin_dashboard")
 
 
-@staff_required
+@require_perms("orders.view_order")
 def orders_list(request):
     """Pedidos y sus pagos viven en una sola pantalla: buscar por
     referencia de pago encuentra el pedido, y el detalle del pedido ya
@@ -815,7 +827,7 @@ def orders_list(request):
     )
 
 
-@staff_required
+@require_perms("orders.view_order")
 def order_detail(request, order_number):
     order = get_object_or_404(
         Order.objects
@@ -851,7 +863,7 @@ def order_detail(request, order_number):
     )
 
 
-@staff_required
+@require_perms("orders.change_order")
 @require_POST
 def order_update_status(request, order_number):
     order = get_object_or_404(Order, order_number=order_number)
@@ -873,7 +885,7 @@ def order_update_status(request, order_number):
     return redirect("admin_order_detail", order_number=order_number)
 
 
-@staff_required
+@require_perms("orders.change_order")
 @require_POST
 def order_update_tracking(request, order_number):
     order = get_object_or_404(Order, order_number=order_number)
@@ -902,7 +914,7 @@ def order_refund(request, order_number):
     return redirect("admin_order_detail", order_number=order_number)
 
 
-@staff_required
+@require_perms("accounts.view_user")
 def users_list(request):
     User = get_user_model()
     query = request.GET.get("q", "").strip()
@@ -1010,7 +1022,17 @@ def user_delete(request, pk):
         return _safe_redirect(request, "admin_users")
 
     email = target.email
-    target.delete()
+    try:
+        target.delete()
+    except ProtectedError:
+        # Comisiones, retiros y pagos son registros de dinero: no se borran en
+        # cascada con la cuenta que los originó.
+        messages.error(
+            request,
+            f"No se puede eliminar a {email}: tiene comisiones, retiros o pagos registrados. "
+            "Desactiva la cuenta en lugar de eliminarla.",
+        )
+        return _safe_redirect(request, "admin_users")
     messages.success(request, f"Usuario {email} eliminado.")
     return _safe_redirect(request, "admin_users")
 
@@ -1443,7 +1465,15 @@ def withdrawal_resolve(request, pk):
 def afiliado_delete(request, pk):
     profile = get_object_or_404(PerfilAfiliado, pk=pk)
     email = profile.user.email
-    profile.delete()
+    try:
+        profile.delete()
+    except ProtectedError:
+        messages.error(
+            request,
+            f"No se puede eliminar al afiliado {email}: tiene comisiones o solicitudes de retiro "
+            "registradas. Desactívalo o dalo de baja en lugar de eliminarlo.",
+        )
+        return redirect("admin_afiliados")
     messages.success(request, f"Afiliado {email} eliminado.")
     return redirect("admin_afiliados")
 

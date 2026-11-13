@@ -296,7 +296,7 @@ class WithdrawalRequest(models.Model):
     aprobadas y aun no ligadas a otra solicitud (ver `services.request_withdrawal`):
     el monto queda fijo aunque despues se aprueben mas comisiones."""
 
-    afiliado = models.ForeignKey(PerfilAfiliado, on_delete=models.CASCADE, related_name='withdrawal_requests')
+    afiliado = models.ForeignKey(PerfilAfiliado, on_delete=models.PROTECT, related_name='withdrawal_requests')
     # Comisiones confirmadas que cubre la solicitud, ya descontado lo que se
     # recupera (`recovery_amount`). Antes de gastos de transaccion.
     amount = models.DecimalField(max_digits=12, decimal_places=2)
@@ -346,14 +346,13 @@ class CommissionStatus(models.TextChoices):
 
 
 class Commission(models.Model):
-    """Comision de un pedido referido, con el ciclo de vida documentado en
-    el benchmarking (P10): pendiente al aprobarse el pago, confirmada cuando
+    """Comision de un pedido referido. Ciclo de vida: pendiente al aprobarse el pago, confirmada cuando
     termina su periodo de validacion (5 dias habiles despues de la entrega),
     revertida si el pedido se cancela, se devuelve o se reembolsa, y pagada
     cuando se liquida una solicitud de retiro que la incluye."""
 
-    afiliado = models.ForeignKey(PerfilAfiliado, on_delete=models.CASCADE, related_name='commissions')
-    order = models.OneToOneField('orders.Order', on_delete=models.CASCADE, related_name='commission')
+    afiliado = models.ForeignKey(PerfilAfiliado, on_delete=models.PROTECT, related_name='commissions')
+    order = models.OneToOneField('orders.Order', on_delete=models.PROTECT, related_name='commission')
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     # Con que base y tasa se calculo `amount`: la tasa del afiliado cambia con
     # el tiempo, y la comision ya registrada debe poder explicarse.

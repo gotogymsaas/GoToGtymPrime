@@ -22,7 +22,7 @@ from .signature import verify_signature
 
 logger = logging.getLogger(__name__)
 
-# Proveedor usado por la pantalla de simulacion (Sprint 9): siempre el mock,
+# Proveedor usado por la pantalla de simulacion: siempre el mock,
 # sin importar PAYMENT_PROVIDER, porque esa pantalla existe precisamente
 # para forzar estados de prueba y no tendria sentido con un proveedor real.
 mock_provider = MockPaymentProvider()
@@ -77,7 +77,7 @@ def _current_or_new_transaction(order, provider):
 def payment_pending(request, order_number):
     order = get_object_or_404(Order, order_number=order_number, user=request.user)
     provider = get_active_provider()
-    if not pagos_habilitados():
+    if not pagos_habilitados(request):
         # Con los pagos deshabilitados no se abre ningun intento nuevo; si el
         # pedido ya estaba pagado, la pantalla se muestra igual.
         previa = _latest_transaction(order, provider)

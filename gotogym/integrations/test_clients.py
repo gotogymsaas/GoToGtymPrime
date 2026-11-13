@@ -175,6 +175,27 @@ class MercadoPagoClientTests(SimpleTestCase):
         self.assertEqual(pago['status'], 'approved')
         self.sdk.payment.return_value.get.assert_called_once_with('5')
 
+    def test_el_sdk_se_crea_con_un_tiempo_de_espera_corto(self):
+        MercadoPagoClient(access_token='tok')
+        opciones = mercadopago_client.mercadopago.config.RequestOptions
+        opciones.assert_called_once_with(connection_timeout=10.0, max_retries=1)
+        _, kwargs = mercadopago_client.mercadopago.SDK.call_args
+        self.assertIs(kwargs['request_options'], opciones.return_value)
+
+    def test_un_error_http_conserva_el_codigo_de_estado(self):
+        self.sdk.refund.return_value.create.return_value = {'status': 400, 'response': {'message': 'no'}}
+        with self.assertRaises(MercadoPagoError) as contexto:
+            MercadoPagoClient(access_token='tok').refund_payment('pay-1')
+        self.assertEqual(contexto.exception.estado, 400)
+
+    def test_lista_los_reembolsos_de_un_pago(self):
+        self.sdk.refund.return_value.list_all.return_value = {
+            'status': 200, 'response': [{'id': 7, 'status': 'approved'}],
+        }
+        reembolsos = MercadoPagoClient(access_token='tok').list_refunds('pay-1')
+        self.assertEqual(reembolsos, [{'id': 7, 'status': 'approved'}])
+        self.sdk.refund.return_value.list_all.assert_called_once_with('pay-1')
+
     def test_sin_token_no_se_crea_el_cliente(self):
         with patch.dict(os.environ, {'MERCADOPAGO_ACCESS_TOKEN': ''}):
             with self.assertRaises(RuntimeError):
@@ -189,6 +210,19 @@ class MercadoPagoClientTests(SimpleTestCase):
         self.sdk.refund.return_value.create.return_value = {'status': 201, 'response': {}}
         MercadoPagoClient(access_token='tok').refund_payment('pay-1', amount=25.5)
         self.sdk.refund.return_value.create.assert_called_once_with('pay-1', {'amount': 25.5})
+
+    def test_reembolso_con_clave_de_idempotencia_la_envia_como_cabecera(self):
+        self.sdk.refund.return_value.create.return_value = {'status': 201, 'response': {}}
+        MercadoPagoClient(access_token='tok').refund_payment('pay-1', idempotency_key='clave-1')
+        _, _, opciones = self.sdk.refund.return_value.create.call_args.args
+        self.assertEqual(
+            mercadopago_client.mercadopago.config.RequestOptions.call_args.kwargs,
+            {
+                'connection_timeout': 10.0, 'max_retries': 1,
+                'custom_headers': {'x-idempotency-key': 'clave-1'},
+            },
+        )
+        self.assertIs(opciones, mercadopago_client.mercadopago.config.RequestOptions.return_value)
 
     def test_toma_el_token_del_entorno(self):
         with patch.dict(os.environ, {'MERCADOPAGO_ACCESS_TOKEN': 'del-entorno'}):

@@ -21,6 +21,7 @@ from urllib.parse import urlsplit
 import requests
 from django.conf import settings
 from django.core.cache import cache
+from gotogym.ratelimit import contar, olvidar
 
 from . import contrato, firma
 
@@ -58,18 +59,13 @@ def circuito_abierto():
 
 
 def registrar_fallo():
-    cache.add(_CLAVE_FALLOS, 0, timeout=SEGUNDOS_CIRCUITO)
-    try:
-        fallos = cache.incr(_CLAVE_FALLOS)
-    except ValueError:
-        cache.set(_CLAVE_FALLOS, 1, timeout=SEGUNDOS_CIRCUITO)
-        fallos = 1
+    fallos = contar(_CLAVE_FALLOS, SEGUNDOS_CIRCUITO)
     if fallos >= FALLOS_PARA_ABRIR and cache.add(_CLAVE_CIRCUITO, 1, timeout=SEGUNDOS_CIRCUITO):
         logger.error('Vendedor: circuito del Coach abierto tras %s fallos seguidos.', fallos)
 
 
 def registrar_exito():
-    cache.delete(_CLAVE_FALLOS)
+    olvidar(_CLAVE_FALLOS, SEGUNDOS_CIRCUITO)
 
 
 # --- Cliente real ------------------------------------------------------------

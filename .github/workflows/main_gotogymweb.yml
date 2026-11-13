@@ -15,7 +15,13 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Las mismas validaciones y la suite completa que corren en cada pull
+  # request (ver ci.yml). Si fallan, no se construye ni se despliega nada.
+  ci:
+    uses: ./.github/workflows/ci.yml
+
   build:
+    needs: ci
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -28,8 +34,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Run backend validation suite
-        run: bash environments/backend/run_backend_checks.sh
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          python -m venv .venv-backend-test
+          source .venv-backend-test/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
       - name: Enforce design governance baseline
         run: |

@@ -7,9 +7,60 @@ desarrollo y pruebas es `LocMemCache`, por proceso. Es suficiente para
 frenar el abuso trivial de un solo cliente contra un endpoint sensible; no
 protege contra un ataque distribuido desde muchas IPs.
 """
+import time
+
 from django.conf import settings
-from django.core.cache import cache
+from django.core.cache import DEFAULT_CACHE_ALIAS, cache, caches
+from django.core.cache.backends.redis import RedisCache
 from django.http import HttpResponse
+
+
+def _ahora():
+    return time.time()
+
+
+def _clave_de_ventana(clave_base, periodo, desfase=0):
+    return f'{clave_base}:{int((_ahora() + desfase) // periodo)}'
+
+
+def contar(clave_base, periodo, desfase=0):
+    """Suma uno al contador de la ventana actual de `periodo` segundos y
+    devuelve el total de la ventana.
+
+    El numero de ventana forma parte de la clave, asi que cada ventana empieza
+    en cero por si sola y no importa si el backend renueva el vencimiento al
+    escribir. Eso es lo que ocurre con la cache en tabla: su `incr` lee y
+    reescribe el valor sin vencimiento propio, y la clave pasa a durar el
+    valor por defecto (300 s) en vez de la ventana. Por eso solo se usa `incr`
+    donde es nativo y atomico (Redis); en los demas backends se escribe con el
+    vencimiento explicito. Alli el conteo no es atomico: con peticiones
+    simultaneas del mismo cliente puede quedar por debajo del real, lo que es
+    aceptable para frenar abuso pero no para un cupo estricto.
+
+    Las ventanas empiezan en multiplos de `periodo` contados desde el
+    meridiano de UTC. `desfase` (en segundos, sumado al reloj) las corre: una
+    ventana de un dia con el desfase de la zona horaria del sitio empieza a la
+    medianoche local."""
+    clave = _clave_de_ventana(clave_base, periodo, desfase)
+    if cache.add(clave, 1, timeout=periodo):
+        return 1
+    if isinstance(caches[DEFAULT_CACHE_ALIAS], RedisCache):
+        try:
+            return cache.incr(clave)
+        except ValueError:
+            pass  # caduco entre `add` e `incr`: se vuelve a crear abajo
+    else:
+        actual = cache.get(clave)
+        if actual is not None:
+            cache.set(clave, actual + 1, timeout=periodo)
+            return actual + 1
+    cache.set(clave, 1, timeout=periodo)
+    return 1
+
+
+def olvidar(clave_base, periodo, desfase=0):
+    """Pone a cero el contador de la ventana actual."""
+    cache.delete(_clave_de_ventana(clave_base, periodo, desfase))
 
 
 def _quitar_puerto(direccion):
@@ -49,10 +100,9 @@ def rate_limit(key_prefix, limit, period_seconds, metodos=None):
     por usuario autenticado o por IP si es anonimo. Al superarse, responde 429
     sin ejecutar la vista.
 
-    El contador es atomico (`add` + `incr`): con una cache compartida entre
-    procesos, leer y luego escribir dejaria pasar peticiones simultaneas de
-    mas. La ventana es fija: empieza con la primera peticion y no se prolonga
-    con las siguientes.
+    La ventana es fija y esta alineada al reloj (ver `contar`): no se prolonga
+    con cada peticion. Es atomico solo con Redis; con la cache en tabla puede
+    dejar pasar alguna peticion simultanea de mas.
 
     `metodos` limita el conteo a esos metodos HTTP (por ejemplo `('POST',)`
     para contar intentos de acceso y no las visitas al formulario). Con
@@ -63,14 +113,7 @@ def rate_limit(key_prefix, limit, period_seconds, metodos=None):
                 return view_func(request, *args, **kwargs)
             if metodos and request.method not in metodos:
                 return view_func(request, *args, **kwargs)
-            cache_key = f'ratelimit:{key_prefix}:{_client_key(request)}'
-            cache.add(cache_key, 0, timeout=period_seconds)
-            try:
-                intentos = cache.incr(cache_key)
-            except ValueError:
-                # La clave caduco entre `add` e `incr`: empieza otra ventana.
-                cache.set(cache_key, 1, timeout=period_seconds)
-                intentos = 1
+            intentos = contar(f'ratelimit:{key_prefix}:{_client_key(request)}', period_seconds)
             if intentos > limit:
                 return HttpResponse(
                     'Demasiadas solicitudes. Intenta de nuevo en unos segundos.',

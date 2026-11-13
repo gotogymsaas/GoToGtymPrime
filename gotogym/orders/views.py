@@ -49,7 +49,7 @@ def checkout(request):
     # Avanza lo que depende del tiempo (pedidos sin pagar que vencieron y sus
     # cupones) sin requerir una tarea periodica programada.
     cancel_expired_orders()
-    if compras_pausadas():
+    if compras_pausadas(request):
         messages.warning(request, str(MENSAJE_COMPRAS_PAUSADAS))
         return redirect('carrito:cart_detail')
     cart, reiniciado = read_cart(request.session)

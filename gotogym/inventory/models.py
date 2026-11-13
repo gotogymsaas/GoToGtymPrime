@@ -25,8 +25,8 @@ class InventoryAdjustmentReason(models.TextChoices):
 
 class InventoryAdjustment(models.Model):
     """Kardex: registro historico de cada cambio de stock, no solo el valor
-    final que ya guarda `Inventory` (P02: "ajustes con historial" en
-    Shopify/Adobe/Salesforce/BigCommerce/WooCommerce)."""
+    final que ya guarda `Inventory`. Permite saber quien movio el stock, cuando
+    y por que."""
 
     inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name='adjustments')
     delta = models.IntegerField(help_text="Positivo si suma stock, negativo si lo descuenta.")

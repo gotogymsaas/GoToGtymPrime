@@ -9,8 +9,11 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
-from . import exposicion
+from gotogym import ratelimit
+
+from . import exposicion, views
 from .test_utilidades import aislar_catalogo, crear_producto
 
 
@@ -68,7 +71,9 @@ class InterruptorDelCoachTests(TestCase):
 
         self._mensaje()
 
-        self.assertFalse(cache.get('vendedor:dia:ip:127.0.0.1'))
+        desfase = int(timezone.localtime().utcoffset().total_seconds())
+        clave = ratelimit._clave_de_ventana('vendedor:dia:ip:127.0.0.1', views.SEGUNDOS_DIA, desfase)
+        self.assertFalse(cache.get(clave))
 
     @override_settings(COACH_API_URL='', VENDEDOR_COACH_SIMULADO=False)
     def test_habilitado_pero_sin_servicio_se_muestra_y_dice_que_la_ia_no_esta_disponible(self):

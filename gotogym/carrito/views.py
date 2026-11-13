@@ -41,7 +41,7 @@ def _responder(request, error=None, cart=None):
 @rate_limit('add_to_cart', limit=30, period_seconds=60)
 def add_to_cart(request, variant_id):
     variante = get_object_or_404(ProductVariant, pk=variant_id, is_active=True)
-    if compras_pausadas():
+    if compras_pausadas(request):
         return _responder(request, error=str(MENSAJE_COMPRAS_PAUSADAS))
     cart = _get_cart(request)
 
@@ -84,7 +84,7 @@ def update_cart(request, variant_id):
         write_cart(request.session, cart)
         return _responder(request, cart=cart)
 
-    if cantidad > int(cart.get(str(variante.id), 0)) and compras_pausadas():
+    if cantidad > int(cart.get(str(variante.id), 0)) and compras_pausadas(request):
         return _responder(request, error=str(MENSAJE_COMPRAS_PAUSADAS))
 
     disponible = get_available_quantity(variante)
