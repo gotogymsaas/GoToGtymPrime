@@ -6,4 +6,4 @@ ruff==0.16.9
 django-stubs==5.2.9
 mypy==2.4.0
 coverage==7.17.2
-import-linter==2.15
+import-linter==2.16
