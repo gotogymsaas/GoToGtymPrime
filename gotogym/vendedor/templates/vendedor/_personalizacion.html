@@ -62,17 +62,59 @@
     {% endif %}
 
     {% if medidas_activo and vinculado %}
-    <details class="account-security"{% if not medidas_fecha %} open{% endif %}>
+    <details class="account-security account-medidas-detalle"{% if not medidas_fecha %} open{% endif %}>
       <summary>{% trans "Mis medidas para tallas" %}</summary>
       <p class="account-address-hint">{% trans "Mídete sobre ropa ligera con una cinta métrica. Son privadas: solo se usan para comparar con las medidas de cada prenda, nunca se muestran en el chat." %}</p>
       {% if medidas_fecha and not medidas_vigentes %}
       <p>{% trans "Tus medidas tienen más de 6 meses. Actualízalas para que sigan sirviendo." %}</p>
       {% endif %}
-      <form method="post" action="{% url 'vendedor:personalizacion_medidas' %}" class="account-fields">
+      <div class="account-medidas">
+      {% comment %}Diagrama de donde va la cinta. Los numeros siguen el orden
+      de `medidas` (pecho, cintura, cadera, entrepierna) y coinciden con los
+      de cada etiqueta; al enfocar un campo se resalta su cinta (CSS :has).{% endcomment %}
+      <figure class="medida-guia">
+        <svg class="medida-guia__dibujo" viewBox="0 0 200 352" role="img" aria-labelledby="medida-guia-titulo" focusable="false">
+          <title id="medida-guia-titulo">{% trans "Dónde se toma cada medida en el cuerpo" %}</title>
+          <g class="medida-guia__cuerpo">
+            <circle cx="100" cy="30" r="19"/>
+            <path d="M92 47 L92 60 C82 61 68 63 63 71 L70 92 C71 104 72 128 77 150 C74 165 69 175 69 188 C69 205 72 250 76 300 L79 342 L95 342 L96 300 C97 260 98 235 100 222 C102 235 103 260 104 300 L105 342 L121 342 L124 300 C128 250 131 205 131 188 C131 175 126 165 123 150 C128 128 129 104 130 92 L137 71 C132 63 118 61 108 60 L108 47 Z"/>
+            <path d="M63 71 C56 76 54 90 53 110 L50 170 Q49 182 55 182 Q60 182 60 172 L64 115 L70 92 Z"/>
+            <path d="M137 71 C144 76 146 90 147 110 L150 170 Q151 182 145 182 Q140 182 140 172 L136 115 L130 92 Z"/>
+          </g>
+          <g class="medida-guia__medida" data-medida="chest_cm">
+            <ellipse class="medida-guia__cinta" cx="100" cy="104" rx="31" ry="4"/>
+            <path class="medida-guia__guia" d="M131 104 H171"/>
+            <circle class="medida-guia__marca" cx="180" cy="104" r="9"/><text x="180" y="108">1</text>
+          </g>
+          <g class="medida-guia__medida" data-medida="waist_cm">
+            <ellipse class="medida-guia__cinta" cx="100" cy="148" rx="24" ry="4"/>
+            <path class="medida-guia__guia" d="M124 148 H171"/>
+            <circle class="medida-guia__marca" cx="180" cy="148" r="9"/><text x="180" y="152">2</text>
+          </g>
+          <g class="medida-guia__medida" data-medida="hip_cm">
+            <ellipse class="medida-guia__cinta" cx="100" cy="192" rx="32" ry="4"/>
+            <path class="medida-guia__guia" d="M132 192 H171"/>
+            <circle class="medida-guia__marca" cx="180" cy="192" r="9"/><text x="180" y="196">3</text>
+          </g>
+          <g class="medida-guia__medida" data-medida="inseam_cm">
+            <path class="medida-guia__cinta" d="M103 228 L108 336 M100 228 H106 M105 336 H111"/>
+            <path class="medida-guia__guia" d="M106 290 H171"/>
+            <circle class="medida-guia__marca" cx="180" cy="290" r="9"/><text x="180" y="294">4</text>
+          </g>
+        </svg>
+        <figcaption>
+          <ol class="medida-guia__pasos">
+            {% for medida in medidas %}
+            <li data-medida="{{ medida.campo }}"><span class="medida-num" aria-hidden="true">{{ forloop.counter }}</span><span><strong>{{ medida.nombre }}.</strong> {{ medida.como }}</span></li>
+            {% endfor %}
+          </ol>
+        </figcaption>
+      </figure>
+      <form method="post" action="{% url 'vendedor:personalizacion_medidas' %}" class="account-fields account-medidas__form">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         {% for medida in medidas %}
         <div class="account-field">
-          <label for="medida-{{ medida.campo }}">{{ medida.etiqueta }}</label>
+          <label for="medida-{{ medida.campo }}"><span class="medida-num" aria-hidden="true">{{ forloop.counter }}</span>{{ medida.etiqueta }}</label>
           <input type="number" inputmode="decimal" step="0.1" min="{{ medida.minimo }}" max="{{ medida.maximo }}"
                  name="{{ medida.campo }}" id="medida-{{ medida.campo }}" value="{{ medida.valor|default_if_none:''|stringformat:'s' }}">
         </div>
@@ -83,6 +125,7 @@
           {% if medidas_fecha %}<button type="submit" name="accion" value="borrar" class="editorial-text-link account-link-button">{% trans "Borrar mis medidas" %}</button>{% endif %}
         </div>
       </form>
+      </div>
     </details>
     {% endif %}
 

@@ -4249,3 +4249,28 @@ msgstr ""
 "link your GoToGym account, it will use your sports profile, your training "
 "preferences, your experiences, your measurements and your choices only to "
 "recommend products. You can turn it off whenever you want in My account."
+
+msgid "Pecho"
+msgstr "Chest"
+
+msgid "Entrepierna"
+msgstr "Inseam"
+
+msgid ""
+"Por la parte más llena del pecho, con la cinta horizontal bajo las axilas."
+msgstr ""
+"Around the fullest part of your chest, keeping the tape level under your "
+"arms."
+
+msgid "En la parte más estrecha del torso, por encima del ombligo."
+msgstr "Around the narrowest part of your torso, above your belly button."
+
+msgid "En la parte más ancha de los glúteos, con los pies juntos."
+msgstr ""
+"Around the widest part of your hips and seat, with your feet together."
+
+msgid "Por dentro de la pierna, desde la entrepierna hasta el tobillo."
+msgstr "Along the inside of your leg, from your crotch to your ankle."
+
+msgid "Dónde se toma cada medida en el cuerpo"
+msgstr "Where each measurement is taken on the body"

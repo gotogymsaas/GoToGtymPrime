@@ -134,6 +134,19 @@ class MedidasTests(Base):
         self.assertIn("Mis medidas para tallas", html)
         self.assertIn('value="92.5"', html)
 
+    def test_el_diagrama_marca_donde_va_cada_medida_y_numera_igual_que_el_formulario(self):
+        self.permisos("tailoring.measurements")
+        html = self.client.get(PERFIL).content.decode()
+        guia = html[html.index('class="medida-guia"'):html.index("</figure>")]
+        self.assertIn('role="img"', guia)
+        self.assertIn("Dónde se toma cada medida en el cuerpo", guia)
+        for campo in ("chest_cm", "waist_cm", "hip_cm", "inseam_cm"):
+            self.assertEqual(guia.count(f'data-medida="{campo}"'), 2, campo)  # cinta en el dibujo y su indicacion
+        self.assertIn("desde la entrepierna hasta el tobillo", guia)
+        formulario = html[html.index("</figure>"):]
+        orden = [formulario.index(f'for="medida-{c}"') for c in ("chest_cm", "waist_cm", "hip_cm", "inseam_cm")]
+        self.assertEqual(orden, sorted(orden), "los numeros 1-4 del dibujo siguen este orden")
+
     def test_fuera_de_rango_o_vacio_se_rechaza(self):
         self.permisos("tailoring.measurements")
         self.guardar(waist_cm="7")

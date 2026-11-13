@@ -382,8 +382,11 @@
     botonReintentar.disabled = ocupado;
   }
 
-  function mostrarError(codigo, esperaSegundos, urlContacto) {
+  function mostrarError(codigo, esperaSegundos, urlContacto, diagnostico) {
     var mensaje = texto('error_' + codigo) || texto('error_error');
+    // `diagnostic` solo llega para el personal del sitio: el motivo tecnico
+    // del fallo, para saber que paso sin acceso a los logs del servidor.
+    if (typeof diagnostico === 'string' && diagnostico) mensaje += ' [' + diagnostico + ']';
     textoError.textContent = mensaje;
     botonReintentar.hidden = !!SIN_REINTENTO[codigo];
     if (RUTA_ENLACE.test(urlContacto || '')) enlaceContacto.href = urlContacto;
@@ -463,7 +466,7 @@
         return;
       }
       var codigo = datos && typeof datos.error === 'string' ? datos.error : codigoSegunEstado(resultado.estado);
-      mostrarError(codigo, datos && datos.retry_after, datos && datos.contact_url);
+      mostrarError(codigo, datos && datos.retry_after, datos && datos.contact_url, datos && datos.diagnostic);
     }).catch(function () {
       mostrarError('red', 0, null);
     }).then(function () {

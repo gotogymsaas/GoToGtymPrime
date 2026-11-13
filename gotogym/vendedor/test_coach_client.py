@@ -133,6 +133,22 @@ class ClienteHttpTests(SimpleTestCase):
                     self._enviar(self._cliente(servidor))
                 self.assertEqual(ctx.exception.codigo, codigo)
 
+    def test_un_rechazo_conserva_el_estado_y_el_codigo_del_coach(self):
+        casos = [
+            (400, b'{"error": "invalid_promotion"}', 'http_400:invalid_promotion'),
+            (401, b'{"error": "unauthorized"}', 'http_401:unauthorized'),
+            # Texto libre o sin JSON: solo el estado, nunca el contenido.
+            (400, b'{"error": "Algo salio mal con el usuario x"}', 'http_400'),
+            (403, b'<html>prohibido</html>', 'http_403'),
+            (503, b'{}', 'http_503'),
+        ]
+        for estado, cuerpo, detalle in casos:
+            with self.subTest(estado=estado, cuerpo=cuerpo):
+                servidor = self._servidor(estado=estado, cuerpo=cuerpo)
+                with self.assertRaises(coach_client.CoachNoDisponible) as ctx:
+                    self._enviar(self._cliente(servidor))
+                self.assertEqual(ctx.exception.detalle, detalle)
+
     def test_un_429_del_coach_respeta_su_espera(self):
         servidor = self._servidor(estado=429, cuerpo=b'{}', cabeceras={'Retry-After': '7'})
 

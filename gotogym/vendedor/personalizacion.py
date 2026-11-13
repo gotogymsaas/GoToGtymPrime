@@ -54,6 +54,18 @@ ETIQUETAS_MEDIDAS = {
     "hip_cm": gettext_lazy("Cadera (cm)"),
     "inseam_cm": gettext_lazy("Tiro / entrepierna (cm)"),
 }
+# Nombre corto y como tomar cada medida, para la guia junto al formulario.
+# Su orden numera las cintas del diagrama (1 pecho ... 4 entrepierna).
+GUIA_MEDIDAS = {
+    "chest_cm": (gettext_lazy("Pecho"),
+                 gettext_lazy("Por la parte más llena del pecho, con la cinta horizontal bajo las axilas.")),
+    "waist_cm": (gettext_lazy("Cintura"),
+                 gettext_lazy("En la parte más estrecha del torso, por encima del ombligo.")),
+    "hip_cm": (gettext_lazy("Cadera"),
+               gettext_lazy("En la parte más ancha de los glúteos, con los pies juntos.")),
+    "inseam_cm": (gettext_lazy("Entrepierna"),
+                  gettext_lazy("Por dentro de la pierna, desde la entrepierna hasta el tobillo.")),
+}
 ETIQUETAS_MEMORIA = {
     "size": gettext_lazy("Talla"),
     "fit": gettext_lazy("Ajuste"),
@@ -108,7 +120,8 @@ def contexto(user, now=None):
         "medidas_activo": medidas_activo,
         "medidas": [
             {"campo": campo, "etiqueta": ETIQUETAS_MEDIDAS[campo], "minimo": minimo, "maximo": maximo,
-             "valor": getattr(medida, campo) if medida else None}
+             "valor": getattr(medida, campo) if medida else None,
+             "nombre": GUIA_MEDIDAS[campo][0], "como": GUIA_MEDIDAS[campo][1]}
             for campo, (_nombre, minimo, maximo) in MEASUREMENT_FIELDS.items()
         ],
         "medidas_fecha": medida.captured_at if medida else None,

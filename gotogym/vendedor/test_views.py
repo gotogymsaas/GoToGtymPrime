@@ -219,6 +219,39 @@ class VendedorViewTests(TestCase):
                 self.assertNotIn('reply', cuerpo)
                 self.assertEqual(cuerpo['contact_url'], '/es/contacto/')
 
+    def _fallo_visto_por(self, usuario):
+        cache.clear()
+        cliente = Client()
+        if usuario is not None:
+            cliente.force_login(usuario)
+        coach = _contra_coach()
+        coach.enviar.side_effect = coach_client.CoachNoDisponible('rechazado', detalle='http_400:invalid_promotion')
+        with mock.patch.object(coach_client, 'obtener_cliente', return_value=coach):
+            return self._enviar(cliente=cliente).json()
+
+    def test_el_personal_ve_el_motivo_tecnico_del_fallo(self):
+        personal = get_user_model().objects.create_user(
+            username='staff', email='staff@example.com', password='x', is_staff=True,
+        )
+        cuerpo = self._fallo_visto_por(personal)
+        self.assertEqual(cuerpo['error'], 'error')
+        self.assertEqual(cuerpo['diagnostic'], 'rechazado:http_400:invalid_promotion')
+
+    def test_un_cliente_no_ve_el_motivo_tecnico(self):
+        cliente = get_user_model().objects.create_user(
+            username='cliente', email='cliente@example.com', password='x',
+        )
+        self.assertNotIn('diagnostic', self._fallo_visto_por(cliente))
+        self.assertNotIn('diagnostic', self._fallo_visto_por(None))
+
+    def test_el_motivo_tecnico_solo_lleva_caracteres_de_codigo(self):
+        peticion = mock.Mock()
+        peticion.user.is_staff = True
+        self.assertEqual(
+            views._diagnostico_para(peticion, 'respuesta_invalida', 'meta.status <script>'),
+            'respuesta_invalida:meta.statusscript',
+        )
+
     def test_un_fallo_no_consume_un_turno(self):
         cliente = _contra_coach()
         cliente.enviar.side_effect = [coach_client.CoachNoDisponible('servicio'), mock.DEFAULT]

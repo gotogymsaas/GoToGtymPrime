@@ -10,6 +10,7 @@ Nunca se escribe el texto del mensaje en logs ni en Sentry.
 """
 import json
 import logging
+import re
 import time
 from functools import wraps
 
@@ -39,8 +40,24 @@ _ERRORES_DEL_COACH = {
 _ERROR_GENERICO_DEL_COACH = ('error', 502)
 
 
-def _error(codigo, estado, reintentar_en=None):
+_DIAGNOSTICO_PERMITIDO = re.compile(r'[^A-Za-z0-9_.:\[\]-]')
+
+
+def _diagnostico_para(request, *partes):
+    """Motivo tecnico del fallo, solo para el personal del sitio: sin acceso
+    a los logs del servidor, es la forma de saber por que fallo un turno.
+    Solo codigos y nombres de campo (nunca el mensaje ni la respuesta), y
+    limpio de cualquier caracter fuera de esa forma."""
+    if not getattr(request.user, 'is_staff', False):
+        return ''
+    texto = ':'.join(str(parte) for parte in partes if parte)
+    return _DIAGNOSTICO_PERMITIDO.sub('', texto)[:120]
+
+
+def _error(codigo, estado, reintentar_en=None, diagnostico=''):
     cuerpo = {'ok': False, 'error': codigo, 'contact_url': reverse('contacto')}
+    if diagnostico:
+        cuerpo['diagnostic'] = diagnostico
     if reintentar_en:
         cuerpo['retry_after'] = int(reintentar_en)
     respuesta_http = JsonResponse(cuerpo, status=estado)
@@ -128,7 +145,8 @@ def _atender(request):
 
     cliente = coach_client.obtener_cliente()
     if cliente is None or coach_client.circuito_abierto():
-        return _error('no_disponible', 503)
+        motivo = 'no_configurado' if cliente is None else 'circuito_abierto'
+        return _error('no_disponible', 503, diagnostico=_diagnostico_para(request, motivo))
 
     espera = _segundos_de_espera(request)
     if espera:
@@ -143,7 +161,7 @@ def _atender(request):
         solicitud = paquete.armar_solicitud(request, texto, estado['id'])
     except contrato.ContratoInvalido as error:
         logger.error('Vendedor: no se pudo armar un paquete valido (%s).', error)
-        return _error('paquete_invalido', 500)
+        return _error('paquete_invalido', 500, diagnostico=_diagnostico_para(request, 'paquete_invalido', error))
 
     try:
         crudo = cliente.enviar(solicitud)
@@ -157,14 +175,16 @@ def _atender(request):
         if error.reintentar_en:
             _exigir_espera(request, error.reintentar_en)
         codigo, estado_http = _ERRORES_DEL_COACH.get(error.codigo, _ERROR_GENERICO_DEL_COACH)
-        return _error(codigo, estado_http, error.reintentar_en)
+        return _error(codigo, estado_http, error.reintentar_en,
+                      diagnostico=_diagnostico_para(request, error.codigo, error.detalle))
     coach_client.registrar_exito()
 
     try:
         segura = respuesta.sanear(crudo, solicitud)
     except respuesta.RespuestaRechazada as error:
         logger.warning('Vendedor: respuesta del Coach rechazada (%s).', error.codigo)
-        return _error('respuesta_rechazada', 502)
+        return _error('respuesta_rechazada', 502,
+                      diagnostico=_diagnostico_para(request, 'respuesta_rechazada', error.codigo))
     if segura.descartadas:
         logger.info('Vendedor: se descartaron %s propuestas del Coach.', segura.descartadas)
 

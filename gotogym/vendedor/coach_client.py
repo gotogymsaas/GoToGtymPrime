@@ -15,6 +15,7 @@ Todo fallo se informa con `CoachNoDisponible` y un codigo corto. Ningun
 mensaje de error incluye el texto del visitante ni el cuerpo de la respuesta.
 """
 import logging
+import re
 from decimal import Decimal
 from urllib.parse import urlsplit
 
@@ -46,8 +47,10 @@ class CoachNoDisponible(Exception):
     `circuito_abierto`, `timeout`, `conexion`, `rechazado` (4xx), `servicio`
     (5xx), `limite` (429), `respuesta_invalida`, `error_del_coach`.
 
-    `detalle` es el motivo que dio el propio Coach en un `error_del_coach`
-    (vacio si no dio ninguno), para el registro."""
+    `detalle` es el motivo tecnico (vacio si no hay): el `error_code` del
+    Coach en un `error_del_coach`, el estado HTTP y el `error` del cuerpo en un
+    `rechazado`, el campo fuera de contrato en un `respuesta_invalida`. Solo
+    codigos y nombres de campo, nunca texto de la conversacion."""
 
     def __init__(self, codigo, reintentar_en=None, detalle=''):
         super().__init__(codigo)
@@ -104,6 +107,20 @@ def _segundos_de_espera(cabecera):
         return None
 
 
+_CODIGO_HTTP = re.compile(r'^[a-z0-9_]{1,40}$')
+
+
+def _codigo_de_error_http(respuesta):
+    """El `error` que el Coach pone en el cuerpo de un 4xx (p. ej.
+    `unauthorized`, `invalid_promotion`), o '' si no trae uno con forma de
+    codigo. Nunca se devuelve texto libre: termina en los logs."""
+    try:
+        codigo = respuesta.json().get('error')
+    except (ValueError, AttributeError):
+        return ''
+    return codigo if isinstance(codigo, str) and _CODIGO_HTTP.match(codigo) else ''
+
+
 class ClienteHttp:
     def __init__(self, url, clave_id, secreto, timeout):
         self.url = url
@@ -148,22 +165,23 @@ class ClienteHttp:
         if estado == 429:
             raise CoachNoDisponible('limite', _segundos_de_espera(respuesta.headers.get('Retry-After')))
         if estado >= 500:
-            raise CoachNoDisponible('servicio')
+            raise CoachNoDisponible('servicio', detalle=f'http_{estado}')
         if estado != 200:
             # 3xx, 401, 403, 400...: la tienda y el Coach no se entienden
             # (firma, clave, contrato). Es un problema de configuracion.
-            logger.error('Vendedor: el Coach respondio HTTP %s.', estado)
-            raise CoachNoDisponible('rechazado')
+            motivo = _codigo_de_error_http(respuesta)
+            logger.error('Vendedor: el Coach respondio HTTP %s (%s).', estado, motivo or 'sin motivo')
+            raise CoachNoDisponible('rechazado', detalle=f'http_{estado}' + (f':{motivo}' if motivo else ''))
 
         try:
             datos = respuesta.json()
         except ValueError:
-            raise CoachNoDisponible('respuesta_invalida') from None
+            raise CoachNoDisponible('respuesta_invalida', detalle='no_json') from None
         try:
             validada = contrato.validar_respuesta(datos)
         except contrato.ContratoInvalido as error:
             logger.error('Vendedor: respuesta del Coach fuera de contrato (%s).', error)
-            raise CoachNoDisponible('respuesta_invalida') from None
+            raise CoachNoDisponible('respuesta_invalida', detalle=str(error)) from None
         if not validada.ok:
             raise CoachNoDisponible('error_del_coach', validada.meta.reintentar_en, validada.meta.codigo_error)
         return validada
