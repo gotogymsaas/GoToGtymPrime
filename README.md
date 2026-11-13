@@ -152,7 +152,7 @@ Con el selector en inglés, todo el sitio de cara al cliente sale en inglés: ti
 
 ## 📦 Tecnologías
 
-- **Backend:** Django 5.2 + Django REST Framework
+- **Backend:** Django 5.2
 - **Base de datos:** PostgreSQL (producción, Azure) / SQLite (desarrollo y tests)
 - **Frontend:** Django Templates + Tailwind (CSS compilado y versionado, sin build de Node en el despliegue)
 - **Autenticación:** Sesiones de Django, con reglas de contraseña y límite de intentos de acceso

@@ -1,0 +1,120 @@
+{
+  "components": [
+    {
+      "name": "gotogym",
+      "path": "gotogym",
+      "stack": {
+        "language": "Python",
+        "framework": "Django",
+        "version": "5.2.18"
+      },
+      "readiness": {
+        "status": "fixesApplied",
+        "fixes": [
+          "Django se alinea con django-stubs 5.2.9 y las migraciones existentes.",
+          "README y .dockerignore fueron actualizados."
+        ]
+      },
+      "verdicts": {
+        "build": "PASS",
+        "completeness": "PASS",
+        "deployability": "WARN"
+      },
+      "findings": [
+        {
+          "category": "build",
+          "verdict": "WARN",
+          "summary": "El .venv local es Python 3.11.9 y conserva Django 5.2.18, redis 5.2.1 y Pillow 12.3.0.",
+          "fix": "Recrear el entorno con Python 3.12 y requirements-dev.txt antes de ejecutar la validacion."
+        },
+        {
+          "category": "completeness",
+          "verdict": "PASS",
+          "summary": "Entry point, health endpoints, Dockerfile, .dockerignore y documentacion existen.",
+          "fix": null
+        },
+        {
+          "category": "deployability",
+          "verdict": "WARN",
+          "summary": "Azure App Service/Kudu es viable, pero el startup command productivo vive fuera del repositorio.",
+          "fix": "Gestionar el startup command como configuracion versionada o verificarlo en cada despliegue."
+        }
+      ]
+    }
+  ],
+  "warnings": [
+    {
+      "id": "W-STALE-LOCAL-ENV",
+      "component": "gotogym",
+      "axis": "build",
+      "summary": "El entorno local no representa los manifiestos actuales.",
+      "detail": ".venv contiene Python 3.11.9, Django 5.2.18, redis 5.2.1 y Pillow 12.3.0; CI y App Service usan Python 3.12 y los manifiestos declaran versiones mas recientes para redis y Pillow.",
+      "fix": "Recrear el entorno local con Python 3.12 y las dependencias declaradas antes de validar.",
+      "fixPhase": "deploy-gate"
+    },
+    {
+      "id": "W-NATIVE-F1",
+      "component": "gotogym",
+      "axis": "deployability",
+      "summary": "cryptography implica dependencia nativa y el servicio WSGI no es candidato a F1.",
+      "detail": "requirements.txt incluye cryptography y gunicorn; el despliegue viable es App Service existente o contenedor, no el SKU gratuito como objetivo fiable.",
+      "fix": "Mantener un plan de App Service/Container con recursos suficientes y validar wheels en Python 3.12.",
+      "fixPhase": "deploy-gate"
+    },
+    {
+      "id": "W-STARTUP-OUT-OF-BAND",
+      "component": "gotogym",
+      "axis": "deployability",
+      "summary": "El startup command productivo esta configurado manualmente en Azure Portal.",
+      "detail": "El workflow empaqueta environments/azure/startup.sh pero la documentacion dice que App Service ejecuta otro comando configurado fuera de git.",
+      "fix": "Versionar y verificar la configuracion de arranque para evitar que el artefacto desplegado y Azure ejecuten comandos distintos.",
+      "fixPhase": "deploy-gate"
+    },
+    {
+      "id": "W-LOCAL-STORAGE",
+      "component": "gotogym",
+      "axis": "deployability",
+      "summary": "Media y SQLite local son adecuadas para desarrollo, no para persistencia PaaS.",
+      "detail": "Produccion usa PostgreSQL, pero MEDIA_ROOT y el fallback SQLite escriben en disco local; el disco de App Service es efimero para escalado y reemplazos.",
+      "fix": "Confirmar almacenamiento persistente externo para media y mantener PostgreSQL como unica base productiva.",
+      "fixPhase": "post-deploy"
+    }
+  ],
+  "detectedStack": "Python 3.12 / Django 5.2.18 / gunicorn / Tailwind compilado",
+  "fastTrackEligible": false,
+  "overallHealth": "readyWithCaveats",
+  "buildRequirements": {
+    "hasNativeModules": true,
+    "hasDockerfile": true,
+    "f1Viable": false,
+    "exposedPort": 8000,
+    "estimatedInstallTime": 180,
+    "f1BlockReason": "native modules (cryptography) and WSGI/ASGI server"
+  },
+  "healthEndpoint": "/healthz",
+  "entryPoint": "gotogym/manage.py",
+  "initCommands": [
+    {
+      "type": "migration",
+      "framework": "Django",
+      "command": "python gotogym/manage.py migrate --noinput",
+      "required": true
+    },
+    {
+      "type": "static",
+      "framework": "Django",
+      "command": "python gotogym/manage.py collectstatic --noinput",
+      "required": true
+    }
+  ],
+  "postDeployRecommendations": [
+    {
+      "title": "Externalizar media",
+      "reason": "El almacenamiento local no es persistente al escalar o reemplazar la instancia.",
+      "effort": "medium",
+      "services": [
+        "Azure Blob Storage"
+      ]
+    }
+  ]
+}

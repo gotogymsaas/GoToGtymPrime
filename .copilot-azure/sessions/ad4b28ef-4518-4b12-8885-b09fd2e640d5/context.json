@@ -1,0 +1,88 @@
+{
+  "sessionId": "ad4b28ef-4518-4b12-8885-b09fd2e640d5",
+  "createdUtc": "2026-11-13T18:34:12Z",
+  "lastModifiedUtc": "2026-11-13T18:47:00Z",
+  "currentPhase": null,
+  "completedPhases": [
+    "prereq"
+  ],
+  "statusSummary": "Reevaluacion estatica completada y fixes aplicados; integracion Azure detenida por decision del usuario.",
+  "intent": {
+    "userPrompt": "el proyecto tuvo problemas de versiones, escanealo todo, verifica estado e integracion",
+    "description": "Escaneo estatico de versiones, estado del repositorio e integracion local/Azure.",
+    "refinedFromScan": true,
+    "scanDiscoveredFacts": [
+      "Monolito Django con Python 3.12 en CI y App Service.",
+      "requirements.txt declara Django 5.2.18, redis 8.1.0, Pillow 13.0.0 y gunicorn 26.2.0.",
+      "El .venv local conserva Django 5.2.18, redis 5.2.1, Pillow 12.3.0 y Python 3.11.9.",
+      "Existe Dockerfile y despliegue por GitHub Actions/Kudu; no existe azure.yaml ni IaC Azure declarativa.",
+      "Health endpoints /healthz y /readyz existen; el arranque aplica migraciones y collectstatic."
+    ]
+  },
+  "components": [
+    {
+      "name": "gotogym",
+      "path": "gotogym",
+      "stack": {
+        "language": "Python",
+        "framework": "Django",
+        "version": "5.2.18"
+      },
+      "readiness": {
+        "status": "fixesApplied",
+        "fixes": [
+          "Django se alinea con django-stubs 5.2.9 y las migraciones existentes.",
+          "README y .dockerignore fueron actualizados."
+        ]
+      },
+      "verdicts": {
+        "build": "PASS",
+        "completeness": "PASS",
+        "deployability": "WARN"
+      }
+    }
+  ],
+  "azure": {
+    "subscriptionId": "c6015f72-55d5-4282-ba0b-f02152d798f7",
+    "subscriptionName": "Azure subscription 1",
+    "tenantId": "ed18f421-bdd4-4536-ac49-cc48eb76e01f",
+    "resourceGroup": "rg-gotogym-prime",
+    "region": "unknown"
+  },
+  "repo": {
+    "remote": "https://github.com/gotogymsaas/GoToGtymPrime",
+    "lastScanCommit": "e67d5e8a926df1678607c78997270e629c7aa162"
+  },
+  "app": {
+    "name": "gotogym-prime"
+  },
+  "detectedInfra": [
+    "dockerfile",
+    "docker-compose",
+    "github-actions"
+  ],
+  "detectedInfraProvider": {
+    "terraform": "unknown"
+  },
+  "detectedServices": [
+    {
+      "type": "postgresql",
+      "source": "config"
+    },
+    {
+      "type": "redis",
+      "version": "8.1.0",
+      "source": "config"
+    },
+    {
+      "type": "mercadopago",
+      "source": "code"
+    },
+    {
+      "type": "alegra",
+      "source": "code"
+    }
+  ],
+  "overrides": [],
+  "routeReason": "ready-existing-infra"
+}
