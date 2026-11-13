@@ -114,6 +114,7 @@ ignore_imports = [
     "tienda.test_pdp -> inventory.models",
     "tienda.test_imagen_producto -> inventory.models",
     "tienda.test_consultas -> inventory.models",
+    "tienda.test_filtro_linea -> inventory.models",
     "orders.tests -> payments.models",
     "orders.tests -> payments.providers.mock",
     "orders.tests -> accounts.models",

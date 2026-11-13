@@ -1,16 +1,32 @@
 """Filtro de linea (dama / caballero) del listado de la tienda."""
+from decimal import Decimal
+
 from django.test import TestCase
 from django.urls import reverse
-from vendedor.test_utilidades import aislar_catalogo, crear_producto
+from inventory.models import Inventory
+from products.models import Brand, Product, ProductCategory, ProductVariant
+
+
+def _crear_producto(nombre, talla, sku):
+    categoria, _ = ProductCategory.objects.get_or_create(name='Prendas')
+    marca, _ = Brand.objects.get_or_create(name='Marca')
+    producto = Product.objects.create(
+        name=nombre, category=categoria, brand=marca, base_price=Decimal('100000.0000'),
+    )
+    variante = ProductVariant.objects.create(product=producto, sku=sku, size=talla, color='negro')
+    Inventory.objects.create(variant=variante, quantity_available=3)
+    return producto
 
 
 class FiltroDeLineaTests(TestCase):
     def setUp(self):
-        aislar_catalogo()
-        self.dama, _ = crear_producto('Top para dama', [('M', 'gris', 3)])
-        self.caballero, _ = crear_producto('Chaqueta para caballero', [('L', 'negro', 3)])
-        self.unisex, _ = crear_producto('Gorra unisex', [('UNICA', 'negro', 3)])
-        self.sin_linea, _ = crear_producto('Botella deportiva', [('UNICA', 'azul', 3)])
+        # La base de pruebas trae el catalogo semilla de las migraciones; sin
+        # variantes activas sus productos no salen en el listado.
+        ProductVariant.objects.update(is_active=False)
+        self.dama = _crear_producto('Top para dama', 'M', 'LIN-001')
+        self.caballero = _crear_producto('Chaqueta para caballero', 'L', 'LIN-002')
+        self.unisex = _crear_producto('Gorra unisex', 'UNICA', 'LIN-003')
+        self.sin_linea = _crear_producto('Botella deportiva', 'UNICA', 'LIN-004')
 
     def _nombres(self, **parametros):
         respuesta = self.client.get(reverse('tienda:producto_list'), parametros)
