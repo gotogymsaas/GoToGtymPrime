@@ -7,7 +7,7 @@ requests==2.34.2
 cryptography==50.0.2
 mercadopago==3.6.0
 sentry-sdk==2.72.0
-redis==5.2.1
+redis==8.1.0
 
 PyJWT[crypto]==2.15.1
 gunicorn==23.0.0
