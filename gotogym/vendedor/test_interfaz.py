@@ -144,13 +144,30 @@ class MarcadoTests(TestCase):
 
     def test_hay_sugerencias_para_empezar_y_la_bienvenida_se_presenta(self):
         html = self._html()
-        sugerencias = [a for e, a in _con_atributo(html, 'data-sugerencia')]
         bienvenida = html[html.index('data-vendedor-bienvenida'):]
+        sugerencias_bienvenida = bienvenida[:bienvenida.index('</div>', bienvenida.index('data-vendedor-sugerencias'))]
         bienvenida = bienvenida[:bienvenida.index('data-vendedor-sugerencias')]
 
-        self.assertEqual(len(sugerencias), 3)
+        self.assertEqual(len(list(_con_atributo(sugerencias_bienvenida, 'data-sugerencia'))), 3)
         self.assertIn('Estoy contigo.', bienvenida)
         self.assertIn('gtg-vendedor__orbit', bienvenida)
+
+    def test_las_mismas_sugerencias_quedan_en_una_fila_para_quien_vuelve(self):
+        html = self._html()
+        atajos = html[html.index('data-vendedor-atajos'):]
+        atajos = atajos[:atajos.index('</div>')]
+        textos = [t.strip() for t in re.findall(r'data-sugerencia>([^<]+)<', atajos)]
+
+        self.assertIn('hidden', atajos[:atajos.index('>')], 'oculta hasta que el panel decide mostrarla')
+        self.assertEqual(textos, ['Quiero algo para entrenar', '¿Qué talla me conviene?', '¿Cómo funcionan los envíos?'])
+
+    def test_la_configuracion_lleva_la_vigencia_y_las_soluciones(self):
+        html = self._html()
+        bloque = html[html.index('id="vendedor-config"'):]
+        configuracion = json.loads(bloque[bloque.index('>') + 1:bloque.index('</script>')])
+
+        self.assertEqual(configuracion['vigenciaHistorial'], 30 * 60)
+        self.assertTrue(all(url.startswith('https://') for url in configuracion['soluciones']))
 
     def test_saluda_por_nombre_al_usuario_autenticado(self):
         from django.contrib.auth import get_user_model

@@ -148,8 +148,11 @@ def _atender(request):
     try:
         crudo = cliente.enviar(solicitud)
     except coach_client.CoachNoDisponible as error:
-        logger.warning('Vendedor: el Coach no atendio el turno (%s).', error.codigo)
-        if error.codigo != 'no_configurado':
+        logger.warning(
+            'Vendedor: el Coach no atendio el turno (%s%s).',
+            error.codigo, f': {error.detalle}' if error.detalle else '',
+        )
+        if error.codigo != 'no_configurado' and not error.es_de_contenido:
             coach_client.registrar_fallo()
         if error.reintentar_en:
             _exigir_espera(request, error.reintentar_en)

@@ -28,6 +28,7 @@ from django.urls import reverse
 from django.utils import timezone
 from gotogym.afirmaciones import PROHIBIDAS
 from orders.models import Coupon
+from products import linea
 from tienda.catalog import (
     ORDEN_DEL_PANEL,
     catalog_variants_queryset,
@@ -127,6 +128,8 @@ def _texto_de_busqueda(producto):
     if producto.brand_id:
         partes.append(producto.brand.name)
     partes.extend(tag.name for tag in producto.tags.all())
+    # "busco algo para hombre" debe encontrar las prendas de caballero.
+    partes.append(linea.SINONIMOS.get(producto.line, ''))
     return normalizar(' '.join(partes))
 
 
@@ -152,7 +155,7 @@ def _candidato(producto, incluir_agotadas=False):
         return None
     elegidas = sorted(elegidas, key=lambda v: (size_sort_key(v.size), v.color))
     elegidas = elegidas[: contrato.MAX_VARIANTES_POR_CANDIDATO]
-    return {
+    candidato = {
         'product_id': producto.id,
         'name': producto.name,
         'price': precio_texto(min(v.effective_price for v in elegidas)),
@@ -160,6 +163,10 @@ def _candidato(producto, incluir_agotadas=False):
         'url': reverse('tienda:producto_detail', args=[producto.id]),
         'variants': [_variante(v) for v in elegidas],
     }
+    # Sin clasificar no viaja: el agente no debe suponer una linea.
+    if producto.line:
+        candidato['line'] = producto.line
+    return candidato
 
 
 def _variante(v):
@@ -203,13 +210,23 @@ def promociones(momento=None):
     return filas
 
 
-def candidatos(mensaje, foco_id=None, ids_carrito=(), limite=contrato.MAX_CANDIDATOS):
+def candidatos(mensaje, foco_id=None, ids_carrito=(), limite=contrato.MAX_CANDIDATOS, linea_preferida=''):
     """Hasta `limite` productos para el turno, en orden de prioridad.
 
     El orden importa: si el paquete no cabe en el presupuesto, se descartan
     primero los del final, es decir los que menos tienen que ver con el
-    visitante."""
-    productos = _productos_del_catalogo()
+    visitante.
+
+    Con `linea_preferida` (la que la persona guardo en su perfil), a igual
+    afinidad van primero las prendas de esa linea o unisex. Las demas no se
+    quitan: si pide algo de la otra linea con palabras ("para mi esposa,
+    de dama"), la afinidad las sube igual."""
+    compatibles = linea.lineas_compatibles(linea_preferida)
+
+    def ajena(producto):
+        return bool(compatibles) and producto.line not in compatibles
+
+    productos = sorted(_productos_del_catalogo(), key=ajena)
     por_id = {p.id: p for p in productos}
     elegidos = []
     vistos = set()

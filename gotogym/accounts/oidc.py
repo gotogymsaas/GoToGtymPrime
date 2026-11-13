@@ -20,6 +20,7 @@ from gotogym_oidc import conf
 from gotogym_oidc.adapter import DefaultAdapter
 from gotogym_oidc.client import OIDCError
 
+from .signals import perfil_creado
 from .views import TERMS_PATH
 
 
@@ -74,6 +75,7 @@ def accept_terms(request):
             user.terms_accepted_at = timezone.now()
             user.terms_hash = hashlib.sha512(terms_text.encode()).hexdigest()
             user.save(update_fields=['accepted_terms', 'terms_accepted_at', 'terms_hash'])
+            perfil_creado.send(sender=type(user), user=user)
             return redirect(next_url)
         messages.error(request, gettext('Para continuar debes aceptar los términos y condiciones.'))
     return render(request, 'accounts/accept_terms.html', {'next': next_url})

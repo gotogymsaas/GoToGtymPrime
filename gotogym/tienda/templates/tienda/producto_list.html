@@ -41,6 +41,11 @@
         {% trans "Buscar" %}: “{{ filtro }}”<span class="material-icons-outlined" aria-hidden="true">close</span>
       </a>
       {% endif %}
+      {% if selected_line_name %}
+      <a href="{% querystring linea=None page=None %}" class="shop-chip-active">
+        {{ selected_line_name }}<span class="material-icons-outlined" aria-hidden="true">close</span>
+      </a>
+      {% endif %}
       {% if selected_category_name %}
       <a href="{% querystring categoria=None page=None %}" class="shop-chip-active">
         {{ selected_category_name|traducir }}<span class="material-icons-outlined" aria-hidden="true">close</span>
@@ -73,6 +78,20 @@
             <label for="f-buscar">{% trans "Buscar" %}</label>
             <input id="f-buscar" type="search" name="filtro" value="{{ filtro }}" placeholder="{% trans 'Nombre del producto' %}">
           </div>
+
+          <fieldset class="shop-field">
+            <legend>{% trans "Línea" %}</legend>
+            <div class="shop-chip-group" role="group">
+              <label class="shop-chip">
+                <input type="radio" name="linea" value="" {% if not selected_line %}checked{% endif %}>{% trans "Todas" %}
+              </label>
+              {% for valor, nombre in lineas %}
+              <label class="shop-chip">
+                <input type="radio" name="linea" value="{{ valor }}" {% if selected_line == valor %}checked{% endif %}>{{ nombre }}
+              </label>
+              {% endfor %}
+            </div>
+          </fieldset>
 
           <div class="shop-field">
             <label for="f-categoria">{% trans "Categoría" %}</label>

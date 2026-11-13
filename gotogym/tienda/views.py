@@ -2,8 +2,9 @@ from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Prefetch
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
-from django.utils.translation import gettext
+from django.utils.translation import gettext, gettext_lazy
 from gotogym.seo import contexto_seo, recortar, url_absoluta
+from products import linea
 from products.models import Product, ProductCategory, ProductMedia, ProductVariant
 
 from .catalog import (
@@ -22,6 +23,13 @@ from .catalog import (
 )
 
 PRODUCTS_PER_PAGE = 12
+
+# Opciones del filtro de linea. Unisex no es una opcion propia: esas prendas
+# aparecen al elegir cualquiera de las dos.
+LINEAS_DEL_FILTRO = {
+    linea.DAMA: gettext_lazy('Dama'),
+    linea.CABALLERO: gettext_lazy('Caballero'),
+}
 
 ORDER_OPTIONS = {
     'precio_asc': 'base_price',
@@ -46,6 +54,9 @@ def producto_list(request):
     productos = _catalog_queryset()
 
     filtro = request.GET.get('filtro', '').strip()
+    linea_elegida = request.GET.get('linea', '').strip()
+    if linea_elegida not in LINEAS_DEL_FILTRO:
+        linea_elegida = ''
     categoria_id = request.GET.get('categoria', '').strip()
     talla = request.GET.get('talla', '').strip()
     color = request.GET.get('color', '').strip()
@@ -55,6 +66,9 @@ def producto_list(request):
 
     if filtro:
         productos = productos.filter(name__icontains=filtro)
+    # Una prenda unisex sirve a las dos lineas, asi que aparece en ambas.
+    if linea_elegida:
+        productos = productos.filter(line__in=linea.lineas_compatibles(linea_elegida))
     if categoria_id:
         productos = productos.filter(category_id=categoria_id)
     # Talla y color filtran por disponibilidad real: solo cuentan las variantes
@@ -88,7 +102,8 @@ def producto_list(request):
 
     sizes, colors = available_filter_values()
 
-    filtros_activos = any([filtro, categoria_id, talla, color, precio_min, precio_max])
+    filtros_activos = any([filtro, linea_elegida, categoria_id, talla, color, precio_min, precio_max])
+    lineas = [(valor, LINEAS_DEL_FILTRO[valor]) for valor in LINEAS_DEL_FILTRO]
 
     categorias = ProductCategory.objects.all().order_by('name')
     selected_category_name = ''
@@ -101,6 +116,9 @@ def producto_list(request):
         'page_obj': page_obj,
         'cards': [build_product_card(producto) for producto in page_obj],
         'categorias': categorias,
+        'lineas': lineas,
+        'selected_line': linea_elegida,
+        'selected_line_name': LINEAS_DEL_FILTRO.get(linea_elegida, ''),
         'sizes': sizes,
         'colors': colors,
         'filtro': filtro,

@@ -111,6 +111,19 @@ def carrito_de_la_sesion(request):
     return carrito_armado, ids_de_producto
 
 
+def linea_de_ropa_preferida(request):
+    """'dama', 'caballero' o '' segun lo que la persona eligio en Mi cuenta.
+
+    Es una preferencia de compra que ella misma guardo para que le recomienden
+    esa linea, no un dato de su identidad; viaja sola, sin nada que la
+    identifique."""
+    user = request.user
+    if not user.is_authenticated:
+        return ''
+    preferencia = getattr(user, 'clothing_line', '') or ''
+    return preferencia if preferencia in contrato.LINEAS_PREFERIDAS else ''
+
+
 def pagos_en_vivo():
     """True solo si el cobro es real: proveedor no simulado, con credenciales
     y con los pagos en linea habilitados en el panel. El agente no debe
@@ -155,13 +168,17 @@ def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=No
     sujeto, autenticado = sujeto_del_visitante(request)
     pagina = contexto_de_pagina(request)
     carrito, productos_del_carrito = carrito_de_la_sesion(request)
+    linea_preferida = linea_de_ropa_preferida(request)
+    visitante = {'subject': sujeto, 'authenticated': autenticado}
+    if linea_preferida:
+        visitante['line_preference'] = linea_preferida
 
     solicitud = {
         'request_id': request_id or str(uuid.uuid4()),
         'conversation_id': conversation_id,
         'locale': idioma,
         'message': mensaje.strip(),
-        'visitor': {'subject': sujeto, 'authenticated': autenticado},
+        'visitor': visitante,
         'page': pagina,
         'cart': carrito,
         'shop_flags': {
@@ -172,6 +189,7 @@ def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=No
         'evidence': {
             'candidates': evidencia.candidatos(
                 mensaje, foco_id=pagina['product_id'], ids_carrito=productos_del_carrito,
+                linea_preferida=linea_preferida,
             ),
             'policies': evidencia.politicas(idioma),
             'promotions': evidencia.promociones(),

@@ -18,9 +18,10 @@
   {% csrf_token %}
   <input type="hidden" name="next" value="{{ next }}">
   <label class="commercial-auth__checkbox">
-    <input type="checkbox" name="accepted_terms" id="accepted_terms" required>
+    <input type="checkbox" name="accepted_terms" id="accepted_terms" aria-describedby="personalizacion-aviso" required>
     <span>{% trans "Acepto los" %} <button type="button" id="show-terms">{% trans "términos y condiciones" %}</button></span>
   </label>
+  {% include 'accounts/_aviso_personalizacion.html' %}
   <button type="submit" class="commercial-auth__button">{% trans "Continuar" %}</button>
 </form>
 {% endblock %}

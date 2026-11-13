@@ -3,38 +3,65 @@
   <div class="account-panel account-field--full">
     <p class="editorial-kicker">{% trans "Quantum Coach" %}</p>
     <h2>{% trans "Personalización con Quantum Coach" %}</h2>
-    <p class="account-address-hint">{% trans "Elige qué puede usar Quantum Coach para recomendarte en la tienda. Todo empieza desactivado, puedes cambiarlo cuando quieras y cada permiso vence a los 12 meses." %}</p>
+    <p class="account-address-hint">{% trans "Quantum Coach usa lo que ya sabe de ti para recomendarte en la tienda. Puedes apagarlo cuando quieras y cada permiso vence a los 12 meses." %}</p>
 
-    {% if not vinculado %}
-    <p>{% trans "Para activar la personalización, entra con tu cuenta GoToGym (la misma de Quantum Coach) y vincúlala con esta tienda." %}</p>
-    {% endif %}
-
-    <form method="post" action="{% url 'vendedor:personalizacion_permisos' %}">
+    {% if vinculado %}
+    {# Un solo interruptor: activa o apaga todo. Funciona sin JavaScript (es un boton que envia el formulario). #}
+    <form method="post" action="{% url 'vendedor:personalizacion_todo' %}" class="account-switch-form">
       <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-      <fieldset class="account-personalizacion">
-        <legend class="sr-only">{% trans "Permisos de personalización" %}</legend>
-        <ul class="account-address-list">
-          {% for fila in filas %}
-          <li>
-            <label for="scope-{{ fila.id }}">
-              <input type="checkbox" name="scopes" value="{{ fila.scope }}" id="scope-{{ fila.id }}"
-                     {% if fila.activo %}checked{% endif %}{% if not vinculado and not fila.activo %} disabled{% endif %}
-                     aria-describedby="scope-{{ fila.id }}-ayuda">
-              <span>
-                <strong>{{ fila.etiqueta }}</strong>
-                <small id="scope-{{ fila.id }}-ayuda">{{ fila.descripcion }}{% if fila.activo %} · {% blocktrans with fecha=fila.vence|date:"j M Y" %}Vence el {{ fecha }}{% endblocktrans %}{% endif %}</small>
-              </span>
-            </label>
-          </li>
-          {% endfor %}
-        </ul>
-      </fieldset>
-      <div class="account-actions">
-        <button type="submit" class="editorial-action">{% trans "Guardar permisos" %}</button>
-      </div>
+      <input type="hidden" name="accion" value="{% if todo_activo %}desactivar{% else %}activar{% endif %}">
+      <button type="submit" class="account-switch" role="switch" aria-checked="{% if todo_activo %}true{% else %}false{% endif %}">
+        <span class="account-switch__track" aria-hidden="true"><span class="account-switch__thumb"></span></span>
+        <span class="account-switch__text">
+          <strong>{% trans "Personalizar con Quantum Coach" %}</strong>
+          <small>{% if todo_activo %}{% trans "Activada" %}{% elif activos %}{% blocktrans %}Activada en {{ activos }} de {{ total }} permisos{% endblocktrans %}{% else %}{% trans "Desactivada" %}{% endif %}</small>
+        </span>
+      </button>
     </form>
 
-    {% if medidas_activo %}
+    <details class="account-security account-personalizacion-detalle"{% if activos and not todo_activo %} open{% endif %}>
+      <summary>{% trans "Elegir uno por uno" %}</summary>
+      <form method="post" action="{% url 'vendedor:personalizacion_permisos' %}">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <fieldset class="account-personalizacion">
+          <legend class="sr-only">{% trans "Permisos de personalización" %}</legend>
+          <ul class="account-address-list">
+            {% for fila in filas %}
+            <li>
+              <label for="scope-{{ fila.id }}">
+                <input type="checkbox" name="scopes" value="{{ fila.scope }}" id="scope-{{ fila.id }}"
+                       {% if fila.activo %}checked{% endif %} aria-describedby="scope-{{ fila.id }}-ayuda">
+                <span>
+                  <strong>{{ fila.etiqueta }}</strong>
+                  <small id="scope-{{ fila.id }}-ayuda">{{ fila.descripcion }}{% if fila.activo %} · {% blocktrans with fecha=fila.vence|date:"j M Y" %}Vence el {{ fecha }}{% endblocktrans %}{% endif %}</small>
+                </span>
+              </label>
+            </li>
+            {% endfor %}
+          </ul>
+        </fieldset>
+        <div class="account-actions">
+          <button type="submit" class="editorial-action">{% trans "Guardar permisos" %}</button>
+        </div>
+      </form>
+    </details>
+    {% else %}
+    <p class="account-personalizacion-estado">
+      {% if activos %}{% trans "La personalización está activada y empezará a funcionar cuando vincules tu cuenta GoToGym (la misma de Quantum Coach)." %}{% else %}{% trans "Vincula tu cuenta GoToGym (la misma de Quantum Coach) para que te recomiende según lo que ya sabe de ti." %}{% endif %}
+    </p>
+    <div class="account-actions account-personalizacion-acciones">
+      {% if vincular_url %}<a class="editorial-action" href="{{ vincular_url }}">{% trans "Vincular con mi cuenta GoToGym" %}</a>{% endif %}
+      {% if activos %}
+      <form method="post" action="{% url 'vendedor:personalizacion_todo' %}">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <input type="hidden" name="accion" value="desactivar">
+        <button type="submit" class="editorial-text-link account-link-button">{% trans "Desactivar personalización" %}</button>
+      </form>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if medidas_activo and vinculado %}
     <details class="account-security"{% if not medidas_fecha %} open{% endif %}>
       <summary>{% trans "Mis medidas para tallas" %}</summary>
       <p class="account-address-hint">{% trans "Mídete sobre ropa ligera con una cinta métrica. Son privadas: solo se usan para comparar con las medidas de cada prenda, nunca se muestran en el chat." %}</p>

@@ -1,6 +1,16 @@
+import json
+
 from django.utils.functional import SimpleLazyObject
 
+from . import conversacion
 from .exposicion import coach_configurado, visible_para
+
+
+def _urls_de_soluciones_json():
+    from .respuesta import urls_de_soluciones
+
+    # Va dentro de un <script> JSON: sin "<" no puede cerrar la etiqueta.
+    return json.dumps(urls_de_soluciones()).replace('<', '\\u003c')
 
 
 def _invitar_a_personalizar(request):
@@ -43,4 +53,7 @@ def vendedor(request):
         'vendedor_invitar_personalizar': SimpleLazyObject(
             lambda: disponible and _invitar_a_personalizar(request)),
         'vendedor_puede_recordar': SimpleLazyObject(lambda: disponible and _puede_recordar(request)),
+        'vendedor_urls_soluciones': SimpleLazyObject(_urls_de_soluciones_json),
+        # El panel olvida lo que muestra cuando el servidor ya olvido la conversacion.
+        'vendedor_vigencia_historial': conversacion.INACTIVIDAD_SEGUNDOS,
     }

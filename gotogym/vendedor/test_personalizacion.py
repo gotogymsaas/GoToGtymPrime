@@ -40,18 +40,26 @@ class Base(TestCase):
 
 
 class SeccionDelPerfilTests(Base):
-    def test_sin_vinculo_explica_como_activar_y_no_deja_marcar(self):
+    @override_settings(OIDC_HABILITADO=True)
+    def test_sin_vinculo_muestra_el_boton_para_vincular_en_vez_de_casillas(self):
         html = self.client.get(PERFIL).content.decode()
-        self.assertIn('id="personalizacion"', html)
-        self.assertIn("vincúlala con esta tienda", html)
-        self.assertIn('id="scope-profile-basic"', html)
-        self.assertIn("disabled", html[html.index('id="scope-profile-basic"') - 200:html.index('id="scope-profile-basic"') + 200])
+        seccion = html[html.index('id="personalizacion"'):]
+        self.assertIn("Vincular con mi cuenta GoToGym", seccion)
+        self.assertIn(reverse("gotogym_oidc:start") + "?next=", seccion)
+        self.assertNotIn('id="scope-profile-basic"', seccion)
+        self.assertNotIn('class="account-switch"', seccion)
 
-    def test_con_vinculo_todo_empieza_desactivado(self):
+    @override_settings(OIDC_HABILITADO=False)
+    def test_sin_oidc_en_el_servidor_no_hay_boton_que_no_lleve_a_nada(self):
+        self.assertNotIn("Vincular con mi cuenta GoToGym", self.client.get(PERFIL).content.decode())
+
+    def test_con_vinculo_y_sin_decision_el_interruptor_esta_apagado(self):
         self.vincular()
         html = self.client.get(PERFIL).content.decode()
-        self.assertNotIn("vincúlala con esta tienda", html)
-        self.assertNotIn("checked", html[html.index('id="personalizacion"'):])
+        seccion = html[html.index('id="personalizacion"'):]
+        self.assertIn('role="switch" aria-checked="false"', seccion)
+        self.assertIn("Elegir uno por uno", seccion)
+        self.assertNotIn("checked>", seccion.replace('aria-checked="false"', ""))
         self.assertNotIn("Mis medidas para tallas", html)
 
     def test_anonimo_no_ve_la_seccion(self):

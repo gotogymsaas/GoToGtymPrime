@@ -10,6 +10,8 @@ tienda misma puede comprobar:
   del Coach no se toma ninguna URL ni ningun texto de boton.
 * Un producto o una variante solo cuentan si estaban entre los candidatos del
   turno y, ademas, existen, estan activos y tienen existencias ahora.
+* Un enlace a otra solucion de GoToGym (`open_solution`) solo trae la clave de
+  la solucion; la direccion sale de `settings.VENDEDOR_SOLUCIONES`.
 * Las tarjetas de producto se arman con el nombre, el precio y la imagen de la
   base de datos; del Coach solo se toma el motivo, como texto.
 * Una respuesta que contiene una afirmacion prohibida sobre el textil se
@@ -19,9 +21,10 @@ El texto que llega al navegador se pinta con `textContent`, nunca como HTML.
 """
 from dataclasses import dataclass, field
 
+from django.conf import settings
 from django.db.models import Prefetch
 from django.urls import reverse
-from django.utils.translation import gettext
+from django.utils.translation import gettext, gettext_lazy
 from gotogym.ajustes_tienda import compras_pausadas
 from inventory.services import get_available_quantity
 from products.models import ProductMedia, ProductVariant
@@ -91,6 +94,23 @@ def _variantes_con_stock(ids):
     return {v.id: v for v in variantes if get_available_quantity(v) > 0}
 
 
+ETIQUETAS_SOLUCION = {
+    'coach_app': gettext_lazy('Abrir Quantum Coach'),
+    'developers': gettext_lazy('Ir a GoToGym Developers'),
+}
+
+
+def _url_de_solucion(clave):
+    """Direccion configurada para una solucion, solo si es HTTPS."""
+    url = (getattr(settings, 'VENDEDOR_SOLUCIONES', {}) or {}).get(clave, '')
+    return url if clave in ETIQUETAS_SOLUCION and isinstance(url, str) and url.startswith('https://') else ''
+
+
+def urls_de_soluciones():
+    """Direcciones que el panel acepta en un boton `open_solution`."""
+    return [url for url in (_url_de_solucion(clave) for clave in ETIQUETAS_SOLUCION) if url]
+
+
 def _tarjeta(producto, razon):
     ficha = build_product_card(producto)
     imagen = ficha['image']
@@ -140,7 +160,7 @@ def sanear(respuesta, solicitud):
     acciones = []
     vistas = set()
     for accion in respuesta.acciones:
-        clave = (accion.tipo, accion.variant_id, accion.product_id)
+        clave = (accion.tipo, accion.variant_id, accion.product_id, accion.solucion)
         if clave in vistas:
             descartadas += 1
             continue
@@ -182,6 +202,17 @@ def sanear(respuesta, solicitud):
                 'type': 'go_checkout',
                 'url': reverse('orders:checkout'),
                 'label': gettext('Ir al pago'),
+            })
+        elif accion.tipo == 'open_solution':
+            url = _url_de_solucion(accion.solucion)
+            if not url:
+                descartadas += 1
+                continue
+            acciones.append({
+                'type': 'open_solution',
+                'solution': accion.solucion,
+                'url': url,
+                'label': str(ETIQUETAS_SOLUCION[accion.solucion]),
             })
         else:  # open_contact
             acciones.append({

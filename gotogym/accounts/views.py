@@ -36,6 +36,7 @@ from orders.models import DocumentType
 
 from .forms import CustomerAddressForm
 from .models import CustomerAddress
+from .signals import perfil_creado
 
 TERMS_PATH = Path(__file__).resolve().parent / 'templates' / 'accounts' / 'terms_and_conditions.html'
 
@@ -175,6 +176,7 @@ def register_view(request):
                 terms_accepted_at=timezone.now(),
                 terms_hash=hashlib.sha512(terms_text.encode()).hexdigest(),
             )
+            perfil_creado.send(sender=User, user=user)
             # Quien se registra durante una compra no debe volver a escribir
             # sus datos en el login: queda con sesion y sigue a donde iba.
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
@@ -264,6 +266,13 @@ def edit_profile(request):
         if phone != user.phone:
             user.phone = phone
             changed = True
+        if 'clothing_line' in request.POST:
+            linea_ropa = request.POST.get('clothing_line', '').strip()
+            if linea_ropa not in dict(user._meta.get_field('clothing_line').choices):
+                linea_ropa = ''
+            if linea_ropa != user.clothing_line:
+                user.clothing_line = linea_ropa
+                changed = True
         if 'document_type' in request.POST or 'document_number' in request.POST:
             document_type = request.POST.get('document_type', '').strip()
             document_number = limpiar_numero(document_type, request.POST.get('document_number', ''))
@@ -344,6 +353,7 @@ def edit_profile(request):
         'address_form': CustomerAddressForm(),
         'municipios_por_departamento': MUNICIPIOS_POR_DEPARTAMENTO,
         'tipos_documento': DocumentType.choices,
+        'lineas_ropa': [('dama', gettext('Dama')), ('caballero', gettext('Caballero'))],
     }
     return render(request, 'accounts/edit_profile.html', context)
 

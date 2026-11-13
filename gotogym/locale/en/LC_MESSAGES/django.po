@@ -4165,3 +4165,87 @@ msgid ""
 msgstr ""
 "Let’s find the right gear for you. We can also talk about sizing or "
 "shipping."
+
+msgid "Línea"
+msgstr "Line"
+
+msgid "Dama"
+msgstr "Women"
+
+msgid "Caballero"
+msgstr "Men"
+
+msgid "Prefiero ver ropa de"
+msgstr "I prefer to see clothing for"
+
+msgid "Sin preferencia"
+msgstr "No preference"
+
+msgid "Quantum Coach te recomendará primero prendas de esta línea."
+msgstr "Quantum Coach will recommend items from this line first."
+
+msgid "Abrir Quantum Coach"
+msgstr "Open Quantum Coach"
+
+msgid "Ir a GoToGym Developers"
+msgstr "Go to GoToGym Developers"
+
+msgid ""
+"Quantum Coach usa lo que ya sabe de ti para recomendarte en la tienda. "
+"Puedes apagarlo cuando quieras y cada permiso vence a los 12 meses."
+msgstr ""
+"Quantum Coach uses what it already knows about you to recommend products in "
+"the store. You can turn it off whenever you want, and each permission "
+"expires after 12 months."
+
+msgid "Personalizar con Quantum Coach"
+msgstr "Personalize with Quantum Coach"
+
+msgid "Activada"
+msgstr "On"
+
+msgid "Desactivada"
+msgstr "Off"
+
+msgid "Activada en %(activos)s de %(total)s permisos"
+msgstr "On for %(activos)s of %(total)s permissions"
+
+msgid "Elegir uno por uno"
+msgstr "Choose one by one"
+
+msgid ""
+"La personalización está activada y empezará a funcionar cuando vincules tu "
+"cuenta GoToGym (la misma de Quantum Coach)."
+msgstr ""
+"Personalization is on and will start working once you link your GoToGym "
+"account (the same one you use for Quantum Coach)."
+
+msgid ""
+"Vincula tu cuenta GoToGym (la misma de Quantum Coach) para que te recomiende"
+" según lo que ya sabe de ti."
+msgstr ""
+"Link your GoToGym account (the same one you use for Quantum Coach) so it can"
+" recommend products based on what it already knows about you."
+
+msgid "Vincular con mi cuenta GoToGym"
+msgstr "Link my GoToGym account"
+
+msgid "Desactivar personalización"
+msgstr "Turn off personalization"
+
+msgid "Activamos la personalización con Quantum Coach."
+msgstr "Personalization with Quantum Coach is now on."
+
+msgid "Desactivamos la personalización con Quantum Coach."
+msgstr "Personalization with Quantum Coach is now off."
+
+msgid ""
+"Al crear tu cuenta se activa la personalización con Quantum Coach: cuando "
+"vincules tu cuenta GoToGym, usará tu perfil deportivo, tus preferencias de "
+"entrenamiento, tus experiencias, tus medidas y tus elecciones solo para "
+"recomendarte productos. Puedes desactivarla cuando quieras en Mi cuenta."
+msgstr ""
+"Creating your account turns on personalization with Quantum Coach: once you "
+"link your GoToGym account, it will use your sports profile, your training "
+"preferences, your experiences, your measurements and your choices only to "
+"recommend products. You can turn it off whenever you want in My account."

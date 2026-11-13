@@ -6,7 +6,9 @@ que la auditoria y el borrado al revocar sean identicos.
 """
 import json
 from decimal import Decimal, InvalidOperation
+from urllib.parse import urlencode
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -90,8 +92,18 @@ def contexto(user, now=None):
             {"etiqueta": ETIQUETAS_MEMORIA.get(item.kind, item.kind), "valor": item.value, "hasta": item.expires_at}
             for item in CommerceMemoryItem.objects.filter(user=user, expires_at__gt=now).order_by("kind")
         ]
+    activos = sum(1 for fila in filas if fila["activo"])
     return {
         "vinculado": _vinculado(user),
+        # Sin OIDC habilitado en el servidor no hay con que vincular: no se
+        # muestra un boton que no lleva a ninguna parte.
+        "vincular_url": (
+            reverse("gotogym_oidc:start") + "?" + urlencode({"next": reverse("edit_profile") + "#personalizacion"})
+            if getattr(settings, "OIDC_HABILITADO", False) else ""
+        ),
+        "activos": activos,
+        "total": len(filas),
+        "todo_activo": activos == len(filas),
         "filas": filas,
         "medidas_activo": medidas_activo,
         "medidas": [
@@ -121,6 +133,28 @@ def guardar_permisos(request):
         if quiere != activo:
             consentimiento.aplicar(request.user, scope, quiere, now)
     messages.success(request, _("Guardamos tus preferencias de personalización."))
+    return _volver()
+
+
+@login_required
+@require_POST
+def guardar_todo(request):
+    """Interruptor "Personalizar con Quantum Coach": activa o apaga todos los
+    permisos a la vez. Activar exige la cuenta vinculada; apagar, nunca."""
+    activar = request.POST.get("accion") == "activar"
+    if activar and not _vinculado(request.user):
+        messages.error(request, _("Para personalizar con Quantum Coach primero vincula tu cuenta GoToGym."))
+        return _volver()
+    now = timezone.now()
+    consent = CommercePersonalizationConsent.objects.filter(user=request.user).first()
+    for scope in SCOPE_FIELDS:
+        activo = consent is not None and consent.is_active(scope, now)
+        if activo != activar:
+            consentimiento.aplicar(request.user, scope, activar, now)
+    if activar:
+        messages.success(request, _("Activamos la personalización con Quantum Coach."))
+    else:
+        messages.success(request, _("Desactivamos la personalización con Quantum Coach."))
     return _volver()
 
 

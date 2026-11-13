@@ -47,8 +47,8 @@ LOW_STOCK_THRESHOLD = 3
 # Guia de tallas de referencia general (medidas del cuerpo, no de la
 # prenda), en centimetros. NO son medidas propias de GoToGym: son valores
 # de referencia usados de forma comun en el mercado colombiano de ropa
-# deportiva/casual para mujer, el mismo publico de todo el catalogo actual
-# (ver Product.objects.all(), todas las prendas son "para dama"). Deben
+# deportiva/casual para mujer. El catalogo ya tiene prendas de caballero
+# (`Product.line`) y no hay aun una guia propia para ellas. Deben
 # reemplazarse por la tabla real de la marca en cuanto exista una medida
 # propia; mientras tanto se muestran marcadas como "referencia general",
 # nunca como una medida verificada de la prenda concreta.

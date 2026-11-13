@@ -4,6 +4,8 @@ from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from . import linea
+
 
 class ProductCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -63,6 +65,9 @@ class Product(models.Model):
     # Posicion del producto en el listado del panel y en la tienda. 0 solo
     # significa "sin asignar": `save` le da la siguiente posicion libre.
     sort_order = models.PositiveIntegerField(default=0, db_index=True)
+    # Dama / caballero / unisex. Vacio = sin clasificar: `save` la deduce del
+    # nombre o la descripcion si la dicen (ver products/linea.py).
+    line = models.CharField('línea', max_length=10, choices=linea.OPCIONES, blank=True, db_index=True)
 
     def __str__(self):
         return self.name
@@ -71,6 +76,8 @@ class Product(models.Model):
         if self._state.adding and not self.sort_order:
             ultimo = Product.objects.aggregate(ultimo=models.Max('sort_order'))['ultimo']
             self.sort_order = (ultimo or 0) + 1
+        if not self.line:
+            self.line = linea.inferir_linea(self.name, self.description)
         super().save(*args, **kwargs)
 
     @property

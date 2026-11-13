@@ -8,6 +8,7 @@ urlpatterns = [
     path('mensaje/', views.mensaje, name='mensaje'),
     path('consentimiento/', consentimiento.consentimiento, name='consentimiento'),
     path('personalizacion/permisos/', personalizacion.guardar_permisos, name='personalizacion_permisos'),
+    path('personalizacion/todo/', personalizacion.guardar_todo, name='personalizacion_todo'),
     path('personalizacion/medidas/', personalizacion.guardar_medidas, name='personalizacion_medidas'),
     path('personalizacion/memoria/olvidar/', personalizacion.olvidar_memoria, name='personalizacion_olvidar'),
     path('personalizacion/recordar/', personalizacion.recordar, name='personalizacion_recordar'),

@@ -411,6 +411,13 @@ VENDEDOR_POLITICAS_PENDIENTES = _split_csv(os.environ.get('VENDEDOR_POLITICAS_PE
 # Porcentaje de visitantes que ven el vendedor (0-100). El grupo se deriva del
 # hash del visitante, asi que es estable y permite comparar contra un control.
 VENDEDOR_ROLLOUT_PERCENT = max(0, min(100, int(os.environ.get('VENDEDOR_ROLLOUT_PERCENT', '100'))))
+# Otras soluciones de GoToGym a las que Quantum Coach puede llevar a alguien
+# cuando pregunta por algo que no es de la tienda. El Coach solo nombra la
+# clave; la direccion sale de aqui, nunca de su respuesta.
+VENDEDOR_SOLUCIONES = {
+    'coach_app': os.environ.get('VENDEDOR_URL_COACH_APP', 'https://app.gotogym.store/'),
+    'developers': os.environ.get('VENDEDOR_URL_DEVELOPERS', 'https://developers.gotogym.store/'),
+}
 
 # Monitoreo de errores (Sentry). La configuración de despliegue y el preflight
 # lo exigen en producción, pero su ausencia no debe impedir que la aplicación

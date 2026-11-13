@@ -54,7 +54,12 @@ MAX_SEGUNDOS_REINTENTO = 3600
 IDIOMAS = ('es', 'en')
 MONEDA = 'COP'
 
-ACCIONES_PERMITIDAS = frozenset({'add_to_cart', 'open_product', 'go_checkout', 'open_contact'})
+ACCIONES_PERMITIDAS = frozenset({'add_to_cart', 'open_product', 'go_checkout', 'open_contact', 'open_solution'})
+# Claves de `open_solution`. La direccion de cada una la pone la tienda.
+SOLUCIONES_PERMITIDAS = frozenset({'coach_app', 'developers'})
+# Linea de cada candidato y preferencia de la persona (products/linea.py).
+LINEAS_DE_PRODUCTO = frozenset({'dama', 'caballero', 'unisex'})
+LINEAS_PREFERIDAS = frozenset({'dama', 'caballero'})
 ESTADOS_RESPUESTA = frozenset({'ok', 'error'})
 ESTADOS_REVISION = frozenset({'validated', 'pending_review'})
 
@@ -82,6 +87,7 @@ class AccionPropuesta:
     variant_id: int | None = None
     product_id: int | None = None
     etiqueta: str = ''
+    solucion: str = ''
 
 
 @dataclass(frozen=True)
@@ -96,6 +102,12 @@ class MetaRespuesta:
     referencias: tuple[str, ...] = ()
     estado: str = 'ok'
     reintentar_en: int | None = None
+    # Motivo corto que da el Coach cuando no responde (p. ej. `validation_failed`).
+    # Solo sirve para el registro: nunca se muestra al visitante.
+    codigo_error: str = ''
+
+
+_CODIGO_ERROR = re.compile(r'^[a-z0-9_]{1,40}$')
 
 
 @dataclass(frozen=True)
@@ -181,6 +193,7 @@ def _validar_candidato(candidato, ruta):
     _texto(candidato.get('description'), f'{ruta}.description', MAX_LARGO_DESCRIPCION, vacio=True)
     _texto(candidato.get('url'), f'{ruta}.url', 300)
     _requerir(candidato['url'].startswith('/'), f'{ruta}.url')
+    _requerir(candidato.get('line', 'dama') in LINEAS_DE_PRODUCTO, f'{ruta}.line')
     variantes = candidato.get('variants')
     _requerir(isinstance(variantes, list) and 0 < len(variantes) <= MAX_VARIANTES_POR_CANDIDATO,
               f'{ruta}.variants')
@@ -252,6 +265,9 @@ def validar_solicitud(solicitud):
     _texto(visitante.get('subject'), 'visitor.subject', 80)
     _requerir(visitante['subject'].startswith(_PREFIJOS_SUJETO), 'visitor.subject')
     _requerir(isinstance(visitante.get('authenticated'), bool), 'visitor.authenticated')
+    if 'line_preference' in visitante:
+        _requerir(visitante['authenticated'] and visitante['line_preference'] in LINEAS_PREFERIDAS,
+                  'visitor.line_preference')
 
     # v2: asercion de identidad opcional (vendedor/identidad.py). Solo su
     # forma; la firma y la vigencia las comprueba el Coach.
@@ -348,6 +364,9 @@ def _leer_accion(cruda):
         return None
     if tipo == 'open_product' and not _entero(product_id):
         return None
+    solucion = cruda.get('solution', '') if tipo == 'open_solution' else ''
+    if tipo == 'open_solution' and solucion not in SOLUCIONES_PERMITIDAS:
+        return None
     etiqueta = cruda.get('label', '')
     if not isinstance(etiqueta, str) or len(etiqueta) > MAX_LARGO_ETIQUETA:
         etiqueta = ''
@@ -356,6 +375,7 @@ def _leer_accion(cruda):
         variant_id=variant_id if _entero(variant_id) else None,
         product_id=product_id if _entero(product_id) else None,
         etiqueta=etiqueta,
+        solucion=solucion,
     )
 
 
@@ -373,11 +393,17 @@ def validar_respuesta(datos):
     _requerir(isinstance(crudo_meta, dict), 'meta')
     estado = crudo_meta.get('status')
     _requerir(estado in ESTADOS_RESPUESTA, 'meta.status')
+    # Un codigo con otra forma se ignora en vez de rechazar la respuesta: el
+    # motivo es informativo y llega a los logs, asi que no se acepta texto libre.
+    codigo_error = crudo_meta.get('error_code')
+    if not (isinstance(codigo_error, str) and _CODIGO_ERROR.match(codigo_error)):
+        codigo_error = ''
     meta = MetaRespuesta(
         agentes=_lista_de_textos(crudo_meta.get('agents_used'), 'meta.agents_used', 12, 40),
         referencias=_lista_de_textos(crudo_meta.get('evidence_refs'), 'meta.evidence_refs', 40, 120),
         estado=estado,
         reintentar_en=_entero_opcional(crudo_meta.get('retry_after_seconds'), 'meta.retry_after_seconds'),
+        codigo_error=codigo_error,
     )
     _requerir(meta.reintentar_en is None or meta.reintentar_en <= MAX_SEGUNDOS_REINTENTO,
               'meta.retry_after_seconds')

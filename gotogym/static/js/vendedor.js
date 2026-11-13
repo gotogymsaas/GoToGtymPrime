@@ -20,8 +20,10 @@
  *  - Al medir se envian categorias y numeros, nunca el texto de los mensajes.
  *
  * El historial se guarda en sessionStorage (solo en esta pestana) para que no
- * se pierda al cambiar de pagina. Si el almacenamiento falla, el panel
- * funciona igual.
+ * se pierda al cambiar de pagina. Vence con la misma inactividad con la que el
+ * servidor da por terminada la conversacion (`vigenciaHistorial`): una
+ * pestana que el navegador restaura dias despues no muestra una charla que el
+ * Coach ya no recuerda. Si el almacenamiento falla, el panel funciona igual.
  */
 (function () {
   'use strict';
@@ -41,6 +43,7 @@
   var CLAVE_AVISO = 'gtg_vendedor_aviso';
   var MAX_ENTRADAS = 24;
   var ESPERA_POR_DEFECTO = 10;
+  var VIGENCIA_MS = (configuracion.vigenciaHistorial > 0 ? configuracion.vigenciaHistorial : 1800) * 1000;
   // Rutas internas a las que puede apuntar un enlace del panel.
   var RUTA_ENLACE = /^\/[a-z]{2}\/(tienda|carrito|pedidos-tienda|contacto)\/[A-Za-z0-9\-_\/.%]*$/;
   var RUTA_IMAGEN = /^\/(media|static)\/[A-Za-z0-9\-_\/.%]+$/;
@@ -52,6 +55,7 @@
   var registro = panel.querySelector('[data-vendedor-log]');
   var bienvenida = panel.querySelector('[data-vendedor-bienvenida]');
   var sugerencias = panel.querySelector('[data-vendedor-sugerencias]');
+  var atajos = panel.querySelector('[data-vendedor-atajos]');
   var estado = panel.querySelector('[data-vendedor-status]');
   var cajaError = panel.querySelector('[data-vendedor-error]');
   var textoError = panel.querySelector('[data-vendedor-error-texto]');
@@ -114,16 +118,19 @@
 
   // --- Historial ---------------------------------------------------------
 
+  // Se guarda con la hora del ultimo cambio: { ts, e: [entradas] }.
   function guardarHistorial() {
-    guardar(CLAVE_HISTORIAL, JSON.stringify(historial.slice(-MAX_ENTRADAS)));
+    guardar(CLAVE_HISTORIAL, JSON.stringify({ ts: Date.now(), e: historial.slice(-MAX_ENTRADAS) }));
   }
 
+  // Un historial vencido, sin hora (formato anterior) o ilegible se descarta.
   function leerHistorial() {
     var crudo = guardado(CLAVE_HISTORIAL);
     if (!crudo) return [];
     try {
       var datos = JSON.parse(crudo);
-      return Array.isArray(datos) ? datos.slice(-MAX_ENTRADAS) : [];
+      var vigente = datos && typeof datos.ts === 'number' && Date.now() - datos.ts <= VIGENCIA_MS;
+      return vigente && Array.isArray(datos.e) ? datos.e.slice(-MAX_ENTRADAS) : [];
     } catch (error) {
       return [];
     }
@@ -278,6 +285,19 @@
       boton.addEventListener('click', function () { agregarAlCarrito(accion, boton, caja); });
       return boton;
     }
+    if (accion.type === 'open_solution') {
+      // Otra solucion de GoToGym: solo direcciones que la tienda declaro.
+      var permitidas = Array.isArray(configuracion.soluciones) ? configuracion.soluciones : [];
+      if (permitidas.indexOf(accion.url) === -1) return null;
+      var externo = crear('a', 'gtg-vendedor__button gtg-vendedor__button--quiet', accion.label);
+      externo.href = accion.url;
+      externo.target = '_blank';
+      externo.rel = 'noopener noreferrer';
+      externo.addEventListener('click', function () {
+        medir('vendedor_solution_click', { solucion: String(accion.solution || '') });
+      });
+      return externo;
+    }
     if (!RUTA_ENLACE.test(accion.url || '')) return null;
     var enlace = crear('a', 'gtg-vendedor__button gtg-vendedor__button--quiet', accion.label);
     enlace.href = accion.url;
@@ -323,6 +343,12 @@
 
   function ocultarBienvenida() {
     if (sugerencias) bienvenida.hidden = true;
+  }
+
+  // Al abrir sobre una conversacion reciente, las sugerencias quedan a mano
+  // encima del campo; desaparecen en cuanto la persona escribe.
+  function mostrarAtajos(visible) {
+    if (atajos) atajos.hidden = !(visible && bienvenida && bienvenida.hidden);
   }
 
   function restaurarHistorial() {
@@ -469,6 +495,7 @@
     campo.value = '';
     ultimoMensaje = mensaje;
     ocultarBienvenida();
+    mostrarAtajos(false);
     historial.push({ r: 'u', t: mensaje });
     guardarHistorial();
     pintarUsuario(mensaje);
@@ -486,6 +513,7 @@
       if (nodo !== bienvenida) registro.removeChild(nodo);
     });
     bienvenida.hidden = false;
+    mostrarAtajos(false);
     nuevaConversacion = true;
     ultimoMensaje = '';
     ocultarError();
@@ -528,6 +556,10 @@
     marcarBotones(true);
     abierto = true;
     if (aviso) aviso.hidden = guardado(CLAVE_AVISO) === '1';
+    // Si la conversacion vencio mientras la pestana seguia abierta, se empieza
+    // de nuevo con la bienvenida en vez de mostrar lo que el Coach ya olvido.
+    if (historial.length && !leerHistorial().length) empezarDeNuevo();
+    mostrarAtajos(historial.length > 0);
     desplazarAlFinal();
     panel.focus();
   }
@@ -595,15 +627,15 @@
 
   // Una sugerencia es un mensaje como cualquier otro: se escribe en el campo
   // y sigue el mismo camino, con los mismos limites.
-  if (sugerencias) {
-    sugerencias.addEventListener('click', function (evento) {
-      var chip = evento.target.closest ? evento.target.closest('[data-sugerencia]') : null;
-      if (!chip || enviando || temporizadorEspera !== null) return;
-      registro.focus();
-      campo.value = chip.textContent.trim();
-      enviarDesdeElCampo();
-    });
+  function alElegirSugerencia(evento) {
+    var chip = evento.target.closest ? evento.target.closest('[data-sugerencia]') : null;
+    if (!chip || enviando || temporizadorEspera !== null) return;
+    registro.focus();
+    campo.value = chip.textContent.trim();
+    enviarDesdeElCampo();
   }
+  if (sugerencias) sugerencias.addEventListener('click', alElegirSugerencia);
+  if (atajos) atajos.addEventListener('click', alElegirSugerencia);
 
   if (botonAviso) {
     botonAviso.addEventListener('click', function () {

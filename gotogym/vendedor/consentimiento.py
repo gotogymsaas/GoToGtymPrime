@@ -1,8 +1,12 @@
 """Consentimiento granular del vendedor. No lee datos del Coach.
 
-El enlace OIDC es condicion necesaria para conceder, pero NO es consentimiento.
-Revocar no exige enlace: un permiso siempre se puede retirar, aunque la cuenta
-se haya desvinculado despues de concederlo.
+Al crear el perfil (aceptar por primera vez los terminos de la tienda, que
+informan esta finalidad) la personalizacion queda activada en todos sus
+scopes: es la autorizacion dada en el registro (`conceder_al_crear_perfil`).
+Despues, conceder a mano exige el enlace OIDC, que NO es consentimiento.
+En ambos casos los datos del Coach solo viajan con la cuenta vinculada (la
+asercion de identidad lo exige). Revocar no exige enlace: un permiso siempre
+se puede retirar, aunque la cuenta se haya desvinculado despues.
 Los endpoints son same-origin; POST utiliza CSRF y sesion Django.
 """
 import json
@@ -127,6 +131,25 @@ def aplicar(user, scope, allowed, now=None):
                 user=user, scope=scope, allowed=allowed, consent_version=row.version,
             )
     return row
+
+
+def conceder_al_crear_perfil(user, now=None):
+    """Activa todos los scopes para quien acaba de crear su perfil.
+
+    Solo si nunca hubo una decision suya (no existe fila): no reactiva algo
+    que la persona apago. Cada scope queda auditado como cualquier concesion."""
+    if CommercePersonalizationConsent.objects.filter(user=user).exists():
+        return None
+    now = now or timezone.now()
+    row = None
+    for scope in SCOPES:
+        row = aplicar(user, scope, True, now)
+    return row
+
+
+def al_crear_perfil(sender, user, **kwargs):
+    """Receptor de `accounts.signals.perfil_creado` (ver apps.py)."""
+    conceder_al_crear_perfil(user)
 
 
 def _borrar_datos_del_scope(user, scope):

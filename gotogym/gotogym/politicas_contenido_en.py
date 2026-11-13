@@ -8,7 +8,7 @@ here at the same time.
 """
 from .politicas_contenido import CORREO_PRIVACIDAD, CORREO_SOPORTE, RESPONSABLE
 
-ACTUALIZADO = 'Last updated: October 2026.'
+ACTUALIZADO = 'Last updated: November 2026.'
 
 PRIVACIDAD = {
     'title': 'Privacy policy',
@@ -307,6 +307,14 @@ ASISTENTE_IA = {
         'Coach only suggests actions, such as adding a product to your cart; you decide whether '
         'to carry them out. It can be wrong: always confirm the price and availability on the product '
         'page.',
+        'Personalization: when you create your store account, personalization with Quantum Coach is turned '
+        'on. Once you link your store account with your GoToGym account, Coach may use, only to recommend '
+        'products, your basic sports profile, your training preferences, which sports experiences you '
+        'completed (without their results), the measurements you enter to suggest sizes and the choices you '
+        'confirm in the chat. If you choose the clothing line you prefer (women or men) in your profile, it '
+        'is also taken into account. Without a linked account, nothing from Quantum Coach is used.',
+        'You can turn off personalization entirely or permission by permission in My account, at any time. '
+        'Turning off measurements or your choices deletes them. Each permission expires after 12 months.',
         f'To exercise your rights over this data, write to {CORREO_PRIVACIDAD}.',
     ]},
     'PRIVACIDAD': {'title': 'Quantum Coach', 'paragraphs': [

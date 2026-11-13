@@ -11,7 +11,7 @@ decisiones comerciales y se cambian aqui.
 RESPONSABLE = 'Friends N Gifts S.A.S.'
 CORREO_SOPORTE = 'support@gotogym.store'
 CORREO_PRIVACIDAD = 'privacy@gotogym.store'
-ACTUALIZADO = 'Última actualización: octubre de 2026.'
+ACTUALIZADO = 'Última actualización: noviembre de 2026.'
 
 PRIVACIDAD = {
     'title': 'Política de privacidad',
@@ -314,6 +314,15 @@ ASISTENTE_IA = {
         'Coach solo propone acciones, como agregar un producto al carrito; tú decides si las '
         'ejecutas. Puede equivocarse: confirma siempre el precio y la disponibilidad en la ficha del '
         'producto.',
+        'Personalización: al crear tu cuenta en la tienda queda activada la personalización con Quantum '
+        'Coach. Cuando vinculas tu cuenta de la tienda con tu cuenta GoToGym, Coach puede usar, solo para '
+        'recomendarte productos, tu perfil deportivo básico, tus preferencias de entrenamiento, qué '
+        'experiencias deportivas completaste (sin sus resultados), las medidas que escribas para sugerirte '
+        'tallas y las elecciones que confirmes en el chat. Si eliges en tu perfil la línea de ropa que '
+        'prefieres (dama o caballero), también se tiene en cuenta. Sin la cuenta vinculada no se usa nada '
+        'de Quantum Coach.',
+        'Puedes desactivar la personalización completa o permiso por permiso en Mi cuenta, cuando quieras. '
+        'Al desactivar las medidas o tus elecciones, se borran. Cada permiso vence a los 12 meses.',
         f'Para ejercer tus derechos sobre estos datos escribe a {CORREO_PRIVACIDAD}.',
     ]},
     'PRIVACIDAD': {'title': 'Quantum Coach', 'paragraphs': [

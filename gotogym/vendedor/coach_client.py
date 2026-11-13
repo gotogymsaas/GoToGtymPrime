@@ -44,12 +44,30 @@ PALABRA_MALICIOSO_SIMULADO = '[simular-malicioso]'
 class CoachNoDisponible(Exception):
     """El Coach no pudo atender el turno. `codigo` es uno de: `no_configurado`,
     `circuito_abierto`, `timeout`, `conexion`, `rechazado` (4xx), `servicio`
-    (5xx), `limite` (429), `respuesta_invalida`, `error_del_coach`."""
+    (5xx), `limite` (429), `respuesta_invalida`, `error_del_coach`.
 
-    def __init__(self, codigo, reintentar_en=None):
+    `detalle` es el motivo que dio el propio Coach en un `error_del_coach`
+    (vacio si no dio ninguno), para el registro."""
+
+    def __init__(self, codigo, reintentar_en=None, detalle=''):
         super().__init__(codigo)
         self.codigo = codigo
         self.reintentar_en = reintentar_en
+        self.detalle = detalle
+
+    @property
+    def es_de_contenido(self):
+        """El Coach esta en linea pero no aprobo la respuesta de este turno.
+        No es una caida: no debe abrir el circuito para todos."""
+        return self.codigo == 'error_del_coach' and self.detalle in CODIGOS_DE_CONTENIDO
+
+
+# Motivos del Coach que dependen del mensaje o de la respuesta del modelo, no
+# de que el servicio este caido.
+CODIGOS_DE_CONTENIDO = frozenset({
+    'validation_failed', 'invalid_model_format', 'price_not_in_evidence',
+    'prohibited_claim', 'isolation_denied',
+})
 
 
 # --- Circuito de corte -----------------------------------------------------
@@ -147,7 +165,7 @@ class ClienteHttp:
             logger.error('Vendedor: respuesta del Coach fuera de contrato (%s).', error)
             raise CoachNoDisponible('respuesta_invalida') from None
         if not validada.ok:
-            raise CoachNoDisponible('error_del_coach', validada.meta.reintentar_en)
+            raise CoachNoDisponible('error_del_coach', validada.meta.reintentar_en, validada.meta.codigo_error)
         return validada
 
 

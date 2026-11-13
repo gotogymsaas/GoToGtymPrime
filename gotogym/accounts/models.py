@@ -66,6 +66,12 @@ class User(AbstractUser):
     customer_segments = models.ManyToManyField(
         CustomerSegment, blank=True, related_name='members', verbose_name="Segmentos de cliente",
     )
+    # Linea de ropa que la persona prefiere ver (no su genero): Quantum Coach
+    # recomienda primero prendas de esa linea. Vacio = sin preferencia.
+    clothing_line = models.CharField(
+        'línea de ropa preferida', max_length=10, blank=True,
+        choices=[('dama', 'Dama'), ('caballero', 'Caballero')],
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

@@ -81,7 +81,7 @@ class ProductAdminForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = [
-            "name", "category", "brand", "description", "base_price", "discount",
+            "name", "category", "line", "brand", "description", "base_price", "discount",
             "stock", "featured", "tags",
         ]
         widgets = {
@@ -91,6 +91,7 @@ class ProductAdminForm(forms.ModelForm):
         labels = {
             "name": "Nombre",
             "category": "Categoría",
+            "line": "Línea",
             "brand": "Marca",
             "description": "Descripción",
             "discount": "Descuento (%)",
@@ -102,6 +103,11 @@ class ProductAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["tags"].queryset = ProductTag.objects.filter(is_active=True)
+        self.fields["line"].choices = [("", "Sin clasificar (se deduce del nombre)"), *Product._meta.get_field("line").choices]
+        self.fields["line"].help_text = (
+            "Si la dejas sin clasificar y el nombre o la descripción dicen «dama» o «caballero», se asigna sola. "
+            "La usan el filtro de la tienda y Quantum Coach."
+        )
 
 
 class ProductVariantForm(forms.ModelForm):

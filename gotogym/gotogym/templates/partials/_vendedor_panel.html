@@ -125,6 +125,15 @@ con ese mismo aviso, sin llamar al servidor.
     </div>
   </form>
 
+  {% if vendedor_disponible %}
+  {# Las mismas sugerencias de la bienvenida, en una fila, para quien vuelve a una conversacion reciente. #}
+  <div class="gtg-vendedor__atajos" data-vendedor-atajos role="group" aria-label="{% trans 'Sugerencias para empezar' %}" hidden>
+    <button type="button" class="gtg-vendedor__atajo" data-sugerencia>{% trans "Quiero algo para entrenar" %}</button>
+    <button type="button" class="gtg-vendedor__atajo" data-sugerencia>{% trans "¿Qué talla me conviene?" %}</button>
+    <button type="button" class="gtg-vendedor__atajo" data-sugerencia>{% trans "¿Cómo funcionan los envíos?" %}</button>
+  </div>
+  {% endif %}
+
   <form class="gtg-vendedor__form" data-vendedor-form novalidate>
     <label class="sr-only" for="vendedor-mensaje">{% trans "Escribe tu mensaje" %}</label>
     <div class="gtg-vendedor__composer">
@@ -168,5 +177,5 @@ con ese mismo aviso, sin llamar al servidor.
     <span data-texto="atencion_espera">{% trans "Ya enviaste varias solicitudes. Intenta más tarde o escríbenos desde Contacto." %}</span>
   </div>
 
-  <script id="vendedor-config" type="application/json">{"endpoint": "{% url 'vendedor:mensaje' %}", "csrf": "{{ csrf_token }}", "maxLength": 600, "disponible": {% if vendedor_disponible %}true{% else %}false{% endif %}, "cartUrl": "{% url 'carrito:cart_detail' %}", "contactUrl": "{% url 'contacto' %}", "puedeRecordar": {% if vendedor_puede_recordar %}true{% else %}false{% endif %}, "recordarUrl": "{% url 'vendedor:personalizacion_recordar' %}", "atencionUrl": "{% url 'vendedor:atencion' %}"}</script>
+  <script id="vendedor-config" type="application/json">{"endpoint": "{% url 'vendedor:mensaje' %}", "csrf": "{{ csrf_token }}", "maxLength": 600, "disponible": {% if vendedor_disponible %}true{% else %}false{% endif %}, "cartUrl": "{% url 'carrito:cart_detail' %}", "contactUrl": "{% url 'contacto' %}", "puedeRecordar": {% if vendedor_puede_recordar %}true{% else %}false{% endif %}, "recordarUrl": "{% url 'vendedor:personalizacion_recordar' %}", "atencionUrl": "{% url 'vendedor:atencion' %}", "soluciones": {{ vendedor_urls_soluciones|default:'[]'|safe }}, "vigenciaHistorial": {{ vendedor_vigencia_historial|default:1800 }}}</script>
 </aside>

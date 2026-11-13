@@ -1,0 +1,9 @@
+{% load i18n %}{% comment %}
+Aviso junto a la aceptacion de terminos: al crear el perfil la personalizacion
+con Quantum Coach queda activada (vendedor.consentimiento.conceder_al_crear_perfil).
+Debe coincidir con la politica de tratamiento de datos (politicas_contenido.ASISTENTE_IA).
+{% endcomment %}
+<p class="commercial-auth__hint" id="personalizacion-aviso">
+  {% trans "Al crear tu cuenta se activa la personalización con Quantum Coach: cuando vincules tu cuenta GoToGym, usará tu perfil deportivo, tus preferencias de entrenamiento, tus experiencias, tus medidas y tus elecciones solo para recomendarte productos. Puedes desactivarla cuando quieras en Mi cuenta." %}
+  <a href="{% url 'politica_tratamiento_datos' %}" target="_blank" rel="noopener">{% trans "Cómo tratamos tus datos" %}</a>
+</p>

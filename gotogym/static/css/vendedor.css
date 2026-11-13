@@ -478,8 +478,12 @@
   gap: var(--space-4);
   min-height: 0;
   padding: var(--space-4);
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* La bienvenida mide su letra con el ancho del panel (cqi), no con el de
+     la ventana: el panel es angosto aunque la pantalla sea ancha. */
+  container-type: inline-size;
 }
 
 /* Cada respuesta del Coach lleva su orbe a un lado. */
@@ -542,8 +546,12 @@
   flex: none;
   width: 100%;
   margin-block: auto;
-  padding-block: clamp(28px, 6dvh, 72px);
+  padding-block: clamp(16px, 4dvh, 40px);
   text-align: center;
+  /* La órbita girada se sale de la caja; sin recorte el registro muestra
+     barras de desplazamiento para alcanzarla. */
+  overflow: hidden;
+  overflow: clip;
 }
 
 .gtg-vendedor__orbit {
@@ -587,10 +595,11 @@
   margin: 0;
   color: var(--color-premium-white);
   font-family: var(--font-display);
-  font-size: clamp(2rem, 6vw, 3.75rem);
+  font-size: 1.75rem;
+  font-size: clamp(1.5rem, 7cqi, 2rem);
   font-weight: 800;
-  line-height: 1.04;
-  letter-spacing: -0.045em;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
   overflow-wrap: anywhere;
 }
 
@@ -625,8 +634,9 @@
     var(--color-bg-elevated));
   color: var(--color-text-primary);
   font: inherit;
-  font-size: clamp(0.9375rem, 2.5vw, 1.0625rem);
-  font-weight: 800;
+  font-size: 0.9375rem;
+  font-size: clamp(0.875rem, 3.6cqi, 1rem);
+  font-weight: 700;
   cursor: pointer;
   transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
@@ -757,6 +767,46 @@
 }
 
 /* --- Formulario ------------------------------------------------------------------------------ */
+
+/* Sugerencias en una fila, para quien vuelve a una conversacion reciente.
+   Se desplazan de lado en vez de crecer hacia arriba y tapar la charla. */
+.gtg-vendedor__atajos {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-2) 0;
+  overflow-x: auto;
+  background: var(--color-bg-elevated);
+  scrollbar-width: none;
+}
+
+.gtg-vendedor__atajos[hidden] {
+  display: none;
+}
+
+.gtg-vendedor__atajos::-webkit-scrollbar {
+  display: none;
+}
+
+.gtg-vendedor__atajo {
+  flex: none;
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.gtg-vendedor__atajo:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
 
 .gtg-vendedor__form {
   padding: var(--space-2) var(--space-2) max(var(--space-2), env(safe-area-inset-bottom));
