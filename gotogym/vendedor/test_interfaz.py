@@ -138,9 +138,9 @@ class MarcadoTests(TestCase):
         titulo = next(a for e, a in _nodos(encabezado) if a.get('id') == 'vendedor-titulo')
 
         self.assertIsNotNone(titulo)
-        self.assertIn('coach-orb coach-orb--lg', encabezado)
+        self.assertIn('logo-gotogym-symbol-transparent.png', encabezado)
         self.assertIn('Quantum Coach', encabezado)
-        self.assertIn('La IA de GoToGym', encabezado)
+        self.assertIn('gtg-vendedor__brand', encabezado)
 
     def test_hay_sugerencias_para_empezar_y_la_bienvenida_se_presenta(self):
         html = self._html()
@@ -149,8 +149,18 @@ class MarcadoTests(TestCase):
         bienvenida = bienvenida[:bienvenida.index('data-vendedor-sugerencias')]
 
         self.assertEqual(len(sugerencias), 3)
-        self.assertIn('soy Quantum Coach, la IA de GoToGym', bienvenida)
-        self.assertIn('coach-orb', bienvenida)
+        self.assertIn('Estoy contigo.', bienvenida)
+        self.assertIn('gtg-vendedor__orbit', bienvenida)
+
+    def test_saluda_por_nombre_al_usuario_autenticado(self):
+        from django.contrib.auth import get_user_model
+
+        usuario = get_user_model().objects.create_user(
+            username='juan', email='juan@example.com', first_name='Juan Manuel', password='test-password',
+        )
+        self.client.force_login(usuario)
+
+        self.assertContains(self.client.get('/es/'), 'Estoy contigo, Juan Manuel.')
 
     def test_el_estado_de_pensando_lleva_el_orbe_acelerado(self):
         html = self._html()
@@ -234,7 +244,7 @@ class SinIATests(TestCase):
 
         self.assertIn('En este momento la IA de GoToGym no está disponible. Vuelve más tarde.', bienvenida)
         self.assertIn('href="/es/contacto/"', bienvenida)
-        self.assertNotIn('Hola, soy Quantum Coach', bienvenida)
+        self.assertNotIn('gtg-vendedor__greeting', bienvenida)
 
     def test_no_hay_sugerencias_ni_aviso_de_ia(self):
         html = self._html()

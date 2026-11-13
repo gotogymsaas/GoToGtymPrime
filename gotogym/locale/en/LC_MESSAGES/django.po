@@ -4151,3 +4151,17 @@ msgstr "Closed"
 
 msgid "Página de contacto"
 msgstr "Contact page"
+
+#, python-format
+msgid "Estoy contigo, %(nombre)s."
+msgstr "I’m here with you, %(nombre)s."
+
+msgid "Estoy contigo."
+msgstr "I’m here with you."
+
+msgid ""
+"Veamos qué prenda te acompaña mejor. También podemos hablar de tallas o "
+"envíos."
+msgstr ""
+"Let’s find the right gear for you. We can also talk about sizing or "
+"shipping."

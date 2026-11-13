@@ -70,7 +70,6 @@
 
 .coach-orb--sm { --orb: 24px; }
 .coach-orb--md { --orb: 30px; }
-.coach-orb--lg { --orb: 44px; }
 
 /* Mientras el Coach piensa, todo gira mas rapido. */
 .coach-orb--busy,
@@ -229,9 +228,6 @@
 @supports (background: color-mix(in srgb, red, blue)) {
   .gtg-vendedor {
     border-left-color: color-mix(in srgb, var(--color-accent) 30%, var(--color-border));
-    background:
-      radial-gradient(120% 55% at 100% 0%, color-mix(in srgb, var(--color-zafiro) 75%, transparent), transparent 70%),
-      var(--color-bg-elevated);
   }
 }
 
@@ -367,11 +363,15 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: max(var(--space-4), env(safe-area-inset-top)) var(--space-3) var(--space-4) var(--space-4);
+  gap: var(--space-2);
+  padding: max(var(--space-2), env(safe-area-inset-top)) var(--space-3) var(--space-2);
+  background: var(--color-bg-base);
+  background: linear-gradient(115deg,
+    color-mix(in srgb, var(--color-accent) 5%, var(--color-bg-base)),
+    color-mix(in srgb, var(--color-gold) 4%, var(--color-bg-base)));
 }
 
-/* Linea turquesa que se desvanece: el borde inferior del encabezado. */
+/* Borde inferior de la cabecera. */
 .gtg-vendedor__head::after {
   content: "";
   position: absolute;
@@ -379,7 +379,7 @@
   bottom: 0;
   left: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  background: linear-gradient(90deg, transparent, var(--color-gold), var(--color-accent), transparent);
   opacity: 0.7;
 }
 
@@ -388,33 +388,34 @@
   min-width: 0;
 }
 
+.gtg-vendedor__mark {
+  flex: none;
+  object-fit: contain;
+}
+
 .gtg-vendedor__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 18px;
+  color: var(--color-premium-white);
+  font-size: clamp(0.875rem, 2.2vw, 1.0625rem);
   font-weight: 800;
-  letter-spacing: 0.01em;
   line-height: 1.15;
 }
 
-.gtg-vendedor__tagline {
-  margin: 2px 0 0;
-  color: var(--color-gold);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.gtg-vendedor__brand {
+  color: var(--color-accent);
 }
 
 .gtg-vendedor__icon-button {
   display: inline-flex;
+  flex: none;
   width: 44px;
   height: 44px;
   align-items: center;
   justify-content: center;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
   color: var(--color-text-secondary);
   cursor: pointer;
   transition: color 0.2s ease, background 0.2s ease;
@@ -425,7 +426,12 @@
   height: 22px;
 }
 
-.gtg-vendedor__icon-button:hover {
+.gtg-vendedor__icon-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gtg-vendedor__icon-button:hover:not(:disabled) {
   color: var(--color-accent);
   background: var(--color-accent-soft);
 }
@@ -436,7 +442,8 @@
   align-items: center;
   gap: var(--space-1) var(--space-3);
   padding: var(--space-2) var(--space-4);
-  background: var(--color-accent-soft);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-base);
   font-size: 12px;
   line-height: 1.45;
 }
@@ -502,14 +509,6 @@
   white-space: pre-wrap;
 }
 
-/* Invitacion discreta a activar la personalizacion (solo cuentas vinculadas). */
-.gtg-vendedor__msg p.gtg-vendedor__hint {
-  margin-top: 8px;
-  font-size: 0.85em;
-  opacity: 0.85;
-  white-space: normal;
-}
-
 .gtg-vendedor__msg--bot {
   flex: 1;
   max-width: none;
@@ -533,31 +532,116 @@
   }
 }
 
-/* Sugerencias para empezar: dan a entender que se le puede preguntar en libre. */
+/* Bienvenida del Shop. Las órbitas son decorativas y quedan detrás del texto. */
+.gtg-vendedor__welcome {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  flex: none;
+  width: 100%;
+  margin-block: auto;
+  padding-block: clamp(28px, 6dvh, 72px);
+  text-align: center;
+}
+
+.gtg-vendedor__orbit {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  width: min(96%, 560px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) rotate(-25deg);
+  border: 1px solid var(--color-gold);
+  border-left-color: transparent;
+  border-radius: 50%;
+  opacity: 0.34;
+  pointer-events: none;
+}
+
+.gtg-vendedor__orbit::before,
+.gtg-vendedor__orbit::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+.gtg-vendedor__orbit::before {
+  inset: 17% 7%;
+  border: 1px solid var(--color-gold);
+  background: radial-gradient(ellipse, var(--color-accent-soft), transparent 70%);
+}
+
+.gtg-vendedor__orbit::after {
+  inset: auto 21% 7% auto;
+  width: 7px;
+  height: 7px;
+  background: var(--color-gold);
+  box-shadow: 0 0 16px 3px var(--color-gold);
+}
+
+.gtg-vendedor__greeting {
+  max-width: 100%;
+  margin: 0;
+  color: var(--color-premium-white);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 3.75rem);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
+}
+
+.gtg-vendedor__intro,
+.gtg-vendedor__hint {
+  max-width: 38ch;
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.gtg-vendedor__hint {
+  font-size: 0.8125rem;
+}
+
 .gtg-vendedor__chips {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: var(--space-2);
-  padding-left: calc(24px + var(--space-2));
+  width: min(100%, 440px);
 }
 
 .gtg-vendedor__chip {
-  min-height: 44px;
-  padding: 0 var(--space-4);
+  --coach-chip-accent: var(--color-border);
+  min-height: 48px;
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
+  border-color: color-mix(in srgb, var(--coach-chip-accent) 55%, var(--color-border));
   border-radius: var(--radius-pill);
-  background: transparent;
+  background: var(--color-bg-card);
+  background: linear-gradient(110deg,
+    color-mix(in srgb, var(--coach-chip-accent) 16%, var(--color-bg-elevated)),
+    var(--color-bg-elevated));
   color: var(--color-text-primary);
   font: inherit;
-  font-size: 13px;
+  font-size: clamp(0.9375rem, 2.5vw, 1.0625rem);
   font-weight: 800;
   cursor: pointer;
   transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
+.gtg-vendedor__chip:first-child {
+  --coach-chip-accent: var(--color-gold);
+}
+
+.gtg-vendedor__chip:nth-child(2) {
+  --coach-chip-accent: var(--color-accent);
+}
+
 .gtg-vendedor__chip:hover {
   border-color: var(--color-accent);
-  background: var(--color-accent-soft);
+  background: var(--color-bg-card);
   color: var(--color-accent);
 }
 
@@ -675,37 +759,45 @@
 /* --- Formulario ------------------------------------------------------------------------------ */
 
 .gtg-vendedor__form {
+  padding: var(--space-2) var(--space-2) max(var(--space-2), env(safe-area-inset-bottom));
+  background: var(--color-bg-elevated);
+}
+
+.gtg-vendedor__composer {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4) max(var(--space-4), env(safe-area-inset-bottom));
-  border-top: 1px solid var(--color-border);
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-base);
 }
 
 .gtg-vendedor__form textarea {
+  box-sizing: border-box;
+  width: 100%;
   min-height: 44px;
-  max-height: 140px;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-base);
+  max-height: 120px;
+  field-sizing: content;
+  padding: 10px var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
   color: var(--color-text-primary);
   font: inherit;
   /* 16 px evita el zoom automatico de iOS al enfocar el campo. */
   font-size: 16px;
   line-height: 1.4;
   resize: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.gtg-vendedor__form textarea:focus {
+.gtg-vendedor__composer:focus-within {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px var(--color-accent-soft);
-  outline: none;
 }
 
 .gtg-vendedor__form textarea::placeholder {
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .gtg-vendedor__button {
@@ -739,7 +831,15 @@
 }
 
 .gtg-vendedor__send {
-  border-radius: var(--radius-pill);
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.gtg-vendedor__send svg {
+  width: 22px;
+  height: 22px;
 }
 
 .gtg-vendedor__button--quiet {
