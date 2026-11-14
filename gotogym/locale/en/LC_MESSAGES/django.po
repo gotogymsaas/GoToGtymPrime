@@ -4274,3 +4274,7 @@ msgstr "Along the inside of your leg, from your crotch to your ankle."
 
 msgid "Dónde se toma cada medida en el cuerpo"
 msgstr "Where each measurement is taken on the body"
+
+#: gotogym/templates/partials/_mensajes.html
+msgid "Cerrar aviso"
+msgstr "Dismiss notice"

@@ -28,7 +28,7 @@
   hay: al editar style.css o tokens.css hay que subirlo o el navegador
   seguira sirviendo la copia vieja.
   {% endcomment %}
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261109-sinbuscador">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261113-avisos">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
   <link rel="stylesheet" href="{% static 'css/cookie_banner.css' %}?v=20261017-responsive">
   {% if vendedor_visible %}<link rel="stylesheet" href="{% static 'css/vendedor.css' %}?v=20261110-coach-shop">{% endif %}
@@ -227,6 +227,7 @@
   {% if vendedor_visible %}{% include "partials/_vendedor_panel.html" %}{% endif %}
 
   <main class="gtg-page" id="main-content">
+    {% block mensajes %}{% include "partials/_mensajes.html" %}{% endblock %}
     {% if compras_pausadas %}
     <p class="gtg-pausa" role="status">{% trans "Las compras están en pausa temporalmente. Puedes seguir explorando el catálogo." %}</p>
     {% endif %}
@@ -289,6 +290,7 @@
   {% endcomment %}
   <script id="gtg-analytics-config" type="application/json">{"endpoint": "{% url 'analitica:registrar_eventos' %}", "csrf": "{{ csrf_token }}"}</script>
   <script src="{% static 'js/commerce_header.js' %}" defer></script>
+  <script src="{% static 'js/avisos.js' %}?v=20261113" defer></script>
   <script src="{% static 'js/cookies.js' %}?v=20261015-compacto" defer></script>
   <script src="{% static 'js/analytics.js' %}?v=20261031-vendedor" defer></script>
   {% if vendedor_visible %}<script src="{% static 'js/vendedor.js' %}?v=20261110-coach-shop" defer></script>{% endif %}

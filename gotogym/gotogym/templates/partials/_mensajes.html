@@ -1,0 +1,24 @@
+{% load i18n %}
+{% comment %}
+Avisos del sitio (django.contrib.messages), en un solo lugar para todas las
+paginas. Flotan bajo la cabecera, no empujan el contenido y las
+confirmaciones se cierran solas (static/js/avisos.js); los errores y las
+advertencias se quedan hasta que la persona los cierra.
+
+Con `sin_errores` se omiten los errores: lo usan las pantallas que ya los
+muestran junto a su formulario, para no repetirlos.
+{% endcomment %}
+{% if messages %}
+<div class="gtg-avisos" data-avisos>
+  {% for message in messages %}{% if not sin_errores or message.level_tag != 'error' %}
+  <div class="gtg-aviso gtg-aviso--{{ message.level_tag|default:'info' }}"
+       role="{% if message.level_tag == 'error' %}alert{% else %}status{% endif %}"
+       data-aviso{% if message.level_tag != 'error' and message.level_tag != 'warning' %} data-aviso-temporal{% endif %}>
+    <p class="gtg-aviso__texto">{{ message }}</p>
+    <button type="button" class="gtg-aviso__cerrar" data-aviso-cerrar aria-label="{% trans 'Cerrar aviso' %}">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  {% endif %}{% endfor %}
+</div>
+{% endif %}

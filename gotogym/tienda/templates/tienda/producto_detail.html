@@ -12,14 +12,6 @@
 <div class="shop-page shop-pdp">
   {% include "partials/_quantum_lens.html" %}
 
-  {% if messages %}
-  <div class="shop-shell" style="padding-top: 20px;">
-    {% for message in messages %}
-    <p class="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm">{{ message }}</p>
-    {% endfor %}
-  </div>
-  {% endif %}
-
   <div class="shop-shell">
     <nav class="shop-pdp__breadcrumb">
       <a href="{% url 'tienda:producto_list' %}">{% trans "Tienda" %}</a>

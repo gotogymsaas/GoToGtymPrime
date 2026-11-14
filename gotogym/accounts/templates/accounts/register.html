@@ -3,6 +3,9 @@
 
 {% block title %}GoToGym - {% trans "Crear cuenta" %}{% endblock %}
 
+{# Los errores ya salen junto al formulario: los avisos flotantes no los repiten. #}
+{% block mensajes %}{% include "partials/_mensajes.html" with sin_errores=True %}{% endblock %}
+
 {% block auth_kicker %}{% trans "Únete a GoToGym" %}{% endblock %}
 {% block auth_title %}{% blocktrans %}Crea tu <em>cuenta</em>{% endblocktrans %}{% endblock %}
 

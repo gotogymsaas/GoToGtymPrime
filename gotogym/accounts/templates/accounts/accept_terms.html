@@ -3,6 +3,9 @@
 
 {% block title %}GoToGym - {% trans "Términos y condiciones" %}{% endblock %}
 
+{# Los errores ya salen junto al formulario: los avisos flotantes no los repiten. #}
+{% block mensajes %}{% include "partials/_mensajes.html" with sin_errores=True %}{% endblock %}
+
 {% block auth_kicker %}{% trans "Un último paso" %}{% endblock %}
 {% block auth_title %}{% blocktrans %}Acepta los <em>términos</em>{% endblocktrans %}{% endblock %}
 

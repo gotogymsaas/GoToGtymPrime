@@ -44,6 +44,8 @@
   --color-border: #2e2e32;
   --color-border-subtle: #1e1e1f;
   --color-gold: #d4b46a;
+  /* Rojo suave para errores sobre fondo oscuro (avisos, minicarrito). */
+  --color-danger: #ff8b8b;
   --shadow-card: 0 24px 70px rgba(0, 0, 0, 0.45);
 
   --font-display: "TT Norms GoToGym", system-ui, sans-serif;
@@ -1286,7 +1288,7 @@ picture source {
 
 /* El mismo panel comunica el error de stock que antes llegaba como
    mensaje de Django despues de recargar. */
-.gtg-minicart.is-error .gtg-minicart__head { color: #ff8b8b; }
+.gtg-minicart.is-error .gtg-minicart__head { color: var(--color-danger); }
 
 @media (max-width: 900px) {
   .gtg-nav-wrap {
@@ -1534,4 +1536,107 @@ picture source {
   color: var(--color-premium-white, #f8f9fa);
   font-size: .875rem;
   text-align: center;
+}
+
+/* --- Avisos del sitio (partials/_mensajes.html) ------------------------------
+   Flotan bajo la cabecera, sobre la pagina y por debajo del panel de Quantum
+   Coach (z-index 79-80). El color solo marca el tipo con una franja fina: un
+   aviso informa, no alarma. Como mucho se ven tres a la vez. */
+
+.gtg-avisos {
+  position: fixed;
+  top: calc(76px + var(--space-3));
+  right: var(--space-4);
+  z-index: 60;
+  display: grid;
+  gap: var(--space-2);
+  width: min(380px, calc(100vw - 2 * var(--space-4)));
+  pointer-events: none;
+}
+
+.gtg-aviso {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  color: var(--color-text-primary);
+  animation: gtg-aviso-entra var(--motion-ui) var(--motion-easing);
+}
+
+.gtg-aviso:nth-last-child(n + 4) { display: none; }
+.gtg-aviso--warning { border-left-color: var(--color-gold); }
+.gtg-aviso--error { border-left-color: var(--color-danger); }
+
+.gtg-aviso__texto {
+  flex: 1;
+  margin: 2px 0 0;
+  font-size: var(--font-size-small);
+  line-height: 1.45;
+}
+
+.gtg-aviso__cerrar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--motion-fast) ease, background-color var(--motion-fast) ease;
+}
+
+.gtg-aviso__cerrar svg { width: 16px; height: 16px; }
+
+.gtg-aviso__cerrar:hover,
+.gtg-aviso__cerrar:focus-visible {
+  color: var(--color-text-primary);
+  background: var(--color-bg-card);
+}
+
+.gtg-aviso__cerrar:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.gtg-aviso.is-saliendo { animation: gtg-aviso-sale var(--motion-ui) var(--motion-easing) forwards; }
+
+@keyframes gtg-aviso-entra {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes gtg-aviso-sale {
+  to { opacity: 0; transform: translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gtg-aviso,
+  .gtg-aviso.is-saliendo { animation: none; }
+}
+
+@media print {
+  .gtg-avisos { display: none; }
+}
+
+/* Bajo 900px la cabecera mide 64px. */
+@media (max-width: 900px) {
+  .gtg-avisos { top: calc(64px + var(--space-2)); }
+}
+
+@media (max-width: 640px) {
+  .gtg-avisos {
+    right: var(--space-4);
+    left: var(--space-4);
+    width: auto;
+  }
 }

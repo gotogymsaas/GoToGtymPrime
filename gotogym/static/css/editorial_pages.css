@@ -160,10 +160,14 @@
   gap: 16px; align-items: center;
 }
 .medida-guia__dibujo { display: block; width: 100%; height: auto; }
-@container (min-width: 640px) {
-  .account-medidas { grid-template-columns: minmax(0,1fr) 240px; grid-template-areas: "form guia"; gap: 40px; align-items: start; }
-  .medida-guia { grid-template-columns: 1fr; gap: 20px; }
-  .medida-guia__dibujo { max-width: 190px; margin-inline: auto; }
+/* Ancha: tres columnas de alto parecido -- campos uno debajo del otro,
+   el dibujo grande al centro y las indicaciones a su lado. */
+@container (min-width: 760px) {
+  .account-medidas { grid-template-columns: minmax(240px, 1fr) minmax(0, 1.6fr); grid-template-areas: "form guia"; gap: 48px; align-items: start; }
+  .account-medidas__form { grid-template-columns: 1fr; }
+  .medida-guia { grid-template-columns: minmax(170px, 230px) minmax(0, 1fr); gap: 28px; }
+  .medida-guia__pasos { gap: 18px; }
+  .medida-guia__pasos li { font-size: .88rem; }
 }
 .medida-guia [data-medida] { --cinta-grosor: 1.75px; --cinta-trazo: 4 3; --marca: var(--ed-ink); }
 .account-medidas:has(#medida-chest_cm:focus) [data-medida="chest_cm"],
