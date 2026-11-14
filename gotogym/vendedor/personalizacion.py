@@ -83,7 +83,8 @@ def _volver():
 
 
 def _vinculado(user):
-    return ExternalIdentityLink.objects.filter(user=user).exists()
+    issuer = (getattr(settings, "GOTOGYM_OIDC", {}) or {}).get("ISSUER")
+    return bool(issuer) and ExternalIdentityLink.objects.filter(user=user, issuer=issuer).exists()
 
 
 def contexto(user, now=None):
