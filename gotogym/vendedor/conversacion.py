@@ -22,17 +22,17 @@ CLAVE_SESION = 'vendedor_conversacion'
 INACTIVIDAD_SEGUNDOS = 30 * 60
 
 
-def _nueva(ahora):
-    return {'id': f'shop-{uuid.uuid4()}', 'turnos': 0, 'ultimo': ahora}
+def _nueva(ahora, binding=None):
+    return {'id': f'shop-{uuid.uuid4()}', 'turnos': 0, 'ultimo': ahora, 'binding': binding}
 
 
-def obtener(sesion, ahora=None, reiniciar=False):
+def obtener(sesion, ahora=None, reiniciar=False, binding=None):
     """Conversacion vigente, o una nueva si no hay, caduco o se pide otra."""
     ahora = time.time() if ahora is None else ahora
     estado = sesion.get(CLAVE_SESION)
     caducada = bool(estado) and ahora - estado.get('ultimo', 0) > INACTIVIDAD_SEGUNDOS
-    if not estado or reiniciar or caducada:
-        estado = _nueva(ahora)
+    if not estado or reiniciar or caducada or estado.get('binding') != binding:
+        estado = _nueva(ahora, binding)
         sesion[CLAVE_SESION] = estado
     return estado
 
