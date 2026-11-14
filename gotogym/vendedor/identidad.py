@@ -19,6 +19,7 @@ import base64
 import hashlib
 import hmac
 import json
+import logging
 import secrets
 import time
 
@@ -29,6 +30,8 @@ from .models import CommercePersonalizationConsent
 
 AUDIENCIA = 'coach-commerce'
 EMISOR = 'gotogym-prime'
+logger = logging.getLogger(__name__)
+
 VIDA_SEGUNDOS = 60
 _DOMINIO = b'gotogym-commerce-identity-v1.'
 
@@ -56,18 +59,29 @@ def emitir(user, ahora=None):
     `None` si: no hay usuario, no hay credencial, la cuenta no esta vinculada
     o no tiene ningun scope vigente. Ninguno de esos casos es un error."""
     if user is None or not user.is_authenticated:
+        logger.info('commerce_identity_not_emitted reason=anonymous')
         return None
     par = credencial()
     if par is None:
+        logger.warning('commerce_identity_not_emitted reason=credentials_missing')
         return None
     issuer = settings.GOTOGYM_OIDC.get('ISSUER')
-    link = ExternalIdentityLink.objects.filter(user=user, issuer=issuer).first() if issuer else None
+    if not issuer:
+        logger.warning('commerce_identity_not_emitted reason=issuer_missing')
+        return None
+    link = ExternalIdentityLink.objects.filter(user=user, issuer=issuer).first()
     if link is None:
+        logger.info('commerce_identity_not_emitted reason=oidc_link_missing')
         return None
     consent = CommercePersonalizationConsent.objects.filter(user=user).first()
-    scopes = consent.active_scopes() if consent else []
-    if not scopes:
+    if consent is None:
+        logger.info('commerce_identity_not_emitted reason=consent_missing')
         return None
+    scopes = consent.active_scopes()
+    if not scopes:
+        logger.info('commerce_identity_not_emitted reason=consent_inactive')
+        return None
+    logger.info('commerce_identity_emitted scope_count=%d', len(scopes))
 
     marca = int(time.time() if ahora is None else ahora)
     carga = {
