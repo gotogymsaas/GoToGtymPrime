@@ -13,6 +13,7 @@ from django.utils import timezone
 CONSENT_VALIDITY = timedelta(days=365)
 
 SCOPE_FIELDS = {
+    "profile.display_name": "display_name",
     "profile.basic": "profile_basic",
     "sports.preferences": "sports_preferences",
     "experiences.summary": "experiences_summary",
@@ -26,6 +27,7 @@ class CommercePersonalizationConsent(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
         related_name="commerce_personalization_consent",
     )
+    display_name = models.BooleanField(default=False)
     profile_basic = models.BooleanField(default=False)
     sports_preferences = models.BooleanField(default=False)
     experiences_summary = models.BooleanField(default=False)
