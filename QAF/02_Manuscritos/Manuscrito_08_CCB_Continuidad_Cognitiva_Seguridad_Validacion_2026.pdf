@@ -1,0 +1,546 @@
+%PDF-1.4
+%QAF2026
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R] /Count 9 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Length 2632 >>
+stream
+0.09 0.16 0.23 rg 0 0 612 792 re f
+0.00 0.63 0.61 rg 45 648 522 7 re f
+1 1 1 rg BT /F2 13 Tf 1 0 0 1 46.0 743.0 Tm (GoToGym  /  QAF) Tj ET
+0.25 0.85 0.79 rg BT /F2 10 Tf 1 0 0 1 46.0 708.0 Tm (SERIE COGNITIVE COMMERCE BRIDGE) Tj ET
+1 1 1 rg BT /F2 18 Tf 1 0 0 1 46.0 608.0 Tm (MANUSCRITO 08) Tj ET
+1 1 1 rg BT /F2 17.3 Tf 1 0 0 1 46.0 570.0 Tm (Cognitive Commerce Bridge III: continuidad) Tj ET
+1 1 1 rg BT /F2 17.3 Tf 1 0 0 1 46.0 544.0 Tm (cognitiva omnicanal, transición de) Tj ET
+1 1 1 rg BT /F2 17.3 Tf 1 0 0 1 46.0 518.0 Tm (sesiones, seguridad y validación) Tj ET
+1 1 1 rg BT /F2 17.3 Tf 1 0 0 1 46.0 492.0 Tm (experimental) Tj ET
+0.00 0.63 0.61 rg 45 403 522 2 re f
+0.25 0.85 0.79 rg BT /F2 8.8 Tf 1 0 0 1 46.0 380.0 Tm (RESUMEN DE INVESTIGACION / ESPECIFICACION DE INGENIERIA) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 354.0 Tm (Una conversación puede comenzar como visitante y continuar tras el inicio de sesión.) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 340.5 Tm (En Prime, vendedor.js conserva un historial visual en sessionStorage bajo una clave) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 327.0 Tm (única; en Django, CommerceContinuityStore separa los turnos comerciales por sujeto y) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 313.5 Tm (añade un distintivo de rol al modo vinculado. Este diseño evita parte de la mezcla de) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 300.0 Tm (memorias del servidor, pero no define explícitamente un protocolo de transición de) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 286.5 Tm (identidad para el navegador ni un mecanismo de continuidad cognitiva entre la persona) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 273.0 Tm (y la tienda. Se propone un ciclo de sesión robusto con identidad de época, rotación) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 259.5 Tm (de conversación, no transferencia automática de diálogos anónimos a memorias) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 246.0 Tm (personales, continuidad comercial consentida y pruebas adversariales de dos usuarios,) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 232.5 Tm (revocación y recuperación ante fallos. El método reaprovecha los principios) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 219.0 Tm (comprobados por código en Business/Admin \(ámbitos, fuentes y proyecciones\) sin) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 205.5 Tm (habilitar herramientas de gestión ni memoria privada para el vendedor.) Tj ET
+0.25 0.85 0.79 rg BT /F2 9 Tf 1 0 0 1 46.0 91.0 Tm (DOCUMENTO DE PROPUESTA - NO ES UNA VALIDACION PRODUCTIVA) Tj ET
+1 1 1 rg BT /F1 8.6 Tf 1 0 0 1 46.0 65.0 Tm (14 NOVIEMBRE 2026  |  GoToGtymPrime + appdesplegada) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 5198 >>
+stream
+1 1 1 rg 0 0 612 792 re f
+0.09 0.16 0.23 rg 0 767 612 25 re f
+1 1 1 rg BT /F2 8.2 Tf 1 0 0 1 48.0 775.0 Tm (GoToGym  /  QAF RESEARCH & ENGINEERING) Tj ET
+1 1 1 rg BT /F1 7.8 Tf 1 0 0 1 380.0 775.0 Tm (COGNITIVE COMMERCE BRIDGE   |   2026) Tj ET
+0.00 0.49 0.49 RG 1.2 w 48 752 m 564 752 l S
+0.00 0.49 0.49 rg BT /F2 17 Tf 1 0 0 1 48.0 712.0 Tm (Manuscrito científico-técnico 08) Tj ET
+0.00 0.49 0.49 rg BT /F2 13.7 Tf 1 0 0 1 48.0 665.0 Tm (Cognitive Commerce Bridge III: continuidad cognitiva omnicanal,) Tj ET
+0.00 0.49 0.49 rg BT /F2 13.7 Tf 1 0 0 1 48.0 647.0 Tm (transición de sesiones, seguridad y validación experimental) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 615.0 Tm (GoToGym / QAF | Especificación de implementación y protocolo experimental | v1.0 |) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 601.8 Tm (14-11-2026) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 584.6 Tm (Aplicaciones: GoToGtymPrime \(Shop\) y appdesplegada \(Quantum Coach\).) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 567.4 Tm (Naturaleza: propuesta técnica basada en inspección de código y conversaciones de prueba;) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 554.2 Tm (no declara resultados de rendimiento ni despliegue realizado.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 537.0 Tm (Dependencias: manuscrito 06 \(identidad/consentimiento\) y manuscrito 07 \(broker de) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 523.8 Tm (conocimiento\).) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 491.6 Tm (Resumen) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 471.6 Tm (Una conversación puede comenzar como visitante y continuar tras el inicio de sesión. En Prime,) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 458.4 Tm (vendedor.js conserva un historial visual en sessionStorage bajo una clave única; en Django,) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 445.2 Tm (CommerceContinuityStore separa los turnos comerciales por sujeto y añade un distintivo de rol) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 432.0 Tm (al modo vinculado. Este diseño evita parte de la mezcla de memorias del servidor, pero no) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 418.8 Tm (define explícitamente un protocolo de transición de identidad para el navegador ni un) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 405.6 Tm (mecanismo de continuidad cognitiva entre la persona y la tienda. Se propone un ciclo de sesión) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 392.4 Tm (robusto con identidad de época, rotación de conversación, no transferencia automática de) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 379.2 Tm (diálogos anónimos a memorias personales, continuidad comercial consentida y pruebas) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 366.0 Tm (adversariales de dos usuarios, revocación y recuperación ante fallos. El método reaprovecha) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 352.8 Tm (los principios comprobados por código en Business/Admin \(ámbitos, fuentes y proyecciones\) sin) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 339.6 Tm (habilitar herramientas de gestión ni memoria privada para el vendedor.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 319.4 Tm (Palabras clave: continuidad cognitiva, namespace, zero trust, session fixation,) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 306.2 Tm (conversación, seguridad, privacidad, SVMCA, pruebas E2E.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 274.0 Tm (1. Evidencia y problema) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 252.0 Tm (Observación: el usuario puede chatear anónimamente, iniciar sesión, ver el nombre en la) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 238.8 Tm (barra de Shop y continuar en un panel cuyo agente todavía afirma desconocerlo. Repetir la) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 225.6 Tm (prueba tras minutos de espera no corrigió la situación; activación de flags de Azure no) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 212.4 Tm (es validación semántica.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 195.2 Tm (Hipótesis H3: la ausencia de un evento confiable de transición de identidad, junto con la) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 182.0 Tm (falta del bridge verificado o la proyección mínima de nombre, impide la experiencia de) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 168.8 Tm (continuidad personalizada.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 151.6 Tm (Pregunta: ¿cómo ofrecer continuidad en el navegador manteniendo separados los contextos) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 138.4 Tm (anónimo, comercial vinculado, personal, Business y Administrativo?) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 106.2 Tm (2. Línea base del código) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 85.2 Tm (Fuente | Comportamiento comprobable) Tj ET
+0.00 0.49 0.49 RG 0.65 w 48 46 m 564 46 l S
+0.45 0.52 0.57 rg BT /F1 7.8 Tf 1 0 0 1 48.0 32.0 Tm (QAF / COGNITIVE COMMERCE BRIDGE  |  Especificacion propuesta) Tj ET
+0.45 0.52 0.57 rg BT /F2 8.2 Tf 1 0 0 1 525.0 32.0 Tm (01 / 08) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 5975 >>
+stream
+1 1 1 rg 0 0 612 792 re f
+0.09 0.16 0.23 rg 0 767 612 25 re f
+1 1 1 rg BT /F2 8.2 Tf 1 0 0 1 48.0 775.0 Tm (GoToGym  /  QAF RESEARCH & ENGINEERING) Tj ET
+1 1 1 rg BT /F1 7.8 Tf 1 0 0 1 380.0 775.0 Tm (COGNITIVE COMMERCE BRIDGE   |   2026) Tj ET
+0.00 0.49 0.49 RG 1.2 w 48 752 m 564 752 l S
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 724.0 Tm (gotogym/static/js/vendedor.js | guarda el historial visual en sessionStorage con una clave global) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 712.6 Tm (gtg_vendedor_historial; no se observó una clave distinta por identidad) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 699.2 Tm (gotogym/vendedor/conversacion.py | crea conversation_id de servidor, cuenta turnos en la sesión,) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 687.8 Tm (caduca tras 30 minutos) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 674.4 Tm (gotogym/vendedor/paquete.py | request.user autenticado -> shop_u_; visitante -> shop_v_; identidad) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 663.0 Tm (v2 opcional) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 649.6 Tm (gotogym/vendedor/views.py | en cada mensaje construye paquete a partir de request real) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 636.2 Tm (backend/api/commerce_agent/continuity.py | _digest calcula la clave desde sujeto, conversation_id y) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 624.8 Tm (sufijo de rol cuando COMMERCE_LINKED) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 611.4 Tm (backend/api/commerce_agent/principal.py | COMMERCE_LINKED exige sujeto shop_u_ y firma de servicio) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 598.0 Tm (backend/api/commerce_agent/turn.py | usa CommerceContinuityStore y CanonicalConversationPipeline,) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 586.6 Tm (no el contexto personal de usuario) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 573.2 Tm (backend/api/superagent/ai_role_isolation.py | contextos separados por tenant, rol, sujeto y) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 561.8 Tm (conversación) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 548.4 Tm (backend/api/superagent/business_conversation_context.py | proyecta solo estado relevante, no) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 537.0 Tm (historial sin límites) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 523.6 Tm (backend/api/superagent/admin_conversation_context.py | contexto reciente de un actor/conversación) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 512.2 Tm (autorizados) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 498.8 Tm (backend/api/superagent/canonical_privacy.py | separa contexto interno de evidencia externa) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 487.4 Tm (redactada) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 468.0 Tm (Inferencia importante: un historial que el navegador pinta después de iniciar sesión no) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 454.8 Tm (demuestra que Django haya recuperado la misma conversación, ni que ésta tenga autoridad) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 441.6 Tm (para vincular la cuenta. En sentido inverso, un servidor que mantenga aislados los) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 428.4 Tm (estados tampoco impide que el navegador muestre mensajes de una cuenta previa si la clave) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 415.2 Tm (local no cambia.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 383.0 Tm (3. Modelo de estados de sesión) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 363.0 Tm (Definimos:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 348.8 Tm (- S0 = visitante anónimo, sin identidad personal.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 334.1 Tm (- S1 = usuario autenticado solo en Prime, pero sin vínculo verificable.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 319.4 Tm (- S2 = autenticado y vinculado en Prime y Django, sin scopes consentidos activos.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 304.7 Tm (- S3 = autenticado, vinculado y con scopes autorizados: COMMERCE_LINKED.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 290.0 Tm (- S4 = consentimiento revocado o expirado durante la conversación.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 275.3 Tm (- S5 = logout, sesión caducada o cambio a otra cuenta.) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 251.6 Tm (stateDiagram-v2) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 240.9 Tm ([*] --> S0) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 230.2 Tm (S0 --> S1: login Prime) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 219.5 Tm (S1 --> S2: vínculo OIDC verificado) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 208.8 Tm (S2 --> S3: consentimiento explícito) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 198.1 Tm (S3 --> S4: revocar / expirar) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 187.4 Tm (S3 --> S5: logout / cambio de usuario) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 176.7 Tm (S4 --> S3: nueva autorización) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 166.0 Tm (S1 --> S5: logout) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 155.3 Tm (S2 --> S5: logout) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 144.6 Tm (S5 --> S0: nueva sesión anónima) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 121.9 Tm (Invariante T1: una transición de estado de identidad rota la conversación servidor para) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 108.7 Tm (ese principal o cambia su espacio de nombres; no se leen turnos de otro rol ni de otro) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 95.5 Tm (usuario.) Tj ET
+0.00 0.49 0.49 RG 0.65 w 48 46 m 564 46 l S
+0.45 0.52 0.57 rg BT /F1 7.8 Tf 1 0 0 1 48.0 32.0 Tm (QAF / COGNITIVE COMMERCE BRIDGE  |  Especificacion propuesta) Tj ET
+0.45 0.52 0.57 rg BT /F2 8.2 Tf 1 0 0 1 525.0 32.0 Tm (02 / 08) Tj ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 5903 >>
+stream
+1 1 1 rg 0 0 612 792 re f
+0.09 0.16 0.23 rg 0 767 612 25 re f
+1 1 1 rg BT /F2 8.2 Tf 1 0 0 1 48.0 775.0 Tm (GoToGym  /  QAF RESEARCH & ENGINEERING) Tj ET
+1 1 1 rg BT /F1 7.8 Tf 1 0 0 1 380.0 775.0 Tm (COGNITIVE COMMERCE BRIDGE   |   2026) Tj ET
+0.00 0.49 0.49 RG 1.2 w 48 752 m 564 752 l S
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 723.0 Tm (T2: los mensajes escritos por un visitante pueden seguir visualmente disponibles en esa) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 709.8 Tm (pestaña si no han cambiado de propietario y existe aviso claro, pero no se importan) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 696.6 Tm (automáticamente a la memoria personal.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 679.4 Tm (T3: al cambiar a otra cuenta o cerrar sesión se eliminan/ocultan mensajes privados de la) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 666.2 Tm (cuenta anterior.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 649.0 Tm (T4: el contexto personal se recompone de fuentes canónicas cada turno, no de un historial) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 635.8 Tm (anterior tomado como autoridad.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 618.6 Tm (T5: la revocación de permisos borra o invalida las proyecciones personalizadas antes del) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 605.4 Tm (siguiente turno.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 573.2 Tm (4. Protocolo de transición AUTH_CONTEXT_CHANGED) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 553.2 Tm (Se propone implementar una señal de versión de identidad generada por el servidor) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 540.0 Tm (\(identity_epoch\), no por el LLM ni un ID aportado por el navegador.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 519.8 Tm (En Prime) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 503.6 Tm (- Middleware o vista de estado obtiene clase de identidad: anonymous / local_only /) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 490.9 Tm (linked_no_consent / linked_consented.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 476.2 Tm (- El servidor mantiene una clave de sesión privada para un "epoch" opaco y la incrementa) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 463.5 Tm (ante login, logout, cambio de usuario o cambio significativo de permisos.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 448.8 Tm (- El cliente consulta GET same-origin /es/vendedor/estado/ \(nuevo endpoint propuesto\)) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 436.1 Tm (con CSRF según el método, Cache-Control: no-store, respuesta limitada: {mode,) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 423.4 Tm (session_epoch, personalization_ready, invitation_required}.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 408.7 Tm (- Si cambia session_epoch, vendedor.js no reutiliza la misma entrada de sessionStorage;) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 396.0 Tm (genera una partición de historial por epoch o elimina el historial anterior. El epoch no) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 383.3 Tm (es usuario id, oid, email ni token.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 368.6 Tm (- El chat solicita una conversación nueva con el flag "new" o un reinicio de estado del) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 355.9 Tm (servidor, y muestra un aviso contextual accesible.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 341.2 Tm (- El servidor no acepta session_epoch enviado por el cliente como autoridad.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 320.5 Tm (En Django) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 304.3 Tm (- ContinuityStore conserva memoria comercial bajo tenant + role + subject +) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 291.6 Tm (conversation_id.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 276.9 Tm (- El rol vinculado no se convierte en PERSONAL, y las memorias personales no se insertan) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 264.2 Tm (en CommerceContinuityStore.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 249.5 Tm (- En cada turno el Cognitive Commerce Bridge resuelve y autoriza una proyección nueva.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 234.8 Tm (- Ante una revocación, los estados COMMERCE_LINKED ya persistidos que podrían incluir) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 222.1 Tm (contexto personal deben invalidarse o limpiarse; no basta solo con omitir la nueva) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 209.4 Tm (proyección si el LLM puede leer el historial anterior.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 194.7 Tm (- La continuidad de la persona en la app y la continuidad comercial son vistas separadas) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 182.0 Tm (de la misma identidad verificada, no la misma bolsa de historial.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 151.3 Tm (5. Modelo matemático de continuidad segura) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 131.3 Tm (Sea X_t el estado conversacional del vendedor en turno t. Sea P_t la proyección autorizada del) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 118.1 Tm (perfil en ese turno; A_t, el conjunto vigente de scopes. Sea M_t la memoria comercial del) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 104.9 Tm (ámbito actual.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 86.7 Tm (Actualización propuesta:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 68.5 Tm (X_\(t+1\) = F\(X_t, pregunta_t, Catalogo_t, P_t, M_t, role_t\)) Tj ET
+0.00 0.49 0.49 RG 0.65 w 48 46 m 564 46 l S
+0.45 0.52 0.57 rg BT /F1 7.8 Tf 1 0 0 1 48.0 32.0 Tm (QAF / COGNITIVE COMMERCE BRIDGE  |  Especificacion propuesta) Tj ET
+0.45 0.52 0.57 rg BT /F2 8.2 Tf 1 0 0 1 525.0 32.0 Tm (03 / 08) Tj ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 5699 >>
+stream
+1 1 1 rg 0 0 612 792 re f
+0.09 0.16 0.23 rg 0 767 612 25 re f
+1 1 1 rg BT /F2 8.2 Tf 1 0 0 1 48.0 775.0 Tm (GoToGym  /  QAF RESEARCH & ENGINEERING) Tj ET
+1 1 1 rg BT /F1 7.8 Tf 1 0 0 1 380.0 775.0 Tm (COGNITIVE COMMERCE BRIDGE   |   2026) Tj ET
+0.00 0.49 0.49 RG 1.2 w 48 752 m 564 752 l S
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 725.0 Tm (sujeta a:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 706.8 Tm (role_t in {COMMERCE, COMMERCE_LINKED}) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 693.6 Tm (P_t = empty si role_t != COMMERCE_LINKED) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 680.4 Tm (P_t ? Allowlist\(A_t\)) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 667.2 Tm (Namespace\(X_t\) = \(tenant, role_t, shop_subject_t, conversation_id_t\)) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 654.0 Tm (Namespace\(X_t\) != Namespace\(X_t'\) para usuarios/roles ajenos.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 635.8 Tm (Criterio de consistencia de sesión:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 617.6 Tm (StableEpoch\(t,t+1\) = \(principal_t == principal_\(t+1\)\)) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 604.4 Tm (AND \(role_t == role_\(t+1\)\)) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 591.2 Tm (AND \(consent_version_t == consent_version_\(t+1\)\)) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 573.0 Tm (Si StableEpoch es falso, no se deben copiar tokens, hechos, historial private-mode o "working) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 559.8 Tm (hypotheses" al nuevo contexto. Solo puede reanudarse un estado anonimizado y expresamente) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 546.6 Tm (seleccionado por el usuario.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 526.4 Tm (Propuesta QAF de decisión de restauración:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 510.2 Tm (- C_t: coherencia entre identidad actual y propietario del historial \(booleano,) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 497.5 Tm (obligación absoluta\).) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 482.8 Tm (- I_t: utilidad conversacional del estado que se pretende restaurar \(medida en pruebas\).) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 468.1 Tm (- eta_t: ahorro relativo de preguntas repetidas por evidencia consentida.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 453.4 Tm (- S_t: incertidumbre sobre origen/vigencia del dato.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 439.7 Tm (La restauración se permite solo si C_t = 1 y no hay conflicto de finalidad; los otros) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 426.5 Tm (indicadores optimizan la experiencia dentro del conjunto seguro. Ninguna suma ponderada puede) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 413.3 Tm (compensar C_t = 0.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 383.1 Tm (6. Reutilización de Business/Admin: patrón, no permisos) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 363.1 Tm (El rol BUSINESS se resuelve contra membresía activa de organización y restringe herramientas) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 349.9 Tm (de negocio; ADMIN se limita a usuarios y acciones administrativas autorizadas. Para Commerce) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 336.7 Tm (se adopta el mismo patrón:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 322.5 Tm (- contexto inmutable de rol y propietario;) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 307.8 Tm (- selección mínima de evidencias por pregunta;) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 293.1 Tm (- historial reciente limitado y por conversación;) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 278.4 Tm (- distinción entre evidencia histórica y hechos actuales;) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 263.7 Tm (- auditoría y guardrails antes de narración;) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 249.0 Tm (- escritura reversible, sujeta a confirmación humana.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 230.3 Tm (No se debe conceder Business read, Admin read, personal.memory.write ni herramientas de salud) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 217.1 Tm (al rol COMMERCE_LINKED. El usuario puede pedir "qué sabes de mí", pero la respuesta solo) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 203.9 Tm (enumera categorías de datos permitidas y hechos ya autorizados, no toda su historia personal.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 173.7 Tm (7. Matriz de amenazas y controles) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 152.7 Tm (Amenaza | Escenario | Control indispensable) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 139.3 Tm (Cambio de cuenta en pestaña compartida | La persona B ve historial de A | Epoch por sesión,) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 127.9 Tm (limpieza de UI, separación de servidor) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 114.5 Tm (Account linking indebido | Coincidencia de correo crea vínculo de identidad | Par issuer + oid,) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 103.1 Tm (prueba de posesión y revisión JIT) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 89.7 Tm (Confused deputy | Credencial del vendedor lee memoria PERSONAL | Broker interior gobernado;) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 78.3 Tm (Commerce no puede llamar personal.read) Tj ET
+0.00 0.49 0.49 RG 0.65 w 48 46 m 564 46 l S
+0.45 0.52 0.57 rg BT /F1 7.8 Tf 1 0 0 1 48.0 32.0 Tm (QAF / COGNITIVE COMMERCE BRIDGE  |  Especificacion propuesta) Tj ET
+0.45 0.52 0.57 rg BT /F2 8.2 Tf 1 0 0 1 525.0 32.0 Tm (04 / 08) Tj ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Length 5761 >>
+stream
+1 1 1 rg 0 0 612 792 re f
+0.09 0.16 0.23 rg 0 767 612 25 re f
+1 1 1 rg BT /F2 8.2 Tf 1 0 0 1 48.0 775.0 Tm (GoToGym  /  QAF RESEARCH & ENGINEERING) Tj ET
+1 1 1 rg BT /F1 7.8 Tf 1 0 0 1 380.0 775.0 Tm (COGNITIVE COMMERCE BRIDGE   |   2026) Tj ET
+0.00 0.49 0.49 RG 1.2 w 48 752 m 564 752 l S
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 724.0 Tm (Replay | Reenvío de aserción firmada | iat, exp <=60 s, jti atómico en cache compartida) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 710.6 Tm (Elevación de scope | Cliente envía scopes extra o cambia consent_version | Consentimiento resuelto) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 699.2 Tm (en Prime y forma cerrada en Django) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 685.8 Tm (Prompt injection | Historia/catálogo incluye instrucciones maliciosas | Tratar evidencia como dato;) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 674.4 Tm (validación de respuesta y acciones) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 661.0 Tm (Consentimiento revocado | Un estado cacheado sigue usando hechos anteriores | Invalidación por) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 649.6 Tm (scope/versión/epoch; nueva proyección cada turno) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 636.2 Tm (Filtración mediante logs | Telemetría registra PII o secretos | Solo códigos enumerados,) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 624.8 Tm (request_id, sin preguntas o perfiles) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 611.4 Tm (Conversación cruzada | Reutilizar conversation_id ajeno | ID emitido por servidor; digest) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 600.0 Tm (sujeto+rol+conversación) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 586.6 Tm (Desincronización entre servicios | Prime vinculado, Django sin vínculo | Fallo en modo anónimo y) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 575.2 Tm (diagnóstico seguro) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 561.8 Tm (Denegación por infraestructura | Cache/Redis no disponible | Falla cerrada de identidad; catálogo) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 550.4 Tm (público opera si es seguro) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 537.0 Tm (Falsa identificación por LLM | Modelo responde "sé tu nombre" sin evidencia | Hecho de identidad) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 525.6 Tm (requerido, respuesta verificable) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 496.2 Tm (8. Algoritmo de transición) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 471.2 Tm (def on_commerce_request\(request, session_state, now\):) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 460.5 Tm (principal = trusted_principal_from_django_session\(request\)) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 449.8 Tm (classification = classify_commerce_identity\(principal\) # sin datos del navegador) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 439.1 Tm (consent_v = active_consent_version_or_zero\(principal\)) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 428.4 Tm (current_epoch = \(classification, principal.internal_session_key, consent_v\)) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 417.7 Tm (previous_epoch = session_state.get\("commerce_epoch_binding"\)) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 402.0 Tm (if previous_epoch != current_epoch:) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 391.3 Tm (# Sin heredar privilegios ni historial del principal anterior.) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 380.6 Tm (session_state["commerce_epoch_binding"] = current_epoch) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 369.9 Tm (session_state["vendedor_conversacion"] = new_server_conversation\(now\)) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 359.2 Tm (session_state["commerce_client_epoch"] = opaque_random_nonce\(\)) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 343.5 Tm (return session_state["commerce_client_epoch"]) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 320.8 Tm (Precaución de diseño: el identificador de epoch enviado a la UI debe ser un nonce) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 307.6 Tm (aleatorio y no una representación reutilizable de IDs personales. Evitar duplicar esta) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 294.4 Tm (lógica entre view y middleware; hacer una única autoridad del estado.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 262.2 Tm (9. Contrato de observabilidad mínima) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 242.2 Tm (Proponer eventos de cardinalidad baja:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 228.0 Tm (- commerce.chat_turn.ok; commerce.chat_turn.error) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 213.3 Tm (- commerce.identity.anonymous / local_only / verified / rejected) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 198.6 Tm (- commerce.identity.reason_code \(sin PII\)) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 183.9 Tm (- commerce.context.scope_count, fact_count, withheld_count) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 169.2 Tm (- commerce.context.revocation_effective) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 154.5 Tm (- commerce.session.transition, reset, conflicting_epoch) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 139.8 Tm (- commerce.safety.cross_subject_denied) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 125.1 Tm (- commerce.experience.personalization_accepted) Tj ET
+0.00 0.49 0.49 RG 0.65 w 48 46 m 564 46 l S
+0.45 0.52 0.57 rg BT /F1 7.8 Tf 1 0 0 1 48.0 32.0 Tm (QAF / COGNITIVE COMMERCE BRIDGE  |  Especificacion propuesta) Tj ET
+0.45 0.52 0.57 rg BT /F2 8.2 Tf 1 0 0 1 525.0 32.0 Tm (05 / 08) Tj ET
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 16 0 R >>
+endobj
+18 0 obj
+<< /Length 6460 >>
+stream
+1 1 1 rg 0 0 612 792 re f
+0.09 0.16 0.23 rg 0 767 612 25 re f
+1 1 1 rg BT /F2 8.2 Tf 1 0 0 1 48.0 775.0 Tm (GoToGym  /  QAF RESEARCH & ENGINEERING) Tj ET
+1 1 1 rg BT /F1 7.8 Tf 1 0 0 1 380.0 775.0 Tm (COGNITIVE COMMERCE BRIDGE   |   2026) Tj ET
+0.00 0.49 0.49 RG 1.2 w 48 752 m 564 752 l S
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 725.0 Tm (No registrar textos de las preguntas, respuestas, nombre, correo, oid, claims OIDC, secret ni) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 711.8 Tm (memorias. Correlacionar con request_id de corto alcance y trazas de servicio, evitando IDs) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 698.6 Tm (persistentes en dashboards. Definir tableros de conversión sin unir la telemetría de bienestar) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 685.4 Tm (a publicidad individual.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 655.2 Tm (10. Experimentos y validación E2E) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 635.2 Tm (Proponer un corpus de 60 recorridos: 20 identidad/consentimiento, 20 continuidad/memoria, 20) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 622.0 Tm (seguridad/resiliencia. Dos usuarios sintéticos A y B, uno con cuenta legacy; incluir) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 608.8 Tm (conversación guest->login->logout->nuevo login, sesiones en varias pestañas y permisos) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 595.6 Tm (revocados.) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 576.4 Tm (Código | Recorrido | Criterio) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 563.0 Tm (E01 | Visitante consulta productos | Respuesta comercial correcta, sin perfil) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 549.6 Tm (E02 | Visitante inicia sesión y cuenta vinculada | Cambia modo al siguiente turno, tras) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 538.2 Tm (consentimiento) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 524.8 Tm (E03 | Usuario inicia sesión con cuenta Prime local sin enlace | No se autovincula; muestra acción) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 513.4 Tm (útil de enlace) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 500.0 Tm (E04 | Usuario inicia sesión como A, luego como B en la misma pestaña | B nunca ve historial privado) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 488.6 Tm (de A) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 475.2 Tm (E05 | A desactiva permiso durante chat | Datos de scope revocado ausentes inmediatamente) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 461.8 Tm (E06 | Nombre autorizado y presente en User.full_name | Saluda con nombre correcto sin volver a) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 450.4 Tm (preguntar) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 437.0 Tm (E07 | Nombre ausente en perfil | Pregunta cómo desea ser llamado, no lo adivina) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 423.6 Tm (E08 | Deporte y compras autorizados | Recomienda prendas reales con procedencia del catálogo) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 410.2 Tm (E09 | Memoria episódica no autorizada | No lee ni revela anécdotas personales) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 396.8 Tm (E10 | Fecha de experiencia caducada | No la presenta como preferencia vigente) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 383.4 Tm (E11 | Perfil Django con dos correos similares | Solo identifica por issuer/oid) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 370.0 Tm (E12 | Caída de Redis working_state | No acepta replay ni personaliza sin prueba confiable) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 356.6 Tm (E13 | Error de Django comercial | UI ofrece reintentar sin exponer diagnóstico privado) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 343.2 Tm (E14 | Chat extendido y paginación | No sobrepasa límites ni mezcla roles) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 329.8 Tm (E15 | Solicitud administrativa dentro de Shop | Deniega acción y mantiene rol comercial) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 316.4 Tm (E16 | Pregunta sobre métricas clínicas | Rechaza uso comercial de salud no consentida) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 303.0 Tm (E17 | Login desde otra pestaña | Detecta cambio o reinicia en interacción siguiente) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 289.6 Tm (E18 | Browser history restaurado después de 30 minutos | Descartar historial caducado y resetear) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 278.2 Tm (contexto) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 264.8 Tm (E19 | Consentimiento caducado anual | No interpreta un toggle antiguo como autorización) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 251.4 Tm (E20 | Key Vault rota clave | Servicio y aserciones continúan con ventana de transición segura) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 232.0 Tm (Métricas primarias \(todas sujetas a ensayo, no resultados\): tasa de reconocimiento) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 218.8 Tm (correcto, porcentaje de turnos sin repetición de preguntas ya respondidas y autorizadas,) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 205.6 Tm (cero mezclas entre usuarios, revocación efectiva a primer turno, latencia P95, tasa de) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 192.4 Tm (respuestas sin evidencia, porcentaje de sugerencias con respaldo en catálogo. Medir) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 179.2 Tm (utilidad comercial mediante evaluación humana ciega antes de inferir incremento de) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 166.0 Tm (conversión.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 133.8 Tm (11. Diseño experimental QAF y decisiones) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 113.8 Tm (Se propone una comparación por cohortes:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 99.6 Tm (- Control: COMMERCE, sin datos personales.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 84.9 Tm (- Grupo P: COMMERCE_LINKED con perfil básico autorizado.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 70.2 Tm (- Grupo M: COMMERCE_LINKED con broker de conocimiento ampliado opt-in.) Tj ET
+0.00 0.49 0.49 RG 0.65 w 48 46 m 564 46 l S
+0.45 0.52 0.57 rg BT /F1 7.8 Tf 1 0 0 1 48.0 32.0 Tm (QAF / COGNITIVE COMMERCE BRIDGE  |  Especificacion propuesta) Tj ET
+0.45 0.52 0.57 rg BT /F2 8.2 Tf 1 0 0 1 525.0 32.0 Tm (06 / 08) Tj ET
+endstream
+endobj
+19 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 18 0 R >>
+endobj
+20 0 obj
+<< /Length 5732 >>
+stream
+1 1 1 rg 0 0 612 792 re f
+0.09 0.16 0.23 rg 0 767 612 25 re f
+1 1 1 rg BT /F2 8.2 Tf 1 0 0 1 48.0 775.0 Tm (GoToGym  /  QAF RESEARCH & ENGINEERING) Tj ET
+1 1 1 rg BT /F1 7.8 Tf 1 0 0 1 380.0 775.0 Tm (COGNITIVE COMMERCE BRIDGE   |   2026) Tj ET
+0.00 0.49 0.49 RG 1.2 w 48 752 m 564 752 l S
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 725.0 Tm (El usuario se asigna solo si hay consentimiento; sin consentimiento queda en control, nunca se) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 711.8 Tm (fuerza.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 698.6 Tm (Resultado de experiencia Y = correcta_recomendacion + no_repeticion + satisfacción; se) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 685.4 Tm (reportan componentes por separado para evitar pesos arbitrarios. Valor causal incremental de M) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 672.2 Tm (frente a P exige muestra y control de sesgo. La función QAF decide qué evidencia recuperar, no) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 659.0 Tm (el consentimiento, que es una restricción absoluta.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 628.8 Tm (12. Secuencia de implementación y plan de liberación) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 606.8 Tm (Fase 0 - diagnóstico y guardrails: ejecutar preflight Prime, comando de identidad,) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 593.6 Tm (commerce_readiness Django y verificar CI; obtener motivo real de fallbacks en cuenta de) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 580.4 Tm (prueba. Sin modificar usuarios ni secretos.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 563.2 Tm (Fase 1 - vínculo: verificar ambas tablas ExternalIdentityLink con issuer+oid, JIT seguro) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 550.0 Tm (y permisos vigentes. Prueba H1 del manuscrito 06.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 532.8 Tm (Fase 2 - contexto mínimo: agregar presentación de nombre autorizado y preferencias al) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 519.6 Tm (Context Broker, medir exactitud y comportamiento de fallback. Prueba H2 del manuscrito) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 506.4 Tm (07.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 489.2 Tm (Fase 3 - transición: gestionar cambio de identidad/epoch en vendedor.js y) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 476.0 Tm (conversacion.py; probar guest->login y logout.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 458.8 Tm (Fase 4 - memoria: habilitar proyección seleccionada por finalidad en canario opt-in, sin) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 445.6 Tm (abrir MemoryRetriever a Commerce.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 428.4 Tm (Fase 5 - aceptación: ensayos en PostgreSQL/Redis reales de staging, revisión de) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 415.2 Tm (seguridad, gradualidad, alertas y rollback.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 395.0 Tm (Los flags de infraestructura existentes se deben interpretar como condición de habilitación,) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 381.8 Tm (no como prueba funcional:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 367.6 Tm (- VENDEDOR_CONTRATO_V2 \(Prime\).) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 352.9 Tm (- COMMERCE_LINKED_CONTEXT_ENABLED \(Django\).) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 338.2 Tm (- COMMERCE_AGENT_ENABLED \(Django\).) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 324.5 Tm (La reversión de funciones no implica borrar perfiles o contraseñas ni apagar el servicio) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 311.3 Tm (comercial.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 281.1 Tm (13. Estructura de cambios y contratos) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 259.1 Tm (Prime: gotogym/static/js/vendedor.js;) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 245.9 Tm (gotogym/gotogym/templates/partials/_vendedor_panel.html;) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 232.7 Tm (gotogym/vendedor/conversacion.py; gotogym/vendedor/views.py;) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 219.5 Tm (gotogym/vendedor/context_processors.py; gotogym/vendedor/personalizacion.py. Se propone) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 206.3 Tm (nuevo vendedor/estado.py para clasificar y exponer estado limitado.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 189.1 Tm (Django: backend/api/commerce_agent/continuity.py; principal.py; views.py; turn.py;) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 175.9 Tm (evidence.py; narration.py; knowledge_bridge.py \(nuevo\); commerce_knowledge_policy.py) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 162.7 Tm (\(nuevo\).) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 145.5 Tm (Pruebas Prime: gotogym/vendedor/test_identidad.py, test_consentimiento.py, nuevas) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 132.3 Tm (test_session_transitions.py y test_vendedor_epoch.py.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 115.1 Tm (Pruebas Django: backend/api/test_commerce_linked_context.py, nuevas) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 101.9 Tm (test_commerce_knowledge_bridge.py, test_commerce_isolation.py y pruebas de cache.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 86.7 Tm (No se debe declarar un test existente bajo un nombre propuesto.) Tj ET
+0.00 0.49 0.49 RG 0.65 w 48 46 m 564 46 l S
+0.45 0.52 0.57 rg BT /F1 7.8 Tf 1 0 0 1 48.0 32.0 Tm (QAF / COGNITIVE COMMERCE BRIDGE  |  Especificacion propuesta) Tj ET
+0.45 0.52 0.57 rg BT /F2 8.2 Tf 1 0 0 1 525.0 32.0 Tm (07 / 08) Tj ET
+endstream
+endobj
+21 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 20 0 R >>
+endobj
+22 0 obj
+<< /Length 5159 >>
+stream
+1 1 1 rg 0 0 612 792 re f
+0.09 0.16 0.23 rg 0 767 612 25 re f
+1 1 1 rg BT /F2 8.2 Tf 1 0 0 1 48.0 775.0 Tm (GoToGym  /  QAF RESEARCH & ENGINEERING) Tj ET
+1 1 1 rg BT /F1 7.8 Tf 1 0 0 1 380.0 775.0 Tm (COGNITIVE COMMERCE BRIDGE   |   2026) Tj ET
+0.00 0.49 0.49 RG 1.2 w 48 752 m 564 752 l S
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 713.0 Tm (14. Plan de recuperación y aceptación productiva) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 693.0 Tm (Antes de activar en todos los usuarios:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 678.8 Tm (- CI y tests de seguridad sin fallos.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 664.1 Tm (- Prueba humana documentada en cuenta de ensayo verificada.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 649.4 Tm (- Métricas de no reconocimiento clasificadas con códigos concretos.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 634.7 Tm (- Auditoría de retiro de consentimientos.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 620.0 Tm (- 0 filtraciones en suites de dos usuarios y 0 intentos autorizados por correo.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 605.3 Tm (- Entradas de log con formato seguro.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 590.6 Tm (- Backout probado para ambos flags, manteniendo chat comercial operativo.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 575.9 Tm (- Plan de migración aditiva y reversión sin pérdida de planes, claves, historial ni) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 563.2 Tm (registros de usuario.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 532.5 Tm (15. Limitaciones y amenazas a validez) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 512.5 Tm (Inspección estática no equivale a ejecución productiva. La memoria del navegador puede) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 499.3 Tm (persistir por pestaña, pero el estado del servidor depende de cookie/rol/subject, y la) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 486.1 Tm (ejecución real requiere logs y DB. Los índices C, I, eta y S son métricas operacionales) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 472.9 Tm (propuestas, no demostración de computación cuántica. Los resultados experimentales quedan en) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 459.7 Tm (blanco hasta ejecutar el protocolo. La intervención podría producir una mejora de) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 446.5 Tm (satisfacción, pero también aumentar latencia o percepción de invasión; hay que medir ambos) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 433.3 Tm (efectos.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 403.1 Tm (16. Referencias de ingeniería y estándares) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 382.1 Tm (1. GoToGtymPrime: gotogym/static/js/vendedor.js; gotogym/vendedor/conversacion.py;) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 369.4 Tm (paquete.py; identidad.py; personalizacion.py.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 354.7 Tm (2. appdesplegada: backend/api/commerce_agent/continuity.py; principal.py; views.py;) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 342.0 Tm (turn.py; context_broker.py.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 327.3 Tm (3. appdesplegada: backend/api/superagent/ai_role_isolation.py;) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 314.6 Tm (business_conversation_context.py; admin_conversation_context.py; canonical_privacy.py.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 299.9 Tm (4. NIST SP 800-63-4 / 63C-4, identidad y federación: https://pages.nist.gov/800-63-4/) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 285.2 Tm (5. OWASP ASVS 5.0.0: https://asvs.owasp.org/) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 270.5 Tm (6. RFC 2104 HMAC: https://www.rfc-editor.org/rfc/rfc2104) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 255.8 Tm (7. OpenID Connect Core 1.0: https://openid.net/specs/openid-connect-core-1_0.html) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 241.1 Tm (8. Manuscrito 06 de esta serie \(identidad\); Manuscrito 07 \(knowledge broker\);) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 228.4 Tm (manuscritos históricos) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 215.7 Tm (QAF/02_Manuscritos/Manuscrito_03_Continuidad_Cognitiva_Omnicanal_Quantum_Coach_Prime.pdf) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 203.0 Tm (y Manuscrito_04_Alta_Costura_Inteligente_Tallaje_QAF_Prime.pdf.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 182.3 Tm (Resultado buscado: continuidad percibida por el usuario, sin degradación de privacidad ni) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 169.1 Tm (privilegios cruzados, con identidad personal efectiva, memoria relevante y respuestas del) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 155.9 Tm (vendedor fundamentadas.) Tj ET
+0.00 0.49 0.49 RG 0.65 w 48 46 m 564 46 l S
+0.45 0.52 0.57 rg BT /F1 7.8 Tf 1 0 0 1 48.0 32.0 Tm (QAF / COGNITIVE COMMERCE BRIDGE  |  Especificacion propuesta) Tj ET
+0.45 0.52 0.57 rg BT /F2 8.2 Tf 1 0 0 1 525.0 32.0 Tm (08 / 08) Tj ET
+endstream
+endobj
+23 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 22 0 R >>
+endobj
+xref
+0 24
+0000000000 65535 f 
+0000000018 00000 n 
+0000000067 00000 n 
+0000000179 00000 n 
+0000000276 00000 n 
+0000000378 00000 n 
+0000000473 00000 n 
+0000003156 00000 n 
+0000003302 00000 n 
+0000008551 00000 n 
+0000008697 00000 n 
+0000014724 00000 n 
+0000014872 00000 n 
+0000020827 00000 n 
+0000020975 00000 n 
+0000026726 00000 n 
+0000026874 00000 n 
+0000032687 00000 n 
+0000032835 00000 n 
+0000039347 00000 n 
+0000039495 00000 n 
+0000045279 00000 n 
+0000045427 00000 n 
+0000050638 00000 n 
+trailer
+<< /Size 24 /Root 1 0 R >>
+startxref
+50786
+%%EOF

@@ -1,0 +1,415 @@
+%PDF-1.4
+%QAF2026
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R] /Count 7 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Length 2630 >>
+stream
+0.09 0.16 0.23 rg 0 0 612 792 re f
+0.00 0.63 0.61 rg 45 648 522 7 re f
+1 1 1 rg BT /F2 13 Tf 1 0 0 1 46.0 743.0 Tm (GoToGym  /  QAF) Tj ET
+0.25 0.85 0.79 rg BT /F2 10 Tf 1 0 0 1 46.0 708.0 Tm (SERIE COGNITIVE COMMERCE BRIDGE) Tj ET
+1 1 1 rg BT /F2 18 Tf 1 0 0 1 46.0 608.0 Tm (MANUSCRITO 06) Tj ET
+1 1 1 rg BT /F2 17.3 Tf 1 0 0 1 46.0 570.0 Tm (Cognitive Commerce Bridge I: identidad) Tj ET
+1 1 1 rg BT /F2 17.3 Tf 1 0 0 1 46.0 544.0 Tm (federada verificable, vinculación) Tj ET
+1 1 1 rg BT /F2 17.3 Tf 1 0 0 1 46.0 518.0 Tm (bidireccional y consentimiento de finalidad) Tj ET
+0.00 0.63 0.61 rg 45 403 522 2 re f
+0.25 0.85 0.79 rg BT /F2 8.8 Tf 1 0 0 1 46.0 380.0 Tm (RESUMEN DE INVESTIGACION / ESPECIFICACION DE INGENIERIA) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 354.0 Tm (Se estudia la discrepancia observada entre una sesión autenticada en GoToGym Prime,) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 340.5 Tm (visible en la cabecera de Shop, y un Quantum Coach comercial que responde sin conocer) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 327.0 Tm (el nombre ni el perfil de la misma persona. El código separa correctamente) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 313.5 Tm (autenticación de aplicación, afirmación de identidad entre servidores, resolución del) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 300.0 Tm (usuario en Django y permisos de finalidad. Sin embargo, los fallos de enlace o) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 286.5 Tm (consentimiento hacen que el agente continúe en modo anónimo y no existe una señal de) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 273.0 Tm (diagnóstico comprensible para el operador y el usuario. Se propone una pasarela de) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 259.5 Tm (identidad vinculada al emisor y sujeto federado de Microsoft Entra External ID, con) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 246.0 Tm (control de permisos versionados, estados explícitos, auditoría sin datos personales y) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 232.5 Tm (recuperación progresiva para usuarios existentes. El objetivo no es copiar) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 219.0 Tm (contraseñas o cuentas, sino demostrar de forma reproducible que una identidad) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 205.5 Tm (autentica la misma persona en Prime y en Django antes de solicitar conocimiento) Tj ET
+1 1 1 rg BT /F1 9.2 Tf 1 0 0 1 46.0 192.0 Tm (privado.) Tj ET
+0.25 0.85 0.79 rg BT /F2 9 Tf 1 0 0 1 46.0 91.0 Tm (DOCUMENTO DE PROPUESTA - NO ES UNA VALIDACION PRODUCTIVA) Tj ET
+1 1 1 rg BT /F1 8.6 Tf 1 0 0 1 46.0 65.0 Tm (14 NOVIEMBRE 2026  |  GoToGtymPrime + appdesplegada) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 5347 >>
+stream
+1 1 1 rg 0 0 612 792 re f
+0.09 0.16 0.23 rg 0 767 612 25 re f
+1 1 1 rg BT /F2 8.2 Tf 1 0 0 1 48.0 775.0 Tm (GoToGym  /  QAF RESEARCH & ENGINEERING) Tj ET
+1 1 1 rg BT /F1 7.8 Tf 1 0 0 1 380.0 775.0 Tm (COGNITIVE COMMERCE BRIDGE   |   2026) Tj ET
+0.00 0.49 0.49 RG 1.2 w 48 752 m 564 752 l S
+0.00 0.49 0.49 rg BT /F2 17 Tf 1 0 0 1 48.0 712.0 Tm (Manuscrito científico-técnico 06) Tj ET
+0.00 0.49 0.49 rg BT /F2 13.7 Tf 1 0 0 1 48.0 665.0 Tm (Cognitive Commerce Bridge I: identidad federada verificable,) Tj ET
+0.00 0.49 0.49 rg BT /F2 13.7 Tf 1 0 0 1 48.0 647.0 Tm (vinculación bidireccional y consentimiento de finalidad) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 615.0 Tm (GoToGym / QAF | Diseño técnico de implementación | Versión 1.0 | 14-11-2026) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 597.8 Tm (Repositorios auditados: gotogymsaas/GoToGtymPrime \(nombre real del repositorio\) y) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 584.6 Tm (gotogymsaas/appdesplegada.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 567.4 Tm (Estado epistemológico: arquitectura propuesta y análisis estático de código; NO equivale) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 554.2 Tm (a experimento en producción ni a funcionalidad desplegada.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 537.0 Tm (Área: identidad digital, autorización, seguridad por diseño, agentes comerciales con IA.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 504.8 Tm (Resumen) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 484.8 Tm (Se estudia la discrepancia observada entre una sesión autenticada en GoToGym Prime, visible en) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 471.6 Tm (la cabecera de Shop, y un Quantum Coach comercial que responde sin conocer el nombre ni el) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 458.4 Tm (perfil de la misma persona. El código separa correctamente autenticación de aplicación,) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 445.2 Tm (afirmación de identidad entre servidores, resolución del usuario en Django y permisos de) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 432.0 Tm (finalidad. Sin embargo, los fallos de enlace o consentimiento hacen que el agente continúe en) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 418.8 Tm (modo anónimo y no existe una señal de diagnóstico comprensible para el operador y el usuario.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 405.6 Tm (Se propone una pasarela de identidad vinculada al emisor y sujeto federado de Microsoft Entra) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 392.4 Tm (External ID, con control de permisos versionados, estados explícitos, auditoría sin datos) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 379.2 Tm (personales y recuperación progresiva para usuarios existentes. El objetivo no es copiar) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 366.0 Tm (contraseñas o cuentas, sino demostrar de forma reproducible que una identidad autentica la) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 352.8 Tm (misma persona en Prime y en Django antes de solicitar conocimiento privado.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 332.6 Tm (Palabras clave: OIDC, Entra External ID, issuer, oid, HMAC-SHA256, consentimiento, JIT,) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 319.4 Tm (fail-closed, continuidad cognitiva, QAF.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 287.2 Tm (1. Pregunta, hipótesis y alcance) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 265.2 Tm (Pregunta: ¿Por qué una sesión de Shop con nombre visible sigue generando respuestas) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 252.0 Tm (anónimas del agente?) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 234.8 Tm (Hipótesis H1: la autenticación en Prime no implica que exista una cadena de) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 221.6 Tm (identidad/comercialización válida en ambas bases de datos. La condición de enlace y los) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 208.4 Tm (permisos se evalúan independientemente. Esta hipótesis se comprobará mediante indicadores) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 195.2 Tm (booleanos y pruebas sobre un usuario de ensayo, sin afirmar que se haya establecido aún) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 182.0 Tm (la causa concreta de producción.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 161.8 Tm (No se modifica Microsoft Entra, la base de usuarios ni las contraseñas mediante este) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 148.6 Tm (manuscrito. No se debe inventar un vínculo basándose en correo o nombre. No se debe copiar un) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 135.4 Tm (token OIDC del navegador al agente ni conceder permisos por poseer la credencial de servicio.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 105.2 Tm (2. Evidencia del estado de implementación) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 84.2 Tm (Componente | Fuente de código inspeccionada | Consecuencia) Tj ET
+0.00 0.49 0.49 RG 0.65 w 48 46 m 564 46 l S
+0.45 0.52 0.57 rg BT /F1 7.8 Tf 1 0 0 1 48.0 32.0 Tm (QAF / COGNITIVE COMMERCE BRIDGE  |  Especificacion propuesta) Tj ET
+0.45 0.52 0.57 rg BT /F2 8.2 Tf 1 0 0 1 525.0 32.0 Tm (01 / 06) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 6543 >>
+stream
+1 1 1 rg 0 0 612 792 re f
+0.09 0.16 0.23 rg 0 767 612 25 re f
+1 1 1 rg BT /F2 8.2 Tf 1 0 0 1 48.0 775.0 Tm (GoToGym  /  QAF RESEARCH & ENGINEERING) Tj ET
+1 1 1 rg BT /F1 7.8 Tf 1 0 0 1 380.0 775.0 Tm (COGNITIVE COMMERCE BRIDGE   |   2026) Tj ET
+0.00 0.49 0.49 RG 1.2 w 48 752 m 564 752 l S
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 724.0 Tm (Identidad de sesión en Shop | gotogym/vendedor/paquete.py: sujeto_del_visitante |) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 712.6 Tm (request.user.is_authenticated y sujeto shop_u_ no demuestran una identidad OIDC vinculada) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 699.2 Tm (Emisión federada | gotogym/vendedor/identidad.py: emitir | Se requiere usuario autenticado,) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 687.8 Tm (credencial, GOTOGYM_OIDC.ISSUER, ExternalIdentityLink y scopes activos) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 674.4 Tm (Consentimiento en Shop | gotogym/vendedor/consentimiento.py | GET/POST con CSRF; emite linked y) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 663.0 Tm (scopes; permiso concedido no equivale a vínculo) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 649.6 Tm (Consentimiento visual | gotogym/vendedor/personalizacion.py y template _personalizacion.html | La) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 638.2 Tm (persona puede activar/revocar scopes y ver vencimiento) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 624.8 Tm (Vinculación Entra | gotogym/gotogym_oidc/views.py | Entra determina issuer + subject; la) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 613.4 Tm (coincidencia de email requiere prueba adicional) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 600.0 Tm (Verificación en Django | backend/api/commerce_agent/identity.py | Verifica HMAC, audiencia, tiempo,) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 588.6 Tm (replay, issuer, oid y cuenta activa; ante fallo devuelve None) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 575.2 Tm (JIT en Django | backend/universal_identity/adapter.py y gotogym_oidc/views.py | Puede vincular) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 563.8 Tm (cuentas existentes por mapeo JIT preparado; no debe migrar por email ambiguo) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 550.4 Tm (Contexto comercial | backend/api/commerce_agent/views.py | La falla de identidad conserva el) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 539.0 Tm (servicio comercial anónimo) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 521.6 Tm (Se observa una inconsistencia de política: el documento) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 508.4 Tm (docs/identity/COMMERCE_OMNICHANNEL_V2_FOUNDATION.md dice que ningún scope se concede por) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 495.2 Tm (defecto, pero vendedor/consentimiento.py dispone de conceder_al_crear_perfil\(\) y) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 482.0 Tm (vendedor/apps.py lo conecta a la señal perfil_creado. El flujo actual puede conceder cinco) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 468.8 Tm (scopes tras la aceptación inicial de términos. Antes de cambiar el producto debe decidirse una) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 455.6 Tm (única política explícita, versionada y demostrable; términos generales no equivalen) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 442.4 Tm (necesariamente a autorización granular de consulta de memorias.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 412.2 Tm (3. Modelo formal de identidad y consentimiento) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 392.2 Tm (Definimos:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 378.0 Tm (- U_P: usuario local Prime; U_D: usuario existente appdesplegada.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 363.3 Tm (- k = \(issuer, oid\): par inmutable de identidad federada verificado en servidor.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 348.6 Tm (- L_P\(U_P,k\), L_D\(U_D,k\): vínculos registrados y activos en cada aplicación.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 333.9 Tm (- C\(U_P,s,t,v\): consentimiento vigente en Prime para scope s, versión v, instante t.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 319.2 Tm (- E\(x\): aserción firmada con clave de identidad exclusiva.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 304.5 Tm (- V\(E\): verificación criptográfica, audiencia, frescura, unicidad jti, emisor y vínculo.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 289.8 Tm (- S: conjunto de scopes comerciales permitidos.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 271.1 Tm (La autorización para exportar un hecho f se define como:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 252.9 Tm (A\(f,U_P,U_D,k,t\) = Auth_P\(U_P,t\) AND L_P\(U_P,k\) AND L_D\(U_D,k\) AND V\(E\)) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 239.7 Tm (AND C\(U_P,scope\(f\),t,v\) AND Purpose\(f,"commerce"\)) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 226.5 Tm (AND Owns\(U_D,f\) AND Fresh\(f,t\) AND PolicyAllow\(f\).) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 206.3 Tm (Invariante I1: el modo personalizado existe solo cuando A es verdadero para al menos un) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 193.1 Tm (scope; para cualquier otra condición el resultado es COMMERCE, sin campos privados.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 175.9 Tm (Invariante I2: la credencial de servicio no concede identidad humana.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 158.7 Tm (Invariante I3: el emisor y el oid se verifican en ambas bases; nunca se utiliza correo,) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 145.5 Tm (username o nombre como sustituto.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 128.3 Tm (Invariante I4: el consentimiento puede revocarse de inmediato en el turno siguiente;) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 115.1 Tm (ningún dato desautorizado se reutiliza en caché, historial o prompt.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 97.9 Tm (Invariante I5: ni el identificador interno de Django ni sus planes, contraseñas y datos) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 84.7 Tm (de salud salen como atributos del agente.) Tj ET
+0.00 0.49 0.49 RG 0.65 w 48 46 m 564 46 l S
+0.45 0.52 0.57 rg BT /F1 7.8 Tf 1 0 0 1 48.0 32.0 Tm (QAF / COGNITIVE COMMERCE BRIDGE  |  Especificacion propuesta) Tj ET
+0.45 0.52 0.57 rg BT /F2 8.2 Tf 1 0 0 1 525.0 32.0 Tm (02 / 06) Tj ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 5498 >>
+stream
+1 1 1 rg 0 0 612 792 re f
+0.09 0.16 0.23 rg 0 767 612 25 re f
+1 1 1 rg BT /F2 8.2 Tf 1 0 0 1 48.0 775.0 Tm (GoToGym  /  QAF RESEARCH & ENGINEERING) Tj ET
+1 1 1 rg BT /F1 7.8 Tf 1 0 0 1 380.0 775.0 Tm (COGNITIVE COMMERCE BRIDGE   |   2026) Tj ET
+0.00 0.49 0.49 RG 1.2 w 48 752 m 564 752 l S
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 713.0 Tm (4. Protocolo propuesto CCB-ID v1) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 693.0 Tm (El contrato comercial v2 y la firma de servicio existentes permanecen intactos. La identidad) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 679.8 Tm (es un segundo bloque criptográfico. Se conservan los encabezados X-Coach-Key-Id,) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 666.6 Tm (X-Coach-Timestamp y X-Coach-Signature para autenticación de servicio, y por separado) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 653.4 Tm (VENDEDOR_IDENTIDAD_CLAVE_ID/SECRETO versus COMMERCE_IDENTITY_KEY_ID/SECRET para la aserción de) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 640.2 Tm (persona.) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 617.0 Tm ({) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 606.3 Tm ("schema_version": 2,) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 595.6 Tm ("visitor": {"subject": "shop_u_<digest>", "authenticated": true},) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 584.9 Tm ("conversation_id": "shop-<uuid>",) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 574.2 Tm ("identity": {) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 563.5 Tm ("key_id": "shop-prime-identity-1",) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 552.8 Tm ("assertion": "<base64url\(payload-servidor\)>",) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 542.1 Tm ("signature": "<hmac-hex>") Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 531.4 Tm (},) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 520.7 Tm ("customer_context": {"size_hint": null}) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 510.0 Tm (}) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 489.3 Tm (La aserción verificada contiene iss, aud, idp_issuer, idp_subject, scopes, consent_version,) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 476.1 Tm (iat, exp y jti; vida máxima actualmente 60 segundos. La clave de identidad debe ser) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 462.9 Tm (independiente de commerce-service-secret y OIDC_CLIENT_SECRET. El servidor Django verifica) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 449.7 Tm (firma y replay antes de resolver la relación local; no permite que el navegador declare scopes) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 436.5 Tm (arbitrariamente.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 416.3 Tm (Propuesta de extensión sin ampliar privilegios: añadir a la trazabilidad interna un) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 403.1 Tm (estado estructurado de resolución, nunca la aserción ni su contenido:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 386.9 Tm (- shop_session_anonymous) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 372.2 Tm (- prime_oidc_link_missing) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 357.5 Tm (- prime_consent_missing) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 342.8 Tm (- prime_consent_expired) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 328.1 Tm (- prime_assertion_emitted) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 313.4 Tm (- coach_issuer_mismatch) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 298.7 Tm (- coach_unknown_identity_key) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 284.0 Tm (- coach_signature_invalid) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 269.3 Tm (- coach_replayed_assertion) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 254.6 Tm (- coach_oidc_link_missing) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 239.9 Tm (- coach_linked_context_ready) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 221.2 Tm (Los estados se envían únicamente a telemetría privada o a una interfaz de diagnóstico con) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 208.0 Tm (permiso administrativo. El usuario solo ve una invitación segura a vincular cuenta o ajustar) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 194.8 Tm (permisos; jamás un oid ni un identificador de base de datos.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 164.6 Tm (5. Algoritmo determinista de diagnóstico) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 139.6 Tm (def evaluate_prime_readiness\(*, request_user, issuer, identity_key_ready, consent, link\):) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 128.9 Tm (if not request_user.is_authenticated:) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 118.2 Tm (return "shop_session_anonymous") Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 107.5 Tm (if not issuer or not identity_key_ready:) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 96.8 Tm (return "configuration_incomplete") Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 86.1 Tm (if link is None or link.issuer != issuer:) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 75.4 Tm (return "prime_oidc_link_missing") Tj ET
+0.00 0.49 0.49 RG 0.65 w 48 46 m 564 46 l S
+0.45 0.52 0.57 rg BT /F1 7.8 Tf 1 0 0 1 48.0 32.0 Tm (QAF / COGNITIVE COMMERCE BRIDGE  |  Especificacion propuesta) Tj ET
+0.45 0.52 0.57 rg BT /F2 8.2 Tf 1 0 0 1 525.0 32.0 Tm (03 / 06) Tj ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 5612 >>
+stream
+1 1 1 rg 0 0 612 792 re f
+0.09 0.16 0.23 rg 0 767 612 25 re f
+1 1 1 rg BT /F2 8.2 Tf 1 0 0 1 48.0 775.0 Tm (GoToGym  /  QAF RESEARCH & ENGINEERING) Tj ET
+1 1 1 rg BT /F1 7.8 Tf 1 0 0 1 380.0 775.0 Tm (COGNITIVE COMMERCE BRIDGE   |   2026) Tj ET
+0.00 0.49 0.49 RG 1.2 w 48 752 m 564 752 l S
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 725.0 Tm (if consent is None:) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 714.3 Tm (return "prime_consent_missing") Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 703.6 Tm (scopes = consent.active_scopes\(\)) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 692.9 Tm (if not scopes:) Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 682.2 Tm (return "prime_consent_expired") Tj ET
+0.15 0.20 0.25 rg BT /F3 7.65 Tf 1 0 0 1 54.0 671.5 Tm (return "prime_assertion_ready") Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 650.8 Tm (La evaluación se hace cada turno, no una sola vez al cargar el HTML; se utilizan identidades) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 637.6 Tm (resueltas por middleware/servidor. Se propone instrumentar vendedor/identidad.py y exponer una) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 624.4 Tm (comprobación administrativa de solo lectura. No se recomienda habilitar vinculaciones por) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 611.2 Tm (coincidencia de email en producción.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 581.0 Tm (6. Migración JIT y cuentas antiguas) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 560.0 Tm (1. Elaborar inventario de usuarios Prime autenticados por login legado, cuentas Prime) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 547.3 Tm (con ExternalIdentityLink, usuarios Django con ExternalIdentityLink y registros de) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 534.6 Tm (consentimiento.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 519.9 Tm (2. Para cada identidad existente que necesite vinculación, usar un flujo OIDC) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 507.2 Tm (autenticado con prueba de posesión de la cuenta local o JIT preparado por operador) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 494.5 Tm (autorizado.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 479.8 Tm (3. Rechazar vínculos si hay dos cuentas locales con el mismo correo, identidades) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 467.1 Tm (conflictivas, oid ya asociado a otro usuario o emisor no coincidente.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 452.4 Tm (4. No sobrescribir el usuario ni el plan Django; agregar solamente relación verificada) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 439.7 Tm (de identidad.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 425.0 Tm (5. No convertir una cuenta vieja en "consentida" por inferencia. Mostrar la pantalla de) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 412.3 Tm (permisos de Prime y registrar una decisión afirmativa con fecha, versión de texto y) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 399.6 Tm (scopes.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 384.9 Tm (6. Hacer doble comprobación U_P -> k -> U_D sin exponer IDs en el cliente.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 364.2 Tm (Riesgo de diseño: Prime permite login local y OIDC. Por ello una cabecera que muestra) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 351.0 Tm (nombre representa una cuenta local válida, pero no prueba que el login haya pasado por el) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 337.8 Tm (proveedor central. El estado "reconocido en Prime" no es sinónimo de "perfil personal) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 324.6 Tm (disponible en Django".) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 292.4 Tm (7. Política de consentimiento verificable) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 272.4 Tm (Se propone ConsentDecision con: actor local, scope, granted, granted_at, expires_at,) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 259.2 Tm (consent_version, policy_version, source_ui, revoked_at y audit_event_id. La fuente operativa) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 246.0 Tm (puede permanecer en CommercePersonalizationConsent; estos campos son una evolución aditiva, no) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 232.8 Tm (una migración destructiva. El texto de interfaz debe describir por separado: perfil básico;) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 219.6 Tm (preferencias; experiencias; medidas voluntarias; memoria comercial. Incorporar display_name) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 206.4 Tm (requiere notificar y versionar el alcance, porque hoy "profile.basic" solo describe deporte,) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 193.2 Tm (horario y actividad.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 175.0 Tm (Separar:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 160.8 Tm (- Autenticación: prueba de quién eres.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 146.1 Tm (- Autorización: qué se puede consultar.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 131.4 Tm (- Consentimiento: para qué categoría y finalidad.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 116.7 Tm (- Proyección: qué campos concretos necesita cada respuesta.) Tj ET
+0.00 0.49 0.49 RG 0.65 w 48 46 m 564 46 l S
+0.45 0.52 0.57 rg BT /F1 7.8 Tf 1 0 0 1 48.0 32.0 Tm (QAF / COGNITIVE COMMERCE BRIDGE  |  Especificacion propuesta) Tj ET
+0.45 0.52 0.57 rg BT /F2 8.2 Tf 1 0 0 1 525.0 32.0 Tm (04 / 06) Tj ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Length 5228 >>
+stream
+1 1 1 rg 0 0 612 792 re f
+0.09 0.16 0.23 rg 0 767 612 25 re f
+1 1 1 rg BT /F2 8.2 Tf 1 0 0 1 48.0 775.0 Tm (GoToGym  /  QAF RESEARCH & ENGINEERING) Tj ET
+1 1 1 rg BT /F1 7.8 Tf 1 0 0 1 380.0 775.0 Tm (COGNITIVE COMMERCE BRIDGE   |   2026) Tj ET
+0.00 0.49 0.49 RG 1.2 w 48 752 m 564 752 l S
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 713.0 Tm (8. Plan de cambios por repositorio) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 691.0 Tm (Prime) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 674.8 Tm (- gotogym/vendedor/identidad.py: añadir códigos estructurados y métricas cardinalidad) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 662.1 Tm (controlada.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 647.4 Tm (- gotogym/vendedor/consentimiento.py: unificar política de opt-in, decisión explícita y) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 634.7 Tm (revocación.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 620.0 Tm (- gotogym/vendedor/personalizacion.py: estado visible "Conectado", "Falta vincular",) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 607.3 Tm ("Falta autorizar", sin información sensible.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 592.6 Tm (- gotogym/gotogym_oidc/views.py: integración de cuenta local mediante prueba y enlace) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 579.9 Tm (verificado.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 565.2 Tm (- gotogym/vendedor/test_identidad.py, test_consentimiento.py: regresiones de permisos y) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 552.5 Tm (emisión.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 531.8 Tm (appdesplegada) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 515.6 Tm (- backend/api/commerce_agent/identity.py: diagnóstico de fallos por etapa y correlación) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 502.9 Tm (con request_id, sin PII.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 488.2 Tm (- backend/api/commerce_agent/views.py: señales de contexto vinculado/proyectado.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 473.5 Tm (- backend/universal_identity/jit_verify.py: verificar mapeos preexistentes, sin) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 460.8 Tm (modificar cuentas.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 446.1 Tm (- backend/api/test_commerce_linked_context.py: pruebas cruzadas con issuer + oid y) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 433.4 Tm (revocación.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 402.7 Tm (9. Plan experimental y métricas falsables) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 382.7 Tm (Se evalúa en staging sobre cuentas sintéticas A/B/legacy y después canario humano; no se) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 369.5 Tm (declaran resultados antes de ejecutarlos.) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 350.3 Tm (Ensayo | Condición | Resultado exigido) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 336.9 Tm (T01 | Visitante sin login | Respuesta comercial útil; cero datos personales) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 323.5 Tm (T02 | Login legado Prime sin vínculo OIDC | Diagnóstico "prime_oidc_link_missing"; ninguna) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 312.1 Tm (inferencia por correo) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 298.7 Tm (T03 | Cuenta vinculada en Prime pero no Django | "coach_oidc_link_missing"; sin datos privados) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 285.3 Tm (T04 | Ambos vínculos y permiso activo | Proyección mínima y trazable) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 271.9 Tm (T05 | Consentimiento revocado | Ningún campo revocado en el siguiente turno) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 258.5 Tm (T06 | Firma alterada o jti repetido | Rechazo y fallback controlado) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 245.1 Tm (T07 | Mapeo JIT conflictivo | Bloqueo; cuentas y planes intactos) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 231.7 Tm (T08 | Dos cuentas con mismo nombre o correo parecido | Nunca se mezclan identidades) Tj ET
+0.15 0.20 0.25 rg BT /F3 8 Tf 1 0 0 1 48.0 218.3 Tm (T09 | Nombre de usuario no incluido en proyección | Respuesta no debe inventarlo) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 200.9 Tm (Indicadores de aceptación propuestos \(metas, NO resultados\): tasa de identidad resuelta >=99%) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 187.7 Tm (entre sesiones elegibles verificadas en canario; filtraciones entre sujetos = 0 en pruebas) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 174.5 Tm (adversariales; afirmaciones de perfil sin evidencia = 0; latencia P95 adicional del puente) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 161.3 Tm (<=150 ms para datos relacionales cacheados \(objetivo a medir, no promesa\).) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 131.1 Tm (10. Seguridad, privacidad y reversibilidad) Tj ET
+0.00 0.49 0.49 RG 0.65 w 48 46 m 564 46 l S
+0.45 0.52 0.57 rg BT /F1 7.8 Tf 1 0 0 1 48.0 32.0 Tm (QAF / COGNITIVE COMMERCE BRIDGE  |  Especificacion propuesta) Tj ET
+0.45 0.52 0.57 rg BT /F2 8.2 Tf 1 0 0 1 525.0 32.0 Tm (05 / 06) Tj ET
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 16 0 R >>
+endobj
+18 0 obj
+<< /Length 4863 >>
+stream
+1 1 1 rg 0 0 612 792 re f
+0.09 0.16 0.23 rg 0 767 612 25 re f
+1 1 1 rg BT /F2 8.2 Tf 1 0 0 1 48.0 775.0 Tm (GoToGym  /  QAF RESEARCH & ENGINEERING) Tj ET
+1 1 1 rg BT /F1 7.8 Tf 1 0 0 1 380.0 775.0 Tm (COGNITIVE COMMERCE BRIDGE   |   2026) Tj ET
+0.00 0.49 0.49 RG 1.2 w 48 752 m 564 752 l S
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 725.0 Tm (Despliegue en etapas: shadow de diagnósticos -> test de vinculación -> canario 1-5% -> 25% ->) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 711.8 Tm (100%, cada etapa con aprobación y métricas. Las banderas existentes VENDEDOR_CONTRATO_V2 y) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 698.6 Tm (COMMERCE_LINKED_CONTEXT_ENABLED son reversibles; apagarlas no elimina usuarios, cuentas,) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 685.4 Tm (planes ni memorias. No registrar tokens, correos, nombres, medidas, secrets ni prompts en) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 672.2 Tm (logs. El monitoreo debe usar request_id, códigos enumerados, métricas agregadas y hashes de) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 659.0 Tm (baja correlacionabilidad si son imprescindibles. No usar flags "true" como prueba de) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 645.8 Tm (funcionamiento.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 615.6 Tm (11. Limitaciones) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 595.6 Tm (Se dispone de evidencia estática del código y capturas de una conversación, pero no de) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 582.4 Tm (observabilidad en producción ni de consultas de base de datos. No se conoce aún si el) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 569.2 Tm (incidente específico es falta de vínculo Prime, consentimiento, vínculo Django o filtrado del) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 556.0 Tm (broker. La extensión de consentimiento y la vinculación de cuentas son propuestas sujetas a) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 542.8 Tm (revisión legal/privacidad. No se afirma novedad científica demostrada ni mejora de KPIs antes) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.4 Tf 1 0 0 1 48.0 529.6 Tm (de ensayos.) Tj ET
+0.00 0.49 0.49 rg BT /F2 11.3 Tf 1 0 0 1 48.0 499.4 Tm (12. Bibliografía y artefactos reproducibles) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 478.4 Tm (1. NIST SP 800-63-4, Digital Identity Guidelines, edición final 2025:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 465.7 Tm (https://doi.org/10.6028/NIST.SP.800-63-4) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 451.0 Tm (2. NIST SP 800-63C-4, Federation and Assertions:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 438.3 Tm (https://pages.nist.gov/800-63-4/sp800-63c.html) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 423.6 Tm (3. OpenID Connect Core 1.0, issuer/subject y validación de tokens:) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 410.9 Tm (https://openid.net/specs/openid-connect-core-1_0.html) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 396.2 Tm (4. RFC 2104, HMAC: https://www.rfc-editor.org/rfc/rfc2104) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 381.5 Tm (5. OWASP ASVS 5.0.0, controles de autenticación y autorización: https://asvs.owasp.org/) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 366.8 Tm (6. GoToGtymPrime: gotogym/vendedor/identidad.py; consentimiento.py; personalizacion.py;) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 354.1 Tm (gotogym_oidc/views.py.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 339.4 Tm (7. appdesplegada: backend/api/commerce_agent/identity.py; views.py;) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 326.7 Tm (backend/universal_identity/adapter.py.) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 312.0 Tm (8. Manuscritos históricos) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 299.3 Tm (QAF/02_Manuscritos/Manuscrito_01_Identidad_Federada_Identity_Bridge_GoToGym.pdf y) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 286.6 Tm (Manuscrito_02_Contexto_Comercial_Personalizacion_QAF.pdf; relacionados por temática, no) Tj ET
+0.15 0.20 0.25 rg BT /F1 9.1 Tf 1 0 0 1 58.0 273.9 Tm (validados experimentalmente aquí.) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 253.2 Tm (Salida requerida de implementación: identidad comercial verificada de extremo a extremo,) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 240.0 Tm (motivo exacto de fallback y consentimiento explícito y revocable. Su aceptación precede a) Tj ET
+0.15 0.20 0.25 rg BT /F2 9.5 Tf 1 0 0 1 48.0 226.8 Tm (toda exportación de conocimiento personal.) Tj ET
+0.00 0.49 0.49 RG 0.65 w 48 46 m 564 46 l S
+0.45 0.52 0.57 rg BT /F1 7.8 Tf 1 0 0 1 48.0 32.0 Tm (QAF / COGNITIVE COMMERCE BRIDGE  |  Especificacion propuesta) Tj ET
+0.45 0.52 0.57 rg BT /F2 8.2 Tf 1 0 0 1 525.0 32.0 Tm (06 / 06) Tj ET
+endstream
+endobj
+19 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 18 0 R >>
+endobj
+xref
+0 20
+0000000000 65535 f 
+0000000018 00000 n 
+0000000067 00000 n 
+0000000165 00000 n 
+0000000262 00000 n 
+0000000364 00000 n 
+0000000459 00000 n 
+0000003140 00000 n 
+0000003286 00000 n 
+0000008684 00000 n 
+0000008830 00000 n 
+0000015425 00000 n 
+0000015573 00000 n 
+0000021123 00000 n 
+0000021271 00000 n 
+0000026935 00000 n 
+0000027083 00000 n 
+0000032363 00000 n 
+0000032511 00000 n 
+0000037426 00000 n 
+trailer
+<< /Size 20 /Root 1 0 R >>
+startxref
+37574
+%%EOF
