@@ -9,7 +9,6 @@ from . import conversacion, estado
 from .consentimiento import aplicar
 from .models import CommercePersonalizationConsent
 
-
 ISSUER = "https://verified.example/tenant/v2.0"
 CONFIG = {
     "GOTOGYM_OIDC": {"ISSUER": ISSUER, "SUBJECT_CLAIM": "oid"},
