@@ -7,6 +7,7 @@ La revocación es inmediata y borra medidas y memoria comercial pertinentes.
 
 import json
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import JsonResponse
@@ -77,7 +78,8 @@ def _read_body(request):
 @require_http_methods(["GET", "POST"])
 def consentimiento(request):
     # Nunca se autoriza personalizar por mera coincidencia de correo.
-    linked = ExternalIdentityLink.objects.filter(user=request.user).exists()
+    issuer = (getattr(settings, "GOTOGYM_OIDC", {}) or {}).get("ISSUER")
+    linked = bool(issuer) and ExternalIdentityLink.objects.filter(user=request.user, issuer=issuer).exists()
 
     if request.method == "GET":
         row = CommercePersonalizationConsent.objects.filter(user=request.user).first()
