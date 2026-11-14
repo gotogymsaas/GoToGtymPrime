@@ -37,6 +37,8 @@ from .models import (
 
 # Orden y textos que ve el cliente.
 SCOPES_VISIBLES = (
+    ("profile.display_name", gettext_lazy("Saludarme por mi nombre"),
+     gettext_lazy("Compartir mi nombre de presentación verificado del Quantum Coach para personalizar las compras.")),
     ("profile.basic", gettext_lazy("Perfil deportivo básico"),
      gettext_lazy("Tu deporte favorito, tu horario de entrenamiento y tu nivel de actividad.")),
     ("sports.preferences", gettext_lazy("Preferencias de entrenamiento"),
