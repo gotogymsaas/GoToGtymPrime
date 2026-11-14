@@ -1,8 +1,11 @@
 """Diagnóstico de personalización Shop→Coach sin imprimir datos personales ni secretos."""
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
+
 from gotogym_oidc.models import ExternalIdentityLink
+from vendedor.identidad import credencial
 from vendedor.models import CommercePersonalizationConsent
 
 
@@ -20,7 +23,6 @@ class Command(BaseCommand):
         linked = bool(issuer) and ExternalIdentityLink.objects.filter(user=user, issuer=issuer).exists()
         consent = CommercePersonalizationConsent.objects.filter(user=user).first()
         scopes = consent.active_scopes() if consent else []
-        from vendedor.identidad import credencial
         checks = {
             "authenticated_account_active": bool(user.is_active),
             "contract_v2_enabled": bool(settings.VENDEDOR_CONTRATO_V2),
