@@ -19,12 +19,12 @@ class Command(BaseCommand):
         key_id = settings.COACH_SERVICE_KEY_ID
         secret = settings.COACH_SERVICE_SECRET
         parsed = urlsplit(url)
-        checks = {
+        # Azure entrega la referencia literal si Key Vault no se resuelve.\n        # Su presencia no significa que tengamos una credencial utilizable.\n        referencia_sin_resolver = bool(\n            secret and secret.lstrip().lower().startswith("@microsoft.keyvault(")\n        )\n        checks = {
             "URL HTTPS o localhost permitida": bool(url and _url_permitida(url)),
             "Ruta del endpoint esperada": parsed.path == "/api/commerce/agent/message/",
             "Identificador de servicio presente": bool(key_id and key_id.strip()),
             "Identificador con formato valido": bool(key_id and __import__("re").fullmatch(r"[A-Za-z0-9_-]{1,40}", key_id)),
-            "Secreto de servicio presente": bool(secret),
+            "Secreto de servicio presente": bool(secret),\n            "Referencia Key Vault resuelta": bool(secret) and not referencia_sin_resolver,
             "Secreto sin espacios exteriores": bool(secret and secret == secret.strip()),
             "Cliente real habilitado": not settings.VENDEDOR_COACH_SIMULADO,
         }
