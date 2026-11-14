@@ -3,8 +3,8 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
-
 from gotogym_oidc.models import ExternalIdentityLink
+
 from vendedor.identidad import credencial
 from vendedor.models import CommercePersonalizationConsent
 
