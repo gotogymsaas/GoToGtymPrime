@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from accounts.signals import perfil_creado
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from gotogym_oidc.models import ExternalIdentityLink
@@ -66,6 +66,7 @@ class AlCrearElPerfilTests(TestCase):
         self.assertEqual(_activos(usuario), [])
 
 
+@override_settings(GOTOGYM_OIDC={"ISSUER": "https://verified.example/v2.0"})
 class InterruptorTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(email="eva@example.com", username="eva", password="x")
