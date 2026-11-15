@@ -18,8 +18,11 @@ from django.views.decorators.http import require_GET, require_POST
 
 from . import consentimiento
 from .models import (
-    CommerceConsentAuditEvent, CommerceMemoryItem, CommercePersonalizationConsent,
-    SCOPE_FIELDS, TailoringMeasurement,
+    SCOPE_FIELDS,
+    CommerceConsentAuditEvent,
+    CommerceMemoryItem,
+    CommercePersonalizationConsent,
+    TailoringMeasurement,
 )
 
 MAX_EVENTS = 100
