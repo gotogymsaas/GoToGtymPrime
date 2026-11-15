@@ -37,4 +37,8 @@ jobs:
           vendedor.test_identidad
           vendedor.test_consentimiento
           vendedor.test_personalizacion_por_defecto
+          vendedor.test_personalizacion
+          vendedor.test_views
+          vendedor.test_interfaz
+          gotogym.test_ingles_completo
           --settings=gotogym.settings_test --parallel 1
