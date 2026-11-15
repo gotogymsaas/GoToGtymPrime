@@ -18,6 +18,7 @@ SCOPE_FIELDS = {
     "sports.preferences": "sports_preferences",
     "experiences.summary": "experiences_summary",
     "experiences.commerce_guidance": "experience_guidance",
+    "experiences.commerce_conclusions": "experience_conclusions",
     "tailoring.measurements": "tailoring_measurements",
     "conversation.commerce_memory": "commerce_memory",
 }
@@ -33,6 +34,8 @@ class CommercePersonalizationConsent(models.Model):
     sports_preferences = models.BooleanField(default=False)
     experiences_summary = models.BooleanField(default=False)
     experience_guidance = models.BooleanField(default=False)
+    # Aprobación voluntaria distinta de completitud y de condiciones generales.
+    experience_conclusions = models.BooleanField(default=False)
     tailoring_measurements = models.BooleanField(default=False)
     commerce_memory = models.BooleanField(default=False)
     # Fecha de la ultima concesion por scope ({"profile.basic": iso8601}).
