@@ -76,10 +76,13 @@ DEVOLUCIONES = {
             'Los defectos de fabricación se atienden bajo la garantía; consulta la política de garantía.',
         ]},
         {'title': 'Reembolso', 'paragraphs': [
-            'Cuando recibimos la prenda y verificamos su estado, devolvemos el dinero por el mismo medio de '
-            'pago que usaste, sin descuentos ni retenciones, y a más tardar dentro de los 30 días calendario '
-            'siguientes a la fecha en que ejerciste el derecho. El tiempo en que el dinero aparece en tu '
-            'cuenta depende de tu banco o del medio de pago.',
+            'Si ejerces válidamente el derecho de retracto, te devolveremos las sumas pagadas sin '
+            'descuentos ni retenciones que contradigan la ley, en un plazo máximo de 15 días calendario '
+            'desde que ejerciste el derecho y hayas cumplido las obligaciones legales aplicables: '
+            'suministrar los datos correctos y completos necesarios para efectuar la devolución '
+            'del dinero y devolver el producto en los términos establecidos por la ley. '
+            'Te informaremos de forma clara los medios de reembolso disponibles y aplicaremos '
+            'la devolución al medio de pago correspondiente o al acordado legalmente.',
         ]},
         {'title': 'Reversión del pago', 'paragraphs': [
             'Si pagaste con tarjeta u otro instrumento electrónico y fuiste víctima de fraude, no solicitaste '
