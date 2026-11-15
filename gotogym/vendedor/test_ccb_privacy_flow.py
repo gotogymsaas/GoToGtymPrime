@@ -1,5 +1,6 @@
 """M11/M12/M14: recibo y revocación comercial bajo identidad de sesión propia."""
 from decimal import Decimal
+from datetime import timedelta
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -73,7 +74,7 @@ class CommercialPrivacyFlowTests(TestCase):
             user=self.a, chest_cm=Decimal("91.5"), captured_at=timezone.now())
         CommerceMemoryItem.objects.create(
             user=self.a, kind="color", value="azul", confirmed_at=timezone.now(),
-            expires_at=timezone.now() + timezone.timedelta(days=90))
+            expires_at=timezone.now() + timedelta(days=90))
         result = self.client.post(reverse("vendedor:privacy_revoke_all"),
                                   {"confirm": "REVOCAR_PERSONALIZACION"})
         self.assertEqual(result.status_code, 302)
