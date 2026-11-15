@@ -5,6 +5,7 @@ No confundir la sesión local con el vínculo OIDC verificable de Django.
 """
 import hashlib
 import hmac
+import secrets
 
 from django.conf import settings
 from gotogym_oidc.models import ExternalIdentityLink
@@ -39,8 +40,11 @@ def estado_usuario(request):
     version = consent.version if consent is not None else 0
     # Cualquier cambio de identidad, versión de consentimiento o scopes activos
     # cambia el epoch. La sesión nunca se identifica por correo ni nombre.
-    cookie = request.session.session_key or "unsaved"
-    private = f"{cookie}|{identity}|{mode}|{version}|{','.join(scopes)}"
+    # Un nonce persistente por sesion es estable desde el primer GET/POST;
+    # la session_key puede ser None en el primer turno y cambiar al guardarse.
+    # El valor nunca se transmite: solo se expone el HMAC de la vinculacion.
+    nonce = request.session.setdefault("_vendedor_epoch_nonce", secrets.token_hex(16))
+    private = f"{nonce}|{identity}|{mode}|{version}|{','.join(scopes)}"
     epoch = hmac.new(settings.SECRET_KEY.encode("utf-8"), private.encode("utf-8"),
                      hashlib.sha256).hexdigest()[:32]
     return {
