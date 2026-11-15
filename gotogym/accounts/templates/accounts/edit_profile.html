@@ -116,6 +116,22 @@
     </div>
 
     {% personalizacion_coach %}
+    {% if user.is_authenticated %}
+    <div class="editorial-shell account-layout">
+      <div class="account-panel account-field--full">
+        <p class="editorial-kicker">{% trans "Tus decisiones" %}</p>
+        <h2>{% trans "Control de personalización comercial" %}</h2>
+        <p>{% trans "Puedes consultar los permisos que concediste al Quantum Coach de la tienda y revocarlos en cualquier momento. Comprar y usar tu cuenta no requiere estos permisos opcionales." %}</p>
+        <p><a class="editorial-text-link" href="{% url 'vendedor:privacy_receipt' %}" rel="nofollow">{% trans "Consultar registro de mis permisos" %}</a></p>
+        <form method="post" action="{% url 'vendedor:privacy_revoke_all' %}" onsubmit="return confirm('{% trans "¿Revocar todos los permisos de personalización comercial y borrar medidas y recuerdos guardados en la tienda?" %}');">
+          {% csrf_token %}
+          <input type="hidden" name="confirm" value="REVOCAR_PERSONALIZACION">
+          <button type="submit" class="editorial-text-link" style="background:none;border:none;cursor:pointer;">{% trans "Revocar toda la personalización comercial" %}</button>
+        </form>
+        <p>{% trans "Esta acción no elimina tu cuenta, pedidos ni planes. Para ejercer otros derechos sobre tus datos, consulta nuestra Política de tratamiento de datos." %}</p>
+      </div>
+    </div>
+    {% endif %}
   </section>
 </div>
 {{ municipios_por_departamento|json_script:"municipios-data" }}
