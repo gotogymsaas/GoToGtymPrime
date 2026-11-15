@@ -116,6 +116,36 @@
     </div>
 
     {% personalizacion_coach %}
+    {% get_current_language as ccb_language %}
+    {% if user.is_authenticated %}
+    <div class="editorial-shell account-layout">
+      <div class="account-panel account-field--full">
+        {% if ccb_language == 'en' %}
+        <p class="editorial-kicker">Your decisions</p>
+        <h2>Commercial personalization controls</h2>
+        <p>You can view the permissions you gave the Shop Quantum Coach and revoke them at any time. Shopping and using your account do not require optional personalization.</p>
+        <p><a class="editorial-text-link" href="{% url 'vendedor:privacy_receipt' %}" rel="nofollow">View my permission record</a></p>
+        <form method="post" action="{% url 'vendedor:privacy_revoke_all' %}" onsubmit="return confirm('Revoke all optional personalization and delete saved measurements and preferences from the Shop?');">
+          {% csrf_token %}
+          <input type="hidden" name="confirm" value="REVOCAR_PERSONALIZACION">
+          <button type="submit" class="editorial-text-link" style="background:none;border:none;cursor:pointer;">Revoke all commercial personalization</button>
+        </form>
+        <p>This does not delete your account, orders or plans. To exercise other data rights, review our privacy policy.</p>
+        {% else %}
+        <p class="editorial-kicker">Tus decisiones</p>
+        <h2>Control de personalización comercial</h2>
+        <p>Puedes consultar los permisos que concediste al Quantum Coach de la tienda y revocarlos en cualquier momento. Comprar y usar tu cuenta no requiere estos permisos opcionales.</p>
+        <p><a class="editorial-text-link" href="{% url 'vendedor:privacy_receipt' %}" rel="nofollow">Consultar registro de mis permisos</a></p>
+        <form method="post" action="{% url 'vendedor:privacy_revoke_all' %}" onsubmit="return confirm('¿Revocar todos los permisos de personalización comercial y borrar medidas y recuerdos guardados en la tienda?');">
+          {% csrf_token %}
+          <input type="hidden" name="confirm" value="REVOCAR_PERSONALIZACION">
+          <button type="submit" class="editorial-text-link" style="background:none;border:none;cursor:pointer;">Revocar toda la personalización comercial</button>
+        </form>
+        <p>Esta acción no elimina tu cuenta, pedidos ni planes. Para ejercer otros derechos sobre tus datos, consulta nuestra Política de tratamiento de datos.</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
   </section>
 </div>
 {{ municipios_por_departamento|json_script:"municipios-data" }}

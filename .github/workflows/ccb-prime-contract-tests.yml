@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'gotogym/vendedor/**'
+      - 'gotogym/accounts/templates/accounts/edit_profile.html'
       - 'gotogym/static/js/vendedor.js'
       - 'gotogym/gotogym/templates/partials/_vendedor_panel.html'
       - '.github/workflows/ccb-prime-contract-tests.yml'
@@ -34,6 +35,7 @@ jobs:
         run: >-
           python manage.py test
           vendedor.test_ccb_session
+          vendedor.test_ccb_privacy_flow
           vendedor.test_identidad
           vendedor.test_consentimiento
           vendedor.test_personalizacion_por_defecto
