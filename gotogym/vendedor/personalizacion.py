@@ -146,14 +146,14 @@ def contexto(user, now=None):
 @login_required
 @require_POST
 def guardar_permisos(request):
-    elegidos = set(request.POST.getlist("scopes")) & set(SCOPE_FIELDS)
+    elegidos = set(request.POST.getlist("scopes")) & (set(SCOPE_FIELDS) - {CONCLUSIONS_SCOPE})
     vinculado = _vinculado(request.user)
     if elegidos and not vinculado:
         messages.error(request, _("Para personalizar con Quantum Coach primero vincula tu cuenta GoToGym."))
         return _volver()
     now = timezone.now()
     consent = CommercePersonalizationConsent.objects.filter(user=request.user).first()
-    for scope in SCOPE_FIELDS:
+    for scope, _label, _description in SCOPES_VISIBLES:
         activo = consent is not None and consent.is_active(scope, now)
         quiere = scope in elegidos
         if quiere != activo:
