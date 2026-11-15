@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from .consentimiento import aplicar
-from .models import CommerceConsentAuditEvent, CommercePersonalizationConsent, SCOPE_FIELDS
+from .models import SCOPE_FIELDS, CommerceConsentAuditEvent, CommercePersonalizationConsent
 from .personalizacion import SCOPES_VISIBLES
 
 SCOPE = "experiences.commerce_guidance"
