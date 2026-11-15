@@ -27,6 +27,8 @@ from .models import (
 )
 
 SCOPES = SCOPE_FIELDS
+CONCLUSIONS_SCOPE = "experiences.commerce_conclusions"
+CONCLUSIONS_NOTICE_VERSION = "2026-11-14"
 MAX_BODY_BYTES = 1024
 
 
@@ -127,6 +129,7 @@ def aplicar(user, scope, allowed, now=None):
             row.save(update_fields=[field, "granted_at", "version", "updated_at"])
             CommerceConsentAuditEvent.objects.create(
                 user=user, scope=scope, allowed=allowed, consent_version=row.version,
+                notice_version=(CONCLUSIONS_NOTICE_VERSION if scope == CONCLUSIONS_SCOPE else ""),
             )
     return row
 
