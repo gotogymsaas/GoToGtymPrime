@@ -47,8 +47,6 @@ SCOPES_VISIBLES = (
      gettext_lazy("Qué agentes deportivos has completado, sin sus resultados.")),
     ("experiences.commerce_guidance", gettext_lazy("Experiencias útiles para mi compra"),
      gettext_lazy("Consultar únicamente si completé Alta Costura Inteligente, Arquitectura Corporal o Corrección de Postura; sugerir experiencias opcionales sin compartir fotos, resultados clínicos ni medidas.")),
-    ("experiences.commerce_conclusions", gettext_lazy("Conclusiones textiles de mis experiencias"),
-     gettext_lazy("Permito usar únicamente sugerencias textiles derivadas y verificadas de Alta Costura Inteligente; sin fotos, keypoints, medidas crudas ni información clínica. Es voluntario y revocable.")),
     ("tailoring.measurements", gettext_lazy("Medidas para tallas"),
      gettext_lazy("Las medidas que escribas aquí, solo para sugerirte tallas.")),
     ("conversation.commerce_memory", gettext_lazy("Recordar mis elecciones"),
@@ -78,7 +76,8 @@ ETIQUETAS_MEMORIA = {
     "color": gettext_lazy("Color"),
     "activity": gettext_lazy("Actividad"),
 }
-assert {s for s, _l, _d in SCOPES_VISIBLES} == set(SCOPE_FIELDS)
+CONCLUSIONS_SCOPE = "experiences.commerce_conclusions"
+assert {s for s, _l, _d in SCOPES_VISIBLES} == set(SCOPE_FIELDS) - {CONCLUSIONS_SCOPE}
 assert set(ETIQUETAS_MEMORIA) == set(MEMORY_KINDS)
 
 
@@ -112,6 +111,11 @@ def contexto(user, now=None):
             for item in CommerceMemoryItem.objects.filter(user=user, expires_at__gt=now).order_by("kind")
         ]
     activos = sum(1 for fila in filas if fila["activo"])
+    conclusions_active = consent is not None and consent.is_active(CONCLUSIONS_SCOPE, now)
+    conclusions_expires = (
+        timezone.datetime.fromisoformat(consent.granted_at[CONCLUSIONS_SCOPE]) + CONSENT_VALIDITY
+        if conclusions_active else None
+    )
     return {
         "vinculado": _vinculado(user),
         # Sin OIDC habilitado en el servidor no hay con que vincular: no se
@@ -122,8 +126,9 @@ def contexto(user, now=None):
         ),
         "activos": activos,
         "total": len(filas),
-        "todo_activo": all(fila["activo"] for fila in filas
-                           if fila["scope"] != "experiences.commerce_conclusions"),
+        "todo_activo": activos == len(filas),
+        "conclusions_active": conclusions_active,
+        "conclusions_expires": conclusions_expires,
         "filas": filas,
         "medidas_activo": medidas_activo,
         "medidas": [
@@ -180,6 +185,26 @@ def guardar_todo(request):
         messages.success(request, _("Activamos la personalización con Quantum Coach."))
     else:
         messages.success(request, _("Desactivamos la personalización con Quantum Coach."))
+    return _volver()
+
+
+@login_required
+@require_POST
+def guardar_conclusiones(request):
+    """Decisión aislada: nunca cambia los otros permisos comerciales."""
+    action = request.POST.get("accion")
+    if action not in {"conceder", "revocar"}:
+        messages.error(request, _("Elige una decisión válida."))
+        return _volver()
+    allowed = action == "conceder"
+    if allowed and not _vinculado(request.user):
+        messages.error(request, _("Primero vincula tu cuenta GoToGym."))
+        return _volver()
+    consentimiento.aplicar(request.user, CONCLUSIONS_SCOPE, allowed)
+    messages.success(
+        request,
+        _("Autorización para conclusiones textiles actualizada.")
+    )
     return _volver()
 
 
