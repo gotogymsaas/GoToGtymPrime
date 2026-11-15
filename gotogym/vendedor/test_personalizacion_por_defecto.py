@@ -19,7 +19,7 @@ from .models import (
 )
 
 PERFIL = "/es/accounts/editar-perfil/"
-TODOS = sorted(SCOPE_FIELDS)
+TODOS = sorted(set(SCOPE_FIELDS) - {"experiences.commerce_conclusions"})
 
 
 def _activos(user):
