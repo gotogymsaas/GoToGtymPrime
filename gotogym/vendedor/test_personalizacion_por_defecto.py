@@ -40,7 +40,7 @@ class AlCrearElPerfilTests(TestCase):
     def test_el_formulario_de_registro_lo_avisa_junto_a_los_terminos(self):
         html = self.client.get(reverse("register")).content.decode()
         self.assertIn('aria-describedby="personalizacion-aviso"', html)
-        self.assertIn("Puedes activar la personalización con Quantum Coach desde Mi cuenta", html)
+        self.assertIn("Para activar la personalización, entra con tu cuenta GoToGym", html)
         self.assertIn(reverse("politica_tratamiento_datos"), html)
 
     def test_un_registro_fallido_no_concede_nada(self):
