@@ -1,20 +1,22 @@
 """M11/M12/M14: recibo y revocación comercial bajo identidad de sesión propia."""
-from decimal import Decimal
 from datetime import timedelta
+from decimal import Decimal
+
 from django.contrib.auth import get_user_model
-from django.test import TestCase, override_settings
+from django.contrib.sessions.backends.db import SessionStore
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from gotogym_oidc.models import ExternalIdentityLink
 
 from .consentimiento import aplicar
-from .models import (
-    CommerceConsentAuditEvent, CommerceMemoryItem,
-    CommercePersonalizationConsent, TailoringMeasurement,
-)
 from .estado import estado_usuario
-from django.test import RequestFactory
-from django.contrib.sessions.backends.db import SessionStore
+from .models import (
+    CommerceConsentAuditEvent,
+    CommerceMemoryItem,
+    CommercePersonalizationConsent,
+    TailoringMeasurement,
+)
 
 ISSUER = "https://verified.example/tenant/v2.0"
 CONFIG = {
