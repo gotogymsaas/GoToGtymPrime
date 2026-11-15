@@ -1,0 +1,29 @@
+{
+  "schema_version": "qaf.sgae.manifest.v1",
+  "product": "prime",
+  "publication_status": "pending_legal_review",
+  "commercial_opt_in_default": false,
+  "commercial_scopes": [
+    "profile.display_name",
+    "profile.basic",
+    "sports.preferences",
+    "experiences.summary",
+    "tailoring.measurements",
+    "conversation.commerce_memory"
+  ],
+  "source_documents": [
+    "gotogym/accounts/templates/accounts/terms_and_conditions.html",
+    "gotogym/accounts/templates/accounts/accept_terms.html",
+    "gotogym/gotogym/templates/static_pages/politicas_privacidad_usuario.html",
+    "gotogym/gotogym/politicas_contenido.py"
+  ],
+  "legal_references": [
+    "Ley 1581 de 2012",
+    "Decreto 1377 de 2013 / 1074 de 2015",
+    "Ley 1480 de 2011",
+    "Ley 2439 de 2024",
+    "Sentencia C-192 de 2026",
+    "SIC Circular Externa 002 de 2024"
+  ],
+  "governance": "No publicar nuevos términos ni reinterpretar permisos antiguos sin aprobación jurídica y evidencia de finalidad equivalente."
+}
