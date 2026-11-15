@@ -122,7 +122,8 @@ def contexto(user, now=None):
         ),
         "activos": activos,
         "total": len(filas),
-        "todo_activo": all(fila["activo"] for fila in filas\n                           if fila["scope"] != "experiences.commerce_conclusions"),
+        "todo_activo": all(fila["activo"] for fila in filas
+                           if fila["scope"] != "experiences.commerce_conclusions"),
         "filas": filas,
         "medidas_activo": medidas_activo,
         "medidas": [
