@@ -19,7 +19,7 @@ from .models import (
 )
 
 PERFIL = "/es/accounts/editar-perfil/"
-TODOS = sorted(SCOPE_FIELDS)
+TODOS = sorted(set(SCOPE_FIELDS) - {"experiences.commerce_conclusions"})
 
 
 def _activos(user):
@@ -112,7 +112,7 @@ class InterruptorTests(TestCase):
         self.vincular()
         aplicar(self.user, "profile.basic", True)
         seccion = self.client.get(PERFIL).content.decode()
-        self.assertIn("Activada en 1 de 7 permisos", seccion)
+        self.assertIn("Activada en 1 de 8 permisos", seccion)
         self.assertIn('role="switch" aria-checked="false"', seccion)
         self.assertIn('account-personalizacion-detalle" open', seccion)
         # Pulsar el interruptor en ese estado activa todo.
