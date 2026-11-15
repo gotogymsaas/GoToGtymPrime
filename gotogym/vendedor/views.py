@@ -19,10 +19,11 @@ from django.core.cache import cache
 from django.http import Http404, JsonResponse
 from django.urls import reverse
 from django.utils import timezone
-from django.views.decorators.http import require_POST
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_GET, require_POST
 from gotogym.ratelimit import contar, ip_del_cliente, rate_limit
 
-from . import coach_client, contrato, conversacion, paquete, respuesta
+from . import coach_client, contrato, conversacion, estado, paquete, respuesta
 from .exposicion import visible_para
 
 logger = logging.getLogger(__name__)
@@ -151,14 +152,16 @@ def _atender(request):
     espera = _segundos_de_espera(request)
     if espera:
         return _error('espera', 429, espera)
-    estado = conversacion.obtener(request.session, reiniciar=datos.get('new') is True)
-    if estado['turnos'] >= settings.VENDEDOR_MAX_TURNOS:
+    identity_epoch = estado.estado_usuario(request)['epoch']
+    estado_conversacion = conversacion.obtener(request.session, reiniciar=datos.get('new') is True,
+                                              binding=identity_epoch)
+    if estado_conversacion['turnos'] >= settings.VENDEDOR_MAX_TURNOS:
         return _error('limite_turnos', 409)
     if _tope_diario_superado(request):
         return _error('limite_diario', 429)
 
     try:
-        solicitud = paquete.armar_solicitud(request, texto, estado['id'])
+        solicitud = paquete.armar_solicitud(request, texto, estado_conversacion['id'])
     except contrato.ContratoInvalido as error:
         logger.error('Vendedor: no se pudo armar un paquete valido (%s).', error)
         return _error('paquete_invalido', 500, diagnostico=_diagnostico_para(request, 'paquete_invalido', error))
@@ -188,14 +191,14 @@ def _atender(request):
     if segura.descartadas:
         logger.info('Vendedor: se descartaron %s propuestas del Coach.', segura.descartadas)
 
-    conversacion.turno_completado(request.session, estado)
+    conversacion.turno_completado(request.session, estado_conversacion)
     return JsonResponse({
         'ok': True,
         'reply': segura.texto,
         'cards': segura.tarjetas,
         'actions': segura.acciones,
         'handoff': segura.contacto,
-        'conversation': {'turns': estado['turnos'], 'max_turns': settings.VENDEDOR_MAX_TURNOS},
+        'conversation': {'turns': estado_conversacion['turnos'], 'max_turns': settings.VENDEDOR_MAX_TURNOS},
     })
 
 
@@ -206,3 +209,14 @@ def mensaje(request):
     if not visible_para(request):
         raise Http404
     return _limitado(_atender)(request)
+
+@never_cache
+@require_GET
+def identidad_estado(request):
+    """Estado opaco de la sesión para actualizar el chat sin mezclar propietarios."""
+    if not visible_para(request):
+        raise Http404
+    result = estado.estado_usuario(request)
+    response = JsonResponse(result)
+    response['Cache-Control'] = 'no-store'
+    return response

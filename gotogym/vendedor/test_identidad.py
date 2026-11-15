@@ -55,6 +55,21 @@ class IdentityAssertionTests(TestCase):
         conceder(self.ana, "profile.basic")
         self.assertIsNone(identidad.emitir(self.ana))
 
+    @override_settings(VENDEDOR_IDENTIDAD_SECRETO=(
+        "@Microsoft.KeyVault(SecretUri=https://kv.example.vault.azure.net/secrets/test/)"
+    ))
+    def test_referencia_key_vault_sin_resolver_no_firma_identidad(self):
+        self.vincular(self.ana, "oid-ana")
+        conceder(self.ana, "profile.basic")
+        self.assertIsNone(identidad.credencial())
+        self.assertIsNone(identidad.emitir(self.ana))
+
+    @override_settings(VENDEDOR_IDENTIDAD_CLAVE_ID="id con espacios")
+    def test_identificador_malformado_no_emite_identidad(self):
+        self.vincular(self.ana, "oid-ana")
+        conceder(self.ana, "profile.basic")
+        self.assertIsNone(identidad.emitir(self.ana))
+
     def test_enlace_de_otro_issuer_no_cuenta(self):
         ExternalIdentityLink.objects.create(user=self.ana, issuer="https://otro/v2.0", subject="oid-ana")
         conceder(self.ana, "profile.basic")

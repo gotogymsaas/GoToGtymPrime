@@ -3,7 +3,7 @@ import json
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.utils import timezone
 from gotogym_oidc.models import ExternalIdentityLink
 
@@ -12,6 +12,7 @@ from .models import CommerceConsentAuditEvent, CommercePersonalizationConsent
 URL = "/es/vendedor/consentimiento/"
 
 
+@override_settings(GOTOGYM_OIDC={"ISSUER": "https://verified.example/tenant/v2.0"})
 class CommerceConsentTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(
@@ -95,6 +96,7 @@ class CommerceConsentTests(TestCase):
         self.assertFalse(CommercePersonalizationConsent.objects.exists())
 
 
+@override_settings(GOTOGYM_OIDC={"ISSUER": "https://verified.example/tenant/v2.0"})
 class CommerceConsentLifecycleTests(TestCase):
     """Revocacion sin enlace, caducidad de 12 meses y memoria comercial."""
 

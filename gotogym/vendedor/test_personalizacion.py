@@ -21,6 +21,7 @@ from .test_utilidades import crear_producto
 PERFIL = "/es/accounts/editar-perfil/"
 
 
+@override_settings(GOTOGYM_OIDC={"ISSUER": "https://verified.example/v2.0", "SUBJECT_CLAIM": "oid"})
 class Base(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(
@@ -259,7 +260,8 @@ class InvitacionEnElPanelTests(Base):
         self.permisos("conversation.commerce_memory")
         self.assertIn('"puedeRecordar": true', self.html())
 
-    def test_sin_vinculo_o_anonimo_no_se_invita(self):
-        self.assertNotIn("data-vendedor-invitacion", self.html())
+    def test_sin_vinculo_se_invita_a_vincular_sin_otorgar_permiso(self):
+        self.assertIn("data-vendedor-invitacion", self.html())
+        self.assertFalse(CommercePersonalizationConsent.objects.exists())
         self.client.logout()
         self.assertNotIn("data-vendedor-invitacion", self.html())

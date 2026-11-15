@@ -1,0 +1,44 @@
+name: Cognitive Commerce Bridge Prime contract tests
+on:
+  pull_request:
+    paths:
+      - 'gotogym/vendedor/**'
+      - 'gotogym/static/js/vendedor.js'
+      - 'gotogym/gotogym/templates/partials/_vendedor_panel.html'
+      - '.github/workflows/ccb-prime-contract-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  commerce_bridge:
+    name: CCB identity consent session and migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Lint and verify migrations
+        run: |
+          python -m ruff check gotogym/vendedor
+          cd gotogym
+          python manage.py check --settings=gotogym.settings_test
+          python manage.py makemigrations --check --dry-run --settings=gotogym.settings_test
+      - name: Test CCB identity, consent, migration and transitions
+        working-directory: gotogym
+        run: >-
+          python manage.py test
+          vendedor.test_ccb_session
+          vendedor.test_identidad
+          vendedor.test_consentimiento
+          vendedor.test_personalizacion_por_defecto
+          vendedor.test_personalizacion
+          vendedor.test_views
+          vendedor.test_interfaz
+          gotogym.test_ingles_completo
+          --settings=gotogym.settings_test --parallel 1

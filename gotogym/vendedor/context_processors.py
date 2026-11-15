@@ -1,8 +1,9 @@
 import json
 
+from django.conf import settings
 from django.utils.functional import SimpleLazyObject
 
-from . import conversacion
+from . import conversacion, estado
 from .exposicion import coach_configurado, visible_para
 
 
@@ -23,8 +24,9 @@ def _invitar_a_personalizar(request):
 
     from .models import CommercePersonalizationConsent
 
-    if not ExternalIdentityLink.objects.filter(user=user).exists():
-        return False
+    issuer = (getattr(settings, 'GOTOGYM_OIDC', {}) or {}).get('ISSUER')
+    if not issuer or not ExternalIdentityLink.objects.filter(user=user, issuer=issuer).exists():
+        return True
     consent = CommercePersonalizationConsent.objects.filter(user=user).first()
     return consent is None or not consent.active_scopes()
 
@@ -56,4 +58,5 @@ def vendedor(request):
         'vendedor_urls_soluciones': SimpleLazyObject(_urls_de_soluciones_json),
         # El panel olvida lo que muestra cuando el servidor ya olvido la conversacion.
         'vendedor_vigencia_historial': conversacion.INACTIVIDAD_SEGUNDOS,
+        'vendedor_identity_epoch': SimpleLazyObject(lambda: estado.estado_usuario(request)['epoch'] if visible else ''),
     }

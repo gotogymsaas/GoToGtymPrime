@@ -1,10 +1,10 @@
-"""Personalización activa al crear el perfil e interruptor único en Mi cuenta."""
+"""Consentimiento explícito en Mi cuenta, sin autorización automática al registrarse."""
 from datetime import timedelta
 from decimal import Decimal
 
 from accounts.signals import perfil_creado
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from gotogym_oidc.models import ExternalIdentityLink
@@ -28,30 +28,30 @@ def _activos(user):
 
 
 class AlCrearElPerfilTests(TestCase):
-    def test_el_registro_activa_todos_los_permisos_y_queda_auditado(self):
+    def test_el_registro_no_autoriza_permisos_y_no_emite_auditoria(self):
         respuesta = self.client.post(reverse("register"), {
             "first_name": "Luis", "email": "luis@example.com", "password1": "Clave-segura1!", "accepted_terms": "on",
         })
         self.assertEqual(respuesta.status_code, 302)
         usuario = get_user_model().objects.get(email="luis@example.com")
-        self.assertEqual(_activos(usuario), TODOS)
-        self.assertEqual(CommerceConsentAuditEvent.objects.filter(user=usuario, allowed=True).count(), len(TODOS))
+        self.assertEqual(_activos(usuario), [])
+        self.assertEqual(CommerceConsentAuditEvent.objects.filter(user=usuario).count(), 0)
 
     def test_el_formulario_de_registro_lo_avisa_junto_a_los_terminos(self):
         html = self.client.get(reverse("register")).content.decode()
         self.assertIn('aria-describedby="personalizacion-aviso"', html)
-        self.assertIn("Al crear tu cuenta se activa la personalización con Quantum Coach", html)
+        self.assertIn("Para activar la personalización, entra con tu cuenta GoToGym", html)
         self.assertIn(reverse("politica_tratamiento_datos"), html)
 
     def test_un_registro_fallido_no_concede_nada(self):
         self.client.post(reverse("register"), {"first_name": "Luis", "email": "luis@example.com", "password1": "x"})
         self.assertFalse(CommercePersonalizationConsent.objects.exists())
 
-    def test_aceptar_los_terminos_tras_el_primer_acceso_con_gotogym_tambien_activa(self):
+    def test_aceptar_terminos_con_gotogym_no_otorga_permisos_de_memoria(self):
         usuario = get_user_model().objects.create_user(email="sso@example.com", username="sso", password="x")
         self.client.force_login(usuario)
         self.client.post(reverse("accept_terms"), {"accepted_terms": "on", "next": "/es/"})
-        self.assertEqual(_activos(usuario), TODOS)
+        self.assertEqual(_activos(usuario), [])
 
     def test_no_reactiva_lo_que_la_persona_ya_apago(self):
         usuario = get_user_model().objects.create_user(email="ana@example.com", username="ana", password="x")
@@ -66,6 +66,7 @@ class AlCrearElPerfilTests(TestCase):
         self.assertEqual(_activos(usuario), [])
 
 
+@override_settings(GOTOGYM_OIDC={"ISSUER": "https://verified.example/v2.0"})
 class InterruptorTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(email="eva@example.com", username="eva", password="x")
@@ -100,10 +101,10 @@ class InterruptorTests(TestCase):
     def test_sin_vinculo_no_se_activa_a_mano_pero_si_se_puede_apagar(self):
         self.todo("activar")
         self.assertEqual(_activos(self.user), [])
-        conceder_al_crear_perfil(self.user)  # como si viniera del registro
+        conceder_al_crear_perfil(self.user)  # el registro ya no otorga permisos
         html = self.client.get(PERFIL).content.decode()
-        self.assertIn("empezará a funcionar cuando vincules tu cuenta GoToGym", html)
-        self.assertIn("Desactivar personalización", html)
+        self.assertIn("Vincula tu cuenta GoToGym", html)
+        self.assertEqual(_activos(self.user), [])
         self.todo("desactivar")
         self.assertEqual(_activos(self.user), [])
 
@@ -111,7 +112,7 @@ class InterruptorTests(TestCase):
         self.vincular()
         aplicar(self.user, "profile.basic", True)
         seccion = self.client.get(PERFIL).content.decode()
-        self.assertIn("Activada en 1 de 5 permisos", seccion)
+        self.assertIn("Activada en 1 de 6 permisos", seccion)
         self.assertIn('role="switch" aria-checked="false"', seccion)
         self.assertIn('account-personalizacion-detalle" open', seccion)
         # Pulsar el interruptor en ese estado activa todo.

@@ -40,6 +40,7 @@
   if (!configuracion.endpoint || !window.fetch) return;
 
   var CLAVE_HISTORIAL = 'gtg_vendedor_historial';
+  var identityEpoch = configuracion.identityEpoch || '';
   var CLAVE_AVISO = 'gtg_vendedor_aviso';
   var MAX_ENTRADAS = 24;
   var ESPERA_POR_DEFECTO = 10;
@@ -120,7 +121,7 @@
 
   // Se guarda con la hora del ultimo cambio: { ts, e: [entradas] }.
   function guardarHistorial() {
-    guardar(CLAVE_HISTORIAL, JSON.stringify({ ts: Date.now(), e: historial.slice(-MAX_ENTRADAS) }));
+    guardar(CLAVE_HISTORIAL, JSON.stringify({ ts: Date.now(), epoch: identityEpoch, e: historial.slice(-MAX_ENTRADAS) }));
   }
 
   // Un historial vencido, sin hora (formato anterior) o ilegible se descarta.
@@ -129,7 +130,8 @@
     if (!crudo) return [];
     try {
       var datos = JSON.parse(crudo);
-      var vigente = datos && typeof datos.ts === 'number' && Date.now() - datos.ts <= VIGENCIA_MS;
+      var vigente = datos && typeof datos.ts === 'number' && Date.now() - datos.ts <= VIGENCIA_MS &&
+        datos.epoch === identityEpoch;
       return vigente && Array.isArray(datos.e) ? datos.e.slice(-MAX_ENTRADAS) : [];
     } catch (error) {
       return [];
@@ -416,6 +418,38 @@
     return 'error';
   }
 
+  // --- Identidad actual del servidor ------------------------------------------
+  // Evita atribuir a una persona el historial visual de otra cuenta o del
+  // visitante que inició sesión. El navegador nunca elige el principal.
+  function verificarEpoch(mensaje) {
+    if (!configuracion.estadoUrl) return Promise.resolve();
+    return fetch(configuracion.estadoUrl, {
+      method: 'GET',
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { 'Accept': 'application/json' }
+    }).then(function (respuesta) {
+      if (!respuesta.ok) throw new Error('identity_status_unavailable');
+      return respuesta.json();
+    }).then(function (datos) {
+      if (!datos || !/^[0-9a-f]{32}$/.test(datos.epoch || '')) {
+        throw new Error('identity_epoch_invalid');
+      }
+      if (datos.epoch !== identityEpoch) {
+        identityEpoch = datos.epoch;
+        empezarDeNuevo();
+        // El mensaje recién escrito no se pierde cuando cambia el contexto;
+        // todo el historial anterior se descarta antes de reenviarlo.
+        ultimoMensaje = mensaje;
+        ocultarBienvenida();
+        historial.push({ r: 'u', t: mensaje });
+        guardarHistorial();
+        pintarUsuario(mensaje);
+        medir('vendedor_identity_transition', { mode: datos.mode || 'unknown' });
+      }
+    });
+  }
+
   // --- Envio ---------------------------------------------------------------
 
   function enviar(mensaje) {
@@ -425,10 +459,10 @@
     mostrarEstado(true);
     actualizarControles();
 
-    var cuerpo = { message: mensaje };
-    if (nuevaConversacion) cuerpo['new'] = true;
-
-    fetch(configuracion.endpoint, {
+    verificarEpoch(mensaje).then(function () {
+      var cuerpo = { message: mensaje };
+      if (nuevaConversacion) cuerpo['new'] = true;
+      return fetch(configuracion.endpoint, {
       method: 'POST',
       credentials: 'same-origin',
       headers: {
@@ -438,6 +472,7 @@
         'X-Requested-With': 'XMLHttpRequest'
       },
       body: JSON.stringify(cuerpo)
+      });
     }).then(function (respuesta) {
       // Un 429 del limitador o un 403 de CSRF pueden no traer JSON.
       return respuesta.text().then(function (crudo) {

@@ -19,6 +19,7 @@ import base64
 import hashlib
 import hmac
 import json
+import re
 import secrets
 import time
 
@@ -41,7 +42,13 @@ def credencial():
     """`(clave_id, secreto)` o `None` si no esta configurada."""
     clave = getattr(settings, 'VENDEDOR_IDENTIDAD_CLAVE_ID', '') or ''
     secreto = getattr(settings, 'VENDEDOR_IDENTIDAD_SECRETO', '') or ''
-    if not clave or not secreto:
+    if not isinstance(clave, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,40}', clave):
+        return None
+    if not isinstance(secreto, str) or not secreto or secreto != secreto.strip():
+        return None
+    # Si Azure devuelve literalmente la referencia, Key Vault no se resolvió.
+    # Nunca firmar una identidad usando ese texto conocido públicamente.
+    if secreto.lower().startswith('@microsoft.keyvault('):
         return None
     return clave, secreto
 
