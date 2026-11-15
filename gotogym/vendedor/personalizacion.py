@@ -47,6 +47,8 @@ SCOPES_VISIBLES = (
      gettext_lazy("Qué agentes deportivos has completado, sin sus resultados.")),
     ("experiences.commerce_guidance", gettext_lazy("Experiencias útiles para mi compra"),
      gettext_lazy("Consultar únicamente si completé Alta Costura Inteligente, Arquitectura Corporal o Corrección de Postura; sugerir experiencias opcionales sin compartir fotos, resultados clínicos ni medidas.")),
+    ("experiences.commerce_conclusions", gettext_lazy("Conclusiones textiles de mis experiencias"),
+     gettext_lazy("Permito usar únicamente sugerencias textiles derivadas y verificadas de Alta Costura Inteligente; sin fotos, keypoints, medidas crudas ni información clínica. Es voluntario y revocable.")),
     ("tailoring.measurements", gettext_lazy("Medidas para tallas"),
      gettext_lazy("Las medidas que escribas aquí, solo para sugerirte tallas.")),
     ("conversation.commerce_memory", gettext_lazy("Recordar mis elecciones"),
@@ -166,6 +168,10 @@ def guardar_todo(request):
     now = timezone.now()
     consent = CommercePersonalizationConsent.objects.filter(user=request.user).first()
     for scope in SCOPE_FIELDS:
+        # El interruptor masivo no puede conceder conclusiones corporales: requiere
+        # una decisión específica del titular en su casilla independiente.
+        if activar and scope == "experiences.commerce_conclusions":
+            continue
         activo = consent is not None and consent.is_active(scope, now)
         if activo != activar:
             consentimiento.aplicar(request.user, scope, activar, now)
