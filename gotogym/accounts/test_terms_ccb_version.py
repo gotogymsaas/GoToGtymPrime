@@ -2,11 +2,10 @@
 import hashlib
 from pathlib import Path
 
+from accounts.views import TERMS_PATH
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-
-from accounts.views import TERMS_PATH
 from vendedor.models import CommercePersonalizationConsent
 
 EN = Path(__file__).resolve().parent / "templates" / "accounts" / "terms_and_conditions_en.html"
