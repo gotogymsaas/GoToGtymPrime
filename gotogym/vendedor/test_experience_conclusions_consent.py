@@ -25,7 +25,7 @@ class ExperienceConclusionsPermissionTests(TestCase):
         row = aplicar(self.user, "experiences.commerce_guidance", True)
         self.assertFalse(row.is_active(SCOPE))
         self.assertFalse(row.experience_conclusions)
-        self.assertIn(SCOPE, {scope for scope, _, _ in SCOPES_VISIBLES})
+        self.assertNotIn(SCOPE, {scope for scope, _, _ in SCOPES_VISIBLES})
 
     def test_specific_consent_is_audited_and_revocable(self):
         row = aplicar(self.user, SCOPE, True)
@@ -49,7 +49,7 @@ class ExperienceConclusionsPermissionTests(TestCase):
 
     def test_explicit_form_optin_then_bulk_disable_revokes(self):
         with patch("vendedor.personalizacion._vinculado", return_value=True):
-            response = self.client.post(reverse("vendedor:personalizacion_permisos"), {"scopes": [SCOPE]})
+            response = self.client.post(reverse("vendedor:personalizacion_conclusiones"), {"accion": "conceder"})
         self.assertEqual(response.status_code, 302)
         self.assertTrue(CommercePersonalizationConsent.objects.get(user=self.user).is_active(SCOPE))
         self.client.post(reverse("vendedor:personalizacion_todo"), {"accion": "desactivar"})
@@ -84,3 +84,29 @@ class ExperienceConclusionsPermissionTests(TestCase):
         self.assertIn(SCOPE, decoded["scopes"])
         aplicar(self.user, SCOPE, False)
         self.assertNotIn(SCOPE, verificar("test-only-secret-not-for-production", emitir(self.user))["scopes"])
+
+
+    def test_general_permissions_form_never_modifies_independent_conclusions(self):
+        aplicar(self.user, SCOPE, True)
+        with patch("vendedor.personalizacion._vinculado", return_value=True):
+            self.client.post(reverse("vendedor:personalizacion_permisos"), {
+                "scopes": ["profile.basic"]
+            })
+        row = CommercePersonalizationConsent.objects.get(user=self.user)
+        self.assertTrue(row.is_active(SCOPE))
+        self.assertTrue(row.is_active("profile.basic"))
+
+    def test_independent_button_never_grants_or_revokes_other_scopes(self):
+        aplicar(self.user, "profile.basic", True)
+        with patch("vendedor.personalizacion._vinculado", return_value=True):
+            self.client.post(reverse("vendedor:personalizacion_conclusiones"), {"accion": "conceder"})
+            self.client.post(reverse("vendedor:personalizacion_conclusiones"), {"accion": "revocar"})
+        row = CommercePersonalizationConsent.objects.get(user=self.user)
+        self.assertTrue(row.is_active("profile.basic"))
+        self.assertFalse(row.is_active(SCOPE))
+
+    def test_conclusions_call_to_action_visible_in_account(self):
+        with patch("vendedor.personalizacion._vinculado", return_value=True):
+            response = self.client.get(reverse("edit_profile"))
+        self.assertContains(response, "Autorizar conclusiones textiles")
+        self.assertContains(response, reverse("vendedor:personalizacion_conclusiones"))
