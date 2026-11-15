@@ -79,7 +79,7 @@ DEVOLUCIONES = {
             'Si ejerces válidamente el retracto, devolveremos lo pagado sin descuentos ni retenciones '
             'indebidas en un máximo de 15 días calendario, una vez cumplas los requisitos legales: '
             'devolver el producto y suministrar los datos correctos y completos para el reembolso. '
-            'El dinero se devolverá al medio de pago correspondiente o al acordado legalmente.',
+            'Reembolsaremos por el medio de pago legalmente aplicable.',
         ]},
         {'title': 'Reversión del pago', 'paragraphs': [
             'Si pagaste con tarjeta u otro instrumento electrónico y fuiste víctima de fraude, no solicitaste '
