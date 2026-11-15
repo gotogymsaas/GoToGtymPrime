@@ -45,6 +45,8 @@ SCOPES_VISIBLES = (
      gettext_lazy("Lo que confirmaste en Quantum Coach: actividad, metas y horarios.")),
     ("experiences.summary", gettext_lazy("Experiencias deportivas"),
      gettext_lazy("Qué agentes deportivos has completado, sin sus resultados.")),
+    ("experiences.commerce_guidance", gettext_lazy("Experiencias útiles para mi compra"),
+     gettext_lazy("Consultar únicamente si completé Alta Costura Inteligente, Arquitectura Corporal o Corrección de Postura; sugerir experiencias opcionales sin compartir fotos, resultados clínicos ni medidas.")),
     ("tailoring.measurements", gettext_lazy("Medidas para tallas"),
      gettext_lazy("Las medidas que escribas aquí, solo para sugerirte tallas.")),
     ("conversation.commerce_memory", gettext_lazy("Recordar mis elecciones"),
