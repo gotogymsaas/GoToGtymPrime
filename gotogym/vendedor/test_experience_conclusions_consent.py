@@ -2,10 +2,12 @@
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
+from gotogym_oidc.models import ExternalIdentityLink
 
 from .consentimiento import aplicar
+from .identidad import emitir, verificar
 from .models import CommerceConsentAuditEvent, CommercePersonalizationConsent
 from .personalizacion import SCOPES_VISIBLES, contexto
 
@@ -60,3 +62,25 @@ class ExperienceConclusionsPermissionTests(TestCase):
         aplicar(self.user, SCOPE, True)
         self.assertFalse(CommercePersonalizationConsent.objects.filter(user=other).exists())
         self.assertFalse(CommerceConsentAuditEvent.objects.filter(user=other).exists())
+
+
+    @override_settings(
+        GOTOGYM_OIDC={"ISSUER": "https://verified.example/tenant/v2.0"},
+        VENDEDOR_IDENTIDAD_CLAVE_ID="test-key",
+        VENDEDOR_IDENTIDAD_SECRETO="test-only-secret-not-for-production",
+    )
+    def test_signed_assertion_contains_only_live_exact_scopes(self):
+        ExternalIdentityLink.objects.create(
+            user=self.user, issuer="https://verified.example/tenant/v2.0", subject="verified-oid",
+        )
+        aplicar(self.user, "experiences.commerce_guidance", True)
+        packet = emitir(self.user)
+        self.assertIsNotNone(packet)
+        decoded = verificar("test-only-secret-not-for-production", packet)
+        self.assertNotIn(SCOPE, decoded["scopes"])
+        aplicar(self.user, SCOPE, True)
+        packet = emitir(self.user)
+        decoded = verificar("test-only-secret-not-for-production", packet)
+        self.assertIn(SCOPE, decoded["scopes"])
+        aplicar(self.user, SCOPE, False)
+        self.assertNotIn(SCOPE, verificar("test-only-secret-not-for-production", emitir(self.user))["scopes"])
