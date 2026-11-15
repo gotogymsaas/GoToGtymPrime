@@ -73,6 +73,8 @@ def emitir(user, ahora=None):
         return None
     consent = CommercePersonalizationConsent.objects.filter(user=user).first()
     scopes = consent.active_scopes() if consent else []
+    # Nunca heredar conclusiones del consentimiento de finalización.
+    # La emisión conserva únicamente los scopes activos exactos.
     if not scopes:
         return None
 
