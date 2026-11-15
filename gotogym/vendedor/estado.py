@@ -47,7 +47,15 @@ def estado_usuario(request):
     private = f"{nonce}|{identity}|{mode}|{version}|{','.join(scopes)}"
     epoch = hmac.new(settings.SECRET_KEY.encode("utf-8"), private.encode("utf-8"),
                      hashlib.sha256).hexdigest()[:32]
+    next_step = {
+        "anonymous": "continue_general",
+        "link_required": "link_account",
+        "consent_required": "optional_personalization",
+        "identity_not_ready": "continue_general",
+        "linked": "ready",
+    }[mode]
     return {
+        "next_step": next_step,
         "epoch": epoch,
         "mode": mode,
         "personalization_ready": mode == "linked",
