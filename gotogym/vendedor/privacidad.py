@@ -37,7 +37,7 @@ def recibo(request):
     row = CommercePersonalizationConsent.objects.filter(user=request.user).first()
     audit = CommerceConsentAuditEvent.objects.filter(user=request.user)
     latest = list(audit.order_by("-pk").values(
-        "scope", "allowed", "consent_version", "created_at")[:MAX_EVENTS])
+        "scope", "allowed", "consent_version", "notice_version", "created_at")[:MAX_EVENTS])
     response = JsonResponse({
         "schema_version": 1,
         "product": "gotogym_shop",
