@@ -33,10 +33,9 @@ class ExperienceConclusionsPermissionTests(TestCase):
         self.assertIn(SCOPE, row.granted_at)
         row = aplicar(self.user, SCOPE, False)
         self.assertFalse(row.is_active(SCOPE))
-        self.assertEqual(
-            list(CommerceConsentAuditEvent.objects.filter(user=self.user, scope=SCOPE)
-                 .values_list("allowed", flat=True)), [True, False],
-        )
+        events = list(CommerceConsentAuditEvent.objects.filter(user=self.user, scope=SCOPE)
+                      .values_list("allowed", "notice_version"))
+        self.assertEqual(events, [(True, "2026-11-14"), (False, "2026-11-14")])
 
     def test_bulk_enable_does_not_enable_independent_conclusions(self):
         with patch("vendedor.personalizacion._vinculado", return_value=True):
