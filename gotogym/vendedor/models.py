@@ -73,6 +73,8 @@ class CommerceConsentAuditEvent(models.Model):
     scope = models.CharField(max_length=64)
     allowed = models.BooleanField()
     consent_version = models.PositiveIntegerField()
+    # Evidence of the specific legal notice presented for optional conclusions.
+    notice_version = models.CharField(max_length=16, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
