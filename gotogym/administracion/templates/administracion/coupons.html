@@ -41,6 +41,7 @@
           {% if coupon.is_usable %}<span class="pill pill-ok">Vigente</span>
           {% elif coupon.is_active %}<span class="badge badge-gold">Fuera de vigencia</span>
           {% else %}<span class="pill pill-off">Desactivado</span>{% endif %}
+          {% if coupon.coach_can_offer %}<small>Lo ofrece Quantum Coach</small>{% endif %}
         </td>
         <td class="actions">
           {% if perms.orders.change_coupon %}

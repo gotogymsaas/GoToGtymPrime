@@ -70,6 +70,13 @@ class Coupon(models.Model):
         related_name='coupons',
         help_text='Si se asigna, solo los clientes de este segmento pueden usar el cupón (precio diferenciado por segmento).',
     )
+    # Opt-in explicito: un cupon no se vuelve publico solo por no tener
+    # afiliado (el vinculo puede faltar o perderse con SET_NULL).
+    coach_can_offer = models.BooleanField(
+        default=False,
+        help_text='Quantum Coach puede mencionarlo a cualquier visitante. Úsalo solo para cupones de campaña; '
+                  'los de afiliados nunca se ofrecen.',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

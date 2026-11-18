@@ -68,6 +68,30 @@ class CuponesAdminTests(PanelAdminBaseTestCase):
         self.assertEqual(cupon.value, Decimal('20'))
         self.assertTrue(cupon.is_usable())
 
+    def test_cupon_nuevo_no_lo_ofrece_el_coach_salvo_que_se_marque(self):
+        self.client.post(reverse('admin_coupon_new'), {'code': 'NORMAL', 'discount_type': 'percentage', 'value': '5'})
+        self.client.post(reverse('admin_coupon_new'), {
+            'code': 'CAMPANA', 'discount_type': 'percentage', 'value': '5', 'coach_can_offer': 'on',
+        })
+        self.assertFalse(Coupon.objects.get(code='NORMAL').coach_can_offer)
+        self.assertTrue(Coupon.objects.get(code='CAMPANA').coach_can_offer)
+
+    def test_cupon_de_afiliado_no_se_puede_marcar_para_el_coach(self):
+        from afiliados.models import PerfilAfiliado
+
+        perfil = PerfilAfiliado.objects.create(user=self.cliente, referral_code='MIMARCA3', status='approved')
+        con_vinculo = Coupon.objects.create(code='MIMARCA3', discount_type='percentage', value=10, afiliado=perfil)
+        sin_vinculo = Coupon.objects.create(code='OTRAMARCA', discount_type='percentage', value=10)
+        PerfilAfiliado.objects.filter(pk=perfil.pk).update(referral_code='OtraMarca')
+        for cupon in (con_vinculo, sin_vinculo):
+            with self.subTest(cupon.code):
+                respuesta = self.client.post(reverse('admin_coupon_edit', args=[cupon.pk]), {
+                    'code': cupon.code, 'discount_type': 'percentage', 'value': '10', 'coach_can_offer': 'on',
+                })
+                self.assertContains(respuesta, 'Los cupones de afiliados no se ofrecen')
+                cupon.refresh_from_db()
+                self.assertFalse(cupon.coach_can_offer)
+
     def test_codigo_duplicado_se_rechaza(self):
         Coupon.objects.create(code='DUPLICADO', discount_type='percentage', value=10)
         respuesta = self.client.post(reverse('admin_coupon_new'), {

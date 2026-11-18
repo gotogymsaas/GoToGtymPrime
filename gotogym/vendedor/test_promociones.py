@@ -1,4 +1,4 @@
-"""Agente 3: precios con descuento y cupones de libre acceso, nunca los de afiliados."""
+"""Agente 3: precios con descuento y solo los cupones de campana marcados, nunca los de afiliados."""
 from datetime import timedelta
 from decimal import Decimal
 
@@ -18,10 +18,18 @@ class PromocionesTests(TestCase):
         Coupon.objects.all().delete()
 
     def cupon(self, code, **campos):
+        campos.setdefault("coach_can_offer", True)
         return Coupon.objects.create(code=code, discount_type=campos.pop("discount_type", "percentage"),
                                      value=campos.pop("value", Decimal("10")), **campos)
 
-    def test_solo_cupones_vigentes_y_de_libre_acceso(self):
+    def afiliado(self, codigo):
+        from afiliados.models import PerfilAfiliado
+
+        user = get_user_model().objects.create_user(username=codigo.lower(), email=f"{codigo.lower()}@example.com",
+                                                    password="x-test")
+        return PerfilAfiliado.objects.create(user=user, referral_code=codigo, status="approved")
+
+    def test_solo_cupones_marcados_vigentes_y_sin_segmento(self):
         ahora = timezone.now()
         self.cupon("BIENVENIDA", min_purchase=Decimal("100000"), ends_at=ahora + timedelta(days=5))
         self.cupon("APAGADO", is_active=False)
@@ -29,23 +37,26 @@ class PromocionesTests(TestCase):
         self.cupon("FUTURO", starts_at=ahora + timedelta(days=1))
         self.cupon("AGOTADO", max_uses=1, times_used=1)
         self.cupon("SEGMENTO", customer_segment=CustomerSegment.objects.create(name="Mayorista"))
+        self.cupon("SINMARCAR", coach_can_offer=False)
         filas = evidencia.promociones()
         self.assertEqual([f["code"] for f in filas], ["BIENVENIDA"])
         self.assertEqual(filas[0]["min_purchase"], "100000.00")
         self.assertEqual(filas[0]["ends_on"], timezone.localdate(ahora + timedelta(days=5)).isoformat())
 
-    def test_el_cupon_heredado_cupon_se_ofrece_si_esta_activo(self):
-        # Decision de negocio: todo cupon de libre acceso, incluido CUPON.
-        self.cupon("CUPON")
-        self.assertEqual([f["code"] for f in evidencia.promociones()], ["CUPON"])
+    def test_un_cupon_sin_marcar_no_viaja_aunque_sea_de_libre_acceso(self):
+        # Por defecto ningun cupon se ofrece: el administrador lo habilita a mano.
+        Coupon.objects.create(code="CUPON", value=Decimal("10"))
+        self.assertEqual(evidencia.promociones(), [])
 
-    def test_cupon_de_afiliado_nunca_viaja(self):
-        from afiliados.models import PerfilAfiliado
+    def test_cupon_de_afiliado_nunca_viaja_aunque_este_marcado(self):
+        self.cupon("AFILIADO10", afiliado=self.afiliado("AFILIADO10"))
+        self.assertEqual(evidencia.promociones(), [])
 
-        user = get_user_model().objects.create_user(username="afi", email="afi@example.com", password="x-test")
-        campos = {f.name for f in PerfilAfiliado._meta.get_fields()}
-        perfil = PerfilAfiliado.objects.create(user=user, **({"status": "approved"} if "status" in campos else {}))
-        self.cupon("AFILIADO10", afiliado=perfil)
+    def test_codigo_de_afiliado_sin_vinculo_tampoco_viaja(self):
+        # El vinculo `afiliado` puede faltar (cupon creado a mano) o perderse
+        # (SET_NULL); el codigo sigue siendo del afiliado.
+        self.afiliado("MiMarca3")
+        self.cupon("MIMARCA3")
         self.assertEqual(evidencia.promociones(), [])
 
     def test_codigo_fuera_de_formato_se_omite_sin_romper(self):

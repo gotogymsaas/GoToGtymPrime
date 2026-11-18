@@ -23,7 +23,9 @@ import unicodedata
 from decimal import Decimal
 
 from django.conf import settings
+from afiliados.models import PerfilAfiliado
 from django.db.models import Prefetch
+from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils import timezone
 from gotogym.afirmaciones import PROHIBIDAS
@@ -188,13 +190,21 @@ MAX_PROMOCIONES = 5
 
 
 def promociones(momento=None):
-    """Cupones de libre acceso que el vendedor puede mencionar.
+    """Cupones de campana que el vendedor puede mencionar.
 
-    Libre acceso = activo, vigente, con usos disponibles, sin afiliado y sin
-    segmento de clientes. Los cupones de afiliados son de ellos y nunca viajan."""
+    Solo viajan los marcados con `coach_can_offer`, activos, vigentes, con usos
+    disponibles y sin segmento. Los de afiliados son de ellos y nunca viajan,
+    aunque esten marcados o hayan perdido el vinculo `afiliado`: tambien se
+    descartan los que coinciden con un `referral_code`."""
     momento = momento or timezone.now()
     filas = []
-    for cupon in Coupon.objects.filter(is_active=True, afiliado__isnull=True, customer_segment__isnull=True).order_by('ends_at', 'code'):
+    # Coupon.code se guarda en mayusculas; el referral_code no necesariamente.
+    codigos_afiliados = PerfilAfiliado.objects.annotate(codigo=Upper('referral_code')).values('codigo')
+    cupones = (Coupon.objects
+               .filter(coach_can_offer=True, is_active=True, afiliado__isnull=True, customer_segment__isnull=True)
+               .exclude(code__in=codigos_afiliados)
+               .order_by('ends_at', 'code'))
+    for cupon in cupones:
         # Un codigo fuera del formato del contrato se omite: nunca debe tumbar el turno.
         if not cupon.is_usable(momento) or not re.fullmatch(r'[A-Z0-9_-]{1,30}', cupon.code or ''):
             continue

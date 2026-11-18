@@ -345,7 +345,7 @@ class CouponForm(forms.ModelForm):
         model = Coupon
         fields = [
             "code", "discount_type", "value", "min_purchase",
-            "starts_at", "ends_at", "max_uses", "is_active",
+            "starts_at", "ends_at", "max_uses", "is_active", "coach_can_offer",
         ]
         widgets = {
             "starts_at": forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"),
@@ -360,6 +360,7 @@ class CouponForm(forms.ModelForm):
             "ends_at": "Vigente hasta",
             "max_uses": "Usos máximos",
             "is_active": "Activo",
+            "coach_can_offer": "Quantum Coach puede ofrecerlo",
         }
 
     def __init__(self, *args, **kwargs):
@@ -382,6 +383,12 @@ class CouponForm(forms.ModelForm):
         fin = cleaned_data.get("ends_at")
         if inicio and fin and fin < inicio:
             self.add_error("ends_at", "La fecha de fin no puede ser anterior a la de inicio.")
+        code = cleaned_data.get("code")
+        if cleaned_data.get("coach_can_offer") and (
+            self.instance.afiliado_id
+            or (code and PerfilAfiliado.objects.filter(referral_code__iexact=code).exists())
+        ):
+            self.add_error("coach_can_offer", "Los cupones de afiliados no se ofrecen en Quantum Coach.")
         return cleaned_data
 
 
