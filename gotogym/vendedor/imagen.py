@@ -20,7 +20,7 @@ try:  # Fotos de iPhone. Sin la libreria, HEIC simplemente no se acepta.
 
     pillow_heif.register_heif_opener()
 except ImportError:  # pragma: no cover - la dependencia esta en requirements
-    pillow_heif = None
+    pass
 
 # Lo que se acepta del navegador. El panel ya reduce la foto antes de subirla;
 # el tope cubre al navegador que no pudo (HEIC en Chrome) y corta abusos.
