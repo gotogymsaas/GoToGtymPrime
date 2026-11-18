@@ -3,7 +3,7 @@
 Estado: **PREPARADO, NO ACTIVADO NI VALIDADO EN AZURE**. Sólo observación de seguridad.
 
 ## Contrato y arquitectura
-Project ID exacto: `GoToGtymPrime`. Fuente revisada: `gotogymsaas/cybersecurity@03900cf91f81ccb001fffaefa079ebd13e50ad18`.
+Project ID exacto: `GoToGtymPrime`. Tooling fijado: `gotogymsaas/cybersecurity@589aa20ffd70bede2394a4769b2aab60c4a5c68d`.
 Commit limpio → cinco scanners → SHA-256 → Blob privado → adaptadores canónicos → SecurityEvent v1 → Gateway.
 Collector comprueba remote allowlisted, checkout limpio, HEAD completo de 40 caracteres antes/después y reportes fuera del árbol.
 El hash de configuración se calcula sobre JSON ordenado del perfil de cada herramienta.

@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 PROJECT = 'GoToGtymPrime'
-TOOLING = '03900cf91f81ccb001fffaefa079ebd13e50ad18'
+TOOLING = '589aa20ffd70bede2394a4769b2aab60c4a5c68d'
 COMMANDS = {'semgrep': ['semgrep', 'scan', '--config', 'auto', '--exclude', 'QAF-Cyber', '--exclude', '1_FaseAnalisis', '--json', '--output', '{report}', '.'], 'osv-scanner': ['osv-scanner', 'scan', 'source', '-r', '.', '--format', 'json', '--output', '{report}'], 'gitleaks': ['gitleaks', 'dir', '.', '--redact', '--report-format', 'json', '--report-path', '{report}', '--exit-code', '0'], 'trivy': ['trivy', 'fs', '--scanners', 'vuln,misconfig', '--skip-dirs', 'QAF-Cyber,1_FaseAnalisis', '--format', 'json', '--output', '{report}', '.'], 'syft': ['syft', 'dir:.', '-o', 'cyclonedx-json={report}']}
 ROOT = Path(__file__).resolve().parents[2]
 

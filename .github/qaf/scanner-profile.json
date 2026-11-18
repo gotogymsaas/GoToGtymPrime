@@ -4,7 +4,7 @@
   "project_id": "GoToGtymPrime",
   "mode": "SHADOW",
   "authority": "READ_ONLY",
-  "tooling_ref": "03900cf91f81ccb001fffaefa079ebd13e50ad18",
+  "tooling_ref": "589aa20ffd70bede2394a4769b2aab60c4a5c68d",
   "status": "PENDING_RUNNER_ATTESTATION",
   "tools": {
     "semgrep": {
@@ -27,7 +27,7 @@
       ],
       "configuration": {
         "source": "central qaf_cyber.scanners.COMMANDS",
-        "tooling_ref": "03900cf91f81ccb001fffaefa079ebd13e50ad18"
+        "tooling_ref": "589aa20ffd70bede2394a4769b2aab60c4a5c68d"
       },
       "output_format": "json"
     },
@@ -48,7 +48,7 @@
       ],
       "configuration": {
         "source": "central qaf_cyber.scanners.COMMANDS",
-        "tooling_ref": "03900cf91f81ccb001fffaefa079ebd13e50ad18"
+        "tooling_ref": "589aa20ffd70bede2394a4769b2aab60c4a5c68d"
       },
       "output_format": "json"
     },
@@ -70,7 +70,7 @@
       ],
       "configuration": {
         "source": "central qaf_cyber.scanners.COMMANDS",
-        "tooling_ref": "03900cf91f81ccb001fffaefa079ebd13e50ad18"
+        "tooling_ref": "589aa20ffd70bede2394a4769b2aab60c4a5c68d"
       },
       "output_format": "json"
     },
@@ -93,7 +93,7 @@
       ],
       "configuration": {
         "source": "central qaf_cyber.scanners.COMMANDS",
-        "tooling_ref": "03900cf91f81ccb001fffaefa079ebd13e50ad18"
+        "tooling_ref": "589aa20ffd70bede2394a4769b2aab60c4a5c68d"
       },
       "output_format": "json"
     },
@@ -109,7 +109,7 @@
       ],
       "configuration": {
         "source": "central qaf_cyber.scanners.COMMANDS",
-        "tooling_ref": "03900cf91f81ccb001fffaefa079ebd13e50ad18"
+        "tooling_ref": "589aa20ffd70bede2394a4769b2aab60c4a5c68d"
       },
       "output_format": "cyclonedx-json"
     }
