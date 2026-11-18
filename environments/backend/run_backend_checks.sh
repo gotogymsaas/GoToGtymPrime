@@ -51,12 +51,12 @@ DATABASE_URL="postgresql://usuario:clave@localhost:5432/gotogym" \
   --settings=gotogym.settings_verificacion_despliegue
 
 echo "[backend] Ejecutando la suite completa con cobertura (settings_test)..."
-# Todo lo que el descubrimiento encuentra: un cambio en cualquier app se
-# prueba antes de llegar a main. `TEST_PARALLEL` fija los procesos: 2 en
-# local (la maquina de desarrollo tiene poca CPU) y uno por nucleo en el CI.
-if [[ -z "${TEST_PARALLEL:-}" ]]; then
-  if [[ "${CI:-}" == "true" ]]; then TEST_PARALLEL=auto; else TEST_PARALLEL=2; fi
-fi
+# Todas las pruebas siguen siendo obligatorias. La modalidad `auto`
+# provoca errores no serializables al transportar tracebacks entre workers
+# (Django/coverage en GitHub Actions), y el job queda vivo hasta el timeout.
+# Un worker hace determinista la suite; habilitar paralelismo solo cuando la
+# configuracion y los tests soporten correctamente aislamiento por proceso.
+TEST_PARALLEL="${TEST_PARALLEL:-1}"
 coverage erase --rcfile="${ROOT_DIR}/pyproject.toml"
 coverage run --rcfile="${ROOT_DIR}/pyproject.toml" manage.py test . \
   --parallel "${TEST_PARALLEL}" --settings=gotogym.settings_test

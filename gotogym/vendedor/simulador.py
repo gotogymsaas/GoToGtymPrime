@@ -13,9 +13,10 @@ import json
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from . import coach_client, contrato, firma
+from . import coach_client, contrato, firma, vision
 
 RUTA = '/api/commerce/agent/message/'
+RUTA_VISION = '/api/commerce/vision/describe/'
 MODOS = ('ok', 'error', 'malicioso', 'lento', 'caido')
 
 
@@ -25,7 +26,10 @@ def crear_servidor(host, puerto, clave_id, secreto, modo='ok', demora=20.0, regi
     `modo`: `ok` responde con el Coach simulado; `error` devuelve un estado de
     error con espera; `malicioso` devuelve acciones que la tienda debe
     descartar; `lento` tarda `demora` segundos; `caido` responde 503.
-    `registro` recibe una linea por peticion (sin texto de mensajes)."""
+    `registro` recibe una linea por peticion (sin texto de mensajes).
+
+    Tambien atiende `RUTA_VISION` (contrato `vision-1`, ver vendedor/vision.py)
+    con la descripcion simulada de la foto."""
     if modo not in MODOS:
         raise ValueError(f'Modo desconocido: {modo}')
     anotar = registro or (lambda linea: None)
@@ -53,13 +57,15 @@ def crear_servidor(host, puerto, clave_id, secreto, modo='ok', demora=20.0, regi
             self._atender()
 
         def _atender(self):
-            if self.path != RUTA:
+            if self.path not in (RUTA, RUTA_VISION):
                 return self._enviar(404, {'error': 'ruta'})
+            es_vision = self.path == RUTA_VISION
             try:
                 largo = int(self.headers.get('Content-Length') or 0)
             except ValueError:
                 return self._enviar(400, {'error': 'largo'})
-            if largo > contrato.MAX_BYTES_SOLICITUD * 2:
+            tope = vision.MAX_BYTES_SOLICITUD if es_vision else contrato.MAX_BYTES_SOLICITUD * 2
+            if largo > tope:
                 return self._enviar(413, {'error': 'tamano'})
             cuerpo = self.rfile.read(largo)
 
@@ -72,6 +78,8 @@ def crear_servidor(host, puerto, clave_id, secreto, modo='ok', demora=20.0, regi
                 )
             except firma.FirmaInvalida as error:
                 return self._enviar(401, {'error': error.motivo})
+            if es_vision:
+                return self._describir(cuerpo)
             if self.headers.get(firma.ENCABEZADO_CONTRATO) != contrato.VERSION_CONTRATO:
                 return self._enviar(400, {'error': 'version_del_contrato'})
 
@@ -92,6 +100,22 @@ def crear_servidor(host, puerto, clave_id, secreto, modo='ok', demora=20.0, regi
             datos = json.dumps(respuesta, ensure_ascii=False).encode('utf-8')
             respuestas_dadas[id_solicitud] = (estado, datos)
             return self._enviar(estado, datos)
+
+        def _describir(self, cuerpo):
+            if self.headers.get(firma.ENCABEZADO_CONTRATO) != vision.VERSION_CONTRATO_VISION:
+                return self._enviar(400, {'error': 'version_del_contrato'})
+            try:
+                solicitud = json.loads(cuerpo)
+                datos = solicitud['image']['data']
+            except (ValueError, KeyError, TypeError):
+                return self._enviar(422, {'error': 'contrato'})
+            if modo == 'caido':
+                return self._enviar(503, {'error': 'servicio'})
+            if modo == 'error':
+                return self._enviar(200, {'meta': {'status': 'error', 'error_code': 'image_rejected'}})
+            if not isinstance(datos, str):
+                return self._enviar(422, {'error': 'contrato'})
+            return self._enviar(200, coach_client.descripcion_simulada(solicitud))
 
         def _respuesta(self, solicitud):
             if modo == 'caido':

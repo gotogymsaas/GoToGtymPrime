@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "status": "ok",
+    "agents_used": [
+      "vision"
+    ]
+  },
+  "garment_detected": true,
+  "person_present": false,
+  "attributes": {
+    "garment_type": "leggings",
+    "colors": [
+      "gris"
+    ],
+    "fit": "ajustado",
+    "pattern": "liso",
+    "line_hint": "dama"
+  },
+  "confidence": 0.82
+}

@@ -28,7 +28,7 @@ from django.urls import reverse
 from django.utils import timezone
 from gotogym.afirmaciones import PROHIBIDAS
 from orders.models import Coupon
-from products import linea
+from products import atributos, linea
 from tienda.catalog import (
     ORDEN_DEL_PANEL,
     catalog_variants_queryset,
@@ -210,12 +210,81 @@ def promociones(momento=None):
     return filas
 
 
-def candidatos(mensaje, foco_id=None, ids_carrito=(), limite=contrato.MAX_CANDIDATOS, linea_preferida=''):
+MAX_COINCIDENCIAS_VISUALES = 5
+# Puntaje minimo para decir que un producto "se parece" a la foto: el mismo
+# tipo de prenda, o uno afin con al menos un color en comun.
+UMBRAL_SIMILITUD = 4
+
+
+def _puntaje_visual(buscados, producto, colores_producto):
+    """`(puntaje, atributos_que_coinciden)` o `None` si es otra cosa.
+
+    Un tipo de prenda distinto y no afin descarta el producto: unos leggings
+    no se parecen a una chaqueta por mucho que compartan el color."""
+    puntaje = 0
+    coinciden = []
+    tipo = buscados.get('garment_type')
+    if tipo:
+        if producto.garment_type == tipo:
+            puntaje += 6
+            coinciden.append('garment_type')
+        elif producto.garment_type in atributos.tipos_afines(tipo):
+            puntaje += 2
+            coinciden.append('garment_type_related')
+        else:
+            return None
+    colores = buscados.get('colors', [])
+    comunes = [c for c in colores if c in colores_producto]
+    if comunes:
+        puntaje += 2 * min(len(comunes), 2)
+        if colores_producto and colores and colores_producto[0] == colores[0]:
+            puntaje += 1
+        coinciden.append('colors')
+    for campo in ('pattern', 'sleeve', 'neckline', 'fit'):
+        if buscados.get(campo) and getattr(producto, campo) == buscados[campo]:
+            puntaje += 1
+            coinciden.append(campo)
+    pista = buscados.get('line_hint')
+    if pista and producto.line and producto.line in (linea.lineas_compatibles(pista) or (pista,)):
+        puntaje += 1
+    return puntaje, coinciden
+
+
+def coincidencias_visuales(buscados, linea_preferida='', limite=MAX_COINCIDENCIAS_VISUALES):
+    """Productos con existencias que se parecen a lo que describe la foto,
+    del mas al menos parecido: `[{'product_id', 'score', 'matched'}]`.
+
+    Lista vacia si nada se parece: el Coach debe poder decir con honestidad
+    que la tienda no tiene algo asi, en vez de forzar un producto."""
+    if not buscados:
+        return []
+    compatibles = linea.lineas_compatibles(linea_preferida)
+    filas = []
+    for posicion, producto in enumerate(_productos_del_catalogo()):
+        if not _tiene_stock(producto):
+            continue
+        resultado = _puntaje_visual(buscados, producto, atributos.colores_del_producto(producto, _variantes_activas(producto)))
+        if resultado is None or resultado[0] < UMBRAL_SIMILITUD:
+            continue
+        ajena = bool(compatibles) and producto.line not in compatibles
+        filas.append((-resultado[0], ajena, posicion, producto.id, resultado))
+    filas.sort()
+    return [
+        {'product_id': id_producto, 'score': puntaje, 'matched': coinciden}
+        for _neg, _ajena, _pos, id_producto, (puntaje, coinciden) in filas[:limite]
+    ]
+
+
+def candidatos(mensaje, foco_id=None, ids_carrito=(), limite=contrato.MAX_CANDIDATOS, linea_preferida='',
+               primero=()):
     """Hasta `limite` productos para el turno, en orden de prioridad.
 
     El orden importa: si el paquete no cabe en el presupuesto, se descartan
     primero los del final, es decir los que menos tienen que ver con el
     visitante.
+
+    `primero` son productos que van antes que todo (los que se parecen a la
+    foto que subio el visitante).
 
     Con `linea_preferida` (la que la persona guardo en su perfil), a igual
     afinidad van primero las prendas de esa linea o unisex. Las demas no se
@@ -239,6 +308,8 @@ def candidatos(mensaje, foco_id=None, ids_carrito=(), limite=contrato.MAX_CANDID
             vistos.add(producto.id)
             elegidos.append(candidato)
 
+    for id_producto in primero:
+        agregar(por_id.get(id_producto))
     agregar(por_id.get(foco_id), incluir_agotadas=True)
     for id_producto in ids_carrito:
         agregar(por_id.get(id_producto))

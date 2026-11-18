@@ -13,9 +13,12 @@ from django.utils import timezone
 CONSENT_VALIDITY = timedelta(days=365)
 
 SCOPE_FIELDS = {
+    "profile.display_name": "display_name",
     "profile.basic": "profile_basic",
     "sports.preferences": "sports_preferences",
     "experiences.summary": "experiences_summary",
+    "experiences.commerce_guidance": "experience_guidance",
+    "experiences.commerce_conclusions": "experience_conclusions",
     "tailoring.measurements": "tailoring_measurements",
     "conversation.commerce_memory": "commerce_memory",
 }
@@ -26,9 +29,13 @@ class CommercePersonalizationConsent(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
         related_name="commerce_personalization_consent",
     )
+    display_name = models.BooleanField(default=False)
     profile_basic = models.BooleanField(default=False)
     sports_preferences = models.BooleanField(default=False)
     experiences_summary = models.BooleanField(default=False)
+    experience_guidance = models.BooleanField(default=False)
+    # Aprobación voluntaria distinta de completitud y de condiciones generales.
+    experience_conclusions = models.BooleanField(default=False)
     tailoring_measurements = models.BooleanField(default=False)
     commerce_memory = models.BooleanField(default=False)
     # Fecha de la ultima concesion por scope ({"profile.basic": iso8601}).
@@ -66,6 +73,8 @@ class CommerceConsentAuditEvent(models.Model):
     scope = models.CharField(max_length=64)
     allowed = models.BooleanField()
     consent_version = models.PositiveIntegerField()
+    # Evidence of the specific legal notice presented for optional conclusions.
+    notice_version = models.CharField(max_length=16, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

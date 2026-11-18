@@ -17,6 +17,8 @@ import re
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 
+from products import atributos
+
 VERSION_CONTRATO = '1'
 # v2 = v1 + bloque opcional `identity`. Solo se envia si el Coach lo soporta
 # (VENDEDOR_CONTRATO_V2) y hay asercion; si no, el paquete sale como v1.
@@ -247,6 +249,38 @@ def _validar_contexto_cliente(contexto):
             _texto(item['value'], 'customer_context.memory', 40)
 
 
+CLAVES_CONSULTA_VISUAL = frozenset({
+    'source', 'vocabulary_version', 'garment_detected', 'person_present', 'attributes', 'matches',
+})
+COINCIDENCIAS_POSIBLES = frozenset({
+    'garment_type', 'garment_type_related', 'colors', 'pattern', 'sleeve', 'neckline', 'fit',
+})
+MAX_COINCIDENCIAS = 8
+
+
+def _validar_consulta_visual(consulta, evidencia):
+    """Forma cerrada de `visual_query` (paquete.bloque_visual). Los atributos
+    deben estar en el vocabulario y cada coincidencia debe ser un candidato."""
+    _requerir(isinstance(consulta, dict) and set(consulta) == CLAVES_CONSULTA_VISUAL, 'visual_query')
+    _requerir(consulta['source'] == 'customer_photo', 'visual_query.source')
+    _requerir(consulta['vocabulary_version'] == atributos.VERSION_VOCABULARIO, 'visual_query.vocabulary_version')
+    _requerir(isinstance(consulta['garment_detected'], bool), 'visual_query.garment_detected')
+    _requerir(isinstance(consulta['person_present'], bool), 'visual_query.person_present')
+    crudos = consulta['attributes']
+    _requerir(isinstance(crudos, dict) and atributos.limpiar(crudos) == crudos, 'visual_query.attributes')
+    filas = consulta['matches']
+    _requerir(isinstance(filas, list) and len(filas) <= MAX_COINCIDENCIAS, 'visual_query.matches')
+    candidatos = evidencia.get('candidates') if isinstance(evidencia, dict) else None
+    ids = {c.get('product_id') for c in candidatos if isinstance(c, dict)} if isinstance(candidatos, list) else set()
+    for posicion, fila in enumerate(filas):
+        ruta = f'visual_query.matches[{posicion}]'
+        _requerir(isinstance(fila, dict) and set(fila) == {'product_id', 'score', 'matched'}, ruta)
+        _requerir(_entero(fila['product_id']) and fila['product_id'] in ids, f'{ruta}.product_id')
+        _requerir(_entero(fila['score']) and 0 <= fila['score'] <= 100, f'{ruta}.score')
+        _requerir(isinstance(fila['matched'], list) and set(fila['matched']) <= COINCIDENCIAS_POSIBLES,
+                  f'{ruta}.matched')
+
+
 def validar_solicitud(solicitud):
     """Comprueba que `solicitud` (un dict) cumple el contrato. No devuelve
     nada: lanza `ContratoInvalido` ante el primer incumplimiento."""
@@ -283,6 +317,9 @@ def validar_solicitud(solicitud):
     if 'customer_context' in solicitud:
         _requerir('identity' in solicitud, 'customer_context')
         _validar_contexto_cliente(solicitud['customer_context'])
+
+    if 'visual_query' in solicitud:
+        _validar_consulta_visual(solicitud['visual_query'], solicitud.get('evidence'))
 
     pagina = solicitud.get('page')
     _requerir(isinstance(pagina, dict), 'page')

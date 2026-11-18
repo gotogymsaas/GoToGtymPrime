@@ -45,6 +45,20 @@
         </div>
       </form>
     </details>
+    <section class="account-security" aria-label="{% trans 'Autorización independiente de conclusiones textiles' %}">
+      <h3>{% trans "Conclusiones textiles de mis experiencias" %}</h3>
+      <p class="account-address-hint">{% trans "Permito utilizar únicamente sugerencias textiles derivadas y verificadas de Alta Costura Inteligente (Exp-012), para orientarme sobre estilos y ajuste. No comparto fotos, puntos corporales, centímetros, informes completos ni datos clínicos. Este permiso es voluntario, distinto de los términos y de comprobar experiencias completadas; puedo revocarlo sin impedir la compra." %}</p>
+      <form method="post" action="{% url 'vendedor:personalizacion_conclusiones' %}">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        {% if conclusions_active %}
+          <p>{% blocktrans with fecha=conclusions_expires|date:"j M Y" %}Autorizado. Vence el {{ fecha }}.{% endblocktrans %}</p>
+          <button class="editorial-action" type="submit" name="accion" value="revocar">{% trans "Revocar acceso a conclusiones textiles" %}</button>
+        {% else %}
+          <p>{% trans "Desactivado. Sin este permiso el Coach solo podrá consultar estados de experiencias si los autorizaste por separado." %}</p>
+          <button class="editorial-action" type="submit" name="accion" value="conceder">{% trans "Autorizar conclusiones textiles" %}</button>
+        {% endif %}
+      </form>
+    </section>
     {% else %}
     <p class="account-personalizacion-estado">
       {% if activos %}{% trans "La personalización está activada y empezará a funcionar cuando vincules tu cuenta GoToGym (la misma de Quantum Coach)." %}{% else %}{% trans "Vincula tu cuenta GoToGym (la misma de Quantum Coach) para que te recomiende según lo que ya sabe de ti." %}{% endif %}

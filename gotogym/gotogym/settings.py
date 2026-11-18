@@ -418,6 +418,18 @@ VENDEDOR_SOLUCIONES = {
     'coach_app': os.environ.get('VENDEDOR_URL_COACH_APP', 'https://app.gotogym.store/'),
     'developers': os.environ.get('VENDEDOR_URL_DEVELOPERS', 'https://developers.gotogym.store/'),
 }
+# Busqueda por foto (vendedor/vision.py). Quien puede subir una foto:
+# `apagado`, `staff` (piloto con el equipo), `autenticados` o `todos`. Empieza
+# con el equipo: cada foto cuesta una llamada al modelo de vision.
+VENDEDOR_IMAGEN_ACCESO = os.environ.get('VENDEDOR_IMAGEN_ACCESO', 'staff').strip().lower()
+# Endpoint de vision del Coach. Vacio = se deriva de COACH_API_URL
+# (.../commerce/agent/message/ -> .../commerce/vision/describe/).
+COACH_VISION_URL = os.environ.get('COACH_VISION_URL', '').strip()
+# Fotos por minuto y por persona, por persona y dia, y en toda la tienda por
+# dia (tope de costo). El dia va de medianoche a medianoche en hora local.
+VENDEDOR_IMAGEN_RATE = int(os.environ.get('VENDEDOR_IMAGEN_RATE', '3'))
+VENDEDOR_IMAGEN_MAX_DIA = int(os.environ.get('VENDEDOR_IMAGEN_MAX_DIA', '10'))
+VENDEDOR_IMAGEN_MAX_DIA_GLOBAL = int(os.environ.get('VENDEDOR_IMAGEN_MAX_DIA_GLOBAL', '300'))
 
 # Monitoreo de errores (Sentry). La configuración de despliegue y el preflight
 # lo exigen en producción, pero su ausencia no debe impedir que la aplicación

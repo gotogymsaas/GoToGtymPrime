@@ -75,3 +75,21 @@ def visible_para(request):
     if porcentaje <= 0:
         return False
     return grupo_del_visitante(hash_visitante(request), porcentaje) == GRUPO_VENDEDOR
+
+
+ACCESOS_IMAGEN = ('apagado', 'staff', 'autenticados', 'todos')
+
+
+def imagen_permitida_para(request):
+    """Quien puede subir una foto para buscar prendas parecidas, segun
+    `VENDEDOR_IMAGEN_ACCESO`. Cualquier valor desconocido apaga la funcion."""
+    acceso = getattr(settings, 'VENDEDOR_IMAGEN_ACCESO', 'apagado')
+    if acceso == 'todos':
+        return True
+    user = getattr(request, 'user', None)
+    autenticado = bool(user is not None and user.is_authenticated)
+    if acceso == 'autenticados':
+        return autenticado
+    if acceso == 'staff':
+        return autenticado and bool(user.is_staff)
+    return False

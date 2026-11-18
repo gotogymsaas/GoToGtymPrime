@@ -20,6 +20,7 @@ import hashlib
 import hmac
 import json
 import logging
+import re
 import secrets
 import time
 
@@ -44,7 +45,13 @@ def credencial():
     """`(clave_id, secreto)` o `None` si no esta configurada."""
     clave = getattr(settings, 'VENDEDOR_IDENTIDAD_CLAVE_ID', '') or ''
     secreto = getattr(settings, 'VENDEDOR_IDENTIDAD_SECRETO', '') or ''
-    if not clave or not secreto:
+    if not isinstance(clave, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,40}', clave):
+        return None
+    if not isinstance(secreto, str) or not secreto or secreto != secreto.strip():
+        return None
+    # Si Azure devuelve literalmente la referencia, Key Vault no se resolvió.
+    # Nunca firmar una identidad usando ese texto conocido públicamente.
+    if secreto.lower().startswith('@microsoft.keyvault('):
         return None
     return clave, secreto
 
@@ -74,12 +81,14 @@ def emitir(user, ahora=None):
         logger.info('commerce_identity_not_emitted reason=oidc_link_missing')
         return None
     consent = CommercePersonalizationConsent.objects.filter(user=user).first()
-    if consent is None:
-        logger.info('commerce_identity_not_emitted reason=consent_missing')
-        return None
-    scopes = consent.active_scopes()
+    scopes = consent.active_scopes() if consent else []
+    # Nunca heredar conclusiones del consentimiento de finalización.
+    # La emisión conserva únicamente los scopes activos exactos.
     if not scopes:
-        logger.info('commerce_identity_not_emitted reason=consent_inactive')
+        logger.info(
+            'commerce_identity_not_emitted reason=%s',
+            'consent_missing' if consent is None else 'consent_inactive',
+        )
         return None
     logger.info('commerce_identity_emitted scope_count=%d', len(scopes))
 

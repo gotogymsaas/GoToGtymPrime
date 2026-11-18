@@ -1,16 +1,13 @@
-"""Consentimiento granular del vendedor. No lee datos del Coach.
+"""Consentimiento comercial explícito y granular. Vincular OIDC no concede permiso.
 
-Al crear el perfil (aceptar por primera vez los terminos de la tienda, que
-informan esta finalidad) la personalizacion queda activada en todos sus
-scopes: es la autorizacion dada en el registro (`conceder_al_crear_perfil`).
-Despues, conceder a mano exige el enlace OIDC, que NO es consentimiento.
-En ambos casos los datos del Coach solo viajan con la cuenta vinculada (la
-asercion de identidad lo exige). Revocar no exige enlace: un permiso siempre
-se puede retirar, aunque la cuenta se haya desvinculado despues.
-Los endpoints son same-origin; POST utiliza CSRF y sesion Django.
+El registro de un perfil y los términos generales no activan ningún scope.
+Las decisiones existentes se conservan; los nuevos ámbitos empiezan apagados.
+La revocación es inmediata y borra medidas y memoria comercial pertinentes.
 """
+
 import json
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import JsonResponse
@@ -30,6 +27,8 @@ from .models import (
 )
 
 SCOPES = SCOPE_FIELDS
+CONCLUSIONS_SCOPE = "experiences.commerce_conclusions"
+CONCLUSIONS_NOTICE_VERSION = "2026-11-14"
 MAX_BODY_BYTES = 1024
 
 
@@ -81,7 +80,8 @@ def _read_body(request):
 @require_http_methods(["GET", "POST"])
 def consentimiento(request):
     # Nunca se autoriza personalizar por mera coincidencia de correo.
-    linked = ExternalIdentityLink.objects.filter(user=request.user).exists()
+    issuer = (getattr(settings, "GOTOGYM_OIDC", {}) or {}).get("ISSUER")
+    linked = bool(issuer) and ExternalIdentityLink.objects.filter(user=request.user, issuer=issuer).exists()
 
     if request.method == "GET":
         row = CommercePersonalizationConsent.objects.filter(user=request.user).first()
@@ -129,27 +129,19 @@ def aplicar(user, scope, allowed, now=None):
             row.save(update_fields=[field, "granted_at", "version", "updated_at"])
             CommerceConsentAuditEvent.objects.create(
                 user=user, scope=scope, allowed=allowed, consent_version=row.version,
+                notice_version=(CONCLUSIONS_NOTICE_VERSION if scope == CONCLUSIONS_SCOPE else ""),
             )
     return row
 
 
 def conceder_al_crear_perfil(user, now=None):
-    """Activa todos los scopes para quien acaba de crear su perfil.
-
-    Solo si nunca hubo una decision suya (no existe fila): no reactiva algo
-    que la persona apago. Cada scope queda auditado como cualquier concesion."""
-    if CommercePersonalizationConsent.objects.filter(user=user).exists():
-        return None
-    now = now or timezone.now()
-    row = None
-    for scope in SCOPES:
-        row = aplicar(user, scope, True, now)
-    return row
+    """Compatibilidad con señales antiguas: nunca autoriza sin decisión explícita."""
+    return None
 
 
 def al_crear_perfil(sender, user, **kwargs):
-    """Receptor de `accounts.signals.perfil_creado` (ver apps.py)."""
-    conceder_al_crear_perfil(user)
+    """Sin permisos automáticos: el usuario elige en Mi cuenta."""
+    return None
 
 
 def _borrar_datos_del_scope(user, scope):

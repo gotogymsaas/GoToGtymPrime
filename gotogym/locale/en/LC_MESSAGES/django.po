@@ -4278,3 +4278,162 @@ msgstr "Where each measurement is taken on the body"
 #: gotogym/templates/partials/_mensajes.html
 msgid "Cerrar aviso"
 msgstr "Dismiss notice"
+
+msgid "Foto adjunta"
+msgstr "Attached photo"
+
+msgid ""
+"Uso la foto solo para buscar prendas parecidas y no la guardo. Funciona "
+"mejor si se ve solo la prenda."
+msgstr ""
+"I use the photo only to look for similar items and I do not keep it. It "
+"works best when only the garment is visible."
+
+msgid "Quitar la foto"
+msgstr "Remove photo"
+
+msgid "Buscar prendas parecidas con una foto"
+msgstr "Find similar items with a photo"
+
+msgid "Foto para buscar prendas parecidas"
+msgstr "Photo to find similar items"
+
+msgid "Busqué:"
+msgstr "I looked for:"
+
+msgid ""
+"No identifiqué una prenda en esa foto. Prueba con otra en la que se vea la "
+"prenda completa y con buena luz."
+msgstr ""
+"I could not find a garment in that photo. Try another one that shows the "
+"whole garment in good light."
+
+msgid "No pude leer esa imagen. Usa una foto JPG, PNG, WEBP o HEIC."
+msgstr ""
+"I could not read that image. Please use a JPG, PNG, WEBP or HEIC photo."
+
+msgid "La foto es demasiado grande. Prueba con una de menos de 8 MB."
+msgstr "The photo is too large. Try one under 8 MB."
+
+msgid ""
+"La búsqueda por foto no está disponible en este momento. Descríbeme la "
+"prenda con palabras y te ayudo."
+msgstr ""
+"Photo search is not available right now. Describe the garment in words and I"
+" will help you."
+
+msgid ""
+"No pude analizar esa foto. Prueba con otra en la que se vea solo la prenda."
+msgstr ""
+"I could not analyze that photo. Try another one that shows only the garment."
+
+msgid "Alcanzaste el límite de fotos de hoy. Puedes seguir escribiéndome."
+msgstr "You reached today's photo limit. You can keep writing to me."
+
+msgid "Busco prendas parecidas a la de mi foto."
+msgstr "I'm looking for items similar to the one in my photo."
+
+msgid "Top"
+msgstr "Top"
+
+msgid "Buzo o saco"
+msgstr "Sweatshirt or sweater"
+
+msgid "Blazer"
+msgstr "Blazer"
+
+msgid "Leggings"
+msgstr "Leggings"
+
+msgid "Pantalón"
+msgstr "Pants"
+
+msgid "Short"
+msgstr "Shorts"
+
+msgid "Falda"
+msgstr "Skirt"
+
+msgid "Vestido"
+msgstr "Dress"
+
+msgid "Conjunto"
+msgstr "Set"
+
+msgid "Accesorio"
+msgstr "Accessory"
+
+msgid "Sin manga"
+msgstr "Sleeveless"
+
+msgid "Manga corta"
+msgstr "Short sleeve"
+
+msgid "Cuello redondo"
+msgstr "Crew neck"
+
+msgid "Cuello en V"
+msgstr "V-neck"
+
+msgid "Cuello mao"
+msgstr "Mandarin collar"
+
+msgid "Cuello alto"
+msgstr "High neck"
+
+msgid "Con capucha"
+msgstr "Hooded"
+
+msgid "Ajustado"
+msgstr "Fitted"
+
+msgid "Regular"
+msgstr "Regular"
+
+msgid "Holgado"
+msgstr "Loose"
+
+msgid "Liso"
+msgstr "Solid"
+
+msgid "Estampado"
+msgstr "Printed"
+
+msgid "Bloques de color"
+msgstr "Color block"
+
+msgid "Blanco"
+msgstr "White"
+
+msgid "Gris"
+msgstr "Gray"
+
+msgid "Azul"
+msgstr "Blue"
+
+msgid "Rojo"
+msgstr "Red"
+
+msgid "Rosa"
+msgstr "Pink"
+
+msgid "Verde"
+msgstr "Green"
+
+msgid "Amarillo"
+msgstr "Yellow"
+
+msgid "Naranja"
+msgstr "Orange"
+
+msgid "Morado"
+msgstr "Purple"
+
+msgid "Beige"
+msgstr "Beige"
+
+msgid "Café"
+msgstr "Brown"
+
+msgid "Chaqueta"
+msgstr "Jacket"

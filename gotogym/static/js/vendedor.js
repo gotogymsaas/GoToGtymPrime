@@ -18,6 +18,8 @@
  *  - Los textos visibles viven en el panel (ya traducidos); aqui no hay
  *    cadenas en un idioma concreto.
  *  - Al medir se envian categorias y numeros, nunca el texto de los mensajes.
+ *  - Una foto adjunta se reduce aqui (maximo 1280 px, JPEG) antes de subirla y
+ *    no se guarda en el historial: solo queda el rotulo de que hubo una foto.
  *
  * El historial se guarda en sessionStorage (solo en esta pestana) para que no
  * se pierda al cambiar de pagina. Vence con la misma inactividad con la que el
@@ -40,6 +42,7 @@
   if (!configuracion.endpoint || !window.fetch) return;
 
   var CLAVE_HISTORIAL = 'gtg_vendedor_historial';
+  var identityEpoch = configuracion.identityEpoch || '';
   var CLAVE_AVISO = 'gtg_vendedor_aviso';
   var MAX_ENTRADAS = 24;
   var ESPERA_POR_DEFECTO = 10;
@@ -49,7 +52,13 @@
   var RUTA_IMAGEN = /^\/(media|static)\/[A-Za-z0-9\-_\/.%]+$/;
   var RUTA_AGREGAR = /^\/[a-z]{2}\/carrito\/add\/\d+\/$/;
   var RUTA_RECORDAR = /^\/[a-z]{2}\/vendedor\/personalizacion\/recordar\/$/;
-  var SIN_REINTENTO = { limite_turnos: true, limite_diario: true, mensaje_invalido: true };
+  var RUTA_IMAGEN_SUBIDA = /^\/[a-z]{2}\/vendedor\/imagen\/$/;
+  var LADO_FOTO = 1280;
+  var MAX_BYTES_FOTO = 8 * 1024 * 1024;
+  var SIN_REINTENTO = {
+    limite_turnos: true, limite_diario: true, mensaje_invalido: true,
+    imagen_invalida: true, imagen_grande: true, imagen_no_disponible: true, limite_imagenes: true
+  };
 
   var botones = document.querySelectorAll('[data-vendedor-toggle]');
   var registro = panel.querySelector('[data-vendedor-log]');
@@ -69,6 +78,12 @@
   var botonCerrar = panel.querySelector('[data-vendedor-close]');
   var botonNueva = panel.querySelector('[data-vendedor-nueva]');
   var velo = document.querySelector('[data-vendedor-scrim]');
+  var botonAdjuntar = panel.querySelector('[data-vendedor-adjuntar]');
+  var campoArchivo = panel.querySelector('[data-vendedor-archivo]');
+  var cajaAdjunto = panel.querySelector('[data-vendedor-adjunto]');
+  var imagenAdjunto = panel.querySelector('[data-vendedor-adjunto-img]');
+  var botonQuitarFoto = panel.querySelector('[data-vendedor-quitar-foto]');
+  var fotosHabilitadas = !!(botonAdjuntar && campoArchivo && cajaAdjunto && RUTA_IMAGEN_SUBIDA.test(configuracion.imagenUrl || ''));
 
   var abierto = false;
   var enviando = false;
@@ -77,6 +92,9 @@
   var nuevaConversacion = false;
   var temporizadorEspera = null;
   var historial = [];
+  var adjunto = null;        // foto lista para enviar (Blob)
+  var vistaPrevia = '';      // URL local de la foto adjunta
+  var ultimaFoto = null;     // para reintentar el ultimo envio con foto
 
   // --- Utilidades --------------------------------------------------------
 
@@ -120,7 +138,7 @@
 
   // Se guarda con la hora del ultimo cambio: { ts, e: [entradas] }.
   function guardarHistorial() {
-    guardar(CLAVE_HISTORIAL, JSON.stringify({ ts: Date.now(), e: historial.slice(-MAX_ENTRADAS) }));
+    guardar(CLAVE_HISTORIAL, JSON.stringify({ ts: Date.now(), epoch: identityEpoch, e: historial.slice(-MAX_ENTRADAS) }));
   }
 
   // Un historial vencido, sin hora (formato anterior) o ilegible se descarta.
@@ -129,7 +147,8 @@
     if (!crudo) return [];
     try {
       var datos = JSON.parse(crudo);
-      var vigente = datos && typeof datos.ts === 'number' && Date.now() - datos.ts <= VIGENCIA_MS;
+      var vigente = datos && typeof datos.ts === 'number' && Date.now() - datos.ts <= VIGENCIA_MS &&
+        datos.epoch === identityEpoch;
       return vigente && Array.isArray(datos.e) ? datos.e.slice(-MAX_ENTRADAS) : [];
     } catch (error) {
       return [];
@@ -138,9 +157,15 @@
 
   // --- Pintado de mensajes ----------------------------------------------
 
-  function pintarUsuario(contenido) {
+  function pintarUsuario(contenido, urlFoto) {
     var caja = crear('div', 'gtg-vendedor__msg gtg-vendedor__msg--user');
     caja.appendChild(crear('span', 'sr-only', texto('tu') + ': '));
+    if (urlFoto) {
+      var foto = crear('img', 'gtg-vendedor__msg-foto');
+      foto.src = urlFoto;
+      foto.alt = texto('foto_enviada');
+      caja.appendChild(foto);
+    }
     caja.appendChild(crear('p', null, contenido));
     registro.appendChild(caja);
     desplazarAlFinal();
@@ -316,6 +341,11 @@
     var caja = crear('div', 'gtg-vendedor__msg gtg-vendedor__msg--bot');
     fila.appendChild(caja);
     caja.appendChild(crear('span', 'sr-only', texto('coach') + ': '));
+    // Lo que se busco a partir de una foto, con las etiquetas que da la tienda.
+    if (Array.isArray(entrada.v) && entrada.v.length) {
+      var buscado = entrada.v.filter(function (parte) { return typeof parte === 'string'; }).slice(0, 8);
+      caja.appendChild(crear('p', 'gtg-vendedor__busqueda', texto('busque') + ' ' + buscado.join(' · ')));
+    }
     caja.appendChild(crear('p', null, String(entrada.t || '')));
 
     var tarjetas = Array.isArray(entrada.c) ? entrada.c : [];
@@ -356,7 +386,7 @@
     if (historial.length) ocultarBienvenida();
     historial.forEach(function (entrada) {
       if (!entrada || typeof entrada.t !== 'string') return;
-      if (entrada.r === 'u') pintarUsuario(entrada.t);
+      if (entrada.r === 'u') pintarUsuario(entrada.t);  // una foto vieja no se vuelve a mostrar
       else if (entrada.r === 'b') pintarAsistente(entrada);
     });
   }
@@ -378,6 +408,7 @@
   function actualizarControles() {
     var ocupado = enviando || temporizadorEspera !== null;
     botonEnviar.disabled = ocupado;
+    if (botonAdjuntar) botonAdjuntar.disabled = ocupado;
     botonNueva.disabled = enviando;
     botonReintentar.disabled = ocupado;
   }
@@ -416,28 +447,76 @@
     return 'error';
   }
 
+  // --- Identidad actual del servidor ------------------------------------------
+  // Evita atribuir a una persona el historial visual de otra cuenta o del
+  // visitante que inició sesión. El navegador nunca elige el principal.
+  function verificarEpoch(mensaje, urlFoto) {
+    if (!configuracion.estadoUrl) return Promise.resolve();
+    return fetch(configuracion.estadoUrl, {
+      method: 'GET',
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { 'Accept': 'application/json' }
+    }).then(function (respuesta) {
+      if (!respuesta.ok) throw new Error('identity_status_unavailable');
+      return respuesta.json();
+    }).then(function (datos) {
+      if (!datos || !/^[0-9a-f]{32}$/.test(datos.epoch || '')) {
+        throw new Error('identity_epoch_invalid');
+      }
+      if (datos.epoch !== identityEpoch) {
+        identityEpoch = datos.epoch;
+        empezarDeNuevo();
+        // El mensaje recién escrito no se pierde cuando cambia el contexto;
+        // todo el historial anterior se descarta antes de reenviarlo.
+        ultimoMensaje = mensaje;
+        ocultarBienvenida();
+        historial.push(urlFoto ? { r: 'u', t: mensaje, f: 1 } : { r: 'u', t: mensaje });
+        guardarHistorial();
+        pintarUsuario(mensaje, urlFoto);
+        medir('vendedor_identity_transition', { mode: datos.mode || 'unknown' });
+      }
+    });
+  }
+
   // --- Envio ---------------------------------------------------------------
 
-  function enviar(mensaje) {
+  // Turno de texto (JSON) o con foto (multipart, sin Content-Type propio: lo
+  // pone el navegador con el separador).
+  function peticionDeTurno(mensaje, foto) {
+    var cabeceras = {
+      'Accept': 'application/json',
+      'X-CSRFToken': configuracion.csrf || '',
+      'X-Requested-With': 'XMLHttpRequest'
+    };
+    if (foto) {
+      var formulario = new FormData();
+      formulario.append('imagen', foto.blob, 'foto.jpg');
+      // El rotulo visible no es un mensaje: sin texto, el servidor pone el suyo.
+      if (!foto.sinTexto) formulario.append('message', mensaje);
+      if (nuevaConversacion) formulario.append('new', '1');
+      medir('vendedor_image_sent', { kb: Math.round(foto.blob.size / 1024) });
+      return fetch(configuracion.imagenUrl, {
+        method: 'POST', credentials: 'same-origin', headers: cabeceras, body: formulario
+      });
+    }
+    var cuerpo = { message: mensaje };
+    if (nuevaConversacion) cuerpo['new'] = true;
+    cabeceras['Content-Type'] = 'application/json';
+    return fetch(configuracion.endpoint, {
+      method: 'POST', credentials: 'same-origin', headers: cabeceras, body: JSON.stringify(cuerpo)
+    });
+  }
+
+  function enviar(mensaje, foto) {
     if (enviando || temporizadorEspera !== null) return;
     ocultarError();
     enviando = true;
     mostrarEstado(true);
     actualizarControles();
 
-    var cuerpo = { message: mensaje };
-    if (nuevaConversacion) cuerpo['new'] = true;
-
-    fetch(configuracion.endpoint, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-CSRFToken': configuracion.csrf || '',
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-      body: JSON.stringify(cuerpo)
+    verificarEpoch(mensaje, foto ? foto.url : '').then(function () {
+      return peticionDeTurno(mensaje, foto);
     }).then(function (respuesta) {
       // Un 429 del limitador o un 403 de CSRF pueden no traer JSON.
       return respuesta.text().then(function (crudo) {
@@ -447,14 +526,24 @@
       });
     }).then(function (resultado) {
       var datos = resultado.datos;
+      if (datos && datos.ok === true && datos.notice === 'sin_prenda') {
+        var aviso = { r: 'b', t: texto('aviso_sin_prenda'), c: [], a: [] };
+        historial.push(aviso);
+        guardarHistorial();
+        pintarAsistente(aviso);
+        ultimaFoto = null;
+        return;
+      }
       if (datos && datos.ok === true && typeof datos.reply === 'string') {
         nuevaConversacion = false;
+        ultimaFoto = null;
         var entrada = {
           r: 'b',
           t: datos.reply,
           c: Array.isArray(datos.cards) ? datos.cards : [],
           a: Array.isArray(datos.actions) ? datos.actions : []
         };
+        if (datos.visual && Array.isArray(datos.visual.summary)) entrada.v = datos.visual.summary;
         historial.push(entrada);
         guardarHistorial();
         pintarAsistente(entrada);
@@ -494,22 +583,91 @@
     // pintaria sin llegar a enviarse.
     if (enviando || temporizadorEspera !== null) return;
     var mensaje = campo.value.trim();
+    var foto = null;
+    if (adjunto) {
+      // Con foto el texto es opcional: el rotulo solo se muestra.
+      foto = { blob: adjunto, url: vistaPrevia, sinTexto: !mensaje };
+      if (!mensaje) mensaje = texto('foto_enviada');
+    }
     if (!mensaje || mensaje.length > (configuracion.maxLength || 600)) return;
     campo.value = '';
     ultimoMensaje = mensaje;
+    ultimaFoto = foto;
     ocultarBienvenida();
     mostrarAtajos(false);
-    historial.push({ r: 'u', t: mensaje });
+    historial.push(foto ? { r: 'u', t: mensaje, f: 1 } : { r: 'u', t: mensaje });
     guardarHistorial();
-    pintarUsuario(mensaje);
+    pintarUsuario(mensaje, foto ? foto.url : '');
+    if (foto) soltarAdjunto(false);
     if (configuracion.disponible === false) {
       responderQueNoHayIA();
       return;
     }
-    enviar(mensaje);
+    enviar(mensaje, foto);
+  }
+
+  // --- Foto adjunta ----------------------------------------------------------
+
+  function soltarAdjunto(liberarUrl) {
+    // La URL local se conserva mientras la foto se vea en la conversacion.
+    if (liberarUrl && vistaPrevia) URL.revokeObjectURL(vistaPrevia);
+    adjunto = null;
+    vistaPrevia = '';
+    if (cajaAdjunto) cajaAdjunto.hidden = true;
+    if (campoArchivo) campoArchivo.value = '';
+  }
+
+  // Reduce la foto en el navegador: menos datos por la red movil y sin los
+  // metadatos del archivo original (el lienzo no los copia). Si el navegador
+  // no puede leerla (HEIC fuera de Safari), se sube tal cual y la reduce la
+  // tienda.
+  function reducirFoto(archivo) {
+    if (!window.createImageBitmap || !document.createElement('canvas').toBlob) {
+      return Promise.resolve(archivo);
+    }
+    return window.createImageBitmap(archivo, { imageOrientation: 'from-image' }).then(function (mapa) {
+      var escala = Math.min(1, LADO_FOTO / Math.max(mapa.width, mapa.height));
+      var lienzo = document.createElement('canvas');
+      lienzo.width = Math.max(1, Math.round(mapa.width * escala));
+      lienzo.height = Math.max(1, Math.round(mapa.height * escala));
+      var contexto = lienzo.getContext('2d');
+      contexto.fillStyle = 'white';
+      contexto.fillRect(0, 0, lienzo.width, lienzo.height);
+      contexto.drawImage(mapa, 0, 0, lienzo.width, lienzo.height);
+      if (mapa.close) mapa.close();
+      return new Promise(function (resolver) {
+        lienzo.toBlob(function (blob) { resolver(blob || archivo); }, 'image/jpeg', 0.85);
+      });
+    }).catch(function () { return archivo; });
+  }
+
+  function alElegirFoto() {
+    var archivo = campoArchivo.files && campoArchivo.files[0];
+    if (!archivo) return;
+    if (archivo.size > MAX_BYTES_FOTO) {
+      soltarAdjunto(true);
+      mostrarError('imagen_grande', 0, null);
+      return;
+    }
+    ocultarError();
+    reducirFoto(archivo).then(function (blob) {
+      if (blob.size > MAX_BYTES_FOTO) {
+        soltarAdjunto(true);
+        mostrarError('imagen_grande', 0, null);
+        return;
+      }
+      soltarAdjunto(true);
+      adjunto = blob;
+      vistaPrevia = URL.createObjectURL(blob);
+      imagenAdjunto.src = vistaPrevia;
+      cajaAdjunto.hidden = false;
+      campo.focus();
+    });
   }
 
   function empezarDeNuevo() {
+    if (adjunto) soltarAdjunto(true);
+    ultimaFoto = null;
     historial = [];
     guardarHistorial();
     Array.prototype.slice.call(registro.children).forEach(function (nodo) {
@@ -661,8 +819,19 @@
   });
 
   botonReintentar.addEventListener('click', function () {
-    if (ultimoMensaje) enviar(ultimoMensaje);
+    if (ultimoMensaje) enviar(ultimoMensaje, ultimaFoto);
   });
+
+  if (fotosHabilitadas) {
+    botonAdjuntar.hidden = false;
+    var compositor = panel.querySelector('[data-vendedor-composer]');
+    if (compositor) compositor.classList.add('gtg-vendedor__composer--foto');
+    botonAdjuntar.addEventListener('click', function () { campoArchivo.click(); });
+    campoArchivo.addEventListener('change', alElegirFoto);
+    if (botonQuitarFoto) botonQuitarFoto.addEventListener('click', function () { soltarAdjunto(true); campo.focus(); });
+  } else if (botonAdjuntar) {
+    botonAdjuntar.hidden = true;
+  }
 
   enlaceContacto.addEventListener('click', function (evento) {
     medir('vendedor_handoff', { origen: 'error' });

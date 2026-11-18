@@ -246,7 +246,7 @@ class PoliticasTests(SimpleTestCase):
             politicas = evidencia.politicas('es')
 
         self.assertEqual({p['review_status'] for p in politicas}, {'validated'})
-        self.assertIn('30 días', {p['key']: p for p in politicas}['devoluciones']['text'])
+        self.assertIn('15 días', {p['key']: p for p in politicas}['devoluciones']['text'])
 
 
 class AfirmacionesTests(SimpleTestCase):
