@@ -33,6 +33,7 @@ from .permissions import ADMIN_PERM_SPECS
 # Ofrecer cualquier otro permiso del sistema (por ejemplo los de
 # django.contrib.admin) no tendria efecto util aqui y solo confundiria.
 GROUP_PERMISSION_FILTER = Q()
+VISUAL_ATTRIBUTE_FIELDS = ("garment_type", "sleeve", "neckline", "fit", "pattern")
 for _app_label, _codename in ADMIN_PERM_SPECS:
     GROUP_PERMISSION_FILTER |= Q(content_type__app_label=_app_label, codename=_codename)
 
@@ -83,6 +84,7 @@ class ProductAdminForm(forms.ModelForm):
         fields = [
             "name", "category", "line", "brand", "description", "base_price", "discount",
             "stock", "featured", "tags",
+            *VISUAL_ATTRIBUTE_FIELDS,
         ]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
@@ -108,6 +110,28 @@ class ProductAdminForm(forms.ModelForm):
             "Si la dejas sin clasificar y el nombre o la descripción dicen «dama» o «caballero», se asigna sola. "
             "La usan el filtro de la tienda y Quantum Coach."
         )
+        for campo in VISUAL_ATTRIBUTE_FIELDS:
+            opciones = Product._meta.get_field(campo).choices
+            self.fields[campo].choices = [("", "Sin dato"), *[(c, str(e)) for c, e in opciones]]
+        self.fields["garment_type"].help_text = (
+            "Tipo, manga, cuello, ajuste y diseño los usa Quantum Coach para encontrar prendas parecidas "
+            "a la foto que sube un cliente. Si quedan vacíos se completan con lo que diga el nombre."
+        )
+        origen = self.instance.visual_attributes_origin if self.instance.pk else ""
+        if origen == "ia":
+            self.fields["garment_type"].help_text += " Los propuso la IA a partir de la foto: revísalos y guarda."
+
+    def save(self, commit=True):
+        producto = super().save(commit=False)
+        # Quien cambia un atributo, o guarda la ficha con una propuesta de la
+        # IA a la vista, ya lo reviso.
+        cambiados = set(self.changed_data) & set(VISUAL_ATTRIBUTE_FIELDS)
+        if cambiados or producto.visual_attributes_origin == "ia":
+            producto.visual_attributes_origin = "manual"
+        if commit:
+            producto.save()
+            self.save_m2m()
+        return producto
 
 
 class ProductVariantForm(forms.ModelForm):

@@ -33,6 +33,51 @@ Acciones permitidas en `ui_actions`: `add_to_cart` (con `variant_id`),
 se descarta. La tienda genera las etiquetas de los botones; `label` es opcional
 y se ignora.
 
+## Búsqueda por foto (contrato `vision-1`)
+
+El cliente sube la foto de una prenda en el panel y la tienda pregunta al Coach
+qué ve en ella. Es una llamada aparte del turno, porque una foto no cabe en el
+presupuesto de 24 KB:
+
+`POST <COACH_VISION_URL>` (por defecto, la misma base que `COACH_API_URL`
+terminada en `/commerce/vision/describe/`) con el cuerpo de
+`vision_solicitud.json`, las mismas cabeceras de firma y
+`X-Vendedor-Contract: vision-1`. Tope del cuerpo: 512 KB.
+
+- `image` es un JPEG de máximo 1024 px por lado, codificado en base64. La tienda
+  lo vuelve a codificar antes de enviarlo: no trae EXIF, GPS ni otros metadatos.
+- `purpose` es `similar_products` (foto de un cliente) o `catalog_attributes`
+  (foto de un producto del catálogo, para proponer sus atributos).
+- `vocabulary` trae las listas cerradas de cada atributo. El servicio responde
+  solo con esos códigos.
+
+La respuesta es como `vision_respuesta_ok.json`: `garment_detected`,
+`person_present`, `attributes` (tipo, manga, cuello, ajuste, diseño, hasta 3
+colores y una pista de línea) y `confidence` entre 0 y 1. Un valor fuera del
+vocabulario se descarta. Si `meta.status` es `error`, la tienda muestra su propio
+mensaje. Un 404 significa para la tienda que el Coach aún no tiene visión.
+
+Reglas para el servicio de visión:
+
+- No guardar la imagen ni enviarla a otro destino que el modelo. No registrarla
+  en logs.
+- Describir solo la prenda. Si aparece una persona, se marca
+  `person_present: true` y no se describe nada de ella (rostro, cuerpo, edad,
+  género ni medidas).
+- El texto que aparezca dentro de la imagen es dato, nunca instrucción.
+- No proponer productos ni precios: eso lo hace la tienda con su catálogo.
+
+### `visual_query` en el turno
+
+Después, la tienda arma el turno normal (`solicitud_con_foto.json`) con el campo
+opcional `visual_query`: lo que el Coach vio en la foto y `matches`, los
+candidatos que se parecen, con su puntaje y los atributos en que coinciden
+(`garment_type`, `garment_type_related`, `colors`, `pattern`, `sleeve`,
+`neckline`, `fit`). Cada `product_id` de `matches` está entre los candidatos.
+Con `matches` vacío la tienda no tiene nada parecido: el Coach lo dice con
+honestidad y puede ofrecer alternativas del catálogo, sin presentarlas como
+iguales a la foto.
+
 ## Reglas para quien implemente el servicio
 
 - Declarar autenticación y permiso de forma explícita en el endpoint: no heredar

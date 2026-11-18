@@ -14,6 +14,7 @@ Hay dos implementaciones con la misma interfaz (`enviar(solicitud)`):
 Todo fallo se informa con `CoachNoDisponible` y un codigo corto. Ningun
 mensaje de error incluye el texto del visitante ni el cuerpo de la respuesta.
 """
+import base64
 import logging
 import re
 from decimal import Decimal
@@ -24,7 +25,7 @@ from django.conf import settings
 from django.core.cache import cache
 from gotogym.ratelimit import contar, olvidar
 
-from . import contrato, firma
+from . import contrato, firma, imagen, vision
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,8 @@ PALABRA_MALICIOSO_SIMULADO = '[simular-malicioso]'
 class CoachNoDisponible(Exception):
     """El Coach no pudo atender el turno. `codigo` es uno de: `no_configurado`,
     `circuito_abierto`, `timeout`, `conexion`, `rechazado` (4xx), `servicio`
-    (5xx), `limite` (429), `respuesta_invalida`, `error_del_coach`.
+    (5xx), `limite` (429), `respuesta_invalida`, `error_del_coach` y, solo en
+    vision, `no_soportado` (el Coach desplegado aun no describe fotos).
 
     `detalle` es el motivo tecnico (vacio si no hay): el `error_code` del
     Coach en un `error_del_coach`, el estado HTTP y el `error` del cuerpo en un
@@ -121,31 +123,44 @@ def _codigo_de_error_http(respuesta):
     return codigo if isinstance(codigo, str) and _CODIGO_HTTP.match(codigo) else ''
 
 
+def url_de_vision(url_mensajes=None, configurada=None):
+    """Direccion del endpoint de vision del Coach.
+
+    `COACH_VISION_URL` si esta configurada; si no, la misma base del turno
+    (`.../commerce/agent/message/` -> `.../commerce/vision/describe/`)."""
+    configurada = getattr(settings, 'COACH_VISION_URL', '') if configurada is None else configurada
+    if configurada:
+        return configurada
+    url_mensajes = settings.COACH_API_URL if url_mensajes is None else url_mensajes
+    sufijo = '/agent/message/'
+    if url_mensajes and url_mensajes.endswith(sufijo):
+        return url_mensajes[: -len(sufijo)] + '/vision/describe/'
+    return ''
+
+
 class ClienteHttp:
-    def __init__(self, url, clave_id, secreto, timeout):
+    def __init__(self, url, clave_id, secreto, timeout, url_vision=''):
         self.url = url
         self.clave_id = clave_id
         self.secreto = secreto
         self.timeout = timeout
+        self.url_vision = url_vision
 
-    def enviar(self, solicitud):
-        """`RespuestaCoach` ya validada en su forma, o `CoachNoDisponible`."""
-        if not _url_permitida(self.url):
+    def _publicar(self, url, cuerpo, version):
+        """Respuesta HTTP 200 ya leida como JSON, o `CoachNoDisponible`."""
+        if not _url_permitida(url):
             raise CoachNoDisponible('no_configurado')
-        cuerpo = contrato.serializar(solicitud)
         try:
             cabeceras = firma.encabezados_firmados(self.clave_id, self.secreto, cuerpo)
         except firma.SecretoNoConfigurado:
             raise CoachNoDisponible('no_configurado') from None
         cabeceras['Content-Type'] = 'application/json; charset=utf-8'
         cabeceras['Accept'] = 'application/json'
-        cabeceras[firma.ENCABEZADO_CONTRATO] = (
-            contrato.VERSION_CONTRATO_V2 if 'identity' in solicitud else contrato.VERSION_CONTRATO
-        )
+        cabeceras[firma.ENCABEZADO_CONTRATO] = version
 
         try:
             respuesta = requests.post(
-                self.url,
+                url,
                 data=cuerpo,
                 headers=cabeceras,
                 timeout=(min(3.0, self.timeout), self.timeout),
@@ -174,9 +189,14 @@ class ClienteHttp:
             raise CoachNoDisponible('rechazado', detalle=f'http_{estado}' + (f':{motivo}' if motivo else ''))
 
         try:
-            datos = respuesta.json()
+            return respuesta.json()
         except ValueError:
             raise CoachNoDisponible('respuesta_invalida', detalle='no_json') from None
+
+    def enviar(self, solicitud):
+        """`RespuestaCoach` ya validada en su forma, o `CoachNoDisponible`."""
+        version = contrato.VERSION_CONTRATO_V2 if 'identity' in solicitud else contrato.VERSION_CONTRATO
+        datos = self._publicar(self.url, contrato.serializar(solicitud), version)
         try:
             validada = contrato.validar_respuesta(datos)
         except contrato.ContratoInvalido as error:
@@ -185,6 +205,28 @@ class ClienteHttp:
         if not validada.ok:
             raise CoachNoDisponible('error_del_coach', validada.meta.reintentar_en, validada.meta.codigo_error)
         return validada
+
+    def describir(self, solicitud):
+        """`vision.Descripcion` de una foto, o `CoachNoDisponible`.
+
+        Un 404 significa que el Coach desplegado aun no tiene vision: se
+        informa como `no_soportado`, distinto de una caida."""
+        if not self.url_vision:
+            raise CoachNoDisponible('no_soportado')
+        try:
+            datos = self._publicar(self.url_vision, vision.serializar(solicitud), vision.VERSION_CONTRATO_VISION)
+        except CoachNoDisponible as error:
+            if error.codigo == 'rechazado' and error.detalle.startswith('http_404'):
+                raise CoachNoDisponible('no_soportado', detalle=error.detalle) from None
+            raise
+        try:
+            descripcion = vision.validar_respuesta(datos)
+        except contrato.ContratoInvalido as error:
+            logger.error('Vendedor: respuesta de vision fuera de contrato (%s).', error)
+            raise CoachNoDisponible('respuesta_invalida', detalle=str(error)) from None
+        if not descripcion.ok:
+            raise CoachNoDisponible('error_del_coach', descripcion.reintentar_en, descripcion.codigo_error)
+        return descripcion
 
 
 # --- Cliente simulado --------------------------------------------------------
@@ -239,12 +281,29 @@ def respuesta_maliciosa_simulada():
     }
 
 
+def descripcion_simulada(solicitud):
+    """Cuerpo de respuesta de vision que daria un Coach de mentira: el color
+    promedio del centro de la foto y, como tipo, una camiseta. No es vision
+    artificial; sirve para ver el flujo completo sin el Coach real."""
+    datos = base64.b64decode(solicitud['image']['data'])
+    return {
+        'meta': {'status': 'ok', 'agents_used': ['simulado']},
+        'garment_detected': True,
+        'person_present': False,
+        'attributes': {'garment_type': 'camiseta', 'colors': [imagen.color_dominante(datos)]},
+        'confidence': 0.3,
+    }
+
+
 class ClienteSimulado:
     """Coach de mentira. Contesta con lo que hay en el paquete y lo dice.
 
     Dos mensajes de prueba para ver los estados de la interfaz:
     `[simular-error]` devuelve un error con espera, y `[simular-malicioso]`
     devuelve acciones que la tienda debe descartar."""
+
+    def describir(self, solicitud):
+        return vision.validar_respuesta(descripcion_simulada(solicitud))
 
     def enviar(self, solicitud):
         mensaje = solicitud['message']
@@ -264,6 +323,7 @@ def obtener_cliente():
             settings.COACH_SERVICE_KEY_ID,
             settings.COACH_SERVICE_SECRET,
             settings.VENDEDOR_TIMEOUT_SECONDS,
+            url_vision=url_de_vision(),
         )
     if settings.VENDEDOR_COACH_SIMULADO:
         return ClienteSimulado()

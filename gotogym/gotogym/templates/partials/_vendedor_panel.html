@@ -135,8 +135,26 @@ con ese mismo aviso, sin llamar al servidor.
   {% endif %}
 
   <form class="gtg-vendedor__form" data-vendedor-form novalidate>
+    {% if vendedor_imagen %}
+    {# Busqueda por foto. La foto se analiza para buscar prendas parecidas y no se guarda. #}
+    <div class="gtg-vendedor__adjunto" data-vendedor-adjunto hidden>
+      <img class="gtg-vendedor__adjunto-img" data-vendedor-adjunto-img alt="{% trans 'Foto adjunta' %}" width="56" height="56">
+      <p class="gtg-vendedor__adjunto-aviso">{% trans "Uso la foto solo para buscar prendas parecidas y no la guardo. Funciona mejor si se ve solo la prenda." %}</p>
+      <button type="button" class="gtg-vendedor__icon-button" data-vendedor-quitar-foto aria-label="{% trans 'Quitar la foto' %}" title="{% trans 'Quitar la foto' %}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+    {% endif %}
     <label class="sr-only" for="vendedor-mensaje">{% trans "Escribe tu mensaje" %}</label>
-    <div class="gtg-vendedor__composer">
+    <div class="gtg-vendedor__composer" data-vendedor-composer>
+      {% if vendedor_imagen %}
+      <button type="button" class="gtg-vendedor__attach" data-vendedor-adjuntar hidden
+              aria-label="{% trans 'Buscar prendas parecidas con una foto' %}" title="{% trans 'Buscar prendas parecidas con una foto' %}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 8h3l2-3h6l2 3h3v11H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+      </button>
+      <input type="file" class="sr-only" data-vendedor-archivo tabindex="-1" aria-hidden="true"
+             accept="image/jpeg,image/png,image/webp,image/heic,image/heif">
+      {% endif %}
       <textarea id="vendedor-mensaje" name="mensaje" rows="1" maxlength="600" data-vendedor-mensaje
               placeholder="{% trans 'Pregunta por productos, tallas o envíos' %}"></textarea>
       <button type="submit" class="gtg-vendedor__button gtg-vendedor__send" data-vendedor-enviar aria-label="{% trans 'Enviar' %}">
@@ -174,8 +192,16 @@ con ese mismo aviso, sin llamar al servidor.
     <span data-texto="atencion_sin_correo">{% trans "No pudimos enviarte la confirmación por correo, pero tu solicitud quedó registrada. Guarda el número." %}</span>
     <span data-texto="atencion_campos">{% trans "Revisa los campos: nombre, correo válido, un mensaje y la autorización de contacto." %}</span>
     <span data-texto="atencion_error">{% trans "No se pudo registrar tu solicitud. Intenta de nuevo o escríbenos desde Contacto." %}</span>
+    <span data-texto="foto_enviada">{% trans "Foto para buscar prendas parecidas" %}</span>
+    <span data-texto="busque">{% trans "Busqué:" %}</span>
+    <span data-texto="aviso_sin_prenda">{% trans "No identifiqué una prenda en esa foto. Prueba con otra en la que se vea la prenda completa y con buena luz." %}</span>
+    <span data-texto="error_imagen_invalida">{% trans "No pude leer esa imagen. Usa una foto JPG, PNG, WEBP o HEIC." %}</span>
+    <span data-texto="error_imagen_grande">{% trans "La foto es demasiado grande. Prueba con una de menos de 8 MB." %}</span>
+    <span data-texto="error_imagen_no_disponible">{% trans "La búsqueda por foto no está disponible en este momento. Descríbeme la prenda con palabras y te ayudo." %}</span>
+    <span data-texto="error_imagen_rechazada">{% trans "No pude analizar esa foto. Prueba con otra en la que se vea solo la prenda." %}</span>
+    <span data-texto="error_limite_imagenes">{% trans "Alcanzaste el límite de fotos de hoy. Puedes seguir escribiéndome." %}</span>
     <span data-texto="atencion_espera">{% trans "Ya enviaste varias solicitudes. Intenta más tarde o escríbenos desde Contacto." %}</span>
   </div>
 
-  <script id="vendedor-config" type="application/json">{"endpoint": "{% url 'vendedor:mensaje' %}", "estadoUrl": "{% url 'vendedor:identidad_estado' %}", "identityEpoch": "{{ vendedor_identity_epoch }}", "csrf": "{{ csrf_token }}", "maxLength": 600, "disponible": {% if vendedor_disponible %}true{% else %}false{% endif %}, "cartUrl": "{% url 'carrito:cart_detail' %}", "contactUrl": "{% url 'contacto' %}", "puedeRecordar": {% if vendedor_puede_recordar %}true{% else %}false{% endif %}, "recordarUrl": "{% url 'vendedor:personalizacion_recordar' %}", "atencionUrl": "{% url 'vendedor:atencion' %}", "soluciones": {{ vendedor_urls_soluciones|default:'[]'|safe }}, "vigenciaHistorial": {{ vendedor_vigencia_historial|default:1800 }}}</script>
+  <script id="vendedor-config" type="application/json">{"endpoint": "{% url 'vendedor:mensaje' %}", "estadoUrl": "{% url 'vendedor:identidad_estado' %}", "identityEpoch": "{{ vendedor_identity_epoch }}", "csrf": "{{ csrf_token }}", "maxLength": 600, "disponible": {% if vendedor_disponible %}true{% else %}false{% endif %}, "cartUrl": "{% url 'carrito:cart_detail' %}", "contactUrl": "{% url 'contacto' %}", "puedeRecordar": {% if vendedor_puede_recordar %}true{% else %}false{% endif %}, "recordarUrl": "{% url 'vendedor:personalizacion_recordar' %}", "atencionUrl": "{% url 'vendedor:atencion' %}", "imagenUrl": "{% if vendedor_imagen %}{% url 'vendedor:imagen' %}{% endif %}", "soluciones": {{ vendedor_urls_soluciones|default:'[]'|safe }}, "vigenciaHistorial": {{ vendedor_vigencia_historial|default:1800 }}}</script>
 </aside>

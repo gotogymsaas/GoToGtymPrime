@@ -29,6 +29,7 @@ from django.utils import timezone
 from django.utils.translation import get_language
 from gotogym.ajustes_tienda import compras_pausadas, pagos_habilitados
 from inventory.services import get_available_quantity
+from products import atributos
 
 from . import contrato, evidencia, identidad, talla
 from .models import CommerceMemoryItem, CommercePersonalizationConsent
@@ -158,8 +159,25 @@ def contexto_del_cliente(user):
     return contexto
 
 
-def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=None):
+def bloque_visual(descripcion, coincidencias):
+    """`visual_query`: lo que el Coach vio en la foto del visitante y los
+    productos de la tienda que se le parecen, con los atributos en que
+    coinciden. La foto no viaja en el turno."""
+    return {
+        'source': 'customer_photo',
+        'vocabulary_version': atributos.VERSION_VOCABULARIO,
+        'garment_detected': descripcion.prenda,
+        'person_present': descripcion.persona,
+        'attributes': dict(descripcion.atributos),
+        'matches': [dict(fila) for fila in coincidencias],
+    }
+
+
+def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=None, visual=None):
     """Solicitud lista para firmar y enviar.
+
+    `visual` es el bloque de `bloque_visual` cuando el turno viene de una
+    foto: sus coincidencias van primero entre los candidatos.
 
     Lanza `ContratoInvalido` si el paquete no respeta el contrato o no cabe
     en el presupuesto incluso despues de descartar candidatos: en ese caso no
@@ -190,6 +208,7 @@ def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=No
             'candidates': evidencia.candidatos(
                 mensaje, foco_id=pagina['product_id'], ids_carrito=productos_del_carrito,
                 linea_preferida=linea_preferida,
+                primero=[fila['product_id'] for fila in (visual or {}).get('matches', [])],
             ),
             'policies': evidencia.politicas(idioma),
             'promotions': evidencia.promociones(),
@@ -208,9 +227,16 @@ def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=No
             if contexto:
                 solicitud['customer_context'] = contexto
 
+    if visual is not None:
+        solicitud['visual_query'] = visual
+
     candidatos = solicitud['evidence']['candidates']
     while candidatos and contrato.tamano_en_bytes(solicitud) > contrato.MAX_BYTES_SOLICITUD:
         candidatos.pop()
+        if visual is not None:
+            # Una coincidencia sin su candidato no le sirve al Coach.
+            presentes = {c['product_id'] for c in candidatos}
+            visual['matches'] = [f for f in visual['matches'] if f['product_id'] in presentes]
 
     contrato.validar_solicitud(solicitud)
     return solicitud

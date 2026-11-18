@@ -6,6 +6,7 @@ app_name = 'vendedor'
 
 urlpatterns = [
     path('mensaje/', views.mensaje, name='mensaje'),
+    path('imagen/', views.imagen_vista, name='imagen'),
     path('estado/', views.identidad_estado, name='identidad_estado'),
     path('consentimiento/', consentimiento.consentimiento, name='consentimiento'),
     path('personalizacion/permisos/', personalizacion.guardar_permisos, name='personalizacion_permisos'),

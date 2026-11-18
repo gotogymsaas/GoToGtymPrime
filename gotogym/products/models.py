@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from . import linea
+from . import atributos, linea
 
 
 class ProductCategory(models.Model):
@@ -68,6 +68,17 @@ class Product(models.Model):
     # Dama / caballero / unisex. Vacio = sin clasificar: `save` la deduce del
     # nombre o la descripcion si la dicen (ver products/linea.py).
     line = models.CharField('línea', max_length=10, choices=linea.OPCIONES, blank=True, db_index=True)
+    # Atributos visuales (products/atributos.py): con ellos Quantum Coach busca
+    # prendas parecidas a la foto que sube un cliente. Vacio = sin dato; `save`
+    # completa los vacios que el nombre dice con certeza.
+    garment_type = models.CharField('tipo de prenda', max_length=20, choices=atributos.TIPOS, blank=True, db_index=True)
+    sleeve = models.CharField('manga', max_length=20, choices=atributos.MANGAS, blank=True)
+    neckline = models.CharField('cuello', max_length=20, choices=atributos.CUELLOS, blank=True)
+    fit = models.CharField('ajuste', max_length=20, choices=atributos.AJUSTES, blank=True)
+    pattern = models.CharField('diseño', max_length=20, choices=atributos.DISENOS, blank=True)
+    visual_attributes_origin = models.CharField(
+        'origen de los atributos', max_length=10, choices=atributos.ORIGENES, blank=True,
+    )
 
     def __str__(self):
         return self.name
@@ -78,7 +89,23 @@ class Product(models.Model):
             self.sort_order = (ultimo or 0) + 1
         if not self.line:
             self.line = linea.inferir_linea(self.name, self.description)
+        self.completar_atributos_visuales()
         super().save(*args, **kwargs)
+
+    def completar_atributos_visuales(self):
+        """Llena con lo que dice el nombre los atributos que siguen vacios.
+        Nunca cambia un valor ya puesto (a mano o propuesto por la IA)."""
+        completados = False
+        for campo, valor in atributos.inferir_atributos(self.name, self.description).items():
+            if not getattr(self, campo):
+                setattr(self, campo, valor)
+                completados = True
+        if completados and not self.visual_attributes_origin:
+            self.visual_attributes_origin = atributos.ORIGEN_INFERIDO
+
+    def atributos_visuales(self):
+        """Los atributos con valor, como dict de codigos."""
+        return {campo: getattr(self, campo) for campo in atributos.CAMPOS if getattr(self, campo)}
 
     @property
     def primary_image(self):
