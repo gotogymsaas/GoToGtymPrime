@@ -1,0 +1,31 @@
+name: QAF SGAE legal governance preflight
+on:
+  pull_request:
+    paths:
+      - 'config/qaf_legal/**'
+      - 'scripts/qaf_legal_*.py'
+      - 'scripts/test_qaf_legal_decision_engine.py'
+      - '.github/workflows/qaf-legal-governance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sgae-read-only:
+    name: SGAE legal and automation contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit legal source inventory (non-blocking on legal review)
+        run: python scripts/qaf_legal_policy_audit.py --json
+      - name: Validate deterministic authorization decisions
+        run: |
+          cd scripts
+          python -m unittest -v test_qaf_legal_decision_engine
+      - name: Compile the governance tooling
+        run: python -m py_compile scripts/qaf_legal_policy_audit.py scripts/qaf_legal_decision_engine.py

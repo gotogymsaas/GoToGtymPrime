@@ -122,7 +122,7 @@ class PolicyPagesTestCase(TestCase):
     def test_las_politicas_citan_los_plazos_de_ley(self):
         devoluciones = self.client.get(reverse('politica_devoluciones')).content.decode()
         self.assertIn('5 días hábiles', devoluciones)
-        self.assertIn('30 días calendario', devoluciones)
+        self.assertIn('15 días calendario', devoluciones)
         datos = self.client.get(reverse('politica_tratamiento_datos')).content.decode()
         self.assertIn('10 días hábiles', datos)
         self.assertIn('15 días hábiles', datos)
