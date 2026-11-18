@@ -24,10 +24,10 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    uses: gotogymsaas/cybersecurity/.github/workflows/qaf-emitter.yml@03900cf91f81ccb001fffaefa079ebd13e50ad18
+    uses: gotogymsaas/cybersecurity/.github/workflows/qaf-emitter.yml@589aa20ffd70bede2394a4769b2aab60c4a5c68d
     with:
       project_id: GoToGtymPrime
-      tooling_ref: 03900cf91f81ccb001fffaefa079ebd13e50ad18
+      tooling_ref: 589aa20ffd70bede2394a4769b2aab60c4a5c68d
       scanner_profile: .github/qaf/scanner-profile.json
     secrets:
       QAF_TOOLING_READ_TOKEN: ${{ secrets.QAF_TOOLING_READ_TOKEN }}
