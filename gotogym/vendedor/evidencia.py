@@ -22,8 +22,8 @@ import re
 import unicodedata
 from decimal import Decimal
 
-from django.conf import settings
 from afiliados.models import PerfilAfiliado
+from django.conf import settings
 from django.db.models import Prefetch
 from django.db.models.functions import Upper
 from django.urls import reverse
