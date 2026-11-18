@@ -31,12 +31,14 @@ from . import (
     coach_client,
     contrato,
     conversacion,
+    documento,
     estado,
     evidencia,
     imagen,
     paquete,
     respuesta,
     vision,
+    voz,
 )
 from .exposicion import imagen_permitida_para, visible_para
 
@@ -173,10 +175,11 @@ def _abrir_turno(request, reiniciar):
     return estado_conversacion, None
 
 
-def _completar_turno(request, cliente, texto, estado_conversacion, visual=None, extra=None):
+def _completar_turno(request, cliente, texto, estado_conversacion, visual=None, extra=None, adjunto=None):
     """Arma el paquete, lo envia al Coach y devuelve la respuesta ya saneada."""
     try:
-        solicitud = paquete.armar_solicitud(request, texto, estado_conversacion['id'], visual=visual)
+        solicitud = paquete.armar_solicitud(request, texto, estado_conversacion['id'], visual=visual,
+                                            adjunto=adjunto)
     except contrato.ContratoInvalido as error:
         logger.error('Vendedor: no se pudo armar un paquete valido (%s).', error)
         return _error('paquete_invalido', 500, diagnostico=_diagnostico_para(request, 'paquete_invalido', error))
@@ -253,12 +256,24 @@ _ERRORES_DE_VISION = {
 
 
 class _SubidaEnMemoria(MemoryFileUploadHandler):
-    """La foto nunca toca el disco: se recibe entera en memoria, hasta el tope
-    de la peticion. El manejador por defecto la pasaria a un archivo temporal
-    por encima de FILE_UPLOAD_MAX_MEMORY_SIZE."""
+    """Lo que sube el visitante (foto, archivo, nota de voz) nunca toca el
+    disco: se recibe entero en memoria, hasta el tope de la peticion. El
+    manejador por defecto lo pasaria a un archivo temporal por encima de
+    FILE_UPLOAD_MAX_MEMORY_SIZE."""
+
+    def __init__(self, request, tope):
+        super().__init__(request)
+        self.tope = tope
 
     def handle_raw_input(self, input_data, META, content_length, boundary, encoding=None):
-        self.activated = 0 < content_length <= MAX_BYTES_PETICION_IMAGEN
+        self.activated = 0 < content_length <= self.tope
+
+
+def _largo_declarado(request):
+    try:
+        return int(request.META.get('CONTENT_LENGTH') or 0)
+    except ValueError:
+        return 0
 
 
 def _tope_de_imagenes_superado(request):
@@ -356,16 +371,172 @@ def _imagen_con_csrf(request):
 def imagen_vista(request):
     if not visible_para(request) or not imagen_permitida_para(request):
         raise Http404
-    try:
-        largo = int(request.META.get('CONTENT_LENGTH') or 0)
-    except ValueError:
-        largo = 0
+    largo = _largo_declarado(request)
     if largo > MAX_BYTES_PETICION_IMAGEN:
         return _error('imagen_grande', 413)
     if largo <= 0:
         return _error('imagen_invalida', 400)
-    request.upload_handlers = [_SubidaEnMemoria(request)]
+    request.upload_handlers = [_SubidaEnMemoria(request, MAX_BYTES_PETICION_IMAGEN)]
     return _imagen_con_csrf(request)
+
+
+# --- Archivo adjunto -------------------------------------------------------------
+
+MAX_BYTES_PETICION_DOCUMENTO = documento.MAX_BYTES_SUBIDA + 64 * 1024
+# Archivos por minuto y por persona. Cada uno es un turno normal (cuenta contra
+# el tope diario de mensajes); este tope frena el envio en rafaga.
+DOCUMENTOS_POR_MINUTO = 3
+
+_ERRORES_DE_DOCUMENTO = {
+    'grande': ('documento_grande', 413),
+    'sin_texto': ('documento_sin_texto', 422),
+    'protegido': ('documento_protegido', 422),
+}
+
+
+def _mensaje_de_documento(idioma):
+    with translation.override(idioma):
+        return gettext('Te comparto un archivo para que me ayudes con mi compra.')
+
+
+def _atender_documento(request):
+    if request.content_type != 'multipart/form-data':
+        return _error('documento_invalido', 415)
+    archivo = request.FILES.get('documento')
+    if archivo is None:
+        return _error('documento_invalido', 400)
+    texto = (request.POST.get('message') or '').strip()
+    if len(texto) > contrato.MAX_LARGO_MENSAJE:
+        return _error('mensaje_invalido', 400)
+
+    cliente, fallo = _cliente_disponible(request)
+    if fallo:
+        return fallo
+    estado_conversacion, fallo = _abrir_turno(request, reiniciar=request.POST.get('new') == '1')
+    if fallo:
+        return fallo
+    try:
+        leido = documento.leer(archivo.read(), archivo.name or '')
+    except documento.DocumentoInvalido as error:
+        codigo, estado_http = _ERRORES_DE_DOCUMENTO.get(error.codigo, ('documento_invalido', 400))
+        return _error(codigo, estado_http, diagnostico=_diagnostico_para(request, 'documento', error.codigo))
+    finally:
+        archivo.close()
+
+    idioma = paquete.idioma_del_visitante()
+    return _completar_turno(
+        request, cliente, texto or _mensaje_de_documento(idioma), estado_conversacion,
+        adjunto=paquete.bloque_adjunto(leido),
+        extra={'document': {'format': leido.formato, 'truncated': leido.recortado}},
+    )
+
+
+@csrf_protect
+def _documento_con_csrf(request):
+    return rate_limit('vendedor_documento', DOCUMENTOS_POR_MINUTO, 60)(_atender_documento)(request)
+
+
+@csrf_exempt
+@require_POST
+def documento_vista(request):
+    if not visible_para(request):
+        raise Http404
+    largo = _largo_declarado(request)
+    if largo > MAX_BYTES_PETICION_DOCUMENTO:
+        return _error('documento_grande', 413)
+    if largo <= 0:
+        return _error('documento_invalido', 400)
+    request.upload_handlers = [_SubidaEnMemoria(request, MAX_BYTES_PETICION_DOCUMENTO)]
+    return _documento_con_csrf(request)
+
+
+# --- Dictado por voz (respaldo del dictado del navegador) ------------------------
+
+MAX_BYTES_PETICION_VOZ = voz.MAX_BYTES_SUBIDA + 16 * 1024
+# Notas de voz por minuto y por persona, por persona y dia, y en toda la tienda
+# por dia (tope de costo del reconocimiento de voz).
+VOZ_POR_MINUTO = 6
+VOZ_MAX_DIA = 40
+VOZ_MAX_DIA_GLOBAL = 1500
+
+_ERRORES_DE_VOZ = {
+    'no_soportado': ('voz_no_disponible', 503),
+    'no_configurado': ('voz_no_disponible', 503),
+    'timeout': ('timeout', 504),
+    'limite': ('espera', 429),
+    'error_del_coach': ('voz_no_disponible', 503),
+}
+
+
+def _tope_de_voz_superado(request):
+    if not getattr(settings, 'RATE_LIMIT_ENABLED', True):
+        return False
+    desfase = int(timezone.localtime().utcoffset().total_seconds())
+    if contar(f'vendedor:voz:dia:{_clave_de_cliente(request)}', SEGUNDOS_DIA, desfase) > VOZ_MAX_DIA:
+        return True
+    return contar('vendedor:voz:dia:global', SEGUNDOS_DIA, desfase) > VOZ_MAX_DIA_GLOBAL
+
+
+def _atender_voz(request):
+    if request.content_type != 'multipart/form-data':
+        return _error('voz_invalida', 415)
+    archivo = request.FILES.get('audio')
+    if archivo is None:
+        return _error('voz_invalida', 400)
+    cliente, fallo = _cliente_disponible(request)
+    if fallo:
+        return fallo
+    espera = _segundos_de_espera(request)
+    if espera:
+        return _error('espera', 429, espera)
+    if _tope_de_voz_superado(request):
+        return _error('limite_voz', 429)
+    try:
+        preparado = voz.preparar(archivo.read())
+    except voz.VozInvalida as error:
+        larga = error.codigo in ('larga', 'grande')
+        return _error('voz_larga' if larga else 'voz_invalida', 413 if larga else 400,
+                      diagnostico=_diagnostico_para(request, 'voz', error.codigo))
+    finally:
+        archivo.close()
+
+    try:
+        transcripcion = cliente.transcribir(
+            voz.armar_solicitud(preparado, paquete.idioma_del_visitante(), request.POST.get('region', '')))
+    except coach_client.CoachNoDisponible as error:
+        logger.warning(
+            'Vendedor: el Coach no transcribio la nota de voz (%s%s).',
+            error.codigo, f': {error.detalle}' if error.detalle else '',
+        )
+        if error.reintentar_en:
+            _exigir_espera(request, error.reintentar_en)
+        codigo, estado_http = _ERRORES_DE_VOZ.get(error.codigo, _ERROR_GENERICO_DEL_COACH)
+        return _error(codigo, estado_http, error.reintentar_en,
+                      diagnostico=_diagnostico_para(request, 'voz', error.codigo, error.detalle))
+    except contrato.ContratoInvalido as error:
+        logger.error('Vendedor: no se pudo armar la solicitud de voz (%s).', error)
+        return _error('voz_invalida', 400, diagnostico=_diagnostico_para(request, 'voz', error))
+    del preparado
+    return JsonResponse({'ok': True, 'text': transcripcion.texto})
+
+
+@csrf_protect
+def _voz_con_csrf(request):
+    return rate_limit('vendedor_voz', VOZ_POR_MINUTO, 60)(_atender_voz)(request)
+
+
+@csrf_exempt
+@require_POST
+def voz_vista(request):
+    if not visible_para(request):
+        raise Http404
+    largo = _largo_declarado(request)
+    if largo > MAX_BYTES_PETICION_VOZ:
+        return _error('voz_larga', 413)
+    if largo <= 0:
+        return _error('voz_invalida', 400)
+    request.upload_handlers = [_SubidaEnMemoria(request, MAX_BYTES_PETICION_VOZ)]
+    return _voz_con_csrf(request)
 
 
 @require_POST

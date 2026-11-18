@@ -52,6 +52,9 @@ EVENTOS_PERMITIDOS = frozenset({
     'vendedor_error',
     'vendedor_identity_transition',
     'vendedor_image_sent',
+    'vendedor_document_sent',
+    'vendedor_tool',
+    'vendedor_voice',
     'vendedor_solution_click',
 })
 

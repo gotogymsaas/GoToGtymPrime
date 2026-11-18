@@ -419,9 +419,9 @@ VENDEDOR_SOLUCIONES = {
     'developers': os.environ.get('VENDEDOR_URL_DEVELOPERS', 'https://developers.gotogym.store/'),
 }
 # Busqueda por foto (vendedor/vision.py). Quien puede subir una foto:
-# `apagado`, `staff` (piloto con el equipo), `autenticados` o `todos`. Empieza
-# con el equipo: cada foto cuesta una llamada al modelo de vision.
-VENDEDOR_IMAGEN_ACCESO = os.environ.get('VENDEDOR_IMAGEN_ACCESO', 'staff').strip().lower()
+# `apagado`, `staff` (piloto con el equipo), `autenticados` o `todos`. Abierta
+# a todos los visitantes; el costo de cada foto lo acotan los topes de abajo.
+VENDEDOR_IMAGEN_ACCESO = os.environ.get('VENDEDOR_IMAGEN_ACCESO', 'todos').strip().lower()
 # Endpoint de vision del Coach. Vacio = se deriva de COACH_API_URL
 # (.../commerce/agent/message/ -> .../commerce/vision/describe/).
 COACH_VISION_URL = os.environ.get('COACH_VISION_URL', '').strip()

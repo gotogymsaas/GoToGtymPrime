@@ -25,7 +25,7 @@ from django.conf import settings
 from django.core.cache import cache
 from gotogym.ratelimit import contar, olvidar
 
-from . import contrato, firma, imagen, vision
+from . import contrato, firma, imagen, vision, voz
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,8 @@ class CoachNoDisponible(Exception):
     """El Coach no pudo atender el turno. `codigo` es uno de: `no_configurado`,
     `circuito_abierto`, `timeout`, `conexion`, `rechazado` (4xx), `servicio`
     (5xx), `limite` (429), `respuesta_invalida`, `error_del_coach` y, solo en
-    vision, `no_soportado` (el Coach desplegado aun no describe fotos).
+    vision y voz, `no_soportado` (el Coach desplegado aun no describe fotos o
+    no transcribe notas de voz).
 
     `detalle` es el motivo tecnico (vacio si no hay): el `error_code` del
     Coach en un `error_del_coach`, el estado HTTP y el `error` del cuerpo en un
@@ -138,13 +139,24 @@ def url_de_vision(url_mensajes=None, configurada=None):
     return ''
 
 
+def url_de_voz(url_mensajes=None):
+    """Direccion del endpoint de transcripcion del Coach: la misma base del
+    turno (`.../commerce/agent/message/` -> `.../commerce/speech/transcribe/`)."""
+    url_mensajes = settings.COACH_API_URL if url_mensajes is None else url_mensajes
+    sufijo = '/agent/message/'
+    if url_mensajes and url_mensajes.endswith(sufijo):
+        return url_mensajes[: -len(sufijo)] + '/speech/transcribe/'
+    return ''
+
+
 class ClienteHttp:
-    def __init__(self, url, clave_id, secreto, timeout, url_vision=''):
+    def __init__(self, url, clave_id, secreto, timeout, url_vision='', url_voz=''):
         self.url = url
         self.clave_id = clave_id
         self.secreto = secreto
         self.timeout = timeout
         self.url_vision = url_vision
+        self.url_voz = url_voz
 
     def _publicar(self, url, cuerpo, version):
         """Respuesta HTTP 200 ya leida como JSON, o `CoachNoDisponible`."""
@@ -228,6 +240,26 @@ class ClienteHttp:
             raise CoachNoDisponible('error_del_coach', descripcion.reintentar_en, descripcion.codigo_error)
         return descripcion
 
+    def transcribir(self, solicitud):
+        """`voz.Transcripcion` de una nota de voz, o `CoachNoDisponible`.
+        Un 404 es un Coach que aun no transcribe: `no_soportado`."""
+        if not self.url_voz:
+            raise CoachNoDisponible('no_soportado')
+        try:
+            datos = self._publicar(self.url_voz, voz.serializar(solicitud), voz.VERSION_CONTRATO_VOZ)
+        except CoachNoDisponible as error:
+            if error.codigo == 'rechazado' and error.detalle.startswith('http_404'):
+                raise CoachNoDisponible('no_soportado', detalle=error.detalle) from None
+            raise
+        try:
+            transcripcion = voz.validar_respuesta(datos)
+        except contrato.ContratoInvalido as error:
+            logger.error('Vendedor: respuesta de voz fuera de contrato (%s).', error)
+            raise CoachNoDisponible('respuesta_invalida', detalle=str(error)) from None
+        if not transcripcion.ok:
+            raise CoachNoDisponible('error_del_coach', transcripcion.reintentar_en, transcripcion.codigo_error)
+        return transcripcion
+
 
 # --- Cliente simulado --------------------------------------------------------
 
@@ -305,6 +337,14 @@ class ClienteSimulado:
     def describir(self, solicitud):
         return vision.validar_respuesta(descripcion_simulada(solicitud))
 
+    def transcribir(self, solicitud):
+        """Sin reconocimiento de voz: dice cuanto duro la nota, rotulado como simulado."""
+        segundos = solicitud['audio']['duration_ms'] / 1000
+        return voz.validar_respuesta({
+            'meta': {'status': 'ok'},
+            'text': f'[Transcripción simulada de {segundos:.1f} s] Busco ropa para entrenar.',
+        })
+
     def enviar(self, solicitud):
         mensaje = solicitud['message']
         if PALABRA_ERROR_SIMULADO in mensaje:
@@ -324,6 +364,7 @@ def obtener_cliente():
             settings.COACH_SERVICE_SECRET,
             settings.VENDEDOR_TIMEOUT_SECONDS,
             url_vision=url_de_vision(),
+            url_voz=url_de_voz(),
         )
     if settings.VENDEDOR_COACH_SIMULADO:
         return ClienteSimulado()

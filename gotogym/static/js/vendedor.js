@@ -20,6 +20,13 @@
  *  - Al medir se envian categorias y numeros, nunca el texto de los mensajes.
  *  - Una foto adjunta se reduce aqui (maximo 1280 px, JPEG) antes de subirla y
  *    no se guarda en el historial: solo queda el rotulo de que hubo una foto.
+ *    De un archivo adjunto solo queda su nombre; el contenido lo lee la tienda.
+ *  - Herramientas del boton "+" (las de Quantum Coach): tomar foto, adjuntar
+ *    archivo, subir imagen y voz. El microfono dicta con el reconocimiento del
+ *    navegador; si no lo hay, graba (WAV de 16 kHz, maximo 30 s) y lo
+ *    transcribe el Coach a traves de la tienda. Lo dictado queda en el campo
+ *    para revisarlo antes de enviar. Las preferencias de voz se guardan en
+ *    localStorage, solo en este navegador.
  *
  * El historial se guarda en sessionStorage (solo en esta pestana) para que no
  * se pierda al cambiar de pagina. Vence con la misma inactividad con la que el
@@ -53,11 +60,20 @@
   var RUTA_AGREGAR = /^\/[a-z]{2}\/carrito\/add\/\d+\/$/;
   var RUTA_RECORDAR = /^\/[a-z]{2}\/vendedor\/personalizacion\/recordar\/$/;
   var RUTA_IMAGEN_SUBIDA = /^\/[a-z]{2}\/vendedor\/imagen\/$/;
+  var RUTA_DOCUMENTO = /^\/[a-z]{2}\/vendedor\/documento\/$/;
+  var RUTA_VOZ = /^\/[a-z]{2}\/vendedor\/voz\/$/;
   var LADO_FOTO = 1280;
   var MAX_BYTES_FOTO = 8 * 1024 * 1024;
+  var MAX_BYTES_DOCUMENTO = 5 * 1024 * 1024;
+  var MAX_LARGO_NOMBRE = 80;
+  var CLAVE_VOZ = 'gtg_vendedor_voz';
+  var FRECUENCIA_VOZ = 16000;
+  var MAX_SEGUNDOS_VOZ = 30;
   var SIN_REINTENTO = {
     limite_turnos: true, limite_diario: true, mensaje_invalido: true,
-    imagen_invalida: true, imagen_grande: true, imagen_no_disponible: true, limite_imagenes: true
+    imagen_invalida: true, imagen_grande: true, imagen_no_disponible: true, limite_imagenes: true,
+    documento_invalido: true, documento_grande: true, documento_sin_texto: true, documento_protegido: true,
+    microfono: true, voz_invalida: true, voz_larga: true, voz_no_disponible: true, limite_voz: true
   };
 
   var botones = document.querySelectorAll('[data-vendedor-toggle]');
@@ -78,12 +94,26 @@
   var botonCerrar = panel.querySelector('[data-vendedor-close]');
   var botonNueva = panel.querySelector('[data-vendedor-nueva]');
   var velo = document.querySelector('[data-vendedor-scrim]');
-  var botonAdjuntar = panel.querySelector('[data-vendedor-adjuntar]');
+  var botonMas = panel.querySelector('[data-vendedor-mas]');
+  var menuHerramientas = panel.querySelector('[data-vendedor-herramientas]');
+  var campoCamara = panel.querySelector('[data-vendedor-camara]');
   var campoArchivo = panel.querySelector('[data-vendedor-archivo]');
+  var campoDocumento = panel.querySelector('[data-vendedor-documento]');
   var cajaAdjunto = panel.querySelector('[data-vendedor-adjunto]');
   var imagenAdjunto = panel.querySelector('[data-vendedor-adjunto-img]');
-  var botonQuitarFoto = panel.querySelector('[data-vendedor-quitar-foto]');
-  var fotosHabilitadas = !!(botonAdjuntar && campoArchivo && cajaAdjunto && RUTA_IMAGEN_SUBIDA.test(configuracion.imagenUrl || ''));
+  var iconoAdjunto = panel.querySelector('[data-vendedor-adjunto-icono]');
+  var nombreAdjunto = panel.querySelector('[data-vendedor-adjunto-nombre]');
+  var avisoAdjunto = panel.querySelector('[data-vendedor-adjunto-aviso]');
+  var botonQuitarAdjunto = panel.querySelector('[data-vendedor-quitar-adjunto]');
+  var botonMicrofono = panel.querySelector('[data-vendedor-microfono]');
+  var panelVoz = panel.querySelector('[data-vendedor-voz-panel]');
+  var fotosHabilitadas = !!(campoArchivo && cajaAdjunto && RUTA_IMAGEN_SUBIDA.test(configuracion.imagenUrl || ''));
+  var documentosHabilitados = !!(campoDocumento && cajaAdjunto && RUTA_DOCUMENTO.test(configuracion.documentoUrl || ''));
+  var sintesis = window.speechSynthesis && window.SpeechSynthesisUtterance ? window.speechSynthesis : null;
+  var Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+  var ContextoDeAudio = window.AudioContext || window.webkitAudioContext || null;
+  var puedeGrabar = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && ContextoDeAudio &&
+    RUTA_VOZ.test(configuracion.vozUrl || ''));
 
   var abierto = false;
   var enviando = false;
@@ -92,9 +122,12 @@
   var nuevaConversacion = false;
   var temporizadorEspera = null;
   var historial = [];
-  var adjunto = null;        // foto lista para enviar (Blob)
-  var vistaPrevia = '';      // URL local de la foto adjunta
-  var ultimaFoto = null;     // para reintentar el ultimo envio con foto
+  var adjunto = null;        // { tipo: 'foto' | 'documento', blob, url, nombre } listo para enviar
+  var ultimoAdjunto = null;  // para reintentar el ultimo envio con foto o archivo
+  var reconocimiento = null; // dictado del navegador en curso
+  var grabacion = null;      // grabacion de respaldo en curso
+  var transcribiendo = false;
+  var temporizadorNota = null;
 
   // --- Utilidades --------------------------------------------------------
 
@@ -157,7 +190,7 @@
 
   // --- Pintado de mensajes ----------------------------------------------
 
-  function pintarUsuario(contenido, urlFoto) {
+  function pintarUsuario(contenido, urlFoto, nombreArchivo) {
     var caja = crear('div', 'gtg-vendedor__msg gtg-vendedor__msg--user');
     caja.appendChild(crear('span', 'sr-only', texto('tu') + ': '));
     if (urlFoto) {
@@ -166,6 +199,7 @@
       foto.alt = texto('foto_enviada');
       caja.appendChild(foto);
     }
+    if (nombreArchivo) caja.appendChild(crear('p', 'gtg-vendedor__msg-archivo', texto('archivo_enviado') + ' ' + nombreArchivo));
     caja.appendChild(crear('p', null, contenido));
     registro.appendChild(caja);
     desplazarAlFinal();
@@ -347,6 +381,7 @@
       caja.appendChild(crear('p', 'gtg-vendedor__busqueda', texto('busque') + ' ' + buscado.join(' · ')));
     }
     caja.appendChild(crear('p', null, String(entrada.t || '')));
+    if (typeof entrada.n === 'string' && entrada.n) caja.appendChild(crear('p', 'gtg-vendedor__busqueda', entrada.n));
 
     var tarjetas = Array.isArray(entrada.c) ? entrada.c : [];
     if (tarjetas.length) {
@@ -386,7 +421,8 @@
     if (historial.length) ocultarBienvenida();
     historial.forEach(function (entrada) {
       if (!entrada || typeof entrada.t !== 'string') return;
-      if (entrada.r === 'u') pintarUsuario(entrada.t);  // una foto vieja no se vuelve a mostrar
+      // Una foto vieja no se vuelve a mostrar; de un archivo queda el nombre.
+      if (entrada.r === 'u') pintarUsuario(entrada.t, '', typeof entrada.d === 'string' ? entrada.d : '');
       else if (entrada.r === 'b') pintarAsistente(entrada);
     });
   }
@@ -408,7 +444,8 @@
   function actualizarControles() {
     var ocupado = enviando || temporizadorEspera !== null;
     botonEnviar.disabled = ocupado;
-    if (botonAdjuntar) botonAdjuntar.disabled = ocupado;
+    if (botonMas) botonMas.disabled = ocupado;
+    if (botonMicrofono) botonMicrofono.disabled = transcribiendo;
     botonNueva.disabled = enviando;
     botonReintentar.disabled = ocupado;
   }
@@ -450,7 +487,14 @@
   // --- Identidad actual del servidor ------------------------------------------
   // Evita atribuir a una persona el historial visual de otra cuenta o del
   // visitante que inició sesión. El navegador nunca elige el principal.
-  function verificarEpoch(mensaje, urlFoto) {
+  function entradaDeUsuario(mensaje, adj) {
+    if (adj && adj.tipo === 'foto') return { r: 'u', t: mensaje, f: 1 };
+    // Sin texto, el mensaje ya es el rotulo con el nombre del archivo.
+    if (adj && adj.tipo === 'documento' && !adj.sinTexto) return { r: 'u', t: mensaje, d: adj.nombre };
+    return { r: 'u', t: mensaje };
+  }
+
+  function verificarEpoch(mensaje, adj) {
     if (!configuracion.estadoUrl) return Promise.resolve();
     return fetch(configuracion.estadoUrl, {
       method: 'GET',
@@ -471,9 +515,10 @@
         // todo el historial anterior se descarta antes de reenviarlo.
         ultimoMensaje = mensaje;
         ocultarBienvenida();
-        historial.push(urlFoto ? { r: 'u', t: mensaje, f: 1 } : { r: 'u', t: mensaje });
+        historial.push(entradaDeUsuario(mensaje, adj));
         guardarHistorial();
-        pintarUsuario(mensaje, urlFoto);
+        pintarUsuario(mensaje, adj && adj.tipo === 'foto' ? adj.url : '',
+          adj && adj.tipo === 'documento' && !adj.sinTexto ? adj.nombre : '');
         medir('vendedor_identity_transition', { mode: datos.mode || 'unknown' });
       }
     });
@@ -481,22 +526,29 @@
 
   // --- Envio ---------------------------------------------------------------
 
-  // Turno de texto (JSON) o con foto (multipart, sin Content-Type propio: lo
-  // pone el navegador con el separador).
-  function peticionDeTurno(mensaje, foto) {
-    var cabeceras = {
+  function cabecerasSeguras() {
+    return {
       'Accept': 'application/json',
       'X-CSRFToken': configuracion.csrf || '',
       'X-Requested-With': 'XMLHttpRequest'
     };
-    if (foto) {
+  }
+
+  // Turno de texto (JSON) o con foto o archivo (multipart, sin Content-Type
+  // propio: lo pone el navegador con el separador).
+  function peticionDeTurno(mensaje, adj) {
+    var cabeceras = cabecerasSeguras();
+    if (adj) {
       var formulario = new FormData();
-      formulario.append('imagen', foto.blob, 'foto.jpg');
+      var esFoto = adj.tipo === 'foto';
+      formulario.append(esFoto ? 'imagen' : 'documento', adj.blob, esFoto ? 'foto.jpg' : adj.nombre);
       // El rotulo visible no es un mensaje: sin texto, el servidor pone el suyo.
-      if (!foto.sinTexto) formulario.append('message', mensaje);
+      if (!adj.sinTexto) formulario.append('message', mensaje);
       if (nuevaConversacion) formulario.append('new', '1');
-      medir('vendedor_image_sent', { kb: Math.round(foto.blob.size / 1024) });
-      return fetch(configuracion.imagenUrl, {
+      var kb = Math.round(adj.blob.size / 1024);
+      if (esFoto) medir('vendedor_image_sent', { kb: kb });
+      else medir('vendedor_document_sent', { kb: kb });
+      return fetch(esFoto ? configuracion.imagenUrl : configuracion.documentoUrl, {
         method: 'POST', credentials: 'same-origin', headers: cabeceras, body: formulario
       });
     }
@@ -508,15 +560,15 @@
     });
   }
 
-  function enviar(mensaje, foto) {
+  function enviar(mensaje, adj) {
     if (enviando || temporizadorEspera !== null) return;
     ocultarError();
     enviando = true;
     mostrarEstado(true);
     actualizarControles();
 
-    verificarEpoch(mensaje, foto ? foto.url : '').then(function () {
-      return peticionDeTurno(mensaje, foto);
+    verificarEpoch(mensaje, adj).then(function () {
+      return peticionDeTurno(mensaje, adj);
     }).then(function (respuesta) {
       // Un 429 del limitador o un 403 de CSRF pueden no traer JSON.
       return respuesta.text().then(function (crudo) {
@@ -531,12 +583,12 @@
         historial.push(aviso);
         guardarHistorial();
         pintarAsistente(aviso);
-        ultimaFoto = null;
+        ultimoAdjunto = null;
         return;
       }
       if (datos && datos.ok === true && typeof datos.reply === 'string') {
         nuevaConversacion = false;
-        ultimaFoto = null;
+        ultimoAdjunto = null;
         var entrada = {
           r: 'b',
           t: datos.reply,
@@ -544,9 +596,11 @@
           a: Array.isArray(datos.actions) ? datos.actions : []
         };
         if (datos.visual && Array.isArray(datos.visual.summary)) entrada.v = datos.visual.summary;
+        if (datos.document && datos.document.truncated === true) entrada.n = texto('documento_recortado');
         historial.push(entrada);
         guardarHistorial();
         pintarAsistente(entrada);
+        hablarSiCorresponde(entrada.t);
         medir('vendedor_message', {
           turno: datos.conversation && datos.conversation.turns || 0,
           tarjetas: entrada.c.length,
@@ -582,39 +636,65 @@
     // Enter no pasa por el boton deshabilitado: sin esto el mensaje se
     // pintaria sin llegar a enviarse.
     if (enviando || temporizadorEspera !== null) return;
+    detenerDictado(false);
     var mensaje = campo.value.trim();
-    var foto = null;
+    var adj = null;
     if (adjunto) {
-      // Con foto el texto es opcional: el rotulo solo se muestra.
-      foto = { blob: adjunto, url: vistaPrevia, sinTexto: !mensaje };
-      if (!mensaje) mensaje = texto('foto_enviada');
+      // Con adjunto el texto es opcional: el rotulo solo se muestra.
+      adj = { tipo: adjunto.tipo, blob: adjunto.blob, url: adjunto.url, nombre: adjunto.nombre, sinTexto: !mensaje };
+      if (!mensaje) mensaje = adj.tipo === 'foto' ? texto('foto_enviada') : texto('archivo_enviado') + ' ' + adj.nombre;
     }
     if (!mensaje || mensaje.length > (configuracion.maxLength || 600)) return;
     campo.value = '';
     ultimoMensaje = mensaje;
-    ultimaFoto = foto;
+    ultimoAdjunto = adj;
     ocultarBienvenida();
     mostrarAtajos(false);
-    historial.push(foto ? { r: 'u', t: mensaje, f: 1 } : { r: 'u', t: mensaje });
+    historial.push(entradaDeUsuario(mensaje, adj));
     guardarHistorial();
-    pintarUsuario(mensaje, foto ? foto.url : '');
-    if (foto) soltarAdjunto(false);
+    pintarUsuario(mensaje, adj && adj.tipo === 'foto' ? adj.url : '',
+      adj && adj.tipo === 'documento' && !adj.sinTexto ? adj.nombre : '');
+    if (adj) soltarAdjunto(false);
     if (configuracion.disponible === false) {
       responderQueNoHayIA();
       return;
     }
-    enviar(mensaje, foto);
+    enviar(mensaje, adj);
   }
 
-  // --- Foto adjunta ----------------------------------------------------------
+  // --- Foto o archivo adjunto ----------------------------------------------------
+
+  function limpiarCampos() {
+    [campoCamara, campoArchivo, campoDocumento].forEach(function (nodo) { if (nodo) nodo.value = ''; });
+  }
 
   function soltarAdjunto(liberarUrl) {
     // La URL local se conserva mientras la foto se vea en la conversacion.
-    if (liberarUrl && vistaPrevia) URL.revokeObjectURL(vistaPrevia);
+    if (liberarUrl && adjunto && adjunto.url) URL.revokeObjectURL(adjunto.url);
     adjunto = null;
-    vistaPrevia = '';
     if (cajaAdjunto) cajaAdjunto.hidden = true;
-    if (campoArchivo) campoArchivo.value = '';
+    limpiarCampos();
+  }
+
+  function mostrarAdjunto(nuevo) {
+    soltarAdjunto(true);
+    adjunto = nuevo;
+    var esFoto = nuevo.tipo === 'foto';
+    imagenAdjunto.hidden = !esFoto;
+    if (esFoto) imagenAdjunto.src = nuevo.url;
+    if (iconoAdjunto) iconoAdjunto.hidden = esFoto;
+    if (nombreAdjunto) {
+      nombreAdjunto.hidden = esFoto;
+      nombreAdjunto.textContent = esFoto ? '' : nuevo.nombre;
+    }
+    if (avisoAdjunto) avisoAdjunto.textContent = texto(esFoto ? 'aviso_foto' : 'aviso_documento');
+    cajaAdjunto.hidden = false;
+    campo.focus();
+  }
+
+  function nombreCorto(nombre) {
+    var limpio = String(nombre || '').replace(/[\u0000-\u001f]/g, '').trim() || 'archivo';
+    return limpio.length > MAX_LARGO_NOMBRE ? limpio.slice(0, MAX_LARGO_NOMBRE - 1) + '\u2026' : limpio;
   }
 
   // Reduce la foto en el navegador: menos datos por la red movil y sin los
@@ -641,9 +721,7 @@
     }).catch(function () { return archivo; });
   }
 
-  function alElegirFoto() {
-    var archivo = campoArchivo.files && campoArchivo.files[0];
-    if (!archivo) return;
+  function prepararFoto(archivo) {
     if (archivo.size > MAX_BYTES_FOTO) {
       soltarAdjunto(true);
       mostrarError('imagen_grande', 0, null);
@@ -656,18 +734,497 @@
         mostrarError('imagen_grande', 0, null);
         return;
       }
-      soltarAdjunto(true);
-      adjunto = blob;
-      vistaPrevia = URL.createObjectURL(blob);
-      imagenAdjunto.src = vistaPrevia;
-      cajaAdjunto.hidden = false;
-      campo.focus();
+      mostrarAdjunto({ tipo: 'foto', blob: blob, url: URL.createObjectURL(blob), nombre: '' });
     });
+  }
+
+  function alElegirFoto(evento) {
+    var archivo = evento.target.files && evento.target.files[0];
+    if (archivo) prepararFoto(archivo);
+  }
+
+  // Un archivo puede ser una imagen (va a la busqueda por foto) o un
+  // documento que la tienda lee en memoria.
+  function alElegirDocumento() {
+    var archivo = campoDocumento.files && campoDocumento.files[0];
+    if (!archivo) return;
+    if (/^image\//.test(archivo.type || '') && fotosHabilitadas) {
+      prepararFoto(archivo);
+      return;
+    }
+    if (archivo.size > MAX_BYTES_DOCUMENTO) {
+      soltarAdjunto(true);
+      mostrarError('documento_grande', 0, null);
+      return;
+    }
+    ocultarError();
+    mostrarAdjunto({ tipo: 'documento', blob: archivo, url: '', nombre: nombreCorto(archivo.name) });
+  }
+
+  // --- Menu de herramientas (boton +) ----------------------------------------------
+
+  function itemsDelMenu() {
+    if (!menuHerramientas) return [];
+    return Array.prototype.filter.call(menuHerramientas.querySelectorAll('[data-herramienta]'), function (item) {
+      return !item.hidden;
+    });
+  }
+
+  function abrirMenu() {
+    if (!menuHerramientas || !botonMas) return;
+    cerrarPanelVoz(false);
+    menuHerramientas.hidden = false;
+    botonMas.setAttribute('aria-expanded', 'true');
+    var items = itemsDelMenu();
+    if (items.length) items[0].focus();
+  }
+
+  function cerrarMenu(devolverFoco) {
+    if (!menuHerramientas || menuHerramientas.hidden) return false;
+    menuHerramientas.hidden = true;
+    botonMas.setAttribute('aria-expanded', 'false');
+    if (devolverFoco) botonMas.focus();
+    return true;
+  }
+
+  function moverEnElMenu(evento) {
+    var items = itemsDelMenu();
+    var posicion = items.indexOf(document.activeElement);
+    var destino = null;
+    if (evento.key === 'ArrowDown') destino = items[(posicion + 1) % items.length];
+    else if (evento.key === 'ArrowUp') destino = items[(posicion - 1 + items.length) % items.length];
+    else if (evento.key === 'Home') destino = items[0];
+    else if (evento.key === 'End') destino = items[items.length - 1];
+    else if (evento.key === 'Tab') cerrarMenu(false);
+    if (destino) {
+      evento.preventDefault();
+      destino.focus();
+    }
+  }
+
+  function usarHerramienta(nombre) {
+    cerrarMenu(false);
+    medir('vendedor_tool', { herramienta: nombre });
+    if (nombre === 'camara' && campoCamara) campoCamara.click();
+    else if (nombre === 'imagen' && campoArchivo) campoArchivo.click();
+    else if (nombre === 'archivo' && campoDocumento) campoDocumento.click();
+    else if (nombre === 'voz') abrirPanelVoz();
+  }
+
+  // --- Voz: como suenan las respuestas -----------------------------------------------
+
+  var MODOS_VOZ = { text: true, voice: true, both: true };
+  var GENEROS_VOZ = { female: true, male: true, neutral: true };
+  var PISTAS_FEMENINAS = ['female', 'femenina', 'mujer', 'woman', 'sofia', 'paulina', 'maria', 'salome', 'isabella',
+    'helena', 'laura', 'elvira', 'dalia', 'paloma', 'monica', 'lucia', 'camila', 'ximena', 'jenny', 'aria', 'zira',
+    'samantha', 'karen', 'sonia', 'libby'];
+  var PISTAS_MASCULINAS = ['male', 'masculina', 'hombre', 'carlos', 'jorge', 'andres', 'alejandro', 'gonzalo',
+    'alvaro', 'pablo', 'raul', 'diego', 'tomas', 'guy', 'david', 'mark', 'daniel', 'juan', 'ryan'];
+
+  function controlDeVoz(nombre) {
+    return panelVoz ? panelVoz.querySelector('[data-voz="' + nombre + '"]') : null;
+  }
+
+  function regionesDeVoz() {
+    var selector = controlDeVoz('region');
+    return selector ? Array.prototype.map.call(selector.options, function (opcion) { return opcion.value; }) : [];
+  }
+
+  function normalizarPreferencias(crudo) {
+    var regiones = regionesDeVoz();
+    var datos = crudo && typeof crudo === 'object' ? crudo : {};
+    var velocidad = parseFloat(datos.velocidad);
+    var preferencias = {
+      modo: MODOS_VOZ[datos.modo] ? datos.modo : 'text',
+      genero: GENEROS_VOZ[datos.genero] ? datos.genero : 'neutral',
+      region: regiones.indexOf(datos.region) !== -1 ? datos.region : (regiones[0] || ''),
+      velocidad: isFinite(velocidad) ? Math.min(1.3, Math.max(0.8, velocidad)) : 1,
+      autoplay: datos.autoplay !== false
+    };
+    // "Solo voz" sin reproducir automaticamente no tendria sentido.
+    if (preferencias.modo === 'voice') preferencias.autoplay = true;
+    return preferencias;
+  }
+
+  function leerPreferenciasVoz() {
+    try {
+      return normalizarPreferencias(JSON.parse(window.localStorage.getItem(CLAVE_VOZ) || '{}'));
+    } catch (error) {
+      return normalizarPreferencias({});
+    }
+  }
+
+  var preferenciasVoz = leerPreferenciasVoz();
+
+  function guardarPreferenciasVoz() {
+    try { window.localStorage.setItem(CLAVE_VOZ, JSON.stringify(preferenciasVoz)); } catch (error) { /* sin almacenamiento */ }
+  }
+
+  function textoDeOpcion(selector) {
+    return selector && selector.selectedIndex >= 0 ? selector.options[selector.selectedIndex].textContent.trim() : '';
+  }
+
+  function pintarPreferenciasVoz() {
+    if (!panelVoz) return;
+    controlDeVoz('modo').value = preferenciasVoz.modo;
+    controlDeVoz('genero').value = preferenciasVoz.genero;
+    controlDeVoz('region').value = preferenciasVoz.region;
+    controlDeVoz('velocidad').value = String(preferenciasVoz.velocidad);
+    controlDeVoz('autoplay').checked = preferenciasVoz.autoplay;
+    controlDeVoz('autoplay').disabled = preferenciasVoz.modo === 'voice';
+    var resumen = panelVoz.querySelector('[data-vendedor-voz-resumen]');
+    if (resumen) {
+      resumen.textContent = [textoDeOpcion(controlDeVoz('modo')), textoDeOpcion(controlDeVoz('genero')),
+        textoDeOpcion(controlDeVoz('region'))].join(' \u00b7 ');
+    }
+  }
+
+  function alCambiarVoz() {
+    preferenciasVoz = normalizarPreferencias({
+      modo: controlDeVoz('modo').value,
+      genero: controlDeVoz('genero').value,
+      region: controlDeVoz('region').value,
+      velocidad: controlDeVoz('velocidad').value,
+      autoplay: controlDeVoz('autoplay').checked
+    });
+    guardarPreferenciasVoz();
+    pintarPreferenciasVoz();
+    if (preferenciasVoz.modo === 'text') callar();
+  }
+
+  function abrirPanelVoz() {
+    if (!panelVoz) return;
+    cerrarMenu(false);
+    pintarPreferenciasVoz();
+    panelVoz.hidden = false;
+    controlDeVoz('modo').focus();
+  }
+
+  function cerrarPanelVoz(devolverFoco) {
+    if (!panelVoz || panelVoz.hidden) return false;
+    panelVoz.hidden = true;
+    if (devolverFoco && botonMas) botonMas.focus();
+    return true;
+  }
+
+  function puntajeDeVoz(voz) {
+    var idioma = String(voz.lang || '').toLowerCase().replace('_', '-');
+    var region = String(preferenciasVoz.region || '').toLowerCase();
+    var base = region.split('-')[0];
+    var nombre = String(voz.name || '').toLowerCase();
+    var puntaje = 0;
+    if (idioma === region) puntaje += 8;
+    if (idioma.indexOf(base + '-') === 0 || idioma === base) puntaje += 4;
+    if (voz.localService) puntaje += 1;
+    var femenina = PISTAS_FEMENINAS.some(function (pista) { return nombre.indexOf(pista) !== -1; });
+    // "female" contiene "male": una voz femenina no cuenta como masculina.
+    var masculina = !femenina && PISTAS_MASCULINAS.some(function (pista) { return nombre.indexOf(pista) !== -1; });
+    if (preferenciasVoz.genero === 'female' && femenina) puntaje += 4;
+    if (preferenciasVoz.genero === 'male' && masculina) puntaje += 4;
+    return puntaje;
+  }
+
+  function elegirVoz() {
+    var voces = sintesis && sintesis.getVoices ? sintesis.getVoices() : [];
+    var mejor = null;
+    var mejorPuntaje = 0;
+    Array.prototype.forEach.call(voces || [], function (voz) {
+      var puntaje = puntajeDeVoz(voz);
+      if (puntaje > mejorPuntaje) {
+        mejor = voz;
+        mejorPuntaje = puntaje;
+      }
+    });
+    return mejor;
+  }
+
+  function hablar(contenido) {
+    var limpio = String(contenido || '').trim();
+    if (!sintesis || !limpio) return;
+    try {
+      sintesis.cancel();
+      var locucion = new window.SpeechSynthesisUtterance(limpio);
+      locucion.rate = preferenciasVoz.velocidad;
+      locucion.lang = preferenciasVoz.region || document.documentElement.lang || 'es-CO';
+      var voz = elegirVoz();
+      if (voz) {
+        locucion.voice = voz;
+        locucion.lang = voz.lang || locucion.lang;
+      }
+      sintesis.speak(locucion);
+    } catch (error) { /* la voz nunca debe romper el panel */ }
+  }
+
+  function callar() {
+    if (!sintesis) return;
+    try { sintesis.cancel(); } catch (error) { /* nada que detener */ }
+  }
+
+  function hablarSiCorresponde(contenido) {
+    if (preferenciasVoz.modo === 'text' || !preferenciasVoz.autoplay) return;
+    hablar(contenido);
+  }
+
+  // --- Microfono: dictado --------------------------------------------------------------
+
+  var notaVoz = null;
+
+  function nota(clave) {
+    if (!notaVoz) {
+      notaVoz = crear('p', 'gtg-vendedor__nota');
+      notaVoz.setAttribute('role', 'status');
+      notaVoz.hidden = true;
+      var compositor = panel.querySelector('[data-vendedor-composer]');
+      compositor.parentNode.insertBefore(notaVoz, compositor);
+    }
+    if (temporizadorNota) window.clearTimeout(temporizadorNota);
+    temporizadorNota = null;
+    if (!clave) {
+      notaVoz.hidden = true;
+      return;
+    }
+    notaVoz.textContent = texto(clave);
+    notaVoz.hidden = false;
+    if (clave !== 'escuchando' && clave !== 'transcribiendo') {
+      temporizadorNota = window.setTimeout(function () { notaVoz.hidden = true; }, 5000);
+    }
+  }
+
+  function marcarDictado(activo) {
+    if (!botonMicrofono) return;
+    botonMicrofono.classList.toggle('is-recording', activo);
+    botonMicrofono.setAttribute('aria-pressed', activo ? 'true' : 'false');
+    var etiqueta = texto(activo ? 'detener_dictado' : 'dictar');
+    botonMicrofono.setAttribute('aria-label', etiqueta);
+    botonMicrofono.title = etiqueta;
+    nota(activo ? 'escuchando' : null);
+  }
+
+  function idiomaDeDictado() {
+    return preferenciasVoz.region || document.documentElement.lang || 'es-CO';
+  }
+
+  function ponerEnElCampo(base, dictado) {
+    var maximo = configuracion.maxLength || 600;
+    campo.value = (base + dictado).slice(0, maximo);
+  }
+
+  function baseDelCampo() {
+    return campo.value.trim() ? campo.value.replace(/\s+$/, '') + ' ' : '';
+  }
+
+  function dictarConNavegador() {
+    var rec = new Reconocimiento();
+    var base = baseDelCampo();
+    var definitivo = '';
+    var fallo = '';
+    rec.lang = idiomaDeDictado();
+    rec.interimResults = true;
+    rec.continuous = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = function (evento) {
+      var provisional = '';
+      for (var i = evento.resultIndex; i < evento.results.length; i++) {
+        var resultado = evento.results[i];
+        if (resultado.isFinal) definitivo += resultado[0].transcript;
+        else provisional += resultado[0].transcript;
+      }
+      ponerEnElCampo(base, definitivo + provisional);
+    };
+    rec.onerror = function (evento) { fallo = evento.error || 'error'; };
+    rec.onend = function () {
+      reconocimiento = null;
+      marcarDictado(false);
+      if (fallo === 'not-allowed') {
+        mostrarError('microfono', 0, null);
+        return;
+      }
+      // El servicio del navegador no responde (sin red o sin dictado del
+      // sistema): se graba y lo transcribe la tienda.
+      if ((fallo === 'network' || fallo === 'service-not-allowed' || fallo === 'language-not-supported') &&
+          puedeGrabar && !definitivo) {
+        grabar();
+        return;
+      }
+      if (fallo === 'aborted') return;
+      if (!definitivo.trim()) {
+        ponerEnElCampo(base, '');
+        nota('voz_sin_texto');
+        return;
+      }
+      ponerEnElCampo(base, definitivo.trim());
+      campo.focus();
+      nota('voz_lista');
+      medir('vendedor_voice', { via: 'navegador' });
+    };
+    try {
+      rec.start();
+    } catch (error) {
+      if (puedeGrabar) grabar();
+      return;
+    }
+    reconocimiento = rec;
+    marcarDictado(true);
+  }
+
+  function grabar() {
+    ocultarError();
+    navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } })
+      .then(function (flujo) {
+        var contexto = new ContextoDeAudio();
+        var fuente = contexto.createMediaStreamSource(flujo);
+        var procesador = contexto.createScriptProcessor(4096, 1, 1);
+        var actual = { flujo: flujo, contexto: contexto, fuente: fuente, procesador: procesador, trozos: [], muestras: 0 };
+        procesador.onaudioprocess = function (evento) {
+          if (grabacion !== actual) return;
+          var datos = evento.inputBuffer.getChannelData(0);
+          actual.trozos.push(new Float32Array(datos));
+          actual.muestras += datos.length;
+          if (actual.muestras >= contexto.sampleRate * MAX_SEGUNDOS_VOZ) terminarGrabacion(true);
+        };
+        fuente.connect(procesador);
+        procesador.connect(contexto.destination);
+        actual.limite = window.setTimeout(function () { terminarGrabacion(true); }, (MAX_SEGUNDOS_VOZ + 1) * 1000);
+        grabacion = actual;
+        marcarDictado(true);
+      })
+      .catch(function () { mostrarError('microfono', 0, null); });
+  }
+
+  function terminarGrabacion(transcribirla) {
+    var actual = grabacion;
+    if (!actual) return;
+    grabacion = null;
+    window.clearTimeout(actual.limite);
+    try {
+      actual.procesador.disconnect();
+      actual.fuente.disconnect();
+    } catch (error) { /* ya desconectado */ }
+    actual.flujo.getTracks().forEach(function (pista) { pista.stop(); });
+    if (actual.contexto.close) actual.contexto.close();
+    marcarDictado(false);
+    if (!transcribirla) return;
+    var wav = codificarWav(actual.trozos, actual.contexto.sampleRate);
+    if (!wav) {
+      nota('voz_sin_texto');
+      return;
+    }
+    transcribir(wav);
+  }
+
+  // PCM de 16 bits, un canal, 16 kHz: lo que acepta el reconocimiento de voz
+  // sin conversiones. Se reduce la frecuencia promediando muestras.
+  function codificarWav(trozos, frecuencia) {
+    var total = 0;
+    trozos.forEach(function (trozo) { total += trozo.length; });
+    var paso = frecuencia / FRECUENCIA_VOZ;
+    var cantidad = Math.min(Math.floor(total / paso), FRECUENCIA_VOZ * MAX_SEGUNDOS_VOZ);
+    if (cantidad < FRECUENCIA_VOZ * 0.3) return null;
+    var origen = new Float32Array(total);
+    var desde = 0;
+    trozos.forEach(function (trozo) { origen.set(trozo, desde); desde += trozo.length; });
+    var buffer = new ArrayBuffer(44 + cantidad * 2);
+    var vista = new DataView(buffer);
+    function cadena(posicion, valor) {
+      for (var i = 0; i < valor.length; i++) vista.setUint8(posicion + i, valor.charCodeAt(i));
+    }
+    cadena(0, 'RIFF');
+    vista.setUint32(4, 36 + cantidad * 2, true);
+    cadena(8, 'WAVE');
+    cadena(12, 'fmt ');
+    vista.setUint32(16, 16, true);
+    vista.setUint16(20, 1, true);
+    vista.setUint16(22, 1, true);
+    vista.setUint32(24, FRECUENCIA_VOZ, true);
+    vista.setUint32(28, FRECUENCIA_VOZ * 2, true);
+    vista.setUint16(32, 2, true);
+    vista.setUint16(34, 16, true);
+    cadena(36, 'data');
+    vista.setUint32(40, cantidad * 2, true);
+    for (var i = 0; i < cantidad; i++) {
+      var inicio = Math.floor(i * paso);
+      var fin = Math.min(total, Math.max(inicio + 1, Math.floor((i + 1) * paso)));
+      var suma = 0;
+      for (var j = inicio; j < fin; j++) suma += origen[j];
+      var muestra = Math.max(-1, Math.min(1, suma / (fin - inicio)));
+      vista.setInt16(44 + i * 2, muestra < 0 ? muestra * 0x8000 : muestra * 0x7fff, true);
+    }
+    return new Blob([buffer], { type: 'audio/wav' });
+  }
+
+  function transcribir(wav) {
+    var base = baseDelCampo();
+    var formulario = new FormData();
+    formulario.append('audio', wav, 'voz.wav');
+    formulario.append('region', preferenciasVoz.region || '');
+    transcribiendo = true;
+    actualizarControles();
+    nota('transcribiendo');
+    fetch(configuracion.vozUrl, {
+      method: 'POST', credentials: 'same-origin', headers: cabecerasSeguras(), body: formulario
+    }).then(function (respuesta) {
+      return respuesta.text().then(function (crudo) {
+        var datos = null;
+        try { datos = JSON.parse(crudo); } catch (error) { datos = null; }
+        return { estado: respuesta.status, datos: datos };
+      });
+    }).then(function (resultado) {
+      var datos = resultado.datos;
+      if (datos && datos.ok === true && typeof datos.text === 'string') {
+        if (!datos.text.trim()) {
+          nota('voz_sin_texto');
+          return;
+        }
+        ponerEnElCampo(base, datos.text.trim());
+        campo.focus();
+        nota('voz_lista');
+        medir('vendedor_voice', { via: 'tienda' });
+        return;
+      }
+      nota(null);
+      var codigo = datos && typeof datos.error === 'string' ? datos.error : codigoSegunEstado(resultado.estado);
+      mostrarError(codigo, datos && datos.retry_after, datos && datos.contact_url, datos && datos.diagnostic);
+    }).catch(function () {
+      nota(null);
+      mostrarError('red', 0, null);
+    }).then(function () {
+      transcribiendo = false;
+      actualizarControles();
+    });
+  }
+
+  function dictando() {
+    return !!(reconocimiento || grabacion);
+  }
+
+  function detenerDictado(conResultado) {
+    if (reconocimiento) {
+      try {
+        if (conResultado) reconocimiento.stop(); else reconocimiento.abort();
+      } catch (error) { /* ya termino */ }
+    }
+    if (grabacion) terminarGrabacion(conResultado);
+  }
+
+  function alPulsarMicrofono() {
+    if (transcribiendo) return;
+    if (dictando()) {
+      detenerDictado(true);
+      return;
+    }
+    cerrarMenu(false);
+    cerrarPanelVoz(false);
+    ocultarError();
+    callar();
+    if (Reconocimiento) dictarConNavegador();
+    else if (puedeGrabar) grabar();
   }
 
   function empezarDeNuevo() {
     if (adjunto) soltarAdjunto(true);
-    ultimaFoto = null;
+    detenerDictado(false);
+    callar();
+    ultimoAdjunto = null;
     historial = [];
     guardarHistorial();
     Array.prototype.slice.call(registro.children).forEach(function (nodo) {
@@ -739,6 +1296,10 @@
 
   function cerrar() {
     if (!abierto) return;
+    cerrarMenu(false);
+    cerrarPanelVoz(false);
+    detenerDictado(false);
+    callar();
     panel.hidden = true;
     if (velo) velo.hidden = true;
     document.documentElement.classList.remove('gtg-vendedor-abierto');
@@ -750,7 +1311,8 @@
 
   function enfocables() {
     var candidatos = panel.querySelectorAll(
-      'a[href], button:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      'a[href], button:not([disabled]), textarea:not([disabled]), select:not([disabled]), ' +
+      'input:not([disabled]):not([type="file"]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])'
     );
     return Array.prototype.filter.call(candidatos, function (nodo) {
       return nodo.getClientRects().length > 0 && !nodo.closest('[hidden]');
@@ -819,19 +1381,63 @@
   });
 
   botonReintentar.addEventListener('click', function () {
-    if (ultimoMensaje) enviar(ultimoMensaje, ultimaFoto);
+    if (ultimoMensaje) enviar(ultimoMensaje, ultimoAdjunto);
   });
 
-  if (fotosHabilitadas) {
-    botonAdjuntar.hidden = false;
-    var compositor = panel.querySelector('[data-vendedor-composer]');
-    if (compositor) compositor.classList.add('gtg-vendedor__composer--foto');
-    botonAdjuntar.addEventListener('click', function () { campoArchivo.click(); });
-    campoArchivo.addEventListener('change', alElegirFoto);
-    if (botonQuitarFoto) botonQuitarFoto.addEventListener('click', function () { soltarAdjunto(true); campo.focus(); });
-  } else if (botonAdjuntar) {
-    botonAdjuntar.hidden = true;
+  // Herramientas: cada opcion aparece solo si el navegador y el acceso la permiten.
+  if (menuHerramientas && botonMas) {
+    var itemVoz = menuHerramientas.querySelector('[data-herramienta="voz"]');
+    if (itemVoz) itemVoz.hidden = !(sintesis && panelVoz);
+    if (!fotosHabilitadas) {
+      Array.prototype.forEach.call(menuHerramientas.querySelectorAll('[data-herramienta="camara"], [data-herramienta="imagen"]'),
+        function (item) { item.hidden = true; });
+    }
+    var itemArchivo = menuHerramientas.querySelector('[data-herramienta="archivo"]');
+    if (itemArchivo) itemArchivo.hidden = !documentosHabilitados;
+    if (itemsDelMenu().length) {
+      botonMas.hidden = false;
+      botonMas.addEventListener('click', function (evento) {
+        evento.stopPropagation();
+        if (menuHerramientas.hidden) abrirMenu(); else cerrarMenu(true);
+      });
+      menuHerramientas.addEventListener('click', function (evento) {
+        var item = evento.target.closest ? evento.target.closest('[data-herramienta]') : null;
+        if (item) usarHerramienta(item.getAttribute('data-herramienta'));
+      });
+      menuHerramientas.addEventListener('keydown', moverEnElMenu);
+    }
   }
+  if (fotosHabilitadas) {
+    campoArchivo.addEventListener('change', alElegirFoto);
+    if (campoCamara) campoCamara.addEventListener('change', alElegirFoto);
+  }
+  if (documentosHabilitados) campoDocumento.addEventListener('change', alElegirDocumento);
+  if (botonQuitarAdjunto) botonQuitarAdjunto.addEventListener('click', function () { soltarAdjunto(true); campo.focus(); });
+
+  if (panelVoz) {
+    Array.prototype.forEach.call(panelVoz.querySelectorAll('[data-voz]'), function (control) {
+      control.addEventListener('change', alCambiarVoz);
+    });
+    var botonProbar = panelVoz.querySelector('[data-vendedor-voz-probar]');
+    var botonDetener = panelVoz.querySelector('[data-vendedor-voz-detener]');
+    if (botonProbar) botonProbar.addEventListener('click', function () { hablar(texto('voz_prueba')); });
+    if (botonDetener) botonDetener.addEventListener('click', callar);
+  }
+
+  if (botonMicrofono && (Reconocimiento || puedeGrabar)) {
+    botonMicrofono.hidden = false;
+    botonMicrofono.addEventListener('click', alPulsarMicrofono);
+  }
+
+  // Un toque fuera del menu o del panel de voz los cierra.
+  document.addEventListener('click', function (evento) {
+    var objetivo = evento.target;
+    if (!(objetivo instanceof Element)) return;
+    if (menuHerramientas && !menuHerramientas.hidden && !menuHerramientas.contains(objetivo) &&
+        !(botonMas && botonMas.contains(objetivo))) cerrarMenu(false);
+    if (panelVoz && !panelVoz.hidden && !panelVoz.contains(objetivo) &&
+        !(menuHerramientas && menuHerramientas.contains(objetivo))) cerrarPanelVoz(false);
+  });
 
   enlaceContacto.addEventListener('click', function (evento) {
     medir('vendedor_handoff', { origen: 'error' });
@@ -926,7 +1532,14 @@
 
   panel.addEventListener('keydown', atraparElFoco);
   document.addEventListener('keydown', function (evento) {
-    if (evento.key === 'Escape' && abierto) cerrar();
+    if (evento.key !== 'Escape' || !abierto) return;
+    // Escape cierra primero lo que esta encima: el menu, el panel de voz o el dictado.
+    if (cerrarMenu(true) || cerrarPanelVoz(true)) return;
+    if (dictando()) {
+      detenerDictado(false);
+      return;
+    }
+    cerrar();
   });
 
   restaurarHistorial();

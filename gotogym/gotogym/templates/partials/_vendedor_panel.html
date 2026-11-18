@@ -14,6 +14,12 @@ bloque JSON. Lo unico que viaja como JSON es la configuracion que no es texto.
 Nada de lo que escribe el modelo se inserta como HTML: vendedor.js lo pinta
 con textContent.
 
+Herramientas del chat (boton "+"), las mismas de Quantum Coach: tomar foto y
+subir imagen (busqueda por foto, solo si `vendedor_imagen`), adjuntar archivo
+(PDF, Excel, CSV o TXT que la tienda lee en memoria) y voz (como suenan las
+respuestas). El microfono dicta con el reconocimiento del navegador y, si no
+lo hay, graba y lo transcribe el Coach a traves de la tienda.
+
 `vendedor_disponible` dice si hay una IA que responda. Sin ella el Coach se
 muestra igual, pero el panel avisa de entrada que no esta disponible, no ofrece
 sugerencias ni el aviso de IA, y cualquier mensaje se contesta desde el front
@@ -135,28 +141,102 @@ con ese mismo aviso, sin llamar al servidor.
   {% endif %}
 
   <form class="gtg-vendedor__form" data-vendedor-form novalidate>
-    {% if vendedor_imagen %}
-    {# Busqueda por foto. La foto se analiza para buscar prendas parecidas y no se guarda. #}
+    {% if vendedor_disponible %}
+    {# Foto o archivo adjunto: se usa solo para esta respuesta y no se guarda. #}
     <div class="gtg-vendedor__adjunto" data-vendedor-adjunto hidden>
-      <img class="gtg-vendedor__adjunto-img" data-vendedor-adjunto-img alt="{% trans 'Foto adjunta' %}" width="56" height="56">
-      <p class="gtg-vendedor__adjunto-aviso">{% trans "Uso la foto solo para buscar prendas parecidas y no la guardo. Funciona mejor si se ve solo la prenda." %}</p>
-      <button type="button" class="gtg-vendedor__icon-button" data-vendedor-quitar-foto aria-label="{% trans 'Quitar la foto' %}" title="{% trans 'Quitar la foto' %}">
+      <img class="gtg-vendedor__adjunto-img" data-vendedor-adjunto-img alt="{% trans 'Foto adjunta' %}" width="56" height="56" hidden>
+      <span class="gtg-vendedor__adjunto-icono" data-vendedor-adjunto-icono aria-hidden="true" hidden>
+        <svg viewBox="0 0 24 24" focusable="false"><path d="M7 3h7l5 5v13H7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 3v5h5M10 13h6M10 17h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </span>
+      <div class="gtg-vendedor__adjunto-texto">
+        <p class="gtg-vendedor__adjunto-nombre" data-vendedor-adjunto-nombre hidden></p>
+        <p class="gtg-vendedor__adjunto-aviso" data-vendedor-adjunto-aviso></p>
+      </div>
+      <button type="button" class="gtg-vendedor__icon-button" data-vendedor-quitar-adjunto aria-label="{% trans 'Quitar el adjunto' %}" title="{% trans 'Quitar el adjunto' %}">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
       </button>
     </div>
+
+    {# Herramientas del chat, como en Quantum Coach: foto, archivo, imagen y voz. #}
+    <div class="gtg-vendedor__tools" id="vendedor-herramientas" data-vendedor-herramientas role="menu" aria-label="{% trans 'Herramientas del chat' %}" hidden>
+      {% if vendedor_imagen %}<button type="button" class="gtg-vendedor__tool" role="menuitem" data-herramienta="camara">{% trans "Tomar foto" %}</button>{% endif %}
+      <button type="button" class="gtg-vendedor__tool" role="menuitem" data-herramienta="archivo">{% trans "Adjuntar archivo" %}</button>
+      {% if vendedor_imagen %}<button type="button" class="gtg-vendedor__tool" role="menuitem" data-herramienta="imagen">{% trans "Subir imagen" %}</button>{% endif %}
+      <button type="button" class="gtg-vendedor__tool" role="menuitem" data-herramienta="voz" hidden>{% trans "Voz" %}</button>
+    </div>
+
+    {# Como suenan las respuestas. Se guarda solo en este navegador. #}
+    {% get_current_language as idioma_actual %}
+    <div class="gtg-vendedor__voz" data-vendedor-voz-panel role="group" aria-labelledby="vendedor-voz-titulo" hidden>
+      <h3 id="vendedor-voz-titulo" class="gtg-vendedor__voz-title">{% trans "Experiencia de respuesta" %}</h3>
+      <p class="gtg-vendedor__voz-resumen" data-vendedor-voz-resumen></p>
+      <label for="vendedor-voz-modo">{% trans "Modo" %}</label>
+      <select id="vendedor-voz-modo" data-voz="modo">
+        <option value="text">{% trans "Solo texto" %}</option>
+        <option value="voice">{% trans "Solo voz" %}</option>
+        <option value="both">{% trans "Texto + voz" %}</option>
+      </select>
+      <label for="vendedor-voz-genero">{% trans "Tipo de voz" %}</label>
+      <select id="vendedor-voz-genero" data-voz="genero">
+        <option value="female">{% trans "Femenina" %}</option>
+        <option value="male">{% trans "Masculina" %}</option>
+        <option value="neutral">{% trans "Neutra" %}</option>
+      </select>
+      <label for="vendedor-voz-region">{% trans "Región" %}</label>
+      <select id="vendedor-voz-region" data-voz="region">
+        {% if idioma_actual|slice:":2" == "en" %}
+        <option value="en-US">{% trans "Estados Unidos" %}</option>
+        <option value="en-GB">{% trans "Reino Unido" %}</option>
+        {% else %}
+        <option value="es-CO">Colombia</option>
+        <option value="es-MX">México</option>
+        <option value="es-ES">España</option>
+        <option value="es-AR">Argentina</option>
+        <option value="es-CL">Chile</option>
+        <option value="es-PE">Perú</option>
+        <option value="es-US">{% trans "Latino en US" %}</option>
+        {% endif %}
+      </select>
+      <label for="vendedor-voz-velocidad">{% trans "Velocidad" %}</label>
+      <input id="vendedor-voz-velocidad" data-voz="velocidad" type="range" min="0.8" max="1.3" step="0.05" value="1">
+      <label class="gtg-vendedor__voz-switch">
+        <input type="checkbox" data-voz="autoplay" checked>
+        <span>{% trans "Reproducir automáticamente" %}</span>
+      </label>
+      <div class="gtg-vendedor__voz-actions">
+        <button type="button" class="gtg-vendedor__button gtg-vendedor__button--quiet" data-vendedor-voz-probar>{% trans "Probar voz" %}</button>
+        <button type="button" class="gtg-vendedor__button gtg-vendedor__button--quiet" data-vendedor-voz-detener>{% trans "Detener" %}</button>
+      </div>
+      <p class="gtg-vendedor__voz-nota">{% trans "Al dictar, tu voz se convierte en texto con el reconocimiento de tu navegador o el de GoToGym. No guardamos el audio." %}</p>
+    </div>
+
+    {% if vendedor_imagen %}
+    <input type="file" class="sr-only" data-vendedor-camara tabindex="-1" aria-hidden="true" accept="image/*" capture="environment">
+    <input type="file" class="sr-only" data-vendedor-archivo tabindex="-1" aria-hidden="true"
+           accept="image/jpeg,image/png,image/webp,image/heic,image/heif">
     {% endif %}
+    <input type="file" class="sr-only" data-vendedor-documento tabindex="-1" aria-hidden="true"
+           accept="application/pdf,.pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx,text/csv,.csv,text/plain,.txt{% if vendedor_imagen %},image/jpeg,image/png,image/webp,image/heic,image/heif{% endif %}">
+    {% endif %}
+
     <label class="sr-only" for="vendedor-mensaje">{% trans "Escribe tu mensaje" %}</label>
     <div class="gtg-vendedor__composer" data-vendedor-composer>
-      {% if vendedor_imagen %}
-      <button type="button" class="gtg-vendedor__attach" data-vendedor-adjuntar hidden
-              aria-label="{% trans 'Buscar prendas parecidas con una foto' %}" title="{% trans 'Buscar prendas parecidas con una foto' %}">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 8h3l2-3h6l2 3h3v11H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+      {% if vendedor_disponible %}
+      <button type="button" class="gtg-vendedor__attach gtg-vendedor__mas" data-vendedor-mas hidden
+              aria-label="{% trans 'Más opciones' %}" title="{% trans 'Más opciones' %}"
+              aria-haspopup="menu" aria-expanded="false" aria-controls="vendedor-herramientas">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
-      <input type="file" class="sr-only" data-vendedor-archivo tabindex="-1" aria-hidden="true"
-             accept="image/jpeg,image/png,image/webp,image/heic,image/heif">
       {% endif %}
       <textarea id="vendedor-mensaje" name="mensaje" rows="1" maxlength="600" data-vendedor-mensaje
               placeholder="{% trans 'Pregunta por productos, tallas o envíos' %}"></textarea>
+      {% if vendedor_disponible %}
+      <button type="button" class="gtg-vendedor__attach gtg-vendedor__mic" data-vendedor-microfono hidden aria-pressed="false"
+              aria-label="{% trans 'Dictar por voz' %}" title="{% trans 'Dictar por voz' %}">
+        <svg class="gtg-vendedor__mic-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 14a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3z" fill="currentColor"/><path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V20H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-2.08A7 7 0 0 0 19 11z" fill="currentColor"/></svg>
+        <span class="gtg-vendedor__mic-stop" aria-hidden="true">STOP</span>
+      </button>
+      {% endif %}
       <button type="submit" class="gtg-vendedor__button gtg-vendedor__send" data-vendedor-enviar aria-label="{% trans 'Enviar' %}">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 19V5m-6 6 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -200,8 +280,28 @@ con ese mismo aviso, sin llamar al servidor.
     <span data-texto="error_imagen_no_disponible">{% trans "La búsqueda por foto no está disponible en este momento." %}</span>
     <span data-texto="error_imagen_rechazada">{% trans "No pude analizar esa foto. Prueba con otra en la que se vea solo la prenda." %}</span>
     <span data-texto="error_limite_imagenes">{% trans "Alcanzaste el límite de fotos de hoy. Puedes seguir escribiéndome." %}</span>
+    <span data-texto="aviso_foto">{% trans "Uso la foto solo para buscar prendas parecidas y no la guardo. Funciona mejor si se ve solo la prenda." %}</span>
+    <span data-texto="aviso_documento">{% trans "Leo el archivo solo para esta respuesta y no lo guardo. Antes de leerlo oculto correos, teléfonos y números de documento." %}</span>
+    <span data-texto="archivo_enviado">{% trans "Archivo adjunto:" %}</span>
+    <span data-texto="documento_recortado">{% trans "El archivo era largo: leí solo la primera parte." %}</span>
+    <span data-texto="error_documento_invalido">{% trans "No pude leer ese archivo. Usa un PDF, un Excel (.xlsx), un CSV o un TXT." %}</span>
+    <span data-texto="error_documento_grande">{% trans "El archivo es demasiado grande. Prueba con uno de menos de 5 MB." %}</span>
+    <span data-texto="error_documento_sin_texto">{% trans "No encontré texto en ese archivo. Si es un documento escaneado, envíalo como foto o escribe lo que necesitas." %}</span>
+    <span data-texto="error_documento_protegido">{% trans "Ese archivo tiene contraseña. Quítala o escribe lo que necesitas en el mensaje." %}</span>
+    <span data-texto="dictar">{% trans "Dictar por voz" %}</span>
+    <span data-texto="detener_dictado">{% trans "Detener el dictado" %}</span>
+    <span data-texto="escuchando">{% trans "Te escucho… toca STOP cuando termines." %}</span>
+    <span data-texto="transcribiendo">{% trans "Convirtiendo tu voz en texto…" %}</span>
+    <span data-texto="voz_lista">{% trans "Revisa el texto dictado y envíalo." %}</span>
+    <span data-texto="voz_sin_texto">{% trans "No te escuché bien. Intenta de nuevo." %}</span>
+    <span data-texto="voz_prueba">{% trans "Hola, soy Quantum Coach. Así sonarán mis respuestas." %}</span>
+    <span data-texto="error_microfono">{% trans "No tengo permiso para usar el micrófono. Actívalo en tu navegador para dictar." %}</span>
+    <span data-texto="error_voz_invalida">{% trans "No pude procesar la grabación. Intenta de nuevo." %}</span>
+    <span data-texto="error_voz_larga">{% trans "La nota de voz es muy larga. Habla máximo 30 segundos." %}</span>
+    <span data-texto="error_voz_no_disponible">{% trans "El dictado por voz no está disponible en este momento. Puedes escribir tu mensaje." %}</span>
+    <span data-texto="error_limite_voz">{% trans "Alcanzaste el límite de notas de voz de hoy. Puedes seguir escribiéndome." %}</span>
     <span data-texto="atencion_espera">{% trans "Ya enviaste varias solicitudes. Intenta más tarde o escríbenos desde Contacto." %}</span>
   </div>
 
-  <script id="vendedor-config" type="application/json">{"endpoint": "{% url 'vendedor:mensaje' %}", "estadoUrl": "{% url 'vendedor:identidad_estado' %}", "identityEpoch": "{{ vendedor_identity_epoch }}", "csrf": "{{ csrf_token }}", "maxLength": 600, "disponible": {% if vendedor_disponible %}true{% else %}false{% endif %}, "cartUrl": "{% url 'carrito:cart_detail' %}", "contactUrl": "{% url 'contacto' %}", "puedeRecordar": {% if vendedor_puede_recordar %}true{% else %}false{% endif %}, "recordarUrl": "{% url 'vendedor:personalizacion_recordar' %}", "atencionUrl": "{% url 'vendedor:atencion' %}", "imagenUrl": "{% if vendedor_imagen %}{% url 'vendedor:imagen' %}{% endif %}", "soluciones": {{ vendedor_urls_soluciones|default:'[]'|safe }}, "vigenciaHistorial": {{ vendedor_vigencia_historial|default:1800 }}}</script>
+  <script id="vendedor-config" type="application/json">{"endpoint": "{% url 'vendedor:mensaje' %}", "estadoUrl": "{% url 'vendedor:identidad_estado' %}", "identityEpoch": "{{ vendedor_identity_epoch }}", "csrf": "{{ csrf_token }}", "maxLength": 600, "disponible": {% if vendedor_disponible %}true{% else %}false{% endif %}, "cartUrl": "{% url 'carrito:cart_detail' %}", "contactUrl": "{% url 'contacto' %}", "puedeRecordar": {% if vendedor_puede_recordar %}true{% else %}false{% endif %}, "recordarUrl": "{% url 'vendedor:personalizacion_recordar' %}", "atencionUrl": "{% url 'vendedor:atencion' %}", "imagenUrl": "{% if vendedor_imagen %}{% url 'vendedor:imagen' %}{% endif %}", "documentoUrl": "{% if vendedor_disponible %}{% url 'vendedor:documento' %}{% endif %}", "vozUrl": "{% if vendedor_disponible %}{% url 'vendedor:voz' %}{% endif %}", "soluciones": {{ vendedor_urls_soluciones|default:'[]'|safe }}, "vigenciaHistorial": {{ vendedor_vigencia_historial|default:1800 }}}</script>
 </aside>

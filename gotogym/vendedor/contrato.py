@@ -281,6 +281,21 @@ def _validar_consulta_visual(consulta, evidencia):
                   f'{ruta}.matched')
 
 
+CLAVES_ADJUNTO = frozenset({'source', 'format', 'excerpt', 'truncated'})
+FORMATOS_ADJUNTO = frozenset({'pdf', 'xlsx', 'csv', 'txt'})
+MAX_LARGO_EXTRACTO = 2500
+
+
+def _validar_adjunto(adjunto):
+    """Forma cerrada de `attachment` (paquete.bloque_adjunto): el extracto de
+    texto de un archivo que adjunto el visitante, sin su nombre."""
+    _requerir(isinstance(adjunto, dict) and set(adjunto) == CLAVES_ADJUNTO, 'attachment')
+    _requerir(adjunto['source'] == 'customer_document', 'attachment.source')
+    _requerir(adjunto['format'] in FORMATOS_ADJUNTO, 'attachment.format')
+    _texto(adjunto['excerpt'], 'attachment.excerpt', MAX_LARGO_EXTRACTO)
+    _requerir(isinstance(adjunto['truncated'], bool), 'attachment.truncated')
+
+
 def validar_solicitud(solicitud):
     """Comprueba que `solicitud` (un dict) cumple el contrato. No devuelve
     nada: lanza `ContratoInvalido` ante el primer incumplimiento."""
@@ -320,6 +335,9 @@ def validar_solicitud(solicitud):
 
     if 'visual_query' in solicitud:
         _validar_consulta_visual(solicitud['visual_query'], solicitud.get('evidence'))
+
+    if 'attachment' in solicitud:
+        _validar_adjunto(solicitud['attachment'])
 
     pagina = solicitud.get('page')
     _requerir(isinstance(pagina, dict), 'page')

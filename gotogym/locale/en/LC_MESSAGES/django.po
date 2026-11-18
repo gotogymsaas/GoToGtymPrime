@@ -4433,3 +4433,163 @@ msgstr "Brown"
 
 msgid "Chaqueta"
 msgstr "Jacket"
+
+msgid "Quitar el adjunto"
+msgstr "Remove attachment"
+
+msgid "Herramientas del chat"
+msgstr "Chat tools"
+
+msgid "Tomar foto"
+msgstr "Take photo"
+
+msgid "Adjuntar archivo"
+msgstr "Attach file"
+
+msgid "Subir imagen"
+msgstr "Upload image"
+
+msgid "Voz"
+msgstr "Voice"
+
+msgid "Experiencia de respuesta"
+msgstr "Response experience"
+
+msgid "Modo"
+msgstr "Mode"
+
+msgid "Solo texto"
+msgstr "Text only"
+
+msgid "Solo voz"
+msgstr "Voice only"
+
+msgid "Texto + voz"
+msgstr "Text + voice"
+
+msgid "Tipo de voz"
+msgstr "Voice type"
+
+msgid "Femenina"
+msgstr "Female"
+
+msgid "Masculina"
+msgstr "Male"
+
+msgid "Neutra"
+msgstr "Neutral"
+
+msgid "Región"
+msgstr "Region"
+
+msgid "Estados Unidos"
+msgstr "United States"
+
+msgid "Reino Unido"
+msgstr "United Kingdom"
+
+msgid "Latino en US"
+msgstr "Latino in the US"
+
+msgid "Velocidad"
+msgstr "Speed"
+
+msgid "Reproducir automáticamente"
+msgstr "Play automatically"
+
+msgid "Probar voz"
+msgstr "Test voice"
+
+msgid "Detener"
+msgstr "Stop"
+
+msgid ""
+"Al dictar, tu voz se convierte en texto con el reconocimiento de tu "
+"navegador o el de GoToGym. No guardamos el audio."
+msgstr ""
+"When you dictate, your voice is turned into text by your browser's speech "
+"recognition or GoToGym's. We don't keep the audio."
+
+msgid "Más opciones"
+msgstr "More options"
+
+msgid "Dictar por voz"
+msgstr "Dictate by voice"
+
+msgid "Detener el dictado"
+msgstr "Stop dictation"
+
+msgid ""
+"Leo el archivo solo para esta respuesta y no lo guardo. Antes de leerlo "
+"oculto correos, teléfonos y números de documento."
+msgstr ""
+"I read the file only for this reply and don't keep it. Before reading it, I "
+"hide emails, phone numbers and ID numbers."
+
+msgid "Archivo adjunto:"
+msgstr "Attached file:"
+
+msgid "El archivo era largo: leí solo la primera parte."
+msgstr "The file was long: I only read the first part."
+
+msgid ""
+"No pude leer ese archivo. Usa un PDF, un Excel (.xlsx), un CSV o un TXT."
+msgstr ""
+"I couldn't read that file. Use a PDF, an Excel file (.xlsx), a CSV or a TXT."
+
+msgid "El archivo es demasiado grande. Prueba con uno de menos de 5 MB."
+msgstr "The file is too large. Try one under 5 MB."
+
+msgid ""
+"No encontré texto en ese archivo. Si es un documento escaneado, envíalo como"
+" foto o escribe lo que necesitas."
+msgstr ""
+"I couldn't find any text in that file. If it's a scanned document, send it "
+"as a photo or type what you need."
+
+msgid ""
+"Ese archivo tiene contraseña. Quítala o escribe lo que necesitas en el "
+"mensaje."
+msgstr ""
+"That file is password-protected. Remove the password or type what you need "
+"in the message."
+
+msgid "Te escucho… toca STOP cuando termines."
+msgstr "I'm listening… tap STOP when you're done."
+
+msgid "Convirtiendo tu voz en texto…"
+msgstr "Turning your voice into text…"
+
+msgid "Revisa el texto dictado y envíalo."
+msgstr "Review the dictated text and send it."
+
+msgid "No te escuché bien. Intenta de nuevo."
+msgstr "I didn't catch that. Please try again."
+
+msgid "Hola, soy Quantum Coach. Así sonarán mis respuestas."
+msgstr "Hi, I'm Quantum Coach. This is how my replies will sound."
+
+msgid ""
+"No tengo permiso para usar el micrófono. Actívalo en tu navegador para "
+"dictar."
+msgstr ""
+"I don't have permission to use the microphone. Allow it in your browser to "
+"dictate."
+
+msgid "No pude procesar la grabación. Intenta de nuevo."
+msgstr "I couldn't process the recording. Please try again."
+
+msgid "La nota de voz es muy larga. Habla máximo 30 segundos."
+msgstr "The voice note is too long. Speak for 30 seconds at most."
+
+msgid ""
+"El dictado por voz no está disponible en este momento. Puedes escribir tu "
+"mensaje."
+msgstr "Voice dictation isn't available right now. You can type your message."
+
+msgid ""
+"Alcanzaste el límite de notas de voz de hoy. Puedes seguir escribiéndome."
+msgstr "You've reached today's voice note limit. You can keep typing to me."
+
+msgid "Te comparto un archivo para que me ayudes con mi compra."
+msgstr "Here's a file to help me with my purchase."

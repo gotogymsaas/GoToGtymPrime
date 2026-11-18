@@ -173,11 +173,26 @@ def bloque_visual(descripcion, coincidencias):
     }
 
 
-def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=None, visual=None):
+def bloque_adjunto(leido):
+    """`attachment`: el extracto de un archivo que adjunto el visitante
+    (documento.leer), ya sin datos personales evidentes ni nombre de archivo."""
+    return {
+        'source': 'customer_document',
+        'format': leido.formato,
+        'excerpt': leido.extracto,
+        'truncated': leido.recortado,
+    }
+
+
+def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=None, visual=None, adjunto=None):
     """Solicitud lista para firmar y enviar.
 
     `visual` es el bloque de `bloque_visual` cuando el turno viene de una
     foto: sus coincidencias van primero entre los candidatos.
+
+    `adjunto` es el bloque de `bloque_adjunto` cuando el turno trae un
+    archivo: su texto tambien sirve para elegir candidatos (una lista de
+    prendas, por ejemplo).
 
     Lanza `ContratoInvalido` si el paquete no respeta el contrato o no cabe
     en el presupuesto incluso despues de descartar candidatos: en ese caso no
@@ -206,7 +221,8 @@ def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=No
         },
         'evidence': {
             'candidates': evidencia.candidatos(
-                mensaje, foco_id=pagina['product_id'], ids_carrito=productos_del_carrito,
+                f"{mensaje}\n{adjunto['excerpt']}" if adjunto else mensaje,
+                foco_id=pagina['product_id'], ids_carrito=productos_del_carrito,
                 linea_preferida=linea_preferida,
                 primero=[fila['product_id'] for fila in (visual or {}).get('matches', [])],
             ),
@@ -229,6 +245,8 @@ def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=No
 
     if visual is not None:
         solicitud['visual_query'] = visual
+    if adjunto is not None:
+        solicitud['attachment'] = adjunto
 
     candidatos = solicitud['evidence']['candidates']
     while candidatos and contrato.tamano_en_bytes(solicitud) > contrato.MAX_BYTES_SOLICITUD:

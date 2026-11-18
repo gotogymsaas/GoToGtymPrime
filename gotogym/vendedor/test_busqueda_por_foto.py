@@ -126,7 +126,7 @@ class BusquedaPorFotoTests(TestCase):
         self.assertEqual(respuesta.json()['error'], 'mensaje_invalido')
 
     def test_la_subida_se_queda_en_memoria(self):
-        manejador = views._SubidaEnMemoria(mock.Mock())
+        manejador = views._SubidaEnMemoria(mock.Mock(), views.MAX_BYTES_PETICION_IMAGEN)
         manejador.handle_raw_input(None, {}, views.MAX_BYTES_PETICION_IMAGEN, b'x')
         self.assertTrue(manejador.activated)
         manejador.handle_raw_input(None, {}, views.MAX_BYTES_PETICION_IMAGEN + 1, b'x')
@@ -286,13 +286,13 @@ class ContratoConsultaVisualTests(TestCase):
 @override_settings(VENDEDOR_ENABLED=True, VENDEDOR_ROLLOUT_PERCENT=100, VENDEDOR_IMAGEN_ACCESO='staff')
 class PanelTests(TestCase):
     def test_el_boton_de_foto_solo_para_quien_tiene_acceso(self):
-        self.assertNotIn('data-vendedor-adjuntar', self.client.get('/es/').content.decode())
+        self.assertNotIn('data-herramienta="camara"', self.client.get('/es/').content.decode())
 
         staff = get_user_model().objects.create_user('panel@example.com', 'x', 'panel', is_staff=True)
         self.client.force_login(staff)
         html = self.client.get('/es/').content.decode()
 
-        self.assertIn('data-vendedor-adjuntar', html)
+        self.assertIn('data-herramienta="camara"', html)
         self.assertIn('"imagenUrl": "/es/vendedor/imagen/"', html)
         self.assertIn('no la guardo', html)
 
@@ -300,4 +300,4 @@ class PanelTests(TestCase):
     def test_sin_ia_no_hay_boton_de_foto(self):
         staff = get_user_model().objects.create_user('panel2@example.com', 'x', 'panel2', is_staff=True)
         self.client.force_login(staff)
-        self.assertNotIn('data-vendedor-adjuntar', self.client.get('/es/').content.decode())
+        self.assertNotIn('data-herramienta="camara"', self.client.get('/es/').content.decode())
