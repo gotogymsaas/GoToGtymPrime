@@ -229,7 +229,3 @@ class FavoritosTests(TestCase):
 
         self.assertNotIn('favoritos_cards', respuesta.context)
         self.assertNotContains(respuesta, 'data-favoritos-lista')
-
-    def test_el_evento_de_medicion_esta_permitido(self):
-        from analitica.views import EVENTOS_PERMITIDOS
-        self.assertIn('favorite_toggle', EVENTOS_PERMITIDOS)

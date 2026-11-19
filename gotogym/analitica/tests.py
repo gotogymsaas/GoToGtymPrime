@@ -216,6 +216,14 @@ class EventosDelJournalTests(SimpleTestCase):
             self.assertIn(evento, EVENTOS_PERMITIDOS)
 
 
+class EventosDeFavoritosTests(SimpleTestCase):
+    def test_el_corazon_de_favoritos_esta_permitido(self):
+        """El corazon declara su propio data-track: si el evento no estuviera
+        en la lista, la vista lo descartaria en silencio."""
+        from .views import EVENTOS_PERMITIDOS
+        self.assertIn('favorite_toggle', EVENTOS_PERMITIDOS)
+
+
 class ConsentimientoDeCookiesTests(TestCase):
     """La medicion es opt-in: sin aceptar la analitica en el banner no se guarda nada."""
 
