@@ -25,8 +25,9 @@
  *    archivo, subir imagen y voz. El microfono dicta con el reconocimiento del
  *    navegador; si no lo hay, graba (WAV de 16 kHz, maximo 30 s) y lo
  *    transcribe el Coach a traves de la tienda. Lo dictado queda en el campo
- *    para revisarlo antes de enviar. Las preferencias de voz se guardan en
- *    localStorage, solo en este navegador.
+ *    para revisarlo antes de enviar. "Leer respuestas en voz alta" nace
+ *    apagado, usa la voz de GoToGym y se recuerda en localStorage (solo en
+ *    este navegador).
  *
  * El historial se guarda en sessionStorage (solo en esta pestana) para que no
  * se pierda al cambiar de pagina. Vence con la misma inactividad con la que el
@@ -106,7 +107,11 @@
   var avisoAdjunto = panel.querySelector('[data-vendedor-adjunto-aviso]');
   var botonQuitarAdjunto = panel.querySelector('[data-vendedor-quitar-adjunto]');
   var botonMicrofono = panel.querySelector('[data-vendedor-microfono]');
-  var panelVoz = panel.querySelector('[data-vendedor-voz-panel]');
+  var barraGrabando = panel.querySelector('[data-vendedor-grabando]');
+  var tiempoGrabando = panel.querySelector('[data-vendedor-grabando-tiempo]');
+  var compositor = panel.querySelector('[data-vendedor-composer]');
+  // Voz de GoToGym: espanol de Colombia, o ingles si el sitio esta en ingles.
+  var REGION_GOTOGYM = /^en/i.test(document.documentElement.lang || '') ? 'en-US' : 'es-CO';
   var fotosHabilitadas = !!(campoArchivo && cajaAdjunto && RUTA_IMAGEN_SUBIDA.test(configuracion.imagenUrl || ''));
   var documentosHabilitados = !!(campoDocumento && cajaAdjunto && RUTA_DOCUMENTO.test(configuracion.documentoUrl || ''));
   var sintesis = window.speechSynthesis && window.SpeechSynthesisUtterance ? window.speechSynthesis : null;
@@ -441,9 +446,15 @@
     cajaError.hidden = true;
   }
 
+  // Sin texto ni adjunto el boton de enviar se ve en reposo.
+  function actualizarEnvio() {
+    if (compositor) compositor.classList.toggle('gtg-vendedor__composer--vacio', !campo.value.trim() && !adjunto);
+  }
+
   function actualizarControles() {
     var ocupado = enviando || temporizadorEspera !== null;
     botonEnviar.disabled = ocupado;
+    actualizarEnvio();
     if (botonMas) botonMas.disabled = ocupado;
     if (botonMicrofono) botonMicrofono.disabled = transcribiendo;
     botonNueva.disabled = enviando;
@@ -674,6 +685,7 @@
     adjunto = null;
     if (cajaAdjunto) cajaAdjunto.hidden = true;
     limpiarCampos();
+    actualizarEnvio();
   }
 
   function mostrarAdjunto(nuevo) {
@@ -689,6 +701,7 @@
     }
     if (avisoAdjunto) avisoAdjunto.textContent = texto(esFoto ? 'aviso_foto' : 'aviso_documento');
     cajaAdjunto.hidden = false;
+    actualizarEnvio();
     campo.focus();
   }
 
@@ -772,7 +785,6 @@
 
   function abrirMenu() {
     if (!menuHerramientas || !botonMas) return;
-    cerrarPanelVoz(false);
     menuHerramientas.hidden = false;
     botonMas.setAttribute('aria-expanded', 'true');
     var items = itemsDelMenu();
@@ -803,133 +815,55 @@
   }
 
   function usarHerramienta(nombre) {
-    cerrarMenu(false);
     medir('vendedor_tool', { herramienta: nombre });
+    // El interruptor de lectura cambia ahi mismo y el menu sigue abierto para verlo.
+    if (nombre === 'leer') {
+      cambiarLectura();
+      return;
+    }
+    cerrarMenu(false);
     if (nombre === 'camara' && campoCamara) campoCamara.click();
     else if (nombre === 'imagen' && campoArchivo) campoArchivo.click();
     else if (nombre === 'archivo' && campoDocumento) campoDocumento.click();
-    else if (nombre === 'voz') abrirPanelVoz();
   }
 
-  // --- Voz: como suenan las respuestas -----------------------------------------------
+  // --- Lectura en voz alta (apagada por defecto, voz de GoToGym) ------------------------
 
-  var MODOS_VOZ = { text: true, voice: true, both: true };
-  var GENEROS_VOZ = { female: true, male: true, neutral: true };
-  var PISTAS_FEMENINAS = ['female', 'femenina', 'mujer', 'woman', 'sofia', 'paulina', 'maria', 'salome', 'isabella',
-    'helena', 'laura', 'elvira', 'dalia', 'paloma', 'monica', 'lucia', 'camila', 'ximena', 'jenny', 'aria', 'zira',
-    'samantha', 'karen', 'sonia', 'libby'];
-  var PISTAS_MASCULINAS = ['male', 'masculina', 'hombre', 'carlos', 'jorge', 'andres', 'alejandro', 'gonzalo',
-    'alvaro', 'pablo', 'raul', 'diego', 'tomas', 'guy', 'david', 'mark', 'daniel', 'juan', 'ryan'];
+  var itemLeer = menuHerramientas ? menuHerramientas.querySelector('[data-herramienta="leer"]') : null;
 
-  function controlDeVoz(nombre) {
-    return panelVoz ? panelVoz.querySelector('[data-voz="' + nombre + '"]') : null;
-  }
-
-  function regionesDeVoz() {
-    var selector = controlDeVoz('region');
-    return selector ? Array.prototype.map.call(selector.options, function (opcion) { return opcion.value; }) : [];
-  }
-
-  function normalizarPreferencias(crudo) {
-    var regiones = regionesDeVoz();
-    var datos = crudo && typeof crudo === 'object' ? crudo : {};
-    var velocidad = parseFloat(datos.velocidad);
-    var preferencias = {
-      modo: MODOS_VOZ[datos.modo] ? datos.modo : 'text',
-      genero: GENEROS_VOZ[datos.genero] ? datos.genero : 'neutral',
-      region: regiones.indexOf(datos.region) !== -1 ? datos.region : (regiones[0] || ''),
-      velocidad: isFinite(velocidad) ? Math.min(1.3, Math.max(0.8, velocidad)) : 1,
-      autoplay: datos.autoplay !== false
-    };
-    // "Solo voz" sin reproducir automaticamente no tendria sentido.
-    if (preferencias.modo === 'voice') preferencias.autoplay = true;
-    return preferencias;
-  }
-
-  function leerPreferenciasVoz() {
+  function lecturaGuardada() {
     try {
-      return normalizarPreferencias(JSON.parse(window.localStorage.getItem(CLAVE_VOZ) || '{}'));
+      return JSON.parse(window.localStorage.getItem(CLAVE_VOZ) || '{}').leer === true;
     } catch (error) {
-      return normalizarPreferencias({});
+      return false;
     }
   }
 
-  var preferenciasVoz = leerPreferenciasVoz();
+  var leerRespuestas = lecturaGuardada();
 
-  function guardarPreferenciasVoz() {
-    try { window.localStorage.setItem(CLAVE_VOZ, JSON.stringify(preferenciasVoz)); } catch (error) { /* sin almacenamiento */ }
+  function pintarLectura() {
+    if (itemLeer) itemLeer.setAttribute('aria-checked', leerRespuestas ? 'true' : 'false');
   }
 
-  function textoDeOpcion(selector) {
-    return selector && selector.selectedIndex >= 0 ? selector.options[selector.selectedIndex].textContent.trim() : '';
-  }
-
-  function pintarPreferenciasVoz() {
-    if (!panelVoz) return;
-    controlDeVoz('modo').value = preferenciasVoz.modo;
-    controlDeVoz('genero').value = preferenciasVoz.genero;
-    controlDeVoz('region').value = preferenciasVoz.region;
-    controlDeVoz('velocidad').value = String(preferenciasVoz.velocidad);
-    controlDeVoz('autoplay').checked = preferenciasVoz.autoplay;
-    controlDeVoz('autoplay').disabled = preferenciasVoz.modo === 'voice';
-    var resumen = panelVoz.querySelector('[data-vendedor-voz-resumen]');
-    if (resumen) {
-      resumen.textContent = [textoDeOpcion(controlDeVoz('modo')), textoDeOpcion(controlDeVoz('genero')),
-        textoDeOpcion(controlDeVoz('region'))].join(' \u00b7 ');
-    }
-  }
-
-  function alCambiarVoz() {
-    preferenciasVoz = normalizarPreferencias({
-      modo: controlDeVoz('modo').value,
-      genero: controlDeVoz('genero').value,
-      region: controlDeVoz('region').value,
-      velocidad: controlDeVoz('velocidad').value,
-      autoplay: controlDeVoz('autoplay').checked
-    });
-    guardarPreferenciasVoz();
-    pintarPreferenciasVoz();
-    if (preferenciasVoz.modo === 'text') callar();
-  }
-
-  function abrirPanelVoz() {
-    if (!panelVoz) return;
-    cerrarMenu(false);
-    pintarPreferenciasVoz();
-    panelVoz.hidden = false;
-    controlDeVoz('modo').focus();
-  }
-
-  function cerrarPanelVoz(devolverFoco) {
-    if (!panelVoz || panelVoz.hidden) return false;
-    panelVoz.hidden = true;
-    if (devolverFoco && botonMas) botonMas.focus();
-    return true;
-  }
-
-  function puntajeDeVoz(voz) {
-    var idioma = String(voz.lang || '').toLowerCase().replace('_', '-');
-    var region = String(preferenciasVoz.region || '').toLowerCase();
-    var base = region.split('-')[0];
-    var nombre = String(voz.name || '').toLowerCase();
-    var puntaje = 0;
-    if (idioma === region) puntaje += 8;
-    if (idioma.indexOf(base + '-') === 0 || idioma === base) puntaje += 4;
-    if (voz.localService) puntaje += 1;
-    var femenina = PISTAS_FEMENINAS.some(function (pista) { return nombre.indexOf(pista) !== -1; });
-    // "female" contiene "male": una voz femenina no cuenta como masculina.
-    var masculina = !femenina && PISTAS_MASCULINAS.some(function (pista) { return nombre.indexOf(pista) !== -1; });
-    if (preferenciasVoz.genero === 'female' && femenina) puntaje += 4;
-    if (preferenciasVoz.genero === 'male' && masculina) puntaje += 4;
-    return puntaje;
+  function cambiarLectura() {
+    leerRespuestas = !leerRespuestas;
+    try { window.localStorage.setItem(CLAVE_VOZ, JSON.stringify({ leer: leerRespuestas })); } catch (error) { /* sin almacenamiento */ }
+    pintarLectura();
+    if (!leerRespuestas) callar();
   }
 
   function elegirVoz() {
     var voces = sintesis && sintesis.getVoices ? sintesis.getVoices() : [];
+    var region = REGION_GOTOGYM.toLowerCase();
+    var base = region.split('-')[0];
     var mejor = null;
     var mejorPuntaje = 0;
     Array.prototype.forEach.call(voces || [], function (voz) {
-      var puntaje = puntajeDeVoz(voz);
+      var idioma = String(voz.lang || '').toLowerCase().replace('_', '-');
+      var puntaje = 0;
+      if (idioma === region) puntaje += 8;
+      if (idioma === base || idioma.indexOf(base + '-') === 0) puntaje += 4;
+      if (voz.localService) puntaje += 1;
       if (puntaje > mejorPuntaje) {
         mejor = voz;
         mejorPuntaje = puntaje;
@@ -944,8 +878,7 @@
     try {
       sintesis.cancel();
       var locucion = new window.SpeechSynthesisUtterance(limpio);
-      locucion.rate = preferenciasVoz.velocidad;
-      locucion.lang = preferenciasVoz.region || document.documentElement.lang || 'es-CO';
+      locucion.lang = REGION_GOTOGYM;
       var voz = elegirVoz();
       if (voz) {
         locucion.voice = voz;
@@ -961,8 +894,7 @@
   }
 
   function hablarSiCorresponde(contenido) {
-    if (preferenciasVoz.modo === 'text' || !preferenciasVoz.autoplay) return;
-    hablar(contenido);
+    if (leerRespuestas) hablar(contenido);
   }
 
   // --- Microfono: dictado --------------------------------------------------------------
@@ -974,7 +906,6 @@
       notaVoz = crear('p', 'gtg-vendedor__nota');
       notaVoz.setAttribute('role', 'status');
       notaVoz.hidden = true;
-      var compositor = panel.querySelector('[data-vendedor-composer]');
       compositor.parentNode.insertBefore(notaVoz, compositor);
     }
     if (temporizadorNota) window.clearTimeout(temporizadorNota);
@@ -985,9 +916,16 @@
     }
     notaVoz.textContent = texto(clave);
     notaVoz.hidden = false;
-    if (clave !== 'escuchando' && clave !== 'transcribiendo') {
+    if (clave !== 'transcribiendo') {
       temporizadorNota = window.setTimeout(function () { notaVoz.hidden = true; }, 5000);
     }
+  }
+
+  var cronometro = null;
+
+  function pintarTiempo(inicio) {
+    var segundos = Math.floor((Date.now() - inicio) / 1000);
+    if (tiempoGrabando) tiempoGrabando.textContent = Math.floor(segundos / 60) + ':' + ('0' + (segundos % 60)).slice(-2);
   }
 
   function marcarDictado(activo) {
@@ -997,16 +935,26 @@
     var etiqueta = texto(activo ? 'detener_dictado' : 'dictar');
     botonMicrofono.setAttribute('aria-label', etiqueta);
     botonMicrofono.title = etiqueta;
-    nota(activo ? 'escuchando' : null);
+    if (compositor) compositor.classList.toggle('gtg-vendedor__composer--grabando', activo);
+    if (cronometro) window.clearInterval(cronometro);
+    cronometro = null;
+    if (barraGrabando) barraGrabando.hidden = !activo;
+    if (activo) {
+      nota(null);
+      var inicio = Date.now();
+      pintarTiempo(inicio);
+      cronometro = window.setInterval(function () { pintarTiempo(inicio); }, 500);
+    }
   }
 
   function idiomaDeDictado() {
-    return preferenciasVoz.region || document.documentElement.lang || 'es-CO';
+    return REGION_GOTOGYM;
   }
 
   function ponerEnElCampo(base, dictado) {
     var maximo = configuracion.maxLength || 600;
     campo.value = (base + dictado).slice(0, maximo);
+    actualizarEnvio();
   }
 
   function baseDelCampo() {
@@ -1156,7 +1104,7 @@
     var base = baseDelCampo();
     var formulario = new FormData();
     formulario.append('audio', wav, 'voz.wav');
-    formulario.append('region', preferenciasVoz.region || '');
+    formulario.append('region', REGION_GOTOGYM);
     transcribiendo = true;
     actualizarControles();
     nota('transcribiendo');
@@ -1213,7 +1161,6 @@
       return;
     }
     cerrarMenu(false);
-    cerrarPanelVoz(false);
     ocultarError();
     callar();
     if (Reconocimiento) dictarConNavegador();
@@ -1263,6 +1210,58 @@
     return !(consultaEscritorio && consultaEscritorio.matches);
   }
 
+  // --- Movil: pagina quieta y panel encima del teclado -----------------------------
+  // overflow: hidden no detiene el arrastre elastico de Safari en iPhone, asi
+  // que mientras el panel es modal el body queda fijo donde estaba. Y como
+  // 100dvh no cambia al abrir el teclado, el panel toma el alto y la posicion
+  // de la parte visible (visualViewport) para que nada de la tienda se asome.
+
+  var vistaVisible = window.visualViewport || null;
+  var desplazamientoGuardado = null;
+
+  function fijarPagina() {
+    if (desplazamientoGuardado !== null || !esModal()) return;
+    desplazamientoGuardado = window.scrollY || window.pageYOffset || 0;
+    var cuerpo = document.body.style;
+    cuerpo.position = 'fixed';
+    cuerpo.top = -desplazamientoGuardado + 'px';
+    cuerpo.left = '0';
+    cuerpo.right = '0';
+    cuerpo.width = '100%';
+  }
+
+  function soltarPagina() {
+    if (desplazamientoGuardado === null) return;
+    var cuerpo = document.body.style;
+    cuerpo.position = cuerpo.top = cuerpo.left = cuerpo.right = cuerpo.width = '';
+    window.scrollTo(0, desplazamientoGuardado);
+    desplazamientoGuardado = null;
+  }
+
+  function ajustarALaVista() {
+    if (!abierto || !esModal() || !vistaVisible) {
+      panel.style.removeProperty('--coach-alto');
+      panel.style.removeProperty('--coach-arriba');
+      return;
+    }
+    panel.style.setProperty('--coach-alto', Math.round(vistaVisible.height) + 'px');
+    panel.style.setProperty('--coach-arriba', Math.round(vistaVisible.offsetTop) + 'px');
+  }
+
+  if (vistaVisible) {
+    vistaVisible.addEventListener('resize', ajustarALaVista);
+    vistaVisible.addEventListener('scroll', ajustarALaVista);
+  }
+  if (consultaEscritorio && consultaEscritorio.addEventListener) {
+    // Al girar una tablet o cambiar el tamano de la ventana, el panel puede
+    // dejar de ser modal (o volver a serlo).
+    consultaEscritorio.addEventListener('change', function () {
+      if (!abierto) return;
+      if (esModal()) fijarPagina(); else soltarPagina();
+      ajustarALaVista();
+    });
+  }
+
   function abrir(origen) {
     if (abierto) return;
     disparador = origen || null;
@@ -1273,6 +1272,8 @@
     document.documentElement.classList.add('gtg-vendedor-abierto');
     marcarBotones(true);
     abierto = true;
+    fijarPagina();
+    ajustarALaVista();
     if (aviso) aviso.hidden = guardado(CLAVE_AVISO) === '1';
     // Si la conversacion vencio mientras la pestana seguia abierta, se empieza
     // de nuevo con la bienvenida en vez de mostrar lo que el Coach ya olvido.
@@ -1297,7 +1298,6 @@
   function cerrar() {
     if (!abierto) return;
     cerrarMenu(false);
-    cerrarPanelVoz(false);
     detenerDictado(false);
     callar();
     panel.hidden = true;
@@ -1305,6 +1305,8 @@
     document.documentElement.classList.remove('gtg-vendedor-abierto');
     marcarBotones(false);
     abierto = false;
+    soltarPagina();
+    ajustarALaVista();
     devolverElFoco();
     disparador = null;
   }
@@ -1386,8 +1388,8 @@
 
   // Herramientas: cada opcion aparece solo si el navegador y el acceso la permiten.
   if (menuHerramientas && botonMas) {
-    var itemVoz = menuHerramientas.querySelector('[data-herramienta="voz"]');
-    if (itemVoz) itemVoz.hidden = !(sintesis && panelVoz);
+    if (itemLeer) itemLeer.hidden = !sintesis;
+    pintarLectura();
     if (!fotosHabilitadas) {
       Array.prototype.forEach.call(menuHerramientas.querySelectorAll('[data-herramienta="camara"], [data-herramienta="imagen"]'),
         function (item) { item.hidden = true; });
@@ -1414,29 +1416,20 @@
   if (documentosHabilitados) campoDocumento.addEventListener('change', alElegirDocumento);
   if (botonQuitarAdjunto) botonQuitarAdjunto.addEventListener('click', function () { soltarAdjunto(true); campo.focus(); });
 
-  if (panelVoz) {
-    Array.prototype.forEach.call(panelVoz.querySelectorAll('[data-voz]'), function (control) {
-      control.addEventListener('change', alCambiarVoz);
-    });
-    var botonProbar = panelVoz.querySelector('[data-vendedor-voz-probar]');
-    var botonDetener = panelVoz.querySelector('[data-vendedor-voz-detener]');
-    if (botonProbar) botonProbar.addEventListener('click', function () { hablar(texto('voz_prueba')); });
-    if (botonDetener) botonDetener.addEventListener('click', callar);
-  }
+  campo.addEventListener('input', actualizarEnvio);
+  actualizarEnvio();
 
   if (botonMicrofono && (Reconocimiento || puedeGrabar)) {
     botonMicrofono.hidden = false;
     botonMicrofono.addEventListener('click', alPulsarMicrofono);
   }
 
-  // Un toque fuera del menu o del panel de voz los cierra.
+  // Un toque fuera del menu lo cierra.
   document.addEventListener('click', function (evento) {
     var objetivo = evento.target;
     if (!(objetivo instanceof Element)) return;
     if (menuHerramientas && !menuHerramientas.hidden && !menuHerramientas.contains(objetivo) &&
         !(botonMas && botonMas.contains(objetivo))) cerrarMenu(false);
-    if (panelVoz && !panelVoz.hidden && !panelVoz.contains(objetivo) &&
-        !(menuHerramientas && menuHerramientas.contains(objetivo))) cerrarPanelVoz(false);
   });
 
   enlaceContacto.addEventListener('click', function (evento) {
@@ -1533,8 +1526,8 @@
   panel.addEventListener('keydown', atraparElFoco);
   document.addEventListener('keydown', function (evento) {
     if (evento.key !== 'Escape' || !abierto) return;
-    // Escape cierra primero lo que esta encima: el menu, el panel de voz o el dictado.
-    if (cerrarMenu(true) || cerrarPanelVoz(true)) return;
+    // Escape cierra primero lo que esta encima: el menu o el dictado.
+    if (cerrarMenu(true)) return;
     if (dictando()) {
       detenerDictado(false);
       return;

@@ -142,6 +142,7 @@
 .account-switch__text strong { display: block; }
 .account-switch__text small { display: block; color: var(--ed-muted); margin-top: 2px; }
 .account-switch:focus-visible { outline: 2px solid var(--ed-turquoise-ink); outline-offset: 4px; border-radius: 6px; }
+.account-switch-form--aparte { margin-top: var(--space-3); border-top: 1px solid rgba(0,0,0,.08); }
 .account-personalizacion-detalle { margin-top: var(--space-2); }
 .account-personalizacion-estado { margin: var(--space-4) 0 0; }
 .account-personalizacion-acciones { align-items: center; justify-content: flex-start; }

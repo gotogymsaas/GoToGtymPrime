@@ -201,10 +201,10 @@ def guardar_conclusiones(request):
         messages.error(request, _("Primero vincula tu cuenta GoToGym."))
         return _volver()
     consentimiento.aplicar(request.user, CONCLUSIONS_SCOPE, allowed)
-    messages.success(
-        request,
-        _("Autorización para conclusiones textiles actualizada.")
-    )
+    if allowed:
+        messages.success(request, _("Quantum Coach ya puede usar tus resultados de Alta Costura."))
+    else:
+        messages.success(request, _("Quantum Coach dejó de usar tus resultados de Alta Costura."))
     return _volver()
 
 

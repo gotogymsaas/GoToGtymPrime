@@ -35,7 +35,7 @@ class ExperienceConclusionsPermissionTests(TestCase):
         self.assertFalse(row.is_active(SCOPE))
         events = list(CommerceConsentAuditEvent.objects.filter(user=self.user, scope=SCOPE)
                       .values_list("allowed", "notice_version"))
-        self.assertEqual(events, [(True, "2026-11-14"), (False, "2026-11-14")])
+        self.assertEqual(events, [(True, "2026-11-18"), (False, "2026-11-18")])
 
     def test_bulk_enable_does_not_enable_independent_conclusions(self):
         with patch("vendedor.personalizacion._vinculado", return_value=True):
@@ -107,5 +107,6 @@ class ExperienceConclusionsPermissionTests(TestCase):
     def test_conclusions_call_to_action_visible_in_account(self):
         with patch("vendedor.personalizacion._vinculado", return_value=True):
             response = self.client.get(reverse("edit_profile"))
-        self.assertContains(response, "Autorizar conclusiones textiles")
+        self.assertContains(response, "Usar mis resultados de Alta Costura para recomendarme")
+        self.assertContains(response, 'name="accion" value="conceder"')
         self.assertContains(response, reverse("vendedor:personalizacion_conclusiones"))

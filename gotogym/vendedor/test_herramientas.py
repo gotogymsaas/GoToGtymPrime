@@ -403,12 +403,15 @@ class PanelHerramientasTests(TestCase):
     def test_menu_con_las_cuatro_herramientas_y_el_microfono(self):
         html = Client().get(reverse('home')).content.decode()
         for marca in ('data-vendedor-mas', 'data-herramienta="camara"', 'data-herramienta="archivo"',
-                      'data-herramienta="imagen"', 'data-herramienta="voz"', 'data-vendedor-microfono',
-                      'data-vendedor-voz-panel', 'capture="environment"'):
+                      'data-herramienta="imagen"', 'data-herramienta="leer"', 'data-vendedor-microfono',
+                      'data-vendedor-grabando', 'capture="environment"'):
             self.assertIn(marca, html)
         self.assertIn('"documentoUrl": "/es/vendedor/documento/"', html)
         self.assertIn('"vozUrl": "/es/vendedor/voz/"', html)
         self.assertIn('"imagenUrl": "/es/vendedor/imagen/"', html)
+        # Leer en voz alta nace apagado y ya no hay panel para configurar la voz.
+        self.assertIn('role="menuitemcheckbox" aria-checked="false" data-herramienta="leer"', html)
+        self.assertNotIn('data-vendedor-voz-panel', html)
 
     @override_settings(VENDEDOR_IMAGEN_ACCESO='apagado')
     def test_sin_acceso_a_fotos_queda_el_archivo_sin_imagenes(self):

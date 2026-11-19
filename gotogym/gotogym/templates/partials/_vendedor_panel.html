@@ -16,8 +16,8 @@ con textContent.
 
 Herramientas del chat (boton "+"), las mismas de Quantum Coach: tomar foto y
 subir imagen (busqueda por foto, solo si `vendedor_imagen`), adjuntar archivo
-(PDF, Excel, CSV o TXT que la tienda lee en memoria) y voz (como suenan las
-respuestas). El microfono dicta con el reconocimiento del navegador y, si no
+(PDF, Excel, CSV o TXT que la tienda lee en memoria) y leer las respuestas en voz
+alta (apagado por defecto, voz de GoToGym). El microfono dicta con el reconocimiento del navegador y, si no
 lo hay, graba y lo transcribe el Coach a traves de la tienda.
 
 `vendedor_disponible` dice si hay una IA que responda. Sin ella el Coach se
@@ -157,57 +157,25 @@ con ese mismo aviso, sin llamar al servidor.
       </button>
     </div>
 
-    {# Herramientas del chat, como en Quantum Coach: foto, archivo, imagen y voz. #}
+    {# Herramientas del chat, como en Quantum Coach: foto, archivo, imagen y lectura en voz alta. #}
     <div class="gtg-vendedor__tools" id="vendedor-herramientas" data-vendedor-herramientas role="menu" aria-label="{% trans 'Herramientas del chat' %}" hidden>
       {% if vendedor_imagen %}<button type="button" class="gtg-vendedor__tool" role="menuitem" data-herramienta="camara">{% trans "Tomar foto" %}</button>{% endif %}
       <button type="button" class="gtg-vendedor__tool" role="menuitem" data-herramienta="archivo">{% trans "Adjuntar archivo" %}</button>
       {% if vendedor_imagen %}<button type="button" class="gtg-vendedor__tool" role="menuitem" data-herramienta="imagen">{% trans "Subir imagen" %}</button>{% endif %}
-      <button type="button" class="gtg-vendedor__tool" role="menuitem" data-herramienta="voz" hidden>{% trans "Voz" %}</button>
+      {# Apagada por defecto; la eleccion se guarda solo en este navegador. #}
+      <button type="button" class="gtg-vendedor__tool gtg-vendedor__tool--interruptor" role="menuitemcheckbox" aria-checked="false" data-herramienta="leer" hidden>
+        <span>{% trans "Leer respuestas en voz alta" %}</span>
+        <span class="gtg-vendedor__interruptor" aria-hidden="true"></span>
+      </button>
     </div>
 
-    {# Como suenan las respuestas. Se guarda solo en este navegador. #}
-    {% get_current_language as idioma_actual %}
-    <div class="gtg-vendedor__voz" data-vendedor-voz-panel role="group" aria-labelledby="vendedor-voz-titulo" hidden>
-      <h3 id="vendedor-voz-titulo" class="gtg-vendedor__voz-title">{% trans "Experiencia de respuesta" %}</h3>
-      <p class="gtg-vendedor__voz-resumen" data-vendedor-voz-resumen></p>
-      <label for="vendedor-voz-modo">{% trans "Modo" %}</label>
-      <select id="vendedor-voz-modo" data-voz="modo">
-        <option value="text">{% trans "Solo texto" %}</option>
-        <option value="voice">{% trans "Solo voz" %}</option>
-        <option value="both">{% trans "Texto + voz" %}</option>
-      </select>
-      <label for="vendedor-voz-genero">{% trans "Tipo de voz" %}</label>
-      <select id="vendedor-voz-genero" data-voz="genero">
-        <option value="female">{% trans "Femenina" %}</option>
-        <option value="male">{% trans "Masculina" %}</option>
-        <option value="neutral">{% trans "Neutra" %}</option>
-      </select>
-      <label for="vendedor-voz-region">{% trans "Región" %}</label>
-      <select id="vendedor-voz-region" data-voz="region">
-        {% if idioma_actual|slice:":2" == "en" %}
-        <option value="en-US">{% trans "Estados Unidos" %}</option>
-        <option value="en-GB">{% trans "Reino Unido" %}</option>
-        {% else %}
-        <option value="es-CO">Colombia</option>
-        <option value="es-MX">México</option>
-        <option value="es-ES">España</option>
-        <option value="es-AR">Argentina</option>
-        <option value="es-CL">Chile</option>
-        <option value="es-PE">Perú</option>
-        <option value="es-US">{% trans "Latino en US" %}</option>
-        {% endif %}
-      </select>
-      <label for="vendedor-voz-velocidad">{% trans "Velocidad" %}</label>
-      <input id="vendedor-voz-velocidad" data-voz="velocidad" type="range" min="0.8" max="1.3" step="0.05" value="1">
-      <label class="gtg-vendedor__voz-switch">
-        <input type="checkbox" data-voz="autoplay" checked>
-        <span>{% trans "Reproducir automáticamente" %}</span>
-      </label>
-      <div class="gtg-vendedor__voz-actions">
-        <button type="button" class="gtg-vendedor__button gtg-vendedor__button--quiet" data-vendedor-voz-probar>{% trans "Probar voz" %}</button>
-        <button type="button" class="gtg-vendedor__button gtg-vendedor__button--quiet" data-vendedor-voz-detener>{% trans "Detener" %}</button>
-      </div>
-      <p class="gtg-vendedor__voz-nota">{% trans "Al dictar, tu voz se convierte en texto con el reconocimiento de tu navegador o el de GoToGym. No guardamos el audio." %}</p>
+    {# Indicador de grabacion: aparece mientras la persona dicta. #}
+    <div class="gtg-vendedor__grabando" data-vendedor-grabando role="status" hidden>
+      <span class="gtg-vendedor__grabando-punto" aria-hidden="true"></span>
+      <span class="gtg-vendedor__ondas" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="gtg-vendedor__grabando-tiempo" data-vendedor-grabando-tiempo>0:00</span>
+      <span class="gtg-vendedor__grabando-texto">{% trans "Te escucho… toca STOP cuando termines." %}</span>
+      <span class="gtg-vendedor__grabando-nota">{% trans "Al dictar, tu voz se convierte en texto con el reconocimiento de tu navegador o el de GoToGym. No guardamos el audio." %}</span>
     </div>
 
     {% if vendedor_imagen %}
@@ -238,7 +206,7 @@ con ese mismo aviso, sin llamar al servidor.
       </button>
       {% endif %}
       <button type="submit" class="gtg-vendedor__button gtg-vendedor__send" data-vendedor-enviar aria-label="{% trans 'Enviar' %}">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 19V5m-6 6 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 18.5V6.5M6.5 11.5 12 6l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
   </form>
@@ -290,11 +258,9 @@ con ese mismo aviso, sin llamar al servidor.
     <span data-texto="error_documento_protegido">{% trans "Ese archivo tiene contraseña. Quítala o escribe lo que necesitas en el mensaje." %}</span>
     <span data-texto="dictar">{% trans "Dictar por voz" %}</span>
     <span data-texto="detener_dictado">{% trans "Detener el dictado" %}</span>
-    <span data-texto="escuchando">{% trans "Te escucho… toca STOP cuando termines." %}</span>
     <span data-texto="transcribiendo">{% trans "Convirtiendo tu voz en texto…" %}</span>
     <span data-texto="voz_lista">{% trans "Revisa el texto dictado y envíalo." %}</span>
     <span data-texto="voz_sin_texto">{% trans "No te escuché bien. Intenta de nuevo." %}</span>
-    <span data-texto="voz_prueba">{% trans "Hola, soy Quantum Coach. Así sonarán mis respuestas." %}</span>
     <span data-texto="error_microfono">{% trans "No tengo permiso para usar el micrófono. Actívalo en tu navegador para dictar." %}</span>
     <span data-texto="error_voz_invalida">{% trans "No pude procesar la grabación. Intenta de nuevo." %}</span>
     <span data-texto="error_voz_larga">{% trans "La nota de voz es muy larga. Habla máximo 30 segundos." %}</span>

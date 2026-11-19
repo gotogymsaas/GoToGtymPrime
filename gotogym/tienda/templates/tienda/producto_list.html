@@ -131,13 +131,13 @@
           </div>
           {% endif %}
 
-          <div class="shop-field">
-            <span>{% trans "Precio (COP)" %}</span>
+          <fieldset class="shop-field">
+            <legend>{% trans "Precio (COP)" %}</legend>
             <div class="shop-price-row">
               <input type="number" name="precio_min" value="{{ precio_min }}" min="0" placeholder="{% trans 'Mín' %}" aria-label="{% trans 'Precio mínimo' %}">
               <input type="number" name="precio_max" value="{{ precio_max }}" min="0" placeholder="{% trans 'Máx' %}" aria-label="{% trans 'Precio máximo' %}">
             </div>
-          </div>
+          </fieldset>
 
           <div class="shop-field">
             <label for="f-orden">{% trans "Ordenar por" %}</label>

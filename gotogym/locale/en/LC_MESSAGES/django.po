@@ -4593,3 +4593,6 @@ msgstr "You've reached today's voice note limit. You can keep typing to me."
 
 msgid "Te comparto un archivo para que me ayudes con mi compra."
 msgstr "Here's a file to help me with my purchase."
+
+msgid "Leer respuestas en voz alta"
+msgstr "Read replies aloud"
