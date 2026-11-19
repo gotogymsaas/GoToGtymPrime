@@ -126,9 +126,9 @@ class LoggedHomeTests(TestCase):
         image_names = [
             'bienestar_empresarial_5.jpeg',
             'WhatsApp Image 2026-07-21 at 6.53.20 PM (2).jpeg',
-            'WhatsApp Image 2026-07-21 at 6.53.19 PM (8).jpeg',
-            'bienestar_empresarial_3.jpeg',
-            'WhatsApp Image 2026-07-21 at 6.53.19 PM (1).jpeg',
+            'tenis_saque.jpeg',
+            'equipo_multideporte.jpeg',
+            'tenis_reves.jpeg',
         ]
 
         media_directory = Path(__file__).resolve().parents[1] / 'media' / 'products' / 'Imagenes Home'

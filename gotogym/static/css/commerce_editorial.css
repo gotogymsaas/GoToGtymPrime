@@ -464,3 +464,96 @@
 
 /* Areas de clic de enlaces sueltos (tarjetas, migas de pan, politicas). */
 .gtg-product-card__name a, .shop-pdp__breadcrumb a, .shop-pdp__policies a { display: inline-block; padding-block: 4px; }
+
+/* Favoritos (tienda/partials/_favorito_boton.html). El corazon va en la
+ * esquina inferior derecha de la foto, fuera del enlace de la tarjeta; por
+ * eso la foto y el corazon comparten un contenedor posicionado. Turquesa de
+ * marca cuando el producto ya esta en favoritos, contorno en tinta si no.
+ *
+ * El circulo blanco que se ve (::before) es mas pequeno que el boton: el
+ * boton transparente conserva un area de toque de 32-36px aunque el
+ * corazon visible mida poco mas de 20px. */
+.gtg-product-card__media { position: relative; }
+.gtg-favorito { position: absolute; right: 2px; bottom: 2px; z-index: 3; margin: 0; }
+.gtg-favorito__boton {
+  --favorito-circulo: 21px;
+  position: relative; display: grid; place-items: center; width: 32px; height: 32px; padding: 0;
+  border: 0; border-radius: 999px; background: transparent; color: #101012; cursor: pointer;
+  transition: transform .2s cubic-bezier(.22,1,.36,1);
+}
+.gtg-favorito__boton::before {
+  content: ""; position: absolute; top: 50%; left: 50%;
+  width: var(--favorito-circulo); height: var(--favorito-circulo); margin: calc(var(--favorito-circulo) / -2) 0 0 calc(var(--favorito-circulo) / -2);
+  border-radius: 999px; background: rgba(248, 249, 250, .94); box-shadow: 0 3px 10px rgba(16, 16, 18, .16);
+  transition: background-color .2s ease;
+}
+/* 20px de relleno de la diapositiva + 4px de boton: el circulo queda a unos
+ * 10px de la esquina de una foto 4:5. Para otras proporciones
+ * static/js/favoritos.js recalcula la esquina real. */
+.gtg-favorito--galeria { right: 24px; bottom: 24px; }
+.gtg-favorito--galeria .gtg-favorito__boton { --favorito-circulo: 24px; width: 36px; height: 36px; }
+.gtg-favorito__icono { position: relative; width: 13px; height: 13px; fill: transparent; stroke: currentColor; stroke-width: 2.2; stroke-linejoin: round; transition: fill .2s ease, color .2s ease; }
+.gtg-favorito--galeria .gtg-favorito__icono { width: 15px; height: 15px; }
+.gtg-favorito__boton.is-favorito { color: var(--color-accent, #0fbfb0); }
+.gtg-favorito__boton.is-favorito .gtg-favorito__icono { fill: currentColor; }
+.gtg-favorito__boton:hover::before { background: #fff; }
+.gtg-favorito__boton:hover { transform: scale(1.06); }
+.gtg-favorito__boton:active { transform: scale(.94); }
+.gtg-favorito__boton:focus-visible { outline: 2px solid var(--color-accent, #0fbfb0); outline-offset: -2px; }
+.gtg-favorito__boton[aria-busy="true"] { opacity: .6; cursor: progress; }
+
+/* Mensaje al pasar el cursor: encima del corazon, alineado a su borde
+ * derecho para no salirse de la foto. Solo con puntero real (en tactil el
+ * hover se queda pegado tras el toque) y tambien con foco de teclado. */
+.gtg-favorito__boton::after {
+  content: attr(data-favorito-tooltip); position: absolute; right: 0; bottom: calc(100% + 2px);
+  padding: 7px 11px; border-radius: 6px; background: #101012; color: #f8f9fa;
+  font-size: .75rem; font-weight: 700; letter-spacing: .02em; line-height: 1.2; white-space: nowrap;
+  opacity: 0; transform: translateY(4px); pointer-events: none; transition: opacity .18s ease, transform .18s ease;
+}
+.gtg-favorito__boton:focus-visible::after { opacity: 1; transform: translateY(0); }
+@media (hover: hover) {
+  .gtg-favorito__boton:hover::after { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gtg-favorito__boton, .gtg-favorito__boton::before, .gtg-favorito__boton::after, .gtg-favorito__icono { transition: none; }
+  .gtg-favorito__boton:hover, .gtg-favorito__boton:active { transform: none; }
+}
+
+/* En la ficha el corazon ocupa la esquina inferior derecha que tenia el
+ * contador de fotos ("1 / 3"); el contador pasa a la izquierda. */
+.pdp-gallery__viewport .pdp-gallery__counter { right: auto; left: 14px; }
+
+/* Pagina de favoritos (tienda/favoritos.html). */
+.favoritos-lista { padding: clamp(40px, 5vw, 72px) 0 clamp(56px, 7vw, 96px); }
+/* .gtg-product-grid fija display:grid, que le gana al atributo hidden. */
+.favoritos-lista [hidden] { display: none; }
+
+/* Carrusel horizontal de tarjetas (static/js/carrusel.js). El navegador
+ * hace el desplazamiento con scroll-snap; las flechas solo lo adelantan.
+ * Cuatro tarjetas visibles en escritorio, como el grid; en pantallas mas
+ * angostas se asoma la siguiente para que se note que hay mas. */
+.gtg-carrusel__controles { display: flex; gap: 8px; flex: none; }
+.gtg-carrusel__controles[hidden] { display: none; }
+.gtg-carrusel__control {
+  display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+  border: 1px solid rgba(16, 16, 18, .22); border-radius: 999px; background: transparent; color: inherit; cursor: pointer;
+  transition: background-color .2s ease, border-color .2s ease, opacity .2s ease;
+}
+.gtg-carrusel__control:hover:not(:disabled) { border-color: currentColor; background: rgba(16, 16, 18, .05); }
+.gtg-carrusel__control:focus-visible { outline: 2px solid var(--color-accent, #0fbfb0); outline-offset: 2px; }
+.gtg-carrusel__control:disabled { opacity: .3; cursor: default; }
+.gtg-carrusel__pista {
+  --carrusel-gap: 22px;
+  display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 3 * var(--carrusel-gap)) / 4); gap: var(--carrusel-gap);
+  overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: thin;
+  padding-bottom: 14px;
+}
+.gtg-carrusel__pista > * { scroll-snap-align: start; }
+.gtg-carrusel__pista:focus-visible { outline: 2px solid var(--color-accent, #0fbfb0); outline-offset: 6px; }
+@media (max-width: 980px) {
+  .gtg-carrusel__pista { --carrusel-gap: 18px; grid-auto-columns: calc((100% - 2 * var(--carrusel-gap)) / 2.4); }
+}
+@media (max-width: 560px) {
+  .gtg-carrusel__pista { grid-auto-columns: 72%; }
+}

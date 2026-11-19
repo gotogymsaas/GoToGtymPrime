@@ -160,6 +160,59 @@
     },
     "nombre": "media-products-imagenes-home-bienestar-empresarial-5"
   },
+  "media/products/Imagenes Home/equipo_multideporte.jpeg": {
+    "alto": 1066,
+    "ancho": 1600,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960,
+        1280
+      ],
+      "webp": [
+        400,
+        640,
+        960,
+        1280
+      ]
+    },
+    "nombre": "media-products-imagenes-home-equipo-multideporte"
+  },
+  "media/products/Imagenes Home/tenis_reves.jpeg": {
+    "alto": 1600,
+    "ancho": 1066,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960
+      ],
+      "webp": [
+        400,
+        640,
+        960
+      ]
+    },
+    "nombre": "media-products-imagenes-home-tenis-reves"
+  },
+  "media/products/Imagenes Home/tenis_saque.jpeg": {
+    "alto": 1300,
+    "ancho": 1062,
+    "formatos": {
+      "avif": [
+        400,
+        640,
+        960
+      ],
+      "webp": [
+        400,
+        640,
+        960
+      ]
+    },
+    "nombre": "media-products-imagenes-home-tenis-saque"
+  },
   "product_media/products/IMG_9286.jpg": {
     "alto": 3372,
     "ancho": 2478,

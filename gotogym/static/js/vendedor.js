@@ -70,6 +70,7 @@
   var CLAVE_VOZ = 'gtg_vendedor_voz';
   var FRECUENCIA_VOZ = 16000;
   var MAX_SEGUNDOS_VOZ = 30;
+  var SEGUNDOS_SILENCIO_DICTADO = 5;
   var SIN_REINTENTO = {
     limite_turnos: true, limite_diario: true, mensaje_invalido: true,
     imagen_invalida: true, imagen_grande: true, imagen_no_disponible: true, limite_imagenes: true,
@@ -108,7 +109,6 @@
   var botonQuitarAdjunto = panel.querySelector('[data-vendedor-quitar-adjunto]');
   var botonMicrofono = panel.querySelector('[data-vendedor-microfono]');
   var barraGrabando = panel.querySelector('[data-vendedor-grabando]');
-  var tiempoGrabando = panel.querySelector('[data-vendedor-grabando-tiempo]');
   var compositor = panel.querySelector('[data-vendedor-composer]');
   // Voz de GoToGym: espanol de Colombia, o ingles si el sitio esta en ingles.
   var REGION_GOTOGYM = /^en/i.test(document.documentElement.lang || '') ? 'en-US' : 'es-CO';
@@ -921,13 +921,6 @@
     }
   }
 
-  var cronometro = null;
-
-  function pintarTiempo(inicio) {
-    var segundos = Math.floor((Date.now() - inicio) / 1000);
-    if (tiempoGrabando) tiempoGrabando.textContent = Math.floor(segundos / 60) + ':' + ('0' + (segundos % 60)).slice(-2);
-  }
-
   function marcarDictado(activo) {
     if (!botonMicrofono) return;
     botonMicrofono.classList.toggle('is-recording', activo);
@@ -936,15 +929,8 @@
     botonMicrofono.setAttribute('aria-label', etiqueta);
     botonMicrofono.title = etiqueta;
     if (compositor) compositor.classList.toggle('gtg-vendedor__composer--grabando', activo);
-    if (cronometro) window.clearInterval(cronometro);
-    cronometro = null;
-    if (barraGrabando) barraGrabando.hidden = !activo;
-    if (activo) {
-      nota(null);
-      var inicio = Date.now();
-      pintarTiempo(inicio);
-      cronometro = window.setInterval(function () { pintarTiempo(inicio); }, 500);
-    }
+    if (barraGrabando) barraGrabando.textContent = activo ? texto('escuchando') : '';
+    if (activo) nota(null);
   }
 
   function idiomaDeDictado() {
@@ -966,21 +952,36 @@
     var base = baseDelCampo();
     var definitivo = '';
     var fallo = '';
+    // En modo de una sola frase el navegador corta en la primera pausa (~2 s).
+    // En modo continuo el corte por silencio lo decide la tienda.
+    var silencio = null;
+    var limite = null;
+    function esperarSilencio() {
+      window.clearTimeout(silencio);
+      silencio = window.setTimeout(function () { rec.stop(); }, SEGUNDOS_SILENCIO_DICTADO * 1000);
+    }
     rec.lang = idiomaDeDictado();
     rec.interimResults = true;
-    rec.continuous = false;
+    rec.continuous = true;
     rec.maxAlternatives = 1;
     rec.onresult = function (evento) {
+      // Se rearma con todos los resultados: en modo continuo la lista crece
+      // y sumar solo desde resultIndex duplica frases en algunos navegadores.
+      var finales = '';
       var provisional = '';
-      for (var i = evento.resultIndex; i < evento.results.length; i++) {
+      for (var i = 0; i < evento.results.length; i++) {
         var resultado = evento.results[i];
-        if (resultado.isFinal) definitivo += resultado[0].transcript;
+        if (resultado.isFinal) finales += resultado[0].transcript;
         else provisional += resultado[0].transcript;
       }
+      definitivo = finales;
       ponerEnElCampo(base, definitivo + provisional);
+      esperarSilencio();
     };
     rec.onerror = function (evento) { fallo = evento.error || 'error'; };
     rec.onend = function () {
+      window.clearTimeout(silencio);
+      window.clearTimeout(limite);
       reconocimiento = null;
       marcarDictado(false);
       if (fallo === 'not-allowed') {
@@ -1013,6 +1014,8 @@
     }
     reconocimiento = rec;
     marcarDictado(true);
+    esperarSilencio();
+    limite = window.setTimeout(function () { rec.stop(); }, MAX_SEGUNDOS_VOZ * 1000);
   }
 
   function grabar() {

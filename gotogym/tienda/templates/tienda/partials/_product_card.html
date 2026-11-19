@@ -18,18 +18,23 @@ el objetivo clicable, y asi un solo elemento declara la impresion y el
 clic (ver static/js/analytics.js).
 
 La tarjeta completa es clicable en la imagen y el nombre; no lleva un
-boton propio, igual que en Home (ver PROPUESTA_HOME_STORE_QUANTUM.md,
-seccion 4.4).
+boton de compra propio, igual que en Home (ver PROPUESTA_HOME_STORE_QUANTUM.md,
+seccion 4.4). El unico control aparte es el corazon de favoritos, sobre la
+foto pero fuera del enlace; declara su propio data-track, asi que su clic
+no cuenta como clic en el producto.
 {% endcomment %}
 <article class="gtg-product-card{% if mode == 'compact' %} gtg-product-card--compact{% endif %}"
          data-track="product_click" data-track-impression
          data-track-producto="{{ card.product.id }}"
          data-track-lista="{{ track_list|default:'catalogo' }}"
          data-track-posicion="{{ track_pos|default:0 }}">
-  <a class="gtg-product-card__image" href="{{ detail_url }}">
-    {% imagen_producto nombre=card.image.name alt=card.product.name|traducir sizes="(max-width: 560px) 100vw, (max-width: 980px) 50vw, 25vw" %}
-    {% if not card.in_stock %}<span class="gtg-product-card__badge">{% trans "Agotado" %}</span>{% endif %}
-  </a>
+  <div class="gtg-product-card__media">
+    <a class="gtg-product-card__image" href="{{ detail_url }}">
+      {% imagen_producto nombre=card.image.name alt=card.product.name|traducir sizes="(max-width: 560px) 100vw, (max-width: 980px) 50vw, 25vw" %}
+      {% if not card.in_stock %}<span class="gtg-product-card__badge">{% trans "Agotado" %}</span>{% endif %}
+    </a>
+    {% include "tienda/partials/_favorito_boton.html" with producto_id=card.product.id lugar="tarjeta" %}
+  </div>
   <div class="gtg-product-card__body">
     <p class="gtg-product-card__category">{{ card.product.category.name|traducir }}</p>
     <h3 class="gtg-product-card__name"><a href="{{ detail_url }}">{{ card.product.name|traducir }}</a></h3>

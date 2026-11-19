@@ -1,0 +1,34 @@
+{% load i18n %}{% comment %}
+Corazon de favoritos sobre una foto de producto. Parametros:
+  producto_id - id del producto
+  lugar       - 'tarjeta' (grid, relacionados, perfil) o 'galeria' (PDP);
+                cambia el tamano y es la lista por defecto en la medicion
+  track_list  - lista de origen para la medicion (opcional)
+
+Lee `favoritos_ids` del contexto (tienda.favoritos.ids_favoritos): la vista
+lo calcula una vez y aqui solo se comprueba pertenencia.
+
+Es un formulario real: sin JavaScript tambien funciona (POST y vuelta a la
+pagina). static/js/favoritos.js lo intercepta para no recargar. Va fuera
+del enlace de la foto porque un boton dentro de un <a> no es HTML valido.
+Envia el estado deseado (`favorito`), no "alternar"; el JS lo actualiza.
+
+El mensaje al pasar el cursor sale de data-favorito-tooltip (CSS), no de
+`title`: el title nativo tarda en aparecer y se duplicaria con el propio.
+{% endcomment %}
+<form class="gtg-favorito gtg-favorito--{{ lugar|default:'tarjeta' }}" method="post" action="{% url 'tienda:favorito' producto_id %}" data-favorito-form>
+  {% csrf_token %}
+  <input type="hidden" name="favorito" value="{% if producto_id in favoritos_ids %}0{% else %}1{% endif %}" data-favorito-valor>
+  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+  <button type="submit" class="gtg-favorito__boton{% if producto_id in favoritos_ids %} is-favorito{% endif %}"
+          aria-pressed="{% if producto_id in favoritos_ids %}true{% else %}false{% endif %}"
+          aria-label="{% if producto_id in favoritos_ids %}{% trans 'Quitar de favoritos' %}{% else %}{% trans 'Agregar a favoritos' %}{% endif %}"
+          data-favorito-tooltip="{% if producto_id in favoritos_ids %}{% trans 'Quitar de favoritos' %}{% else %}{% trans 'Agregar a favoritos' %}{% endif %}"
+          data-texto-agregar="{% trans 'Agregar a favoritos' %}"
+          data-texto-quitar="{% trans 'Quitar de favoritos' %}"
+          data-track="favorite_toggle" data-track-producto="{{ producto_id }}" data-track-lista="{{ track_list|default:lugar|default:'tarjeta' }}">
+    <svg class="gtg-favorito__icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 20.6 10.7 19.4C6 15.2 3 12.4 3 8.9 3 6.1 5.2 4 7.9 4c1.6 0 3.1.7 4.1 1.9C13 4.7 14.5 4 16.1 4 18.8 4 21 6.1 21 8.9c0 3.5-3 6.3-7.7 10.5L12 20.6Z"/>
+    </svg>
+  </button>
+</form>

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Product, ProductCategory, ProductReview
+from .models import Product, ProductCategory, ProductFavorite, ProductReview
 
 
 @admin.register(ProductCategory)
@@ -22,3 +22,11 @@ class ProductReviewAdmin(admin.ModelAdmin):
     list_filter = ['rating', 'created_at']
     search_fields = ['product__name', 'user__email', 'comment']
     readonly_fields = ['product', 'order_item', 'user']
+
+
+@admin.register(ProductFavorite)
+class ProductFavoriteAdmin(admin.ModelAdmin):
+    list_display = ['product', 'user', 'created_at']
+    list_filter = ['created_at']
+    search_fields = ['product__name', 'user__email']
+    readonly_fields = ['product', 'user', 'created_at']

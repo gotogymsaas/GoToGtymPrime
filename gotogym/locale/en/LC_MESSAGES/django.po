@@ -3550,6 +3550,16 @@ msgid ""
 "Equipo usando prendas GoToGym en una experiencia de bienestar empresarial"
 msgstr "Team wearing GoToGym garments in a corporate wellbeing experience"
 
+msgid "Tenista con chaqueta técnica GoToGym en posición de saque"
+msgstr "Tennis player in a GoToGym technical jacket getting ready to serve"
+
+msgid ""
+"Equipo con prendas GoToGym para tenis, fuerza y fútbol, junto a la app de "
+"GoToGym"
+msgstr ""
+"Team in GoToGym gear for tennis, strength training and football, with the "
+"GoToGym app"
+
 msgid "Total sin envío"
 msgstr "Total before shipping"
 
@@ -4596,3 +4606,54 @@ msgstr "Here's a file to help me with my purchase."
 
 msgid "Leer respuestas en voz alta"
 msgstr "Read replies aloud"
+
+msgid ""
+"Mídete sobre ropa ligera con una cinta métrica. Son privadas: solo se usan "
+"para orientarte con la guía de tallas de la tienda y nunca se muestran en el"
+" chat."
+msgstr ""
+"Measure yourself over light clothing with a tape measure. They are private: "
+"they are only used to guide you with the store's size chart and are never "
+"shown in the chat."
+
+msgid "Agregar a favoritos"
+msgstr "Add to favorites"
+
+msgid "Quitar de favoritos"
+msgstr "Remove from favorites"
+
+msgid "Guardados"
+msgstr "Saved"
+
+msgid "Mis favoritos"
+msgstr "My favorites"
+
+msgid ""
+"Todavía no tienes favoritos. Toca el corazón en la foto de un producto para "
+"guardarlo aquí."
+msgstr ""
+"You don't have any favorites yet. Tap the heart on a product photo to save "
+"it here."
+
+msgid "%(counter)s producto guardado"
+msgid_plural "%(counter)s productos guardados"
+msgstr[0] "%(counter)s saved product"
+msgstr[1] "%(counter)s saved products"
+
+msgid "Productos guardados"
+msgstr "Saved products"
+
+msgid "Relacionados con tus favoritos"
+msgstr "Related to your favorites"
+
+msgid "Ver anteriores"
+msgstr "Show previous"
+
+msgid "Ver siguientes"
+msgstr "Show next"
+
+msgid "Mis favoritos | GoToGym"
+msgstr "My favorites | GoToGym"
+
+msgid "Los productos que guardaste en la tienda GoToGym."
+msgstr "The products you saved in the GoToGym store."

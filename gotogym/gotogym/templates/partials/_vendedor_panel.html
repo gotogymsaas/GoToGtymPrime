@@ -169,14 +169,8 @@ con ese mismo aviso, sin llamar al servidor.
       </button>
     </div>
 
-    {# Indicador de grabacion: aparece mientras la persona dicta. #}
-    <div class="gtg-vendedor__grabando" data-vendedor-grabando role="status" hidden>
-      <span class="gtg-vendedor__grabando-punto" aria-hidden="true"></span>
-      <span class="gtg-vendedor__ondas" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-      <span class="gtg-vendedor__grabando-tiempo" data-vendedor-grabando-tiempo>0:00</span>
-      <span class="gtg-vendedor__grabando-texto">{% trans "Te escucho… toca STOP cuando termines." %}</span>
-      <span class="gtg-vendedor__grabando-nota">{% trans "Al dictar, tu voz se convierte en texto con el reconocimiento de tu navegador o el de GoToGym. No guardamos el audio." %}</span>
-    </div>
+    {# Mientras dicta solo se anima la barra del mensaje; esto lo anuncia a los lectores de pantalla. #}
+    <span class="sr-only" data-vendedor-grabando role="status"></span>
 
     {% if vendedor_imagen %}
     <input type="file" class="sr-only" data-vendedor-camara tabindex="-1" aria-hidden="true" accept="image/*" capture="environment">
@@ -258,6 +252,7 @@ con ese mismo aviso, sin llamar al servidor.
     <span data-texto="error_documento_protegido">{% trans "Ese archivo tiene contraseña. Quítala o escribe lo que necesitas en el mensaje." %}</span>
     <span data-texto="dictar">{% trans "Dictar por voz" %}</span>
     <span data-texto="detener_dictado">{% trans "Detener el dictado" %}</span>
+    <span data-texto="escuchando">{% trans "Te escucho" %}</span>
     <span data-texto="transcribiendo">{% trans "Convirtiendo tu voz en texto…" %}</span>
     <span data-texto="voz_lista">{% trans "Revisa el texto dictado y envíalo." %}</span>
     <span data-texto="voz_sin_texto">{% trans "No te escuché bien. Intenta de nuevo." %}</span>

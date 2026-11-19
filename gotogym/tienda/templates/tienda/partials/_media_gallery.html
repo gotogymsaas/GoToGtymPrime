@@ -26,6 +26,8 @@ misma resolucion que usa la tarjeta de catalogo.
       {% endfor %}
     </div>
 
+    {% include "tienda/partials/_favorito_boton.html" with producto_id=producto.id lugar="galeria" track_list="ficha" %}
+
     {% if gallery|length > 1 %}
     <button type="button" class="pdp-gallery__control pdp-gallery__control--prev" data-gallery-prev aria-label="{% trans 'Imagen anterior' %}" style="position: absolute; top: 50%; left: 14px; z-index: 2;">
       <span class="material-icons-outlined" aria-hidden="true">chevron_left</span>

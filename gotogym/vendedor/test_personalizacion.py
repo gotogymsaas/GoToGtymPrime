@@ -128,7 +128,7 @@ class MedidasTests(Base):
 
     def test_guarda_con_permiso_acepta_coma_decimal_y_se_ve_en_el_perfil(self):
         self.permisos("tailoring.measurements")
-        self.guardar(chest_cm="92,5", waist_cm="72", hip_cm="", inseam_cm="")
+        self.guardar(chest_cm="92,5", waist_cm="72", hip_cm="")
         medida = TailoringMeasurement.objects.get()
         self.assertEqual((medida.chest_cm, medida.waist_cm, medida.hip_cm), (Decimal("92.5"), Decimal("72.0"), None))
         html = self.client.get(PERFIL).content.decode()
@@ -141,12 +141,19 @@ class MedidasTests(Base):
         guia = html[html.index('class="medida-guia"'):html.index("</figure>")]
         self.assertIn('role="img"', guia)
         self.assertIn("Dónde se toma cada medida en el cuerpo", guia)
-        for campo in ("chest_cm", "waist_cm", "hip_cm", "inseam_cm"):
+        for campo in ("chest_cm", "waist_cm", "hip_cm"):
             self.assertEqual(guia.count(f'data-medida="{campo}"'), 2, campo)  # cinta en el dibujo y su indicacion
-        self.assertIn("desde la entrepierna hasta el tobillo", guia)
         formulario = html[html.index("</figure>"):]
-        orden = [formulario.index(f'for="medida-{c}"') for c in ("chest_cm", "waist_cm", "hip_cm", "inseam_cm")]
-        self.assertEqual(orden, sorted(orden), "los numeros 1-4 del dibujo siguen este orden")
+        orden = [formulario.index(f'for="medida-{c}"') for c in ("chest_cm", "waist_cm", "hip_cm")]
+        self.assertEqual(orden, sorted(orden), "los numeros 1-3 del dibujo siguen este orden")
+
+    def test_no_pide_la_entrepierna(self):
+        # Ninguna regla de talla la usa y las prendas no traen largo de pierna:
+        # pedirla solo alargaba el formulario.
+        self.permisos("tailoring.measurements")
+        html = self.client.get(PERFIL).content.decode()
+        self.assertNotIn("inseam_cm", html)
+        self.assertNotIn("entrepierna", html.lower())
 
     def test_fuera_de_rango_o_vacio_se_rechaza(self):
         self.permisos("tailoring.measurements")

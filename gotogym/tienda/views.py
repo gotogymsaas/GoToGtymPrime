@@ -1,8 +1,15 @@
+from urllib.parse import urlencode
+
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Prefetch
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render, resolve_url
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext, gettext_lazy
+from django.views.decorators.http import require_POST
+from gotogym.ratelimit import rate_limit
 from gotogym.seo import contexto_seo, recortar, url_absoluta
 from products import linea
 from products.models import Product, ProductCategory, ProductMedia, ProductVariant
@@ -21,6 +28,7 @@ from .catalog import (
     storefront_products,
     variant_stock,
 )
+from .favoritos import fijar_favorito, ids_favoritos, tarjetas_favoritas, tarjetas_relacionadas
 
 PRODUCTS_PER_PAGE = 12
 
@@ -131,6 +139,7 @@ def producto_list(request):
         'orden': orden,
         'filtros_activos': filtros_activos,
         'total_resultados': paginator.count,
+        'favoritos_ids': ids_favoritos(request.user),
     }
     context.update(contexto_seo(
         gettext('Tienda GoToGym: ropa deportiva'),
@@ -208,6 +217,7 @@ def producto_detail(request, pk):
         'reviews': reviews,
         'review_average': review_summary['average'],
         'review_count': review_summary['count'],
+        'favoritos_ids': ids_favoritos(request.user),
     }
     context.update(_seo_de_producto(request, producto, variantes, context))
     return render(request, 'tienda/producto_detail.html', context)
@@ -240,6 +250,63 @@ def producto_variante(request, pk):
         'available': stock > 0,
         'stock': stock,
     })
+
+
+@login_required
+def mis_favoritos(request):
+    """Pagina de favoritos: lo guardado y, debajo, un carrusel de
+    recomendaciones de las mismas categorias."""
+    favoritos_cards = tarjetas_favoritas(request.user)
+    context = {
+        'favoritos_cards': favoritos_cards,
+        'relacionados_cards': tarjetas_relacionadas(favoritos_cards),
+        # Un solo conjunto para todos los corazones de la pagina: los de la
+        # lista salen llenos y los del carrusel, vacios.
+        'favoritos_ids': frozenset(card['product'].pk for card in favoritos_cards),
+    }
+    context.update(contexto_seo(
+        gettext('Mis favoritos | GoToGym'),
+        gettext('Los productos que guardaste en la tienda GoToGym.'),
+    ))
+    return render(request, 'tienda/favoritos.html', context)
+
+
+def _destino_seguro(request, fallback):
+    """Pagina desde la que se pulso el corazon, si es de este sitio."""
+    destino = request.POST.get('next', '')
+    if destino and url_has_allowed_host_and_scheme(
+        destino, allowed_hosts={request.get_host()}, require_https=request.is_secure(),
+    ):
+        return destino
+    return fallback
+
+
+@require_POST
+@rate_limit('favoritos', limit=60, period_seconds=60)
+def favorito(request, pk):
+    """Agrega o quita un producto de favoritos.
+
+    El formulario envia el estado deseado (`favorito=1` o `0`), no una orden
+    de alternar. Con JavaScript responde JSON y la pagina no se recarga; sin
+    JavaScript vuelve a la pagina de origen.
+
+    Sin sesion no se guarda nada: se lleva al login y, al volver, la persona
+    queda en la misma pagina para pulsar el corazon de nuevo.
+    """
+    quiere_json = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    producto = get_object_or_404(storefront_products(), pk=pk)
+    volver_a = _destino_seguro(request, resolve_url('tienda:producto_detail', pk=producto.pk))
+
+    if not request.user.is_authenticated:
+        login_url = f"{resolve_url(settings.LOGIN_URL)}?{urlencode({'next': volver_a})}"
+        if quiere_json:
+            return JsonResponse({'ok': False, 'login_url': login_url}, status=401)
+        return redirect(login_url)
+
+    queda_favorito = fijar_favorito(request.user, producto, request.POST.get('favorito') == '1')
+    if quiere_json:
+        return JsonResponse({'ok': True, 'favorito': queda_favorito})
+    return redirect(volver_a)
 
 
 def _pesos(valor):

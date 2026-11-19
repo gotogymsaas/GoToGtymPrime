@@ -173,8 +173,7 @@
 .medida-guia [data-medida] { --cinta-grosor: 1.75px; --cinta-trazo: 4 3; --marca: var(--ed-ink); }
 .account-medidas:has(#medida-chest_cm:focus) [data-medida="chest_cm"],
 .account-medidas:has(#medida-waist_cm:focus) [data-medida="waist_cm"],
-.account-medidas:has(#medida-hip_cm:focus) [data-medida="hip_cm"],
-.account-medidas:has(#medida-inseam_cm:focus) [data-medida="inseam_cm"] {
+.account-medidas:has(#medida-hip_cm:focus) [data-medida="hip_cm"] {
   --cinta-grosor: 3px; --cinta-trazo: none; --marca: var(--ed-turquoise-ink); color: var(--ed-ink);
 }
 .medida-guia__cuerpo { fill: var(--ed-mist); stroke: rgba(16,16,18,.28); stroke-width: 1px; }

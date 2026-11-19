@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Mis favoritos" %}{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260923-fringe-fix">
+<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261017-responsive">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20261118-favoritos">
+{% endblock %}
+
+{% block content %}
+<div class="shop-page">
+  <section class="shop-hero editorial-hero" aria-labelledby="favoritos-title">
+    <div class="shop-hero__background" aria-hidden="true"></div>
+    {% include "partials/_quantum_lens.html" %}
+    <div class="shop-shell editorial-shell">
+      <p class="shop-eyebrow editorial-kicker">{% trans "Guardados" %}</p>
+      <h1 id="favoritos-title" class="editorial-title">{% trans "Mis favoritos" %}</h1>
+      <p class="shop-hero__lead editorial-lead">
+        {% blocktrans count counter=favoritos_cards|length %}{{ counter }} producto guardado{% plural %}{{ counter }} productos guardados{% endblocktrans %}
+      </p>
+    </div>
+  </section>
+
+  <div class="shop-shell favoritos-lista">
+    <h2 class="sr-only">{% trans "Productos guardados" %}</h2>
+    {% comment %}
+    data-favoritos-lista / data-favoritos-vacio: al quitar un favorito,
+    static/js/favoritos.js retira la tarjeta y, si era la ultima, muestra el
+    aviso vacio sin recargar.
+    {% endcomment %}
+    <div class="gtg-product-grid gtg-product-grid--wide" data-favoritos-lista{% if not favoritos_cards %} hidden{% endif %}>
+      {% for card in favoritos_cards %}
+      {% url 'tienda:producto_detail' card.product.id as favorito_detail_url %}
+      {% include "tienda/partials/_product_card.html" with card=card detail_url=favorito_detail_url mode="grid" track_list="favoritos" track_pos=forloop.counter %}
+      {% endfor %}
+    </div>
+    <div class="shop-empty" data-favoritos-vacio{% if favoritos_cards %} hidden{% endif %}>
+      <p>{% trans "Todavía no tienes favoritos. Toca el corazón en la foto de un producto para guardarlo aquí." %}</p>
+      {% url 'tienda:producto_list' as producto_list_url %}
+      {% include "partials/_cta_button.html" with tag="a" href=producto_list_url variant="pill" label=_("Ir a la tienda") %}
+    </div>
+  </div>
+
+  {% if relacionados_cards %}
+  <section class="shop-related" aria-labelledby="relacionados-title">
+    <div class="shop-shell" data-carrusel>
+      <div class="shop-related__heading">
+        <h2 id="relacionados-title">{% if favoritos_cards %}{% trans "Relacionados con tus favoritos" %}{% else %}{% trans "Un buen lugar para empezar." %}{% endif %}</h2>
+        <div class="gtg-carrusel__controles">
+          <button type="button" class="gtg-carrusel__control" data-carrusel-anterior aria-label="{% trans 'Ver anteriores' %}" disabled>
+            <span class="material-icons-outlined" aria-hidden="true">chevron_left</span>
+          </button>
+          <button type="button" class="gtg-carrusel__control" data-carrusel-siguiente aria-label="{% trans 'Ver siguientes' %}">
+            <span class="material-icons-outlined" aria-hidden="true">chevron_right</span>
+          </button>
+        </div>
+      </div>
+      <div class="gtg-carrusel__pista" data-carrusel-pista role="region" tabindex="0" aria-labelledby="relacionados-title">
+        {% for card in relacionados_cards %}
+        {% url 'tienda:producto_detail' card.product.id as relacionado_detail_url %}
+        {% include "tienda/partials/_product_card.html" with card=card detail_url=relacionado_detail_url mode="compact" track_list="favoritos_relacionados" track_pos=forloop.counter %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/quantum_lens.js' %}" defer></script>
+<script src="{% static 'js/favoritos.js' %}" defer></script>
+<script src="{% static 'js/carrusel.js' %}" defer></script>
+{% endblock %}

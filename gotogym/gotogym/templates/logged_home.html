@@ -15,7 +15,7 @@ ancho de pantalla, incluido el movil.
 {% if preload_movil %}<link rel="preload" as="image" type="image/avif" media="(max-width: 720px)" href="{{ preload_movil }}" fetchpriority="high">{% endif %}
 {% if preload_escritorio %}<link rel="preload" as="image" type="image/avif" media="(min-width: 721px)" href="{{ preload_escritorio }}" fetchpriority="high">{% endif %}
 <link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260923-fringe-fix">
-<link rel="stylesheet" href="{% static 'css/store_home.css' %}?v=20261019-story-ancho-maximo">
+<link rel="stylesheet" href="{% static 'css/store_home.css' %}?v=20261118-story-compacta">
 {% endblock %}
 
 {% block content %}
@@ -104,7 +104,7 @@ ancho de pantalla, incluido el movil.
 
   <section class="store-story" id="tecnologia" aria-labelledby="technology-title">
     <div class="store-story__image">
-      {% imagen_editorial "WhatsApp Image 2026-07-21 at 6.53.19 PM (8).jpeg" alt=_("Detalle de una prenda técnica GoToGym") sizes="(max-width: 980px) 100vw, 55vw" %}
+      {% imagen_editorial "tenis_saque.jpeg" alt=_("Tenista con chaqueta técnica GoToGym en posición de saque") sizes="(max-width: 980px) 100vw, 55vw" %}
     </div>
     <div class="store-story__content">
       <p class="store-eyebrow">GoToGym Technology</p>
@@ -126,12 +126,12 @@ ancho de pantalla, incluido el movil.
         <p>{% trans "Prendas y experiencias diseñadas para organizaciones que entienden el bienestar como parte de su cultura, no como un beneficio adicional, sino como una decisión estratégica." %}</p>
         <a class="store-button store-button--dark" href="{% url 'contacto' %}">{% trans "Hablar con GoToGym" %}</a>
       </div>
-      {% imagen_editorial "bienestar_empresarial_3.jpeg" alt=_("Equipo usando prendas GoToGym en una experiencia de bienestar empresarial") sizes="(max-width: 980px) 100vw, 60vw" %}
+      {% imagen_editorial "equipo_multideporte.jpeg" alt=_("Equipo con prendas GoToGym para tenis, fuerza y fútbol, junto a la app de GoToGym") sizes="(max-width: 980px) 100vw, 60vw" %}
     </div>
   </section>
 
   <section class="store-closing" aria-labelledby="closing-title">
-    {% imagen_editorial "WhatsApp Image 2026-07-21 at 6.53.19 PM (1).jpeg" alt="" sizes="100vw" %}
+    {% imagen_editorial "tenis_reves.jpeg" alt="" sizes="100vw" %}
     <div><p class="store-eyebrow">{% trans "Inteligencia que llevas puesta." %}</p><h2 id="closing-title">{% trans "Tu movimiento." %}<br>{% trans "Tu diseño." %}<br><em>{% trans "Tu GoToGym." %}</em></h2><a class="store-button store-button--primary" href="{% url 'tienda:producto_list' %}">{% trans "Entrar a la tienda" %}</a></div>
   </section>
 </div>

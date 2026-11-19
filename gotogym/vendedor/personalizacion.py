@@ -56,10 +56,9 @@ ETIQUETAS_MEDIDAS = {
     "chest_cm": gettext_lazy("Pecho (cm)"),
     "waist_cm": gettext_lazy("Cintura (cm)"),
     "hip_cm": gettext_lazy("Cadera (cm)"),
-    "inseam_cm": gettext_lazy("Tiro / entrepierna (cm)"),
 }
 # Nombre corto y como tomar cada medida, para la guia junto al formulario.
-# Su orden numera las cintas del diagrama (1 pecho ... 4 entrepierna).
+# Su orden numera las cintas del diagrama (1 pecho, 2 cintura, 3 cadera).
 GUIA_MEDIDAS = {
     "chest_cm": (gettext_lazy("Pecho"),
                  gettext_lazy("Por la parte más llena del pecho, con la cinta horizontal bajo las axilas.")),
@@ -67,8 +66,6 @@ GUIA_MEDIDAS = {
                  gettext_lazy("En la parte más estrecha del torso, por encima del ombligo.")),
     "hip_cm": (gettext_lazy("Cadera"),
                gettext_lazy("En la parte más ancha de los glúteos, con los pies juntos.")),
-    "inseam_cm": (gettext_lazy("Entrepierna"),
-                  gettext_lazy("Por dentro de la pierna, desde la entrepierna hasta el tobillo.")),
 }
 ETIQUETAS_MEMORIA = {
     "size": gettext_lazy("Talla"),

@@ -88,7 +88,6 @@ MEASUREMENT_FIELDS = {
     "chest_cm": ("chest_circumference_cm", 50, 200),
     "waist_cm": ("waist_cm", 40, 200),
     "hip_cm": ("hip_cm", 50, 220),
-    "inseam_cm": ("inseam_cm", 40, 120),
 }
 MEASUREMENT_MAX_AGE = timedelta(days=180)
 
@@ -100,7 +99,6 @@ class TailoringMeasurement(models.Model):
     chest_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     waist_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     hip_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    inseam_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     captured_at = models.DateTimeField()
 
     def __str__(self):

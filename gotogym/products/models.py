@@ -226,3 +226,28 @@ class ProductReview(models.Model):
 
     def __str__(self):
         return f'{self.product.name} - {self.rating}/5'
+
+
+class ProductFavorite(models.Model):
+    """Producto que un cliente guardo para volver a verlo despues.
+
+    Se guarda el producto y no la variante: el corazon esta en la foto, antes
+    de elegir talla y color, y lo que la persona quiere recordar es la prenda.
+    """
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='product_favorites',
+    )
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='favorites')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at', '-id']
+        constraints = [
+            # El mismo producto no se repite en la lista de una persona, ni
+            # siquiera con dos clics simultaneos desde pestanas distintas.
+            models.UniqueConstraint(fields=['user', 'product'], name='productfavorite_unico_por_usuario'),
+        ]
+
+    def __str__(self):
+        return f'{self.user} - {self.product.name}'

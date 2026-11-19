@@ -38,6 +38,7 @@ EVENTOS_PERMITIDOS = frozenset({
     'product_impression',
     'product_click',
     'add_to_cart',
+    'favorite_toggle',
     'search_submit',
     'journal_post_click',
     'journal_read_complete',

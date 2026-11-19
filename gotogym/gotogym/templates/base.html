@@ -127,6 +127,7 @@
         <div id="userDropdown" class="gtg-dropdown" hidden>
           <a href="{% url 'orders:my_orders' %}">{% trans "Mis pedidos" %}</a>
           <a href="{% url 'edit_profile' %}">{% trans "Editar perfil" %}</a>
+          <a href="{% url 'tienda:favoritos' %}">{% trans "Mis favoritos" %}</a>
           {% if user.perfil_afiliado.is_active %}
           <a href="{% url 'afiliado_dashboard' %}">
             {% if user.perfil_afiliado.status == 'approved' %}{% trans "Panel de afiliados" %}{% else %}{% trans "Solicitud de afiliado" %}{% endif %}
@@ -207,6 +208,7 @@
     <span class="gtg-mobile-menu__divider"></span>
     <a href="{% url 'orders:my_orders' %}">{% trans "Mis pedidos" %}</a>
     <a href="{% url 'edit_profile' %}">{% trans "Editar perfil" %}</a>
+    <a href="{% url 'tienda:favoritos' %}">{% trans "Mis favoritos" %}</a>
     {% if user.is_staff %}
     <a href="{% url 'admin_dashboard' %}">{% trans "Panel administrador" %}</a>
     {% endif %}

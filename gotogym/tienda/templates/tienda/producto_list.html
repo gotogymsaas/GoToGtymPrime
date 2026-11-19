@@ -7,7 +7,7 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/quantum_lens.css' %}?v=20260923-fringe-fix">
 <link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261017-responsive">
-<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20261015-chips">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20261118-favoritos">
 {% endblock %}
 
 {% block content %}
@@ -198,6 +198,7 @@
 
 {% block extra_scripts %}
 <script src="{% static 'js/quantum_lens.js' %}" defer></script>
+<script src="{% static 'js/favoritos.js' %}" defer></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     var toggle = document.querySelector('[data-filters-toggle]');

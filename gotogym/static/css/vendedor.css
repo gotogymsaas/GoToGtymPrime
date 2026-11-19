@@ -914,7 +914,6 @@
 .gtg-vendedor__attach[hidden],
 .gtg-vendedor__tools[hidden],
 .gtg-vendedor__tool[hidden],
-.gtg-vendedor__grabando[hidden],
 .gtg-vendedor__nota[hidden],
 .gtg-vendedor__adjunto-img[hidden],
 .gtg-vendedor__adjunto-icono[hidden],
@@ -1060,12 +1059,26 @@
   transform: translateX(14px);
 }
 
-/* Mientras la persona dicta: el campo brilla, una barra con ondas y el tiempo
- * que lleva grabando, y el microfono late. Con movimiento reducido (regla
- * global de style.css) queda la barra quieta con el cronometro. */
+/* Mientras la persona dicta, la barra del mensaje es el unico indicador: un
+ * brillo recorre su borde y el microfono late. Con movimiento reducido (regla
+ * global de style.css) queda el borde resaltado, sin animacion. */
 .gtg-vendedor__composer--grabando {
+  position: relative;
   border-color: var(--color-accent);
   animation: coach-campo-graba 1.8s ease-in-out infinite;
+}
+
+.gtg-vendedor__composer--grabando::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  right: 24px;
+  left: 24px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent) 0 0 / 35% 100% no-repeat;
+  animation: coach-campo-barrido 1.6s ease-in-out infinite alternate;
+  pointer-events: none;
 }
 
 @keyframes coach-campo-graba {
@@ -1073,80 +1086,9 @@
   50% { box-shadow: 0 0 0 6px var(--color-accent-soft); }
 }
 
-.gtg-vendedor__grabando {
-  display: grid;
-  grid-template-columns: auto auto auto minmax(0, 1fr);
-  align-items: center;
-  gap: var(--space-2);
-  margin: 0 0 var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-accent);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-base);
-}
-
-.gtg-vendedor__grabando-punto {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  animation: coach-punto-graba 1.2s ease-in-out infinite;
-}
-
-@keyframes coach-punto-graba {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.35; transform: scale(0.75); }
-}
-
-.gtg-vendedor__ondas {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  height: 22px;
-}
-
-.gtg-vendedor__ondas i {
-  display: block;
-  width: 3px;
-  height: 100%;
-  border-radius: 2px;
-  background: var(--color-accent);
-  transform-origin: center;
-  animation: coach-onda 1s ease-in-out infinite;
-}
-
-.gtg-vendedor__ondas i:nth-child(2) { animation-delay: -0.85s; }
-.gtg-vendedor__ondas i:nth-child(3) { animation-delay: -0.6s; }
-.gtg-vendedor__ondas i:nth-child(4) { animation-delay: -0.3s; }
-.gtg-vendedor__ondas i:nth-child(5) { animation-delay: -0.75s; }
-.gtg-vendedor__ondas i:nth-child(6) { animation-delay: -0.45s; }
-.gtg-vendedor__ondas i:nth-child(7) { animation-delay: -0.15s; }
-
-@keyframes coach-onda {
-  0%, 100% { transform: scaleY(0.25); }
-  50% { transform: scaleY(1); }
-}
-
-.gtg-vendedor__grabando-tiempo {
-  color: var(--color-accent);
-  font-size: 13px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-
-.gtg-vendedor__grabando-texto {
-  overflow: hidden;
-  color: var(--color-text-primary);
-  font-size: 13px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.gtg-vendedor__grabando-nota {
-  grid-column: 1 / -1;
-  color: var(--color-text-secondary);
-  font-size: 11px;
-  line-height: 1.4;
+@keyframes coach-campo-barrido {
+  from { background-position: 0 0; }
+  to { background-position: 100% 0; }
 }
 
 /* Aviso breve del dictado (te escucho, revisa el texto...). */

@@ -83,10 +83,13 @@
 .home-product-card__meta small { color: #5f6066; }
 .store-empty { padding: var(--space-8); border: 1px solid #cececc; text-align: center; }
 
-.store-story { min-height: 720px; display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); padding-inline: max(0px, calc((100% - 1440px) / 2)); background: var(--home-graphite); color: var(--home-white); }
-.store-story__image { min-height: 620px; overflow: hidden; }
-.store-story__image img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.75) contrast(1.06); }
-.store-story__content { align-self: center; padding: clamp(60px, 8vw, 120px); }
+.store-story { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); padding-inline: max(0px, calc((100% - 1440px) / 2)); background: var(--home-graphite); color: var(--home-white); }
+.store-story__image { min-height: 560px; overflow: hidden; }
+/* El archivo ya viene recortado justo sobre la mano alzada del saque: anclar
+   arriba la mantiene en cuadro a cualquier ancho. Un porcentaje no sirve,
+   porque el sobrante a recortar cambia con la proporcion del bloque. */
+.store-story__image img { width: 100%; height: 100%; object-fit: cover; object-position: center top; filter: saturate(.75) contrast(1.06); }
+.store-story__content { align-self: center; padding: clamp(44px, 5vw, 76px) clamp(40px, 7vw, 110px); }
 .store-story h2 { margin-bottom: 30px; }
 .store-story__content > p:not(.store-eyebrow) { max-width: 580px; color: rgba(248,249,250,.7); line-height: 1.7; }
 .technology-list { margin: var(--space-7) 0 0; }
@@ -109,7 +112,7 @@
    arbol de CAJAS pero no del arbol de SELECTORES, asi que un combinador
    "> img" deja de casar y la foto de cierre se pintaba a tamano intrinseco
    estirando la seccion. */
-.store-closing img { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: center 32%; filter: grayscale(.2) saturate(.62); }
+.store-closing img { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; filter: grayscale(.2) saturate(.62); }
 .store-closing > div { position: relative; z-index: 1; padding: 80px 20px; }
 .store-closing h2 { margin: 0 0 38px; color: var(--home-white); font-size: clamp(3.2rem, 7vw, 7rem); font-weight: 400; letter-spacing: -.065em; line-height: .9; }
 

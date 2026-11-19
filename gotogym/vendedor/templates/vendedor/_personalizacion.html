@@ -77,13 +77,13 @@
     {% if medidas_activo and vinculado %}
     <details class="account-security account-medidas-detalle"{% if not medidas_fecha %} open{% endif %}>
       <summary>{% trans "Mis medidas para tallas" %}</summary>
-      <p class="account-address-hint">{% trans "Mídete sobre ropa ligera con una cinta métrica. Son privadas: solo se usan para comparar con las medidas de cada prenda, nunca se muestran en el chat." %}</p>
+      <p class="account-address-hint">{% trans "Mídete sobre ropa ligera con una cinta métrica. Son privadas: solo se usan para orientarte con la guía de tallas de la tienda y nunca se muestran en el chat." %}</p>
       {% if medidas_fecha and not medidas_vigentes %}
       <p>{% trans "Tus medidas tienen más de 6 meses. Actualízalas para que sigan sirviendo." %}</p>
       {% endif %}
       <div class="account-medidas">
       {% comment %}Diagrama de donde va la cinta. Los numeros siguen el orden
-      de `medidas` (pecho, cintura, cadera, entrepierna) y coinciden con los
+      de `medidas` (pecho, cintura, cadera) y coinciden con los
       de cada etiqueta; al enfocar un campo se resalta su cinta (CSS :has).{% endcomment %}
       <figure class="medida-guia">
         <svg class="medida-guia__dibujo" viewBox="0 0 200 352" role="img" aria-labelledby="medida-guia-titulo" focusable="false">
@@ -108,11 +108,6 @@
             <ellipse class="medida-guia__cinta" cx="100" cy="192" rx="32" ry="4"/>
             <path class="medida-guia__guia" d="M132 192 H171"/>
             <circle class="medida-guia__marca" cx="180" cy="192" r="9"/><text x="180" y="196">3</text>
-          </g>
-          <g class="medida-guia__medida" data-medida="inseam_cm">
-            <path class="medida-guia__cinta" d="M103 228 L108 336 M100 228 H106 M105 336 H111"/>
-            <path class="medida-guia__guia" d="M106 290 H171"/>
-            <circle class="medida-guia__marca" cx="180" cy="290" r="9"/><text x="180" y="294">4</text>
           </g>
         </svg>
         <figcaption>
