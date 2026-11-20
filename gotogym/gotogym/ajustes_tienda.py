@@ -21,11 +21,12 @@ _POR_DEFECTO = {
     'purchases_paused': False,
     'online_payments_enabled': True,
     'coach_enabled': True,
+    'staff_checkout_without_payment': False,
 }
 
 
 def _leer_todos():
-    """Los tres interruptores en una sola consulta (sin crear la fila)."""
+    """Todos los interruptores en una sola consulta (sin crear la fila)."""
     modelo = apps.get_model('administracion', 'PanelSettings')
     fila = modelo.objects.filter(pk=1).values(*_POR_DEFECTO).first() or {}
     return {
@@ -55,6 +56,20 @@ def compras_pausadas(request=None):
 
 def pagos_habilitados(request=None):
     return _ajuste('online_payments_enabled', request)
+
+
+def modo_sin_pago_activo(request=None):
+    """Interruptor "Confirmar sin pagar (equipo)" del panel."""
+    return _ajuste('staff_checkout_without_payment', request)
+
+
+def confirma_sin_pagar(request):
+    """Si quien hace esta peticion confirma sus pedidos sin pagar: solo una
+    cuenta del equipo, y solo con el modo de pruebas encendido. Un cliente
+    paga siempre, este o no encendido."""
+    usuario = getattr(request, 'user', None)
+    return bool(usuario is not None and usuario.is_authenticated and usuario.is_staff
+                and modo_sin_pago_activo(request))
 
 
 def coach_habilitado(request=None):

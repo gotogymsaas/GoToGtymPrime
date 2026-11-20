@@ -1,0 +1,62 @@
+{% extends "administracion/base.html" %}
+{% load tienda_filters %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Ventas</p>
+    <h1>Tarjetas de regalo</h1>
+  </div>
+  <a class="button ghost" href="{% url 'tarjeta_regalo' %}" target="_blank" rel="noopener">Ver en la tienda</a>
+</section>
+
+<section class="stats stats-compact">
+  <article><span>${{ resumen.saldo_vigente|cop }}</span><p>Saldo por canjear (vigente)</p></article>
+  <article><span>${{ resumen.vendido|cop }}</span><p>Vendido en tarjetas</p></article>
+  <article><span>${{ resumen.saldo_vencido|cop }}</span><p>Saldo vencido sin usar</p></article>
+  <article class="{% if resumen.sin_enviar %}is-gold stat-warning{% endif %}"><a href="?status=unsent"><span>{{ resumen.sin_enviar }}</span><p>Activas sin correo enviado</p></a></article>
+</section>
+<p class="hint">Las tarjetas de pedidos de prueba (sin pago) no suman en estos totales. El saldo por canjear es dinero recibido por mercancía que aún no se entrega: es un pasivo, no un ingreso. La venta se factura cuando la tarjeta se canjea. El tratamiento del saldo vencido lo define el contador.</p>
+
+<div class="filter-tabs">
+  <a href="?q={{ query }}" class="{% if not status %}active{% endif %}">Todas</a>
+  <a href="?q={{ query }}&status=active" class="{% if status == 'active' %}active{% endif %}">Vigentes</a>
+  <a href="?q={{ query }}&status=pending" class="{% if status == 'pending' %}active{% endif %}">Pendientes de pago</a>
+  <a href="?q={{ query }}&status=expired" class="{% if status == 'expired' %}active{% endif %}">Vencidas</a>
+  <a href="?q={{ query }}&status=disabled" class="{% if status == 'disabled' %}active{% endif %}">Bloqueadas</a>
+  <a href="?q={{ query }}&status=cancelled" class="{% if status == 'cancelled' %}active{% endif %}">Anuladas</a>
+</div>
+<form class="search" method="get">
+  <input type="hidden" name="status" value="{{ status }}">
+  <input name="q" value="{{ query }}" placeholder="Últimos 4 del código, correo o número de pedido">
+  <button type="submit">Buscar</button>
+</form>
+
+<div class="panel">
+  <table>
+    <thead><tr><th>Tarjeta</th><th>Compra</th><th>Para</th><th>Valor</th><th>Saldo</th><th>Vence</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
+    <tbody>
+      {% for tarjeta in page_obj %}
+      <tr>
+        <td><strong class="nowrap">{{ tarjeta.masked_code }}</strong>{% if tarjeta.purchase_order.is_test_order %}<br><span class="badge badge-gold">Prueba</span>{% endif %}</td>
+        <td>
+          {% if tarjeta.purchase_order %}<a href="{% url 'admin_order_detail' tarjeta.purchase_order.order_number %}">{{ tarjeta.purchase_order.order_number }}</a>{% endif %}
+          <br><small>{{ tarjeta.buyer.email|default:"" }}</small>
+        </td>
+        <td>{{ tarjeta.recipient_name }}<br><small>{{ tarjeta.recipient_email }}</small></td>
+        <td class="nowrap">${{ tarjeta.initial_amount|cop }}</td>
+        <td class="nowrap">${{ tarjeta.balance|cop }}</td>
+        <td class="nowrap">{{ tarjeta.expires_at|date:"d/m/Y"|default:"—" }}</td>
+        <td>
+          {% if tarjeta.status == 'active' and tarjeta.expires_at and tarjeta.expires_at < ahora %}<span class="badge badge-gold">Vencida</span>
+          {% elif tarjeta.status == 'active' %}<span class="pill pill-ok">Activa</span>
+          {% else %}<span class="pill pill-off">{{ tarjeta.get_status_display }}</span>{% endif %}
+          {% if tarjeta.status == 'active' and not tarjeta.sent_at %}<br><small>Correo sin enviar</small>{% endif %}
+        </td>
+        <td class="actions"><a class="ghost btn-sm" href="{% url 'admin_gift_card_detail' tarjeta.pk %}">Ver</a></td>
+      </tr>
+      {% empty %}<tr><td colspan="8">No hay tarjetas de regalo.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "administracion/pagination.html" %}
+{% endblock %}

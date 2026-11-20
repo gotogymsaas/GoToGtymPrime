@@ -32,6 +32,12 @@ class PanelSettings(models.Model):
         default=True,
         help_text="Si está desactivado, Quantum Coach (la IA de GoToGym) no se muestra en la tienda.",
     )
+    staff_checkout_without_payment = models.BooleanField(
+        default=False,
+        help_text="Modo de pruebas: si está activo, las cuentas del equipo confirman pedidos y tarjetas de regalo "
+                  "sin pagar. Los clientes siguen pagando normal. Esos pedidos quedan marcados como prueba: "
+                  "no se facturan, no generan comisión y no cuentan como venta.",
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

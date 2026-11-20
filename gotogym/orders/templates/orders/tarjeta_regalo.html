@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static i18n tienda_filters %}
+{% block title %}{% trans "Tarjetas de regalo | GoToGym" %}{% endblock %}
+{% block meta_description %}{% trans "Regala una tarjeta de GoToGym: eliges el valor, escribes una dedicatoria y la enviamos por correo a quien quieras." %}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261017-responsive">
+<link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20261118-favoritos">
+<link rel="stylesheet" href="{% static 'css/tarjetas_regalo.css' %}?v=20261119-tarjetas">
+{% endblock %}
+
+{% block content %}
+<div class="editorial-page">
+  <header class="editorial-hero">
+    <div class="editorial-shell">
+      <p class="editorial-kicker">{% trans "Tarjetas de regalo" %}</p>
+      <h1 class="editorial-title">{% blocktrans %}Regala <em>GoToGym</em>{% endblocktrans %}</h1>
+      <p class="editorial-lead">{% trans "Elige el valor, escribe una dedicatoria y la enviamos por correo a quien quieras. Quien la recibe la usa en la tienda, en una o varias compras." %}</p>
+    </div>
+  </header>
+
+  {% if compras_pausadas %}
+  <div class="editorial-shell" style="padding-top: 28px;">
+    <p class="px-4 py-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-sm">{% trans "Las compras están pausadas en este momento. Vuelve en un rato." %}</p>
+  </div>
+  {% endif %}
+
+  <section class="editorial-section editorial-section--mist">
+    <form method="post" novalidate class="editorial-shell account-layout gift-layout" id="gift-card-form">
+      {% csrf_token %}
+
+      <div class="account-panel">
+        <p class="editorial-kicker">1 · {% trans "Valor" %}</p>
+        <h2>{% trans "¿Cuánto quieres regalar?" %}</h2>
+        <div class="gift-amounts" role="group" aria-label="{% trans 'Valores sugeridos' %}">
+          {% for valor in valores_sugeridos %}
+          <button type="button" class="gift-amount" data-gift-amount="{{ valor }}">${{ valor|cop }}</button>
+          {% endfor %}
+        </div>
+        <div class="account-fields">
+          <div class="account-field account-field--full">
+            <label for="{{ form.amount.id_for_label }}">{% trans "Otro valor" %}<span class="text-red-500">*</span></label>
+            <input type="text" name="{{ form.amount.html_name }}" id="{{ form.amount.id_for_label }}" inputmode="numeric"
+                   autocomplete="off" maxlength="20" value="{{ form.amount.value|default:'' }}"
+                   placeholder="{% blocktrans with minimo=valor_minimo|cop maximo=valor_maximo|cop %}Entre ${{ minimo }} y ${{ maximo }}{% endblocktrans %}">
+            <small>{% blocktrans with minimo=valor_minimo|cop maximo=valor_maximo|cop %}Desde ${{ minimo }} hasta ${{ maximo }} COP.{% endblocktrans %}</small>
+            {% for error in form.amount.errors %}<p class="checkout-field-error">{{ error }}</p>{% endfor %}
+          </div>
+        </div>
+
+        <p class="editorial-kicker gift-step">2 · {% trans "Para quién" %}</p>
+        <h2>{% trans "¿A quién se la enviamos?" %}</h2>
+        <div class="account-fields">
+          {% for field in form %}{% if field.name in 'recipient_name,recipient_email,recipient_email_confirm' %}
+          <div class="account-field{% if field.name == 'recipient_name' %} account-field--full{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}<span class="text-red-500">*</span></label>
+            {{ field }}
+            {% for error in field.errors %}<p class="checkout-field-error">{{ error }}</p>{% endfor %}
+          </div>
+          {% endif %}{% endfor %}
+        </div>
+        <p class="gift-note">{% trans "La tarjeta llega a este correo en cuanto se aprueba el pago. Revísalo bien: es adonde enviamos el código." %}</p>
+
+        <p class="editorial-kicker gift-step">3 · {% trans "Tu mensaje" %}</p>
+        <h2>{% trans "Escribe tu dedicatoria" %}</h2>
+        <div class="account-fields">
+          <div class="account-field account-field--full">
+            <label for="{{ form.sender_name.id_for_label }}">{{ form.sender_name.label }}<span class="text-red-500">*</span></label>
+            {{ form.sender_name }}
+            {% for error in form.sender_name.errors %}<p class="checkout-field-error">{{ error }}</p>{% endfor %}
+          </div>
+          <div class="account-field account-field--full">
+            <label for="{{ form.message.id_for_label }}">{{ form.message.label }}</label>
+            {{ form.message }}
+            <small><span id="gift-message-count">0</span>/{{ largo_dedicatoria }} · {% trans "Sin enlaces ni direcciones web." %}</small>
+            {% for error in form.message.errors %}<p class="checkout-field-error">{{ error }}</p>{% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <aside class="account-panel gift-summary">
+        <p class="editorial-kicker">{% trans "Vista previa" %}</p>
+        <h2>{% trans "Así la recibirá" %}</h2>
+
+        <div class="gift-card-preview" aria-hidden="true">
+          <span class="gift-card-preview__ribbon-v"></span>
+          <span class="gift-card-preview__ribbon-h"></span>
+          <p class="gift-card-preview__kicker">{% trans "Tarjeta de regalo" %}</p>
+          <p class="gift-card-preview__brand">GoToGym</p>
+          <p class="gift-card-preview__amount" id="gift-preview-amount">$0</p>
+          <p class="gift-card-preview__to">{% trans "Para" %} <strong id="gift-preview-to">…</strong></p>
+          <p class="gift-card-preview__from">{% trans "De parte de" %} <strong id="gift-preview-from">…</strong></p>
+        </div>
+        <blockquote class="gift-preview-message" id="gift-preview-message" hidden></blockquote>
+
+        <h3 class="gift-conditions__title">{% trans "Condiciones" %}</h3>
+        <ul class="gift-conditions">
+          <li>{% blocktrans count meses=meses_de_vigencia %}Válida por {{ meses }} mes desde que se aprueba el pago.{% plural %}Válida por {{ meses }} meses desde que se aprueba el pago.{% endblocktrans %} {% trans "Al vencer, el saldo que quede ya no se puede usar, y usar una parte no amplía el plazo." %}</li>
+          <li>{% trans "Se usa en una o varias compras hasta agotar el saldo, y se combina con cupones de descuento." %}</li>
+          <li>{% trans "Para usarla, quien la recibe necesita una cuenta en GoToGym. No se cambia por dinero." %}</li>
+          <li>{% trans "Si te arrepientes, puedes pedir la devolución del dinero dentro de los 5 días hábiles siguientes a la compra, siempre que la tarjeta no se haya usado." %}</li>
+        </ul>
+
+        <div class="account-field gift-accept">
+          <label class="gift-accept__label">
+            {{ form.accept_conditions }}
+            <span>{% trans "Acepto las condiciones de la tarjeta de regalo y los" %} <a href="{% url 'terminos' %}" class="underline" target="_blank" rel="noopener">{% trans "términos y condiciones" %}</a>.</span>
+          </label>
+          {% for error in form.accept_conditions.errors %}<p class="checkout-field-error">{{ error }}</p>{% endfor %}
+        </div>
+
+        {% if user.is_authenticated %}
+        <button type="submit" class="editorial-action" style="width: 100%;"{% if compras_pausadas %} disabled{% endif %}>{% trans "Comprar y pagar" %}</button>
+        {% if confirma_sin_pagar %}
+        <p class="text-xs text-amber-900 text-center mt-4">{% trans "Modo de pruebas del equipo: la tarjeta se activa y se envía sin pagar." %}</p>
+        {% else %}
+        <p class="text-xs text-gray-500 text-center mt-4">{% trans "Pagas con Mercado Pago. Te enviaremos la confirmación a tu correo." %}</p>
+        {% endif %}
+        {% else %}
+        <a class="editorial-action" style="width: 100%;" href="{% url 'commercial_login' %}?next={{ request.path|urlencode }}">{% trans "Inicia sesión para comprar" %}</a>
+        <p class="text-xs text-gray-500 text-center mt-4">{% trans "La compra queda a nombre de tu cuenta." %}</p>
+        {% endif %}
+      </aside>
+    </form>
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Vista previa y valores sugeridos. Es mejora progresiva: sin JS el
+  // formulario se llena a mano y el servidor valida todo igual.
+  document.addEventListener('DOMContentLoaded', function () {
+    var campoValor = document.getElementById('id_amount');
+    var campoPara = document.getElementById('id_recipient_name');
+    var campoDe = document.getElementById('id_sender_name');
+    var campoMensaje = document.getElementById('id_message');
+    var contador = document.getElementById('gift-message-count');
+    var vistaValor = document.getElementById('gift-preview-amount');
+    var vistaPara = document.getElementById('gift-preview-to');
+    var vistaDe = document.getElementById('gift-preview-from');
+    var vistaMensaje = document.getElementById('gift-preview-message');
+    var botones = Array.prototype.slice.call(document.querySelectorAll('[data-gift-amount]'));
+    if (!campoValor) return;
+
+    function soloDigitos(texto) { return Number(String(texto || '').replace(/[^\d]/g, '')) || 0; }
+    function pesos(valor) { return '$' + Math.round(valor).toLocaleString('es-CO'); }
+
+    function pintar() {
+      var valor = soloDigitos(campoValor.value);
+      vistaValor.textContent = pesos(valor);
+      botones.forEach(function (boton) {
+        boton.classList.toggle('is-selected', Number(boton.dataset.giftAmount) === valor);
+        boton.setAttribute('aria-pressed', Number(boton.dataset.giftAmount) === valor ? 'true' : 'false');
+      });
+      vistaPara.textContent = (campoPara && campoPara.value.trim()) || '…';
+      vistaDe.textContent = (campoDe && campoDe.value.trim()) || '…';
+      var mensaje = campoMensaje ? campoMensaje.value.trim() : '';
+      vistaMensaje.hidden = !mensaje;
+      vistaMensaje.textContent = mensaje;
+      if (contador && campoMensaje) contador.textContent = campoMensaje.value.length;
+    }
+
+    botones.forEach(function (boton) {
+      boton.addEventListener('click', function () {
+        campoValor.value = Number(boton.dataset.giftAmount).toLocaleString('es-CO');
+        pintar();
+      });
+    });
+    [campoValor, campoPara, campoDe, campoMensaje].forEach(function (campo) {
+      if (campo) campo.addEventListener('input', pintar);
+    });
+    pintar();
+  });
+</script>
+{% endblock %}

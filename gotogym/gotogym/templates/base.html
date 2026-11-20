@@ -199,6 +199,7 @@
     </button>
     {% endif %}
     <a href="{% url 'tienda:producto_list' %}">{% trans "Tienda" %}</a>
+    <a href="{% url 'tarjeta_regalo' %}">{% trans "Tarjetas de regalo" %}</a>
     {% if journal_visible %}
     <a href="{% url 'blog:post_list' %}">Journal</a>
     {% endif %}
@@ -275,6 +276,7 @@
 
     <nav class="gtg-footer-legal" aria-label="{% trans 'Políticas y condiciones' %}">
       <a href="{% url 'acerca_de' %}">{% trans "Acerca de" %}</a>
+      <a href="{% url 'tarjeta_regalo' %}">{% trans "Tarjetas de regalo" %}</a>
       <a href="{% url 'politica_privacidad' %}">{% trans "Privacidad" %}</a>
       <a href="{% url 'terminos' %}">{% trans "Términos" %}</a>
       <a href="{% url 'politica_cambios' %}">{% trans "Cambios" %}</a>

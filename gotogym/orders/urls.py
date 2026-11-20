@@ -8,6 +8,7 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('checkout/cotizar-envio/', views.cotizar_envio, name='cotizar_envio'),
     path('checkout/validar-cupon/', views.validar_cupon, name='validar_cupon'),
+    path('checkout/validar-tarjeta-regalo/', views.validar_tarjeta_regalo, name='validar_tarjeta_regalo'),
     path('mis-pedidos/', views.my_orders, name='my_orders'),
     path('pedido/<str:order_number>/', views.order_detail, name='order_detail'),
     path('pedido/<str:order_number>/item/<int:item_id>/review/', views.create_review, name='create_review'),

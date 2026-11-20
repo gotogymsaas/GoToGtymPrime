@@ -24,6 +24,11 @@
     <option value="{{ value }}" {% if payment_status == value %}selected{% endif %}>{{ label }}</option>
     {% endfor %}
   </select>
+  <select name="kind" aria-label="Tipo de pedido">
+    <option value="">Todos los tipos</option>
+    <option value="products" {% if kind == 'products' %}selected{% endif %}>Productos</option>
+    <option value="gift_card" {% if kind == 'gift_card' %}selected{% endif %}>Tarjetas de regalo</option>
+  </select>
   {% if demorados %}<input type="hidden" name="demorados" value="1">{% endif %}
   <button type="submit">Filtrar</button>
 </form>
@@ -33,7 +38,7 @@
     <tbody>
       {% for order in page_obj %}
       <tr>
-        <td><strong>{{ order.order_number }}</strong></td>
+        <td><strong>{{ order.order_number }}</strong>{% if order.is_gift_card_purchase %}<br><span class="badge badge-gold">Tarjeta de regalo</span>{% endif %}{% if order.is_test_order %}<br><span class="badge badge-gold">Prueba sin pago</span>{% endif %}</td>
         <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
         <td>{{ order.email }}</td>
         <td>{{ order.get_order_status_display }}</td>

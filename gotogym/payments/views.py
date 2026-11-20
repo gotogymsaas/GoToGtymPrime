@@ -9,11 +9,15 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from gotogym.ajustes_tienda import MENSAJE_PAGOS_DESHABILITADOS, pagos_habilitados
+from gotogym.ajustes_tienda import (
+    MENSAJE_PAGOS_DESHABILITADOS,
+    confirma_sin_pagar,
+    pagos_habilitados,
+)
 from gotogym.ratelimit import rate_limit
 from integrations.mercadopago.mercadopago_client import MercadoPagoError
-from orders.models import Order
-from orders.services import confirm_payment
+from orders.models import Order, OrderStatus
+from orders.services import confirm_payment, confirmar_sin_pago
 
 from .models import PaymentTransaction
 from .providers.mercadopago import MercadoPagoPaymentProvider
@@ -76,6 +80,14 @@ def _current_or_new_transaction(order, provider):
 @login_required
 def payment_pending(request, order_number):
     order = get_object_or_404(Order, order_number=order_number, user=request.user)
+    if order.order_status == OrderStatus.PENDING_PAYMENT and confirma_sin_pagar(request):
+        # Modo de pruebas del equipo: un pedido que quedo pendiente (por
+        # ejemplo, creado antes de encender el modo) se confirma aqui en vez
+        # de abrir la pasarela.
+        order = confirmar_sin_pago(order, request.user)
+        if order.order_status == OrderStatus.CONFIRMED:
+            messages.success(request, gettext('Pedido de prueba confirmado sin pago.'))
+        return redirect('orders:order_detail', order_number=order.order_number)
     provider = get_active_provider()
     if not pagos_habilitados(request):
         # Con los pagos deshabilitados no se abre ningun intento nuevo; si el

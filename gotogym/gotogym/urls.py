@@ -25,6 +25,7 @@ from django.urls import URLPattern, URLResolver, include, path
 from django.views.generic import RedirectView
 from django.views.i18n import set_language
 from django.views.static import serve
+from orders import views as orders_views
 from payments import views as payments_views
 
 from . import views
@@ -79,6 +80,7 @@ urlpatterns += i18n_patterns(
     path('contabilidad/', include('contabilidad.urls', namespace='contabilidad')),
     path('analitica/', include('analitica.urls', namespace='analitica')),
     path('tienda/', include('tienda.urls', namespace='tienda')),
+    path('tarjetas-regalo/', orders_views.tarjeta_regalo, name='tarjeta_regalo'),
     path('carrito/', include('carrito.urls', namespace='carrito')),
     path('pedidos-tienda/', include('orders.urls', namespace='orders')),
     path('pagos/', include('payments.urls', namespace='payments')),

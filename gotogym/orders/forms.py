@@ -4,15 +4,40 @@ La validacion vive aqui, no en los atributos HTML: el navegador puede
 saltarselos y la peticion puede llegar sin pasar por el formulario.
 """
 import re
+from decimal import Decimal, InvalidOperation
 
 from django import forms
+from django.utils import timezone
+from django.utils.formats import date_format
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
+from . import tarjetas_regalo
 from .colombia_data import DEPARTAMENTOS, municipios_de
 from .documentos import error_de_documento, limpiar_numero
 from .models import DocumentType
 from .services import es_cupon_propio, get_usable_coupon
+
+
+def error_de_tarjeta(codigo, user):
+    """Mensaje para un codigo de tarjeta de regalo que no se puede usar, o
+    vacio si se puede. Cada codigo equivocado cuenta para el tope de intentos
+    de la cuenta (ver `tarjetas_regalo.demasiados_intentos`)."""
+    if tarjetas_regalo.demasiados_intentos(user):
+        return gettext('Hiciste demasiados intentos con códigos de tarjeta. Inténtalo de nuevo en una hora.')
+    tarjeta = tarjetas_regalo.buscar_por_codigo(codigo)
+    if tarjeta is None:
+        tarjetas_regalo.registrar_intento_fallido(user)
+        return gettext('La tarjeta de regalo no es válida.')
+    if tarjeta.is_usable():
+        return ''
+    motivo = tarjetas_regalo.motivo_no_usable(tarjeta)
+    if motivo == 'expired':
+        return gettext('La tarjeta de regalo venció el %(fecha)s.') % {
+            'fecha': date_format(timezone.localtime(tarjeta.expires_at), 'DATE_FORMAT')}
+    if motivo == 'no_balance':
+        return gettext('La tarjeta de regalo ya no tiene saldo.')
+    return gettext('La tarjeta de regalo no está disponible.')
 
 TELEFONO_VALIDO = re.compile(r'^[0-9+()\s-]{7,20}$')
 
@@ -54,6 +79,8 @@ class CheckoutForm(forms.Form):
         widget=forms.Textarea(attrs={'rows': 3}),
     )
     coupon_code = forms.CharField(label=_('Cupón'), required=False, max_length=30)
+    # Admite el codigo con guiones o espacios (XXXX-XXXX-XXXX-XXXX).
+    gift_card_code = forms.CharField(label=_('Tarjeta de regalo'), required=False, max_length=24)
 
     def __init__(self, *args, user=None, **kwargs):
         self._user = user
@@ -88,9 +115,19 @@ class CheckoutForm(forms.Form):
         if codigo_cupon and get_usable_coupon(codigo_cupon, user=self._user) is None:
             if es_cupon_propio(codigo_cupon, self._user):
                 self.add_error('coupon_code', 'No puedes usar tu propio código de afiliado en tus compras.')
+            elif tarjetas_regalo.buscar_por_codigo(codigo_cupon) is not None:
+                self.add_error('coupon_code', gettext(
+                    'Ese es el código de una tarjeta de regalo: escríbelo en el campo "Tarjeta de regalo".'
+                ))
             else:
                 self.add_error('coupon_code', 'El cupón no es válido.')
         cleaned_data['coupon_code'] = codigo_cupon
+        codigo_tarjeta = tarjetas_regalo.normalizar_codigo(cleaned_data.get('gift_card_code', ''))
+        if codigo_tarjeta:
+            error = error_de_tarjeta(codigo_tarjeta, self._user)
+            if error:
+                self.add_error('gift_card_code', error)
+        cleaned_data['gift_card_code'] = codigo_tarjeta
         self._validar_documento(cleaned_data)
         departamento = cleaned_data.get('department')
         ciudad = cleaned_data.get('city', '').strip()
@@ -116,3 +153,80 @@ class CheckoutForm(forms.Form):
         if not valor:
             raise forms.ValidationError(mensaje)
         return valor
+
+
+# Un enlace en la dedicatoria saldria en un correo con el dominio de GoToGym:
+# se rechaza para que la tarjeta no sirva para enviar enlaces enganosos.
+PARECE_ENLACE = re.compile(r'https?://|www\.|\b[\w-]+\.(com|co|net|org|io|ly|me|info|xyz|link|app)\b', re.IGNORECASE)
+
+
+class GiftCardPurchaseForm(forms.Form):
+    """Compra de una tarjeta de regalo: valor, para quien es y la dedicatoria.
+
+    El valor llega como texto para aceptar "100.000" o "$100,000": se limpia
+    y se valida contra el rango en el servidor, nunca solo en el navegador."""
+
+    amount = forms.CharField(label=_('Valor de la tarjeta'), max_length=20)
+    sender_name = forms.CharField(label=_('De parte de'), max_length=80)
+    recipient_name = forms.CharField(label=_('Para'), max_length=80)
+    recipient_email = forms.EmailField(label=_('Correo de quien recibe el regalo'))
+    recipient_email_confirm = forms.EmailField(label=_('Confirma el correo'))
+    message = forms.CharField(
+        label=_('Dedicatoria (opcional)'), required=False, max_length=tarjetas_regalo.LARGO_DEDICATORIA,
+        widget=forms.Textarea(attrs={'rows': 4, 'maxlength': tarjetas_regalo.LARGO_DEDICATORIA}),
+    )
+    accept_conditions = forms.BooleanField(
+        label=_('Acepto las condiciones de la tarjeta de regalo'),
+        error_messages={'required': _('Debes aceptar las condiciones de la tarjeta de regalo.')},
+    )
+
+    def clean_amount(self):
+        texto = re.sub(r'[^\d]', '', self.cleaned_data['amount'] or '')
+        try:
+            valor = Decimal(texto)
+        except InvalidOperation:
+            valor = None
+        minimo, maximo = tarjetas_regalo.VALOR_MINIMO, tarjetas_regalo.VALOR_MAXIMO
+        if valor is None or not minimo <= valor <= maximo:
+            raise forms.ValidationError(gettext(
+                'Elige un valor entre $%(minimo)s y $%(maximo)s.'
+            ) % {'minimo': _miles(minimo), 'maximo': _miles(maximo)})
+        return valor
+
+    def clean_sender_name(self):
+        return self._texto_sin_enlaces('sender_name', gettext('Escribe tu nombre.'))
+
+    def clean_recipient_name(self):
+        return self._texto_sin_enlaces('recipient_name', gettext('Escribe el nombre de quien recibe el regalo.'))
+
+    def clean_recipient_email(self):
+        return self.cleaned_data['recipient_email'].strip().lower()
+
+    def clean_recipient_email_confirm(self):
+        return self.cleaned_data['recipient_email_confirm'].strip().lower()
+
+    def clean_message(self):
+        mensaje = (self.cleaned_data.get('message') or '').strip()
+        if PARECE_ENLACE.search(mensaje):
+            raise forms.ValidationError(gettext('La dedicatoria no puede incluir enlaces ni direcciones web.'))
+        return mensaje
+
+    def clean(self):
+        cleaned_data = super().clean()
+        correo, confirmacion = cleaned_data.get('recipient_email'), cleaned_data.get('recipient_email_confirm')
+        if correo and confirmacion and correo != confirmacion:
+            self.add_error('recipient_email_confirm', gettext('Los correos no coinciden.'))
+        return cleaned_data
+
+    def _texto_sin_enlaces(self, campo, mensaje_vacio):
+        valor = ' '.join((self.cleaned_data.get(campo) or '').split())
+        if not valor:
+            raise forms.ValidationError(mensaje_vacio)
+        if PARECE_ENLACE.search(valor):
+            raise forms.ValidationError(gettext('Este campo no puede incluir enlaces.'))
+        return valor
+
+
+def _miles(valor):
+    """50000 -> 50.000"""
+    return f'{int(valor):,}'.replace(',', '.')

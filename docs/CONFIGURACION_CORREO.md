@@ -4,12 +4,13 @@ Procedimiento completo con el que se dejó funcionando el correo de la tienda (1
 
 ## 1. Qué hace la aplicación con el correo
 
-La tienda envía correos en cuatro situaciones:
+La tienda envía correos en estas situaciones:
 
 | Situación | Correos |
 |---|---|
 | Recuperar contraseña | Enlace para elegir una contraseña nueva |
 | Pedido | Recibido (pendiente de pago), confirmado, enviado y cancelado |
+| Tarjeta de regalo | El regalo con su código para quien lo recibe, y la confirmación de compra para quien la compró (ver [TARJETAS_REGALO.md](TARJETAS_REGALO.md)) |
 | Programa de afiliados | Solicitud recibida, aprobada (bienvenida), rechazada, baja solicitada y efectiva, terminación, validación extendida, cambio de comisión, avisos generales y comisión pagada |
 | Pruebas | `probar_correo` y `previsualizar_correos` |
 

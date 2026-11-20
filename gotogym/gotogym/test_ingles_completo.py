@@ -130,7 +130,7 @@ class InglesCompletoTests(TestCase):
         for ruta in (
             '/en/', '/en/acerca-de/', '/en/contacto/', '/en/tienda/', f'/en/tienda/producto/{self.producto.pk}/',
             '/en/blog/', '/en/carrito/', '/en/accounts/acceso/', '/en/accounts/register/',
-            '/en/accounts/password_reset/', '/en/afiliados/terminos/',
+            '/en/accounts/password_reset/', '/en/afiliados/terminos/', '/en/tarjetas-regalo/',
         ):
             with self.subTest(ruta=ruta):
                 self._ver(ruta)
@@ -186,7 +186,10 @@ class InglesCompletoTests(TestCase):
     # --- cliente con sesion ------------------------------------------------------
     def test_cuenta_del_cliente(self):
         self.client.force_login(self.cliente)
-        for ruta in ('/en/accounts/editar-perfil/', '/en/accounts/direcciones/nueva/', '/en/pedidos-tienda/mis-pedidos/'):
+        for ruta in (
+            '/en/accounts/editar-perfil/', '/en/accounts/direcciones/nueva/', '/en/pedidos-tienda/mis-pedidos/',
+            '/en/tarjetas-regalo/',
+        ):
             with self.subTest(ruta=ruta):
                 self._ver(ruta)
 

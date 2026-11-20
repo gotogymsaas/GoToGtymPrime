@@ -18,22 +18,26 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.urls import reverse
-from django.utils import translation
+from django.utils import timezone, translation
+from django.utils.formats import date_format
 from django.utils.translation import gettext
 from gotogym.correo import (
     Correo,
     aviso,
     boton,
     datos,
+    dedicatoria,
     enviar_correo,
     parrafo,
+    pasos,
     productos,
+    tarjeta_regalo,
     totales,
     url_absoluta,
 )
 from tienda.templatetags.imagenes import url_imagen_producto
 
-from .models import Order, PaymentStatus
+from .models import GiftCard, Order, PaymentStatus
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +68,9 @@ def _enlace_del_pedido(pedido):
 
 def _saludo(pedido):
     nombre = pedido.address.full_name.split(' ')[0] if hasattr(pedido, 'address') and pedido.address.full_name else ''
+    if not nombre and pedido.user is not None:
+        # La compra de una tarjeta de regalo no tiene direccion de entrega.
+        nombre = (pedido.user.first_name or '').split(' ')[0]
     if nombre:
         return gettext('Hola %(nombre)s,') % {'nombre': nombre}
     return gettext('Hola,')
@@ -105,7 +112,7 @@ def _resumen(pedido):
     lineas = [
         {
             'nombre': gettext(item.product_name_snapshot),
-            'detalle': f'{gettext(item.size_snapshot)} / {gettext(item.color_snapshot)}',
+            'detalle': ' / '.join(gettext(v) for v in (item.size_snapshot, item.color_snapshot) if v),
             'cantidad': item.quantity,
             'total': _pesos(item.line_total),
             'imagen': _imagen_del_producto(item),
@@ -115,8 +122,11 @@ def _resumen(pedido):
     filas = [(gettext('Subtotal'), _pesos(pedido.subtotal))]
     if pedido.discount_total:
         filas.append((gettext('Descuento'), f'-{_pesos(pedido.discount_total)}'))
-    filas.append((gettext('Envío'), _pesos(pedido.shipping_cost)))
-    filas.append((gettext('Total'), _pesos(pedido.total)))
+    if not pedido.is_gift_card_purchase:
+        filas.append((gettext('Envío'), _pesos(pedido.shipping_cost)))
+    if pedido.gift_card_total:
+        filas.append((gettext('Pagado con tarjeta de regalo'), f'-{_pesos(pedido.gift_card_total)}'))
+    filas.append((gettext('Total a pagar') if pedido.gift_card_total else gettext('Total'), _pesos(pedido.total)))
     return [productos(lineas), totales(filas)]
 
 
@@ -136,6 +146,7 @@ def pedido_recibido(order_id):
             parrafo(gettext('Recibimos tu pedido %(numero)s y está pendiente de pago.') % {
                 'numero': pedido.order_number}),
             *_resumen(pedido),
+            *_aviso_de_envio_de_tarjeta(pedido),
             parrafo(gettext('Si ya pagaste, te enviaremos la confirmación en cuanto se acredite el pago.')),
             aviso(gettext(
                 'Si el pago no se completa en %(horas)s horas, el pedido se cancelará automáticamente '
@@ -205,21 +216,146 @@ def pedido_enviado(order_id):
 def pedido_cancelado(order_id):
     pedido = _pedido(order_id)
     with _en_el_idioma_del_pedido(pedido):
-        if pedido.payment_status == PaymentStatus.APPROVED:
+        if pedido.payment_status == PaymentStatus.APPROVED and pedido.is_gift_card_purchase:
+            explicacion = gettext(
+                'Cancelamos la compra de tu tarjeta de regalo y la tarjeta quedó anulada. Te devolveremos el '
+                'dinero por el mismo medio de pago.'
+            )
+        elif pedido.payment_status == PaymentStatus.APPROVED and pedido.total > 0:
             explicacion = gettext(
                 'No pudimos completar tu pedido, y tu pago ya había sido recibido. Nos pondremos en contacto '
                 'contigo para devolverte el dinero por el mismo medio de pago.'
             )
+        elif pedido.payment_status == PaymentStatus.APPROVED:
+            explicacion = gettext('No pudimos completar tu pedido.')
         else:
             explicacion = gettext(
                 'Tu pedido se canceló porque el pago no se completó a tiempo o porque lo cancelamos. '
                 'No se hizo ningún cobro. Si quieres, puedes volver a hacer tu compra cuando quieras.'
             )
-        bloques = [
-            parrafo(explicacion),
-            parrafo(gettext('Si tienes dudas, escríbenos a support@gotogym.store con tu número de pedido.')),
-        ]
+        bloques = [parrafo(explicacion)]
+        if pedido.gift_card_total:
+            bloques.append(parrafo(gettext(
+                'Lo que pagaste con tu tarjeta de regalo (%(monto)s) volvió a su saldo.'
+            ) % {'monto': _pesos(pedido.gift_card_total)}))
+        bloques.append(parrafo(gettext('Si tienes dudas, escríbenos a support@gotogym.store con tu número de pedido.')))
         _enviar(pedido, _correo(
             pedido, gettext('Tu pedido %(numero)s fue cancelado') % {'numero': pedido.order_number},
             gettext('Tu pedido fue cancelado'), bloques,
+        ))
+
+
+# ---------------------------------------------------------------- tarjetas de regalo
+
+def _aviso_de_envio_de_tarjeta(pedido):
+    tarjeta = getattr(pedido, 'purchased_gift_card', None) if pedido.is_gift_card_purchase else None
+    if tarjeta is None:
+        return []
+    return [parrafo(gettext(
+        'Cuando se apruebe el pago, enviaremos la tarjeta de regalo a %(nombre)s (%(correo)s).'
+    ) % {'nombre': tarjeta.recipient_name, 'correo': tarjeta.recipient_email})]
+
+
+def _fecha(momento):
+    return date_format(timezone.localtime(momento), 'DATE_FORMAT')
+
+
+def correo_tarjeta_regalo(tarjeta):
+    """El correo de regalo que recibe el destinatario. Se arma aparte del envio
+    para poder previsualizarlo (`previsualizar_correos`)."""
+    remitente = tarjeta.sender_name
+    vence = _fecha(tarjeta.expires_at)
+    bloques = [
+        parrafo(gettext('%(remitente)s te regaló una tarjeta de GoToGym para que elijas lo que más te guste.') % {
+            'remitente': remitente}),
+        tarjeta_regalo(
+            valor=_pesos(tarjeta.balance),
+            codigo=tarjeta.display_code,
+            etiqueta_codigo=gettext('Tu código'),
+            vigencia=gettext('Válida hasta el %(fecha)s') % {'fecha': vence},
+            encabezado=gettext('Tarjeta de regalo'),
+        ),
+    ]
+    if tarjeta.message:
+        bloques.append(dedicatoria(tarjeta.message, remitente))
+    bloques += [
+        pasos(gettext('Cómo usarla'), [
+            gettext('Elige tus prendas en la tienda de GoToGym.'),
+            gettext('Inicia sesión o crea tu cuenta: la necesitas para pagar.'),
+            gettext('En el pago, escribe el código en el campo "Tarjeta de regalo".'),
+        ]),
+        aviso(gettext(
+            'Tu tarjeta vence el %(fecha)s. Puedes usarla en una o varias compras hasta esa fecha; usar una '
+            'parte del saldo no amplía el plazo. Si el saldo no alcanza para tu compra, pagas la diferencia '
+            'con otro medio. Al vencer, el saldo que quede ya no se podrá usar. No se cambia por dinero.'
+        ) % {'fecha': vence}),
+        boton(
+            gettext('Ir a la tienda'), url_absoluta(reverse('tienda:producto_list')),
+            texto_plano=gettext('Entra a la tienda: %(enlace)s') % {
+                'enlace': url_absoluta(reverse('tienda:producto_list'))},
+        ),
+    ]
+    return Correo(
+        asunto=gettext('%(remitente)s te envió una tarjeta de regalo de GoToGym') % {'remitente': remitente},
+        titulo=gettext('Tienes un regalo'),
+        kicker=gettext('De parte de %(remitente)s') % {'remitente': remitente},
+        saludo=gettext('Hola %(nombre)s,') % {'nombre': tarjeta.recipient_name},
+        previa=gettext('%(remitente)s te regaló %(valor)s para tu próxima compra en GoToGym.') % {
+            'remitente': remitente, 'valor': _pesos(tarjeta.balance)},
+        bloques=bloques,
+        pie=gettext(
+            'Recibes este correo porque %(remitente)s te regaló una tarjeta de GoToGym. Si no conoces a '
+            'quien te la envía, puedes ignorar este mensaje.'
+        ) % {'remitente': remitente},
+    )
+
+
+def tarjeta_regalo_para_destinatario(gift_card_id):
+    """Envia la tarjeta a quien la recibe, en el idioma en que se compro.
+    Registra el envio solo si salio bien, para que el panel muestre cuales
+    hay que reenviar."""
+    tarjeta = GiftCard.objects.filter(pk=gift_card_id).first()
+    if tarjeta is None or tarjeta.expires_at is None:
+        return
+    with translation.override(tarjeta.language or 'es'):
+        correo = correo_tarjeta_regalo(tarjeta)
+    try:
+        enviar_correo(tarjeta.recipient_email, correo)
+    except Exception:
+        logger.exception('No se pudo enviar la tarjeta de regalo %s', tarjeta.masked_code)
+        return
+    GiftCard.objects.filter(pk=tarjeta.pk).update(sent_at=timezone.now())
+
+
+def tarjeta_regalo_comprada(order_id):
+    """Confirmacion a quien compro la tarjeta. No lleva el codigo completo: el
+    codigo es de quien recibe el regalo."""
+    pedido = _pedido(order_id)
+    tarjeta = getattr(pedido, 'purchased_gift_card', None)
+    if tarjeta is None:
+        return
+    with _en_el_idioma_del_pedido(pedido):
+        bloques = [
+            parrafo(gettext(
+                'Recibimos tu pago. Enviamos tu tarjeta de regalo a %(nombre)s, a su correo %(correo)s.'
+            ) % {'nombre': tarjeta.recipient_name, 'correo': tarjeta.recipient_email}),
+            datos([
+                (gettext('Valor'), _pesos(tarjeta.initial_amount)),
+                (gettext('Para'), tarjeta.recipient_name),
+                (gettext('Tarjeta'), tarjeta.masked_code),
+                (gettext('Válida hasta'), _fecha(tarjeta.expires_at)),
+            ]),
+            aviso(gettext(
+                'Si el correo de destino tiene un error o tu regalo no llegó, escríbenos a support@gotogym.store '
+                'con tu número de pedido y lo reenviamos.'
+            )),
+            parrafo(gettext(
+                'Si te arrepientes de la compra, puedes pedir la devolución del dinero dentro de los 5 días '
+                'hábiles siguientes, siempre que la tarjeta no se haya usado.'
+            )),
+            _boton_del_pedido(pedido, gettext('Puedes ver tu compra aquí: %(enlace)s')),
+        ]
+        _enviar(pedido, _correo(
+            pedido, gettext('Tu tarjeta de regalo va en camino a %(nombre)s') % {'nombre': tarjeta.recipient_name},
+            gettext('Tu regalo va en camino'), bloques,
         ))

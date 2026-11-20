@@ -165,6 +165,10 @@ PAGOS = {
             'If the payment is not completed within 48 hours after the order is created, '
             'it is cancelled automatically. You can place your order again whenever you like.',
         ]},
+        {'title': 'Gift cards', 'paragraphs': [
+            'You can pay with a GoToGym gift card, alone or together with Mercado Pago. It is valid for 12 months '
+            'from its issue date and using part of it does not extend that period. Conditions in the terms.',
+        ]},
         {'title': 'Rejected payments and refunds', 'paragraphs': [
             'If your payment is rejected you can try again with another method. Refunds are made '
             'through the same payment method used; see the returns policy for the time limits.',

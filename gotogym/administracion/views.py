@@ -42,6 +42,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
+from django.core.validators import validate_email
 from django.db import transaction
 from django.db.models import Count, Max, Prefetch, ProtectedError, Q, Sum
 from django.http import HttpResponse, JsonResponse
@@ -49,9 +50,20 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
+from gotogym.tasks import enqueue
 from inventory.models import Inventory, InventoryAdjustment, InventoryAdjustmentReason
 from inventory.services import record_adjustment
-from orders.models import Coupon, Order, OrderItem, OrderStatus
+from orders import correos as correos_de_pedidos
+from orders import tarjetas_regalo
+from orders.models import (
+    Coupon,
+    GiftCard,
+    GiftCardStatus,
+    Order,
+    OrderItem,
+    OrderKind,
+    OrderStatus,
+)
 from orders.services import (
     InvalidOrderTransitionError,
     apply_order_status_transition,
@@ -732,6 +744,31 @@ def coach_toggle(request):
 
 @require_perms("administracion.change_panelsettings")
 @require_POST
+def staff_checkout_without_payment_toggle(request):
+    """Interruptor "Confirmar sin pagar (equipo)" (barra superior del panel).
+
+    Modo de pruebas: mientras esta encendido, las cuentas del equipo
+    confirman sus pedidos y tarjetas de regalo al pasar el checkout, sin ir a
+    la pasarela. Los clientes siguen pagando. Esos pedidos quedan marcados
+    como prueba (ver `orders.services.confirmar_sin_pago`)."""
+    activar = request.POST.get("activar") == "1"
+    ajustes = PanelSettings.load()
+    if ajustes.staff_checkout_without_payment != activar:
+        ajustes.staff_checkout_without_payment = activar
+        ajustes.save(update_fields=["staff_checkout_without_payment", "updated_at"])
+    if activar:
+        messages.warning(
+            request,
+            "Modo de pruebas encendido: las cuentas del equipo confirman pedidos sin pagar. "
+            "Apágalo al terminar de probar.",
+        )
+    else:
+        messages.success(request, "Modo de pruebas apagado: todos los pedidos vuelven a requerir pago.")
+    return _safe_redirect(request, "admin_dashboard")
+
+
+@require_perms("administracion.change_panelsettings")
+@require_POST
 def online_payments_toggle(request):
     """Interruptor "Recibir pagos" (barra superior del panel).
 
@@ -786,7 +823,10 @@ def orders_list(request):
 
     order_status = request.GET.get("order_status", "").strip()
     payment_status = request.GET.get("payment_status", "").strip()
+    kind = request.GET.get("kind", "").strip()
     query = request.GET.get("q", "").strip()
+    if kind in OrderKind.values:
+        orders = orders.filter(kind=kind)
 
     demorados = request.GET.get("demorados") == "1"
     if demorados:
@@ -819,6 +859,7 @@ def orders_list(request):
             "query": query,
             "order_status": order_status,
             "payment_status": payment_status,
+            "kind": kind,
             "demorados": demorados,
             "dias_de_envio_demorado": DIAS_DE_ENVIO_DEMORADO,
             "order_status_choices": Order._meta.get_field("order_status").choices,
@@ -831,7 +872,7 @@ def orders_list(request):
 def order_detail(request, order_number):
     order = get_object_or_404(
         Order.objects
-        .select_related("address", "shipping_quote", "referred_by__user")
+        .select_related("address", "shipping_quote", "referred_by__user", "gift_card", "purchased_gift_card")
         .prefetch_related("items", "payment_transactions"),
         order_number=order_number,
     )
@@ -859,6 +900,7 @@ def order_detail(request, order_number):
                 OrderStatus.SHIPPED, OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED),
             "refunds": Refund.objects.filter(payment_transaction__order=order).select_related("requested_by"),
             "history": order.status_history.select_related("changed_by"),
+            "tarjeta_comprada": getattr(order, "purchased_gift_card", None) if order.is_gift_card_purchase else None,
         },
     )
 
@@ -1199,6 +1241,117 @@ def coupon_delete(request, pk):
     coupon.delete()
     messages.success(request, "Cupón eliminado.")
     return redirect("admin_coupons")
+
+
+# ---------------------------------------------------------------- tarjetas de regalo
+
+@require_perms("orders.view_order")
+def gift_cards_list(request):
+    """Tarjetas de regalo vendidas, con lo que la tienda debe en saldo sin
+    canjear (un pasivo, no un ingreso)."""
+    query = request.GET.get("q", "").strip()
+    status = request.GET.get("status", "").strip()
+    tarjetas = GiftCard.objects.select_related("purchase_order", "buyer").order_by("-created_at")
+    ahora = timezone.now()
+    if status == "active":
+        tarjetas = tarjetas.filter(status=GiftCardStatus.ACTIVE, expires_at__gte=ahora)
+    elif status == "expired":
+        tarjetas = tarjetas.filter(status=GiftCardStatus.ACTIVE, expires_at__lt=ahora)
+    elif status == "unsent":
+        tarjetas = tarjetas.filter(status=GiftCardStatus.ACTIVE, sent_at__isnull=True)
+    elif status in GiftCardStatus.values:
+        tarjetas = tarjetas.filter(status=status)
+    if query:
+        codigo = tarjetas_regalo.normalizar_codigo(query)
+        filtro = (
+            Q(recipient_email__icontains=query)
+            | Q(buyer__email__icontains=query)
+            | Q(purchase_order__order_number__icontains=query)
+        )
+        if 4 <= len(codigo) <= tarjetas_regalo.LARGO_CODIGO:
+            filtro |= Q(code__endswith=codigo)
+        tarjetas = tarjetas.filter(filtro)
+
+    vendidas = (
+        GiftCard.objects.exclude(status__in=[GiftCardStatus.PENDING, GiftCardStatus.CANCELLED])
+        .exclude(purchase_order__is_test_order=True)
+    )
+    resumen = {
+        "saldo_vigente": tarjetas_regalo.saldo_vigente(),
+        "vendido": vendidas.aggregate(total=Sum("initial_amount"))["total"] or Decimal("0"),
+        "saldo_vencido": (
+            GiftCard.objects.filter(status=GiftCardStatus.ACTIVE, expires_at__lt=ahora)
+            .aggregate(total=Sum("balance"))["total"] or Decimal("0")
+        ),
+        "sin_enviar": GiftCard.objects.filter(status=GiftCardStatus.ACTIVE, sent_at__isnull=True).count(),
+    }
+    paginator = Paginator(tarjetas, 25)
+    return render(
+        request,
+        "administracion/gift_cards.html",
+        {
+            "page_obj": paginator.get_page(request.GET.get("page")),
+            "query": query,
+            "status": status,
+            "resumen": resumen,
+            "ahora": ahora,
+        },
+    )
+
+
+@require_perms("orders.view_order")
+def gift_card_detail(request, pk):
+    tarjeta = get_object_or_404(GiftCard.objects.select_related("purchase_order", "buyer"), pk=pk)
+    return render(
+        request,
+        "administracion/gift_card_detail.html",
+        {
+            "tarjeta": tarjeta,
+            "movimientos": tarjeta.movements.select_related("order", "created_by"),
+            "ahora": timezone.now(),
+        },
+    )
+
+
+@require_perms("orders.change_order")
+@require_POST
+def gift_card_toggle(request, pk):
+    """Bloquea o desbloquea una tarjeta emitida. Bloquear no toca el saldo:
+    solo impide canjearla mientras se resuelve un caso (fraude, reclamo)."""
+    tarjeta = get_object_or_404(GiftCard, pk=pk)
+    with transaction.atomic():
+        if tarjeta.status == GiftCardStatus.ACTIVE:
+            motivo = request.POST.get("reason", "").strip() or f"Bloqueada desde el panel por {request.user.email}."
+            tarjetas_regalo.bloquear(tarjeta, motivo, request.user)
+            messages.success(request, f"Tarjeta {tarjeta.masked_code} bloqueada.")
+        elif tarjeta.status == GiftCardStatus.DISABLED:
+            tarjetas_regalo.desbloquear(tarjeta)
+            messages.success(request, f"Tarjeta {tarjeta.masked_code} desbloqueada.")
+        else:
+            messages.error(request, "Solo se puede bloquear o desbloquear una tarjeta emitida y sin anular.")
+    return redirect("admin_gift_card_detail", pk=pk)
+
+
+@require_perms("orders.change_order")
+@require_POST
+def gift_card_resend(request, pk):
+    """Reenvia el correo de regalo, si hace falta a un correo corregido (el
+    comprador escribio mal el del destinatario)."""
+    tarjeta = get_object_or_404(GiftCard, pk=pk)
+    if tarjeta.status not in (GiftCardStatus.ACTIVE, GiftCardStatus.DISABLED) or tarjeta.expires_at is None:
+        messages.error(request, "Solo se reenvía una tarjeta emitida y sin anular.")
+        return redirect("admin_gift_card_detail", pk=pk)
+    nuevo_correo = request.POST.get("recipient_email", "").strip().lower()
+    if nuevo_correo and nuevo_correo != tarjeta.recipient_email:
+        try:
+            validate_email(nuevo_correo)
+        except ValidationError:
+            messages.error(request, "El correo nuevo no es válido.")
+            return redirect("admin_gift_card_detail", pk=pk)
+        GiftCard.objects.filter(pk=tarjeta.pk).update(recipient_email=nuevo_correo, updated_at=timezone.now())
+    enqueue(correos_de_pedidos.tarjeta_regalo_para_destinatario, tarjeta.pk)
+    messages.success(request, "Correo de la tarjeta enviado de nuevo.")
+    return redirect("admin_gift_card_detail", pk=pk)
 
 
 def _poner_al_dia_afiliados():

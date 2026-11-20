@@ -133,6 +133,12 @@ body.panel-shell {
   background: #fff; transition: left var(--motion-ui, 200ms);
 }
 .panel-shell .pause-switch.is-paused { border-color: var(--pq-red); }
+/* Modo de pruebas: apagado es lo normal (gris, a la izquierda); encendido
+ * se pinta en dorado para que no pase desapercibido. */
+.panel-shell .pause-switch.is-off .pause-switch__thumb { left: 2px; }
+.panel-shell .pause-switch.is-test-mode { border-color: var(--pq-gold); }
+.panel-shell .pause-switch.is-test-mode .pause-switch__track { background: var(--pq-gold); }
+.panel-shell .pause-notice--test { border-color: var(--pq-gold); color: var(--pq-gold); }
 .panel-shell .pause-switch.is-paused .pause-switch__track { background: var(--pq-red); }
 .panel-shell .pause-switch.is-paused .pause-switch__thumb { left: 2px; }
 .panel-shell .pause-switch span { color: inherit; }

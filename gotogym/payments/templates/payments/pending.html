@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n tienda_filters %}
 {% block title %}{% trans "Pago" %} {{ order.order_number }}{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 {% block content %}
@@ -12,7 +12,15 @@
 
     <div class="border-y border-gray-200 py-4 mb-4 text-sm">
       {% include "partials/_price_row.html" with row_class="flex justify-between mb-1 text-gray-600" label=_("Subtotal") amount=order.subtotal %}
+      {% if order.discount_total %}
+      <div class="flex justify-between mb-1 text-green-700"><span>{% trans "Descuento" %}</span><span class="price-amount">-${{ order.discount_total|cop }} COP</span></div>
+      {% endif %}
+      {% if not order.is_gift_card_purchase %}
       {% include "partials/_price_row.html" with row_class="flex justify-between mb-2 text-gray-600" label=_("Envío") amount=order.shipping_cost %}
+      {% endif %}
+      {% if order.gift_card_total %}
+      <div class="flex justify-between mb-2 text-green-700"><span>{% trans "Pagado con tarjeta de regalo" %}</span><span class="price-amount">-${{ order.gift_card_total|cop }} COP</span></div>
+      {% endif %}
       {% include "partials/_price_row.html" with row_class="flex justify-between text-lg font-bold text-[var(--color-zafiro)]" label=_("Total a pagar") amount=transaction.amount suffix=transaction.currency %}
     </div>
 

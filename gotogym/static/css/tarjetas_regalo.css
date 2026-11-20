@@ -1,0 +1,62 @@
+/* Pagina de compra de tarjetas de regalo. Usa los tokens editoriales
+ * (editorial_pages.css) y los campos del flujo de compra
+ * (commerce_editorial.css); aqui solo lo propio de la tarjeta. */
+
+.gift-step { margin-top: 44px; }
+.gift-note { margin: 14px 0 0; color: var(--ed-muted, #5f6066); font-size: .85rem; line-height: 1.5; }
+
+.gift-amounts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0 0 22px; }
+.gift-amount {
+  min-height: 52px;
+  border: 1px solid #c8c8c5;
+  background: #fff;
+  color: var(--ed-ink, #101012);
+  font-size: .95rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.gift-amount:hover { border-color: var(--ed-ink, #101012); }
+.gift-amount.is-selected { border-color: var(--ed-ink, #101012); background: var(--ed-ink, #101012); color: var(--ed-paper, #f8f9fa); }
+.gift-amount:focus-visible { outline: 2px solid var(--ed-turquoise, #0fbfb0); outline-offset: 2px; }
+
+/* Vista previa: la misma tarjeta que llega por correo (cinta turquesa y dorada). */
+.gift-card-preview {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 18px;
+  padding: 24px 74px 24px 24px;
+  border-radius: 14px;
+  background: var(--ed-ink, #101012);
+  color: #fff;
+}
+.gift-card-preview__ribbon-v { position: absolute; top: 0; right: 34px; bottom: 0; width: 20px; background: var(--ed-turquoise, #0fbfb0); }
+.gift-card-preview__ribbon-h { position: absolute; left: 0; right: 0; top: 78px; height: 8px; background: var(--ed-gold, #d4b46a); }
+.gift-card-preview__kicker { position: relative; margin: 0 0 4px; color: var(--ed-turquoise, #0fbfb0); font-size: .7rem; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
+.gift-card-preview__brand { position: relative; margin: 0 0 34px; font-size: 1.1rem; font-weight: 800; letter-spacing: .04em; }
+.gift-card-preview__amount { position: relative; margin: 0 0 14px; font-size: clamp(2rem, 4vw, 2.6rem); font-weight: 800; line-height: 1; overflow-wrap: anywhere; }
+.gift-card-preview__to,
+.gift-card-preview__from { position: relative; margin: 0; color: #c9c9cf; font-size: .85rem; overflow-wrap: anywhere; }
+.gift-card-preview strong { color: var(--ed-gold, #d4b46a); }
+
+.gift-preview-message {
+  margin: 0 0 24px;
+  padding: 14px 18px;
+  border-left: 4px solid var(--ed-gold, #d4b46a);
+  background: #fbf7ee;
+  color: var(--ed-ink, #101012);
+  font-size: .95rem;
+  line-height: 1.55;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.gift-conditions__title { margin: 0 0 10px; color: var(--ed-ink, #101012); font-size: .9rem; }
+.gift-conditions { display: grid; gap: 8px; margin: 0 0 22px; padding: 0 0 0 18px; color: var(--ed-muted, #5f6066); font-size: .85rem; line-height: 1.5; list-style: disc; }
+
+.gift-accept { margin: 0 0 18px; }
+.gift-accept__label { display: flex; gap: 10px; align-items: flex-start; font-size: .85rem !important; font-weight: 400 !important; letter-spacing: 0 !important; text-transform: none !important; line-height: 1.45; cursor: pointer; }
+.gift-accept__label input { width: 18px !important; min-width: 18px; height: 18px; min-height: 18px !important; margin-top: 2px; padding: 0 !important; }
+
+@media (max-width: 640px) {
+  .gift-amounts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

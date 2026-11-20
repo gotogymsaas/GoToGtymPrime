@@ -25,10 +25,13 @@ Alegra es el software de contabilidad y facturación de GoToGym. Es proveedor te
 - **Descuento de cupón.** Se reparte como el mismo porcentaje en todas las líneas de producto. El envío no se descuenta.
 - **Moneda.** COP. Un pedido en otra moneda no se factura: queda fallido con un mensaje claro.
 - **Medio de pago.** Mercado Pago. Se toma del pago aprobado: tarjeta de crédito, tarjeta débito, transferencia (PSE) o efectivo. Un tipo no reconocido, como dinero en cuenta, usa `ALEGRA_MEDIO_DE_PAGO`. La observación interna de la factura dice «Pagado con Mercado Pago (pago N)», y el número del pedido va como orden de compra.
+- **Tarjeta de regalo.** Lo pagado con una tarjeta de regalo es un medio de pago, no un descuento: las líneas salen por su valor completo (menos el cupón, si lo hay) y la factura totaliza el valor del pedido, no solo lo cobrado por Mercado Pago. La observación interna agrega «Pagado con tarjeta de regalo ····-XXXX: $N». Si la tarjeta cubre todo el pedido no hay pago en Mercado Pago y el medio de pago es `ALEGRA_MEDIO_DE_PAGO_TARJETA_REGALO`.
 
 ### Qué no se factura
 
 Pedidos sin pagar y pedidos cancelados, aunque su pago se aprobara (por ejemplo, por falta de stock): esos se reembolsan, no se facturan.
+
+La compra de una tarjeta de regalo tampoco se factura: según la DIAN (Oficio 16302 de 2019 y Concepto 983 de 2021) la venta ocurre cuando la tarjeta se canjea, y es ese pedido el que se factura con su IVA. Mientras tanto, el dinero recibido es un anticipo (pasivo) por el saldo pendiente de canje; el panel muestra ese saldo en «Tarjetas de regalo». El tratamiento contable del saldo que vence sin usarse lo define el contador.
 
 ## Configuración actual
 
@@ -42,6 +45,7 @@ Las variables están en el `.env` local, que git ignora; los ids salen de una co
 | `ALEGRA_IVA_PORCENTAJE` | `19` | Tarifa de IVA |
 | `ALEGRA_PRECIOS_INCLUYEN_IVA` | `true` | Si el precio publicado ya trae IVA. <u>Es un supuesto: confirmarlo</u> |
 | `ALEGRA_MEDIO_DE_PAGO` | `INSTRUMENT_NOT_DEFINED` | Medio de pago cuando Mercado Pago no lo informa |
+| `ALEGRA_MEDIO_DE_PAGO_TARJETA_REGALO` | vacío (usa `ALEGRA_MEDIO_DE_PAGO`) | Medio de pago de un pedido pagado por completo con tarjeta de regalo |
 | `ALEGRA_NUMBER_TEMPLATE_ID` | `18` | Numeración «Facturacion 2024» (prefijo GYM), la predeterminada para facturas de venta. <u>Confirmar que es la electrónica</u> |
 | `ALEGRA_IVA_TAX_ID` | `3` | IVA 19 % de la cuenta. Vacío: las líneas van sin impuesto |
 | `ALEGRA_CONSUMIDOR_FINAL_ID` | vacío | Contacto «Consumidor final», para compras sin documento. <u>No existe en la cuenta: hay que crearlo</u> |

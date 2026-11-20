@@ -26,6 +26,12 @@ elegido. Un numero sin termino de comparacion no dice si el negocio va bien.
 aprobacion del pago guardada en el pedido; con pagos de aprobacion diferida
 una venta puede caer en un dia anterior al de su cobro.
 
+**Tarjetas de regalo** = su compra no es una venta de mercancia: se cuenta
+cuando se canjea, en el pedido que la usa (como la factura). Por eso los
+pedidos de compra de tarjetas quedan fuera de todas las metricas de ventas y
+se ven en el panel de tarjetas. En un pedido canjeado, `total` es lo cobrado
+por el proveedor; lo pagado con la tarjeta va en `gift_card_total`.
+
 **Embudo** = sesiones (visitantes estables, ver `analitica.services`) que
 alcanzaron cada etapa, donde cada etapa exige haber pasado la anterior. Mide
 solo a quien acepta ser medido: quedan fuera las personas con Do Not Track
@@ -42,7 +48,7 @@ from django.db.models import Count, Min, Q, Sum
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from inventory.models import Inventory
-from orders.models import Order, OrderItem, OrderStatus, PaymentStatus
+from orders.models import Order, OrderItem, OrderKind, OrderStatus, PaymentStatus
 from payments.models import Refund
 from products.models import Product
 
@@ -59,8 +65,12 @@ VENTA_ANULADA = Q(payment_status=PaymentStatus.APPROVED) & Q(
 )
 
 
-def _pedidos(desde, hasta, filtro=None):
+def _pedidos(desde, hasta, filtro=None, incluir_tarjetas=False):
     consulta = Order.objects.filter(created_at__date__gte=desde, created_at__date__lte=hasta)
+    if not incluir_tarjetas:
+        # Los pedidos de prueba (confirmados sin pago desde el panel) tampoco
+        # son ventas; la exportacion los trae con su marca.
+        consulta = consulta.exclude(kind=OrderKind.GIFT_CARD).exclude(is_test_order=True)
     return consulta.filter(filtro) if filtro is not None else consulta
 
 
@@ -99,6 +109,7 @@ def resumen_ventas(desde, hasta):
         descuentos=Sum('discount_total'),
         envio=Sum('shipping_cost'),
         cobrado=Sum('total'),
+        con_tarjeta=Sum('gift_card_total'),
     )
     pedidos = agregado['pedidos'] or 0
     bruto, descuentos = _dec(agregado['bruto']), _dec(agregado['descuentos'])
@@ -117,6 +128,7 @@ def resumen_ventas(desde, hasta):
         'tasa_descuento': _pct(descuentos, bruto),
         'envio': _dec(agregado['envio']),
         'cobrado': cobrado,
+        'pagado_con_tarjeta_regalo': _dec(agregado['con_tarjeta']),
         'reembolsos': reembolsos,
         'neto': cobrado - reembolsos,
         'ticket_promedio': (cobrado / pedidos) if pedidos else CERO,
@@ -616,17 +628,21 @@ def filas_exportacion(desde, hasta):
     ):
         items[pedido_id] += cantidad
     for pedido in (
-        _pedidos(desde, hasta)
+        _pedidos(desde, hasta, incluir_tarjetas=True)
         .select_related('coupon', 'referred_by__user', 'user')
         .order_by('created_at')
     ):
         yield {
             'pedido': pedido.order_number,
+            'tipo': pedido.kind,
+            'prueba_sin_pago': 'si' if pedido.is_test_order else 'no',
             'fecha': timezone.localtime(pedido.created_at).strftime('%Y-%m-%d %H:%M'),
             'estado_pedido': pedido.order_status,
             'estado_pago': pedido.payment_status,
             'venta_valida': 'si' if (
-                pedido.payment_status == PaymentStatus.APPROVED
+                not pedido.is_gift_card_purchase
+                and not pedido.is_test_order
+                and pedido.payment_status == PaymentStatus.APPROVED
                 and pedido.order_status not in (OrderStatus.CANCELLED, OrderStatus.RETURNED)
             ) else 'no',
             'cliente_id': pedido.user_id or '',
@@ -635,12 +651,13 @@ def filas_exportacion(desde, hasta):
             'descuento': pedido.discount_total,
             'envio': pedido.shipping_cost,
             'total': pedido.total,
+            'tarjeta_regalo': pedido.gift_card_total,
             'cupon': pedido.coupon.code if pedido.coupon_id else '',
             'afiliado_id': pedido.referred_by_id or '',
         }
 
 
 COLUMNAS_EXPORTACION = (
-    'pedido', 'fecha', 'estado_pedido', 'estado_pago', 'venta_valida', 'cliente_id', 'unidades',
-    'subtotal', 'descuento', 'envio', 'total', 'cupon', 'afiliado_id',
+    'pedido', 'tipo', 'prueba_sin_pago', 'fecha', 'estado_pedido', 'estado_pago', 'venta_valida', 'cliente_id', 'unidades',
+    'subtotal', 'descuento', 'envio', 'total', 'tarjeta_regalo', 'cupon', 'afiliado_id',
 )

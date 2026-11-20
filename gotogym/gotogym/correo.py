@@ -6,7 +6,8 @@ HTML, y tambien lo que ven las pruebas: por eso sale del mismo contenido y no
 de un segundo texto que pueda desalinearse.
 
 Quien escribe un correo arma un `Correo` con bloques (`parrafo`, `aviso`,
-`productos`, `totales`, `datos`, `boton`) y llama a `enviar_correo`. La plantilla
+`productos`, `totales`, `datos`, `boton`, `tarjeta_regalo`, `dedicatoria`,
+`pasos`) y llama a `enviar_correo`. La plantilla
 (`templates/correo/`) decide como se ve; ningun correo trae su propio HTML.
 
 Es una utilidad compartida: no conoce ninguna app.
@@ -50,6 +51,25 @@ def totales(filas):
 def datos(filas):
     """`filas`: tuplas `(etiqueta, valor)` en un recuadro de datos clave."""
     return {'tipo': 'datos', 'filas': [{'etiqueta': e, 'valor': v} for e, v in filas]}
+
+
+def tarjeta_regalo(valor, codigo, etiqueta_codigo, vigencia, encabezado='Tarjeta de regalo'):
+    """Tarjeta de regalo decorada: el valor en grande, el codigo para copiar
+    y la vigencia. Todos los textos llegan ya traducidos."""
+    return {
+        'tipo': 'tarjeta_regalo', 'valor': valor, 'codigo': codigo,
+        'etiqueta_codigo': etiqueta_codigo, 'vigencia': vigencia, 'encabezado': encabezado,
+    }
+
+
+def dedicatoria(texto, firma):
+    """Mensaje personal de quien regala, destacado como una cita."""
+    return {'tipo': 'dedicatoria', 'texto': texto, 'firma': firma}
+
+
+def pasos(titulo, lineas):
+    """Lista numerada corta (por ejemplo, como usar algo)."""
+    return {'tipo': 'pasos', 'titulo': titulo, 'lineas': list(lineas)}
 
 
 def boton(texto, url, texto_plano=None):
@@ -110,6 +130,18 @@ def _texto_del_bloque(bloque):
         return '\n'.join(f"{fila['etiqueta']}: {fila['valor']}" for fila in bloque['filas'])
     if tipo == 'boton':
         return bloque['texto_plano'] or f"{bloque['texto']}: {bloque['url']}"
+    if tipo == 'tarjeta_regalo':
+        return '\n'.join([
+            f"*** {bloque['encabezado']} GoToGym ***",
+            bloque['valor'],
+            f"{bloque['etiqueta_codigo']}: {bloque['codigo']}",
+            bloque['vigencia'],
+        ])
+    if tipo == 'dedicatoria':
+        return f"\"{bloque['texto']}\"\n- {bloque['firma']}"
+    if tipo == 'pasos':
+        lineas = [f'{i}. {linea}' for i, linea in enumerate(bloque['lineas'], start=1)]
+        return '\n'.join([bloque['titulo'], *lineas])
     raise ValueError(f'Bloque de correo desconocido: {tipo!r}')
 
 

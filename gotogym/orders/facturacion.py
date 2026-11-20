@@ -11,6 +11,11 @@ espera el precio de cada linea sin impuestos y el descuento como porcentaje,
 asi que aqui se convierte: si los precios de la tienda ya incluyen IVA se
 descuenta, y el descuento del cupon (que es del pedido completo) se reparte
 como el mismo porcentaje en todas las lineas, sin tocar el envio.
+
+Las tarjetas de regalo siguen la doctrina de la DIAN (Oficio 16302 de 2019):
+su compra no se factura, y el pedido en que se canjean se factura por el
+valor completo. Lo pagado con la tarjeta es un medio de pago, no un
+descuento, asi que no rebaja ninguna linea.
 """
 import logging
 from datetime import date, datetime, time, timedelta
@@ -22,7 +27,15 @@ from django.db.models import F, Q
 from django.utils import timezone
 from integrations.alegra.alegra_client import AlegraClient, AlegraError
 
-from .models import DocumentType, Invoice, InvoiceStatus, Order, OrderStatus, PaymentStatus
+from .models import (
+    DocumentType,
+    Invoice,
+    InvoiceStatus,
+    Order,
+    OrderKind,
+    OrderStatus,
+    PaymentStatus,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -110,9 +123,12 @@ def _numero(valor):
 
 def facturable(order):
     """Solo se factura un pedido pagado y vigente. Uno cancelado (por ejemplo,
-    por falta de stock aunque el pago se aprobara) se devuelve, no se factura."""
+    por falta de stock aunque el pago se aprobara) se devuelve, no se factura.
+    La compra de una tarjeta de regalo tampoco: se factura cuando se canjea."""
     return (
-        order.payment_status == PaymentStatus.APPROVED
+        not order.is_gift_card_purchase
+        and not order.is_test_order
+        and order.payment_status == PaymentStatus.APPROVED
         and order.order_status not in (OrderStatus.CANCELLED, OrderStatus.PENDING_PAYMENT)
     )
 
@@ -134,8 +150,14 @@ def pago_aprobado(order):
     return order.payment_transactions.filter(status='approved').order_by('-updated_at').first()
 
 
-def medio_de_pago(pago):
-    """Medio de pago DIAN de la factura, segun como pago el comprador."""
+def medio_de_pago(pago, order=None):
+    """Medio de pago DIAN de la factura, segun como pago el comprador. Un
+    pedido pagado por completo con tarjeta de regalo no tiene pago en el
+    proveedor: usa `ALEGRA_MEDIO_DE_PAGO_TARJETA_REGALO`."""
+    if pago is None and order is not None and order.gift_card_total and not order.total:
+        return getattr(settings, 'ALEGRA_MEDIO_DE_PAGO_TARJETA_REGALO', '') or getattr(
+            settings, 'ALEGRA_MEDIO_DE_PAGO', 'INSTRUMENT_NOT_DEFINED',
+        )
     tipo = ((pago.raw_payload or {}).get('payment') or {}).get('payment_type_id') if pago else None
     return MEDIO_DE_PAGO_MERCADO_PAGO.get(
         tipo, getattr(settings, 'ALEGRA_MEDIO_DE_PAGO', 'INSTRUMENT_NOT_DEFINED'),
@@ -146,6 +168,11 @@ def _observaciones(order, pago):
     texto = f'Pedido {order.order_number}.'
     if pago is not None and pago.provider == 'mercadopago':
         texto += f' Pagado con Mercado Pago (pago {pago.payment_id}).'
+    if order.gift_card_total and order.gift_card_id:
+        texto += (
+            f' Pagado con tarjeta de regalo ····-{order.gift_card.code[-4:]}: '
+            f'${order.gift_card_total:,.0f}.'.replace(',', '.')
+        )
     return texto
 
 
@@ -233,7 +260,7 @@ def armar_factura(order, contacto_id, ids_de_items, hoy=None, pago=None):
         'items': items,
         'status': 'open',
         'paymentForm': 'CASH',
-        'paymentMethod': medio_de_pago(pago),
+        'paymentMethod': medio_de_pago(pago, order),
         'type': 'NATIONAL',
         'operationType': 'STANDARD',
         # Permite cruzar la factura de Alegra con el pedido de la tienda. Las
@@ -440,6 +467,8 @@ def ordenes_por_facturar(limite=50):
     pedidos = (
         Order.objects.filter(payment_status=PaymentStatus.APPROVED)
         .exclude(order_status__in=[OrderStatus.CANCELLED, OrderStatus.PENDING_PAYMENT])
+        .exclude(kind=OrderKind.GIFT_CARD)
+        .exclude(is_test_order=True)
         .filter(condicion)
         .order_by('paid_at', 'id')
     )

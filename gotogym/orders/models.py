@@ -126,6 +126,11 @@ class Coupon(models.Model):
         return descuento.quantize(Decimal('0.01'))
 
 
+class OrderKind(models.TextChoices):
+    PRODUCTS = 'products', gettext_lazy('Productos')
+    GIFT_CARD = 'gift_card', gettext_lazy('Tarjeta de regalo')
+
+
 class Order(models.Model):
     """Pedido persistente.
 
@@ -133,8 +138,20 @@ class Order(models.Model):
     (`payment_status`) son independientes: los controla actor distinto (la
     operacion humana uno, el proveedor de pago el otro) y un pedido puede
     estar pagado y todavia sin alistar.
+
+    `kind` distingue la compra de una tarjeta de regalo: se paga igual que
+    cualquier pedido, pero no lleva envio ni stock y no se factura (la venta
+    ocurre cuando la tarjeta se canjea, ver `orders.tarjetas_regalo`).
+
+    `total` es lo que se cobra por el proveedor de pago. La parte pagada con
+    una tarjeta de regalo va en `gift_card_total` y no es un descuento: el
+    valor del pedido sigue siendo `subtotal + shipping_cost - discount_total`.
     """
 
+    kind = models.CharField(max_length=12, choices=OrderKind.choices, default=OrderKind.PRODUCTS)
+    # Confirmado sin pago por una cuenta del equipo con el modo de pruebas del
+    # panel activo. No se factura, no genera comision y no cuenta como venta.
+    is_test_order = models.BooleanField(default=False)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='orders',
@@ -148,6 +165,7 @@ class Order(models.Model):
     subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     shipping_cost = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     discount_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    gift_card_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     order_status = models.CharField(
@@ -176,6 +194,11 @@ class Order(models.Model):
     coupon = models.ForeignKey(
         'orders.Coupon', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='orders',
+    )
+    # Tarjeta de regalo con la que se pago parte o todo el pedido.
+    gift_card = models.ForeignKey(
+        'orders.GiftCard', on_delete=models.PROTECT, null=True, blank=True,
+        related_name='redemption_orders',
     )
 
     # Cuando el pedido paso a entregado. Marca el inicio del periodo de
@@ -212,10 +235,24 @@ class Order(models.Model):
                 ),
                 name='order_importes_no_negativos',
             ),
+            models.CheckConstraint(
+                condition=models.Q(gift_card_total__gte=0),
+                name='order_tarjeta_regalo_no_negativa',
+            ),
         ]
 
     def __str__(self):
         return self.order_number
+
+    @property
+    def is_gift_card_purchase(self):
+        return self.kind == OrderKind.GIFT_CARD
+
+    @property
+    def order_value(self):
+        """Valor del pedido antes de descontar lo pagado con tarjeta de regalo:
+        lo que se factura."""
+        return self.total + self.gift_card_total
 
 
 class OrderItem(models.Model):
@@ -338,3 +375,134 @@ class Address(models.Model):
 
     def __str__(self):
         return f"{self.full_name} - {self.city}"
+
+
+class GiftCardStatus(models.TextChoices):
+    # Creada con su compra, a la espera de que el pago se apruebe: todavia no
+    # se puede canjear y el codigo no se ha enviado a nadie.
+    PENDING = 'pending', gettext_lazy('Pendiente de pago')
+    ACTIVE = 'active', gettext_lazy('Activa')
+    # Bloqueada por el equipo (por ejemplo, por un contracargo de la compra).
+    DISABLED = 'disabled', gettext_lazy('Bloqueada')
+    # La compra no se concreto o se retracto: estado final.
+    CANCELLED = 'cancelled', gettext_lazy('Anulada')
+
+
+class GiftCard(models.Model):
+    """Tarjeta de regalo virtual: un saldo canjeable en el checkout.
+
+    No es un cupon. El cupon rebaja el precio; la tarjeta es un medio de pago
+    con saldo que se consume por partes. Por eso tiene su propio historial
+    (`GiftCardMovement`) y lo pagado con ella va en `Order.gift_card_total`,
+    nunca en `discount_total`: la factura del canje sale por el valor
+    completo de los productos.
+
+    `code` se guarda normalizado (16 caracteres, sin guiones) y se muestra en
+    grupos de cuatro (`display_code`). Vence a los 12 meses de activarse;
+    canjearla en parte no prorroga ese plazo.
+    """
+
+    code = models.CharField(max_length=16, unique=True)
+    status = models.CharField(max_length=12, choices=GiftCardStatus.choices, default=GiftCardStatus.PENDING)
+    initial_amount = models.DecimalField(max_digits=12, decimal_places=2)
+    balance = models.DecimalField(max_digits=12, decimal_places=2)
+    currency = models.CharField(max_length=3, default='COP')
+
+    purchase_order = models.OneToOneField(
+        Order, on_delete=models.PROTECT, null=True, blank=True, related_name='purchased_gift_card',
+    )
+    buyer = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='gift_cards_bought',
+    )
+    sender_name = models.CharField(max_length=80)
+    recipient_name = models.CharField(max_length=80)
+    recipient_email = models.EmailField()
+    message = models.CharField(max_length=300, blank=True)
+    # Idioma en que se compro: el correo al destinatario sale en ese idioma.
+    language = models.CharField(max_length=8, default='es', blank=True)
+
+    issued_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    # Ultimo envio exitoso del correo al destinatario.
+    sent_at = models.DateTimeField(null=True, blank=True)
+    disabled_reason = models.CharField(max_length=255, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at', '-id']
+        indexes = [
+            models.Index(fields=['status', 'expires_at'], name='giftcard_status_expires_idx'),
+            models.Index(fields=['recipient_email'], name='giftcard_recipient_idx'),
+        ]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(initial_amount__gt=0), name='giftcard_valor_positivo'),
+            models.CheckConstraint(
+                condition=models.Q(balance__gte=0, balance__lte=models.F('initial_amount')),
+                name='giftcard_saldo_en_rango',
+            ),
+        ]
+
+    def __str__(self):
+        return self.masked_code
+
+    @property
+    def display_code(self):
+        return '-'.join(self.code[i:i + 4] for i in range(0, len(self.code), 4))
+
+    @property
+    def masked_code(self):
+        return f'····-{self.code[-4:]}'
+
+    def is_expired(self, momento=None):
+        momento = momento or timezone.now()
+        return self.expires_at is not None and momento > self.expires_at
+
+    def is_usable(self, momento=None):
+        return (
+            self.status == GiftCardStatus.ACTIVE
+            and self.balance > 0
+            and not self.is_expired(momento)
+        )
+
+    @property
+    def is_unused(self):
+        """Nunca se ha canjeado, ni siquiera en un pedido que luego se cancelo
+        y devolvio el saldo: es la condicion para aceptar el retracto."""
+        return not self.movements.filter(kind=GiftCardMovementKind.REDEEM).exists()
+
+
+class GiftCardMovementKind(models.TextChoices):
+    ISSUE = 'issue', gettext_lazy('Emisión')
+    REDEEM = 'redeem', gettext_lazy('Canje')
+    RELEASE = 'release', gettext_lazy('Devolución de saldo')
+    VOID = 'void', gettext_lazy('Anulación')
+
+
+class GiftCardMovement(models.Model):
+    """Cada cambio del saldo de una tarjeta, con el pedido que lo causo.
+
+    `amount` lleva signo: positivo suma saldo (emision, devolucion), negativo
+    lo resta (canje, anulacion). `balance_after` es el saldo que quedo; con
+    ambos se reconstruye la historia completa ante un reclamo."""
+
+    gift_card = models.ForeignKey(GiftCard, on_delete=models.CASCADE, related_name='movements')
+    kind = models.CharField(max_length=10, choices=GiftCardMovementKind.choices)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    balance_after = models.DecimalField(max_digits=12, decimal_places=2)
+    order = models.ForeignKey(
+        Order, on_delete=models.PROTECT, null=True, blank=True, related_name='gift_card_movements',
+    )
+    note = models.CharField(max_length=255, blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='+',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at', 'id']
+
+    def __str__(self):
+        return f'{self.gift_card.masked_code}: {self.kind} {self.amount}'

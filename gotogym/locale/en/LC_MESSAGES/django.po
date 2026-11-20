@@ -4657,3 +4657,352 @@ msgstr "My favorites | GoToGym"
 
 msgid "Los productos que guardaste en la tienda GoToGym."
 msgstr "The products you saved in the GoToGym store."
+
+# Tarjetas de regalo
+msgid "NIT"
+msgstr "NIT"
+
+msgid "Tarjeta de regalo"
+msgstr "Gift card"
+
+msgid "Emitida"
+msgstr "Issued"
+
+msgid "Fallida"
+msgstr "Failed"
+
+msgid "Activa"
+msgstr "Active"
+
+msgid "Bloqueada"
+msgstr "Blocked"
+
+msgid "Anulada"
+msgstr "Voided"
+
+msgid "Emisión"
+msgstr "Issue"
+
+msgid "Canje"
+msgstr "Redemption"
+
+msgid "Devolución de saldo"
+msgstr "Balance returned"
+
+msgid "Anulación"
+msgstr "Voiding"
+
+msgid "La tarjeta de regalo no está disponible."
+msgstr "The gift card is not available."
+
+msgid "Hiciste demasiados intentos con códigos de tarjeta. Inténtalo de nuevo en una hora."
+msgstr "You made too many attempts with gift card codes. Try again in an hour."
+
+msgid "La tarjeta de regalo no es válida."
+msgstr "The gift card is not valid."
+
+msgid "La tarjeta de regalo ya no tiene saldo."
+msgstr "The gift card has no balance left."
+
+msgid "La tarjeta de regalo venció el %(fecha)s."
+msgstr "The gift card expired on %(fecha)s."
+
+msgid "Valor de la tarjeta"
+msgstr "Gift card amount"
+
+msgid "De parte de"
+msgstr "From"
+
+msgid "Para"
+msgstr "To"
+
+msgid "Correo de quien recibe el regalo"
+msgstr "Recipient's email"
+
+msgid "Confirma el correo"
+msgstr "Confirm the email"
+
+msgid "Dedicatoria (opcional)"
+msgstr "Message (optional)"
+
+msgid "Acepto las condiciones de la tarjeta de regalo"
+msgstr "I accept the gift card conditions"
+
+msgid "Escribe tu nombre."
+msgstr "Enter your name."
+
+msgid "Escribe el nombre de quien recibe el regalo."
+msgstr "Enter the recipient's name."
+
+msgid "Debes aceptar las condiciones de la tarjeta de regalo."
+msgstr "You must accept the gift card conditions."
+
+msgid "La dedicatoria no puede incluir enlaces ni direcciones web."
+msgstr "The message cannot include links or web addresses."
+
+msgid "Los correos no coinciden."
+msgstr "The emails do not match."
+
+msgid "Este campo no puede incluir enlaces."
+msgstr "This field cannot include links."
+
+msgid "Elige un valor entre $%(minimo)s y $%(maximo)s."
+msgstr "Choose an amount between $%(minimo)s and $%(maximo)s."
+
+msgid "Selecciona un tipo"
+msgstr "Select a type"
+
+msgid "Ese es el código de una tarjeta de regalo: escríbelo en el campo \"Tarjeta de regalo\"."
+msgstr "That is a gift card code: enter it in the \"Gift card\" field."
+
+msgid "Escribe el código de tu tarjeta."
+msgstr "Enter your gift card code."
+
+msgid "Tu tarjeta de regalo cubrió todo el pedido. ¡Quedó confirmado!"
+msgstr "Your gift card covered the whole order. It is confirmed!"
+
+msgid "Cancelamos la compra de tu tarjeta de regalo y la tarjeta quedó anulada. Te devolveremos el dinero por el mismo medio de pago."
+msgstr "We cancelled the purchase of your gift card and the card was voided. We will refund the money through the same payment method."
+
+msgid "Cómo usarla"
+msgstr "How to use it"
+
+msgid "Tienes un regalo"
+msgstr "You have a gift"
+
+msgid "Pagado con tarjeta de regalo"
+msgstr "Paid with gift card"
+
+msgid "Cuando se apruebe el pago, enviaremos la tarjeta de regalo a %(nombre)s (%(correo)s)."
+msgstr "Once the payment is approved, we will send the gift card to %(nombre)s (%(correo)s)."
+
+msgid "%(remitente)s te regaló una tarjeta de GoToGym para que elijas lo que más te guste."
+msgstr "%(remitente)s gave you a GoToGym gift card so you can choose what you like most."
+
+msgid "De parte de %(remitente)s"
+msgstr "From %(remitente)s"
+
+msgid "Tu código"
+msgstr "Your code"
+
+msgid "Elige tus prendas en la tienda de GoToGym."
+msgstr "Choose your garments in the GoToGym store."
+
+msgid "Inicia sesión o crea tu cuenta: la necesitas para pagar."
+msgstr "Sign in or create your account: you need it to pay."
+
+msgid "En el pago, escribe el código en el campo \"Tarjeta de regalo\"."
+msgstr "At checkout, enter the code in the \"Gift card\" field."
+
+msgid "Tu tarjeta vence el %(fecha)s. Puedes usarla en una o varias compras hasta esa fecha; usar una parte del saldo no amplía el plazo. Si el saldo no alcanza para tu compra, pagas la diferencia con otro medio. Al vencer, el saldo que quede ya no se podrá usar. No se cambia por dinero."
+msgstr "Your card expires on %(fecha)s. You can use it in one or several purchases until then; using part of the balance does not extend that date. If the balance is not enough for your purchase, you pay the difference with another method. Once it expires, any remaining balance can no longer be used. It cannot be exchanged for cash."
+
+msgid "%(remitente)s te envió una tarjeta de regalo de GoToGym"
+msgstr "%(remitente)s sent you a GoToGym gift card"
+
+msgid "%(remitente)s te regaló %(valor)s para tu próxima compra en GoToGym."
+msgstr "%(remitente)s gave you %(valor)s for your next GoToGym purchase."
+
+msgid "Recibes este correo porque %(remitente)s te regaló una tarjeta de GoToGym. Si no conoces a quien te la envía, puedes ignorar este mensaje."
+msgstr "You are receiving this email because %(remitente)s gave you a GoToGym gift card. If you do not know the sender, you can ignore this message."
+
+msgid "Si el correo de destino tiene un error o tu regalo no llegó, escríbenos a support@gotogym.store con tu número de pedido y lo reenviamos."
+msgstr "If the recipient email has a mistake or your gift did not arrive, write to support@gotogym.store with your order number and we will resend it."
+
+msgid "Si te arrepientes de la compra, puedes pedir la devolución del dinero dentro de los 5 días hábiles siguientes, siempre que la tarjeta no se haya usado."
+msgstr "If you change your mind, you can ask for a refund within the next 5 business days, as long as the card has not been used."
+
+msgid "Puedes ver tu compra aquí: %(enlace)s"
+msgstr "You can see your purchase here: %(enlace)s"
+
+msgid "Tu regalo va en camino"
+msgstr "Your gift is on its way"
+
+msgid "No pudimos completar tu pedido."
+msgstr "We could not complete your order."
+
+msgid "Válida hasta el %(fecha)s"
+msgstr "Valid until %(fecha)s"
+
+msgid "Entra a la tienda: %(enlace)s"
+msgstr "Visit the store: %(enlace)s"
+
+msgid "Recibimos tu pago. Enviamos tu tarjeta de regalo a %(nombre)s, a su correo %(correo)s."
+msgstr "We received your payment. We sent your gift card to %(nombre)s at %(correo)s."
+
+msgid "Tu tarjeta de regalo va en camino a %(nombre)s"
+msgstr "Your gift card is on its way to %(nombre)s"
+
+msgid "Lo que pagaste con tu tarjeta de regalo (%(monto)s) volvió a su saldo."
+msgstr "The amount you paid with your gift card (%(monto)s) went back to its balance."
+
+msgid "Valor"
+msgstr "Amount"
+
+msgid "Tarjeta"
+msgstr "Card"
+
+msgid "Válida hasta"
+msgstr "Valid until"
+
+msgid "El valor de la tarjeta está fuera del rango permitido."
+msgstr "The gift card amount is outside the allowed range."
+
+msgid "La tarjeta de regalo ya no está disponible."
+msgstr "The gift card is no longer available."
+
+msgid "El cupón ya no está disponible."
+msgstr "The coupon is no longer available."
+
+msgid "Tarjetas de regalo | GoToGym"
+msgstr "Gift cards | GoToGym"
+
+msgid "Regala una tarjeta de GoToGym: eliges el valor, escribes una dedicatoria y la enviamos por correo a quien quieras."
+msgstr "Give a GoToGym gift card: choose the amount, write a message and we email it to whoever you want."
+
+msgid "Tarjetas de regalo"
+msgstr "Gift cards"
+
+msgid "Elige el valor, escribe una dedicatoria y la enviamos por correo a quien quieras. Quien la recibe la usa en la tienda, en una o varias compras."
+msgstr "Choose the amount, write a message and we email it to whoever you want. The recipient uses it in the store, in one or several purchases."
+
+msgid "Las compras están pausadas en este momento. Vuelve en un rato."
+msgstr "Purchases are paused right now. Come back in a while."
+
+msgid "¿Cuánto quieres regalar?"
+msgstr "How much do you want to give?"
+
+msgid "Valores sugeridos"
+msgstr "Suggested amounts"
+
+msgid "Otro valor"
+msgstr "Other amount"
+
+msgid "Para quién"
+msgstr "Who it is for"
+
+msgid "¿A quién se la enviamos?"
+msgstr "Who should we send it to?"
+
+msgid "La tarjeta llega a este correo en cuanto se aprueba el pago. Revísalo bien: es adonde enviamos el código."
+msgstr "The card arrives at this email as soon as the payment is approved. Check it carefully: it is where we send the code."
+
+msgid "Tu mensaje"
+msgstr "Your message"
+
+msgid "Escribe tu dedicatoria"
+msgstr "Write your message"
+
+msgid "Sin enlaces ni direcciones web."
+msgstr "No links or web addresses."
+
+msgid "Vista previa"
+msgstr "Preview"
+
+msgid "Así la recibirá"
+msgstr "This is how they will receive it"
+
+msgid "Condiciones"
+msgstr "Conditions"
+
+msgid "Al vencer, el saldo que quede ya no se puede usar, y usar una parte no amplía el plazo."
+msgstr "Once it expires, any remaining balance can no longer be used, and using part of it does not extend that date."
+
+msgid "Se usa en una o varias compras hasta agotar el saldo, y se combina con cupones de descuento."
+msgstr "It can be used in one or several purchases until the balance runs out, and it can be combined with discount coupons."
+
+msgid "Para usarla, quien la recibe necesita una cuenta en GoToGym. No se cambia por dinero."
+msgstr "To use it, the recipient needs a GoToGym account. It cannot be exchanged for cash."
+
+msgid "Si te arrepientes, puedes pedir la devolución del dinero dentro de los 5 días hábiles siguientes a la compra, siempre que la tarjeta no se haya usado."
+msgstr "If you change your mind, you can ask for a refund within 5 business days after the purchase, as long as the card has not been used."
+
+msgid "Acepto las condiciones de la tarjeta de regalo y los"
+msgstr "I accept the gift card conditions and the"
+
+msgid "Comprar y pagar"
+msgstr "Buy and pay"
+
+msgid "Pagas con Mercado Pago. Te enviaremos la confirmación a tu correo."
+msgstr "You pay with Mercado Pago. We will send the confirmation to your email."
+
+msgid "Inicia sesión para comprar"
+msgstr "Sign in to buy"
+
+msgid "La compra queda a nombre de tu cuenta."
+msgstr "The purchase is made under your account."
+
+msgid "Regala <em>GoToGym</em>"
+msgstr "Give <em>GoToGym</em>"
+
+msgid "Entre $%(minimo)s y $%(maximo)s"
+msgstr "Between $%(minimo)s and $%(maximo)s"
+
+msgid "Desde $%(minimo)s hasta $%(maximo)s COP."
+msgstr "From $%(minimo)s to $%(maximo)s COP."
+
+msgid "Usar datos de usuario"
+msgstr "Use my account details"
+
+msgid "Código de la tarjeta de regalo"
+msgstr "Gift card code"
+
+msgid "Demasiados intentos. Espera un momento e inténtalo de nuevo."
+msgstr "Too many attempts. Wait a moment and try again."
+
+msgid "Saldo disponible:"
+msgstr "Available balance:"
+
+msgid "válida hasta el"
+msgstr "valid until"
+
+msgid "Pago aprobado. Enviamos la tarjeta de regalo."
+msgstr "Payment approved. We sent the gift card."
+
+msgid "Tu tarjeta de regalo"
+msgstr "Your gift card"
+
+msgid "Enviada"
+msgstr "Sent"
+
+msgid "El código lo recibe solo quien recibe el regalo. Si el correo tiene un error o no llegó, escríbenos a support@gotogym.store con tu número de pedido."
+msgstr "Only the recipient receives the code. If the email has a mistake or did not arrive, write to support@gotogym.store with your order number."
+
+msgid "Los pagos en línea están deshabilitados temporalmente. Vuelve más tarde para pagarlo."
+msgstr "Online payments are temporarily disabled. Come back later to pay for it."
+
+msgid "Intentar el pago de nuevo"
+msgstr "Try the payment again"
+
+msgid "Pagar con Mercado Pago"
+msgstr "Pay with Mercado Pago"
+
+msgid "Pagarás en el sitio seguro de Mercado Pago y volverás aquí al terminar."
+msgstr "You will pay on the secure Mercado Pago site and come back here when you finish."
+
+msgid "¿Buscas un regalo? Regala una tarjeta GoToGym"
+msgstr "Looking for a gift? Give a GoToGym gift card"
+
+msgid "Tarjeta de regalo GoToGym"
+msgstr "GoToGym gift card"
+
+msgid "Válida por %(meses)s mes desde que se aprueba el pago."
+msgid_plural "Válida por %(meses)s meses desde que se aprueba el pago."
+msgstr[0] "Valid for %(meses)s month from the payment approval."
+msgstr[1] "Valid for %(meses)s months from the payment approval."
+
+# Tarjetas de regalo
+msgid "Pedido de prueba confirmado sin pago."
+msgstr "Test order confirmed without payment."
+
+msgid "Confirmar sin pagar (prueba)"
+msgstr "Confirm without paying (test)"
+
+msgid "Pedido de prueba: se confirmó sin pago desde el modo de pruebas del equipo."
+msgstr "Test order: it was confirmed without payment using the team test mode."
+
+msgid "Modo de pruebas del equipo: este pedido se confirmará sin pagar."
+msgstr "Team test mode: this order will be confirmed without payment."
+
+msgid "Modo de pruebas del equipo: la tarjeta se activa y se envía sin pagar."
+msgstr "Team test mode: the card is activated and sent without payment."

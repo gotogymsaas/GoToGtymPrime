@@ -4,20 +4,27 @@ from analitica.services import registrar_evento
 from carrito.services import build_cart_context, read_cart, write_cart
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.utils.formats import date_format
 from django.utils.translation import gettext
-from gotogym.ajustes_tienda import MENSAJE_COMPRAS_PAUSADAS, compras_pausadas
+from gotogym.ajustes_tienda import MENSAJE_COMPRAS_PAUSADAS, compras_pausadas, confirma_sin_pagar
+from gotogym.ratelimit import rate_limit
 from products.forms import ProductReviewForm
 from shipping.services import get_mock_quote
 from tienda.catalog import curated_product_cards
 
+from . import tarjetas_regalo
 from .colombia_data import MUNICIPIOS_POR_DEPARTAMENTO
-from .forms import CheckoutForm
-from .models import Order, OrderItem, OrderStatus
+from .forms import CheckoutForm, GiftCardPurchaseForm, error_de_tarjeta
+from .models import Order, OrderItem, OrderStatus, PaymentStatus
 from .services import (
     CheckoutError,
     cancel_expired_orders,
+    confirmar_sin_pago,
+    create_gift_card_order,
     create_order_from_cart,
     es_cupon_propio,
     get_usable_coupon,
@@ -83,9 +90,19 @@ def checkout(request):
                     articulos=sum(item.quantity for item in pedido.items.all()),
                     cupon=1 if pedido.coupon_id else 0,
                     afiliado=1 if pedido.referred_by_id else 0,
+                    tarjeta_regalo=1 if pedido.gift_card_id else 0,
                 )
                 # El carrito solo se vacia si el pedido quedo creado.
                 write_cart(request.session, {})
+                if pedido.payment_status != PaymentStatus.APPROVED and confirma_sin_pagar(request):
+                    return _confirmado_sin_pago(request, pedido)
+                if pedido.payment_status == PaymentStatus.APPROVED:
+                    # La tarjeta de regalo lo cubrio todo: no hay nada que pagar.
+                    if pedido.order_status == OrderStatus.CONFIRMED:
+                        messages.success(request, gettext(
+                            'Tu tarjeta de regalo cubrió todo el pedido. ¡Quedó confirmado!'
+                        ))
+                    return redirect('orders:order_detail', order_number=pedido.order_number)
                 return redirect('payments:pending', order_number=pedido.order_number)
     else:
         # Los datos personales (nombre, documento, correo, telefono) no se
@@ -188,6 +205,75 @@ def validar_cupon(request):
     })
 
 
+def _confirmado_sin_pago(request, pedido):
+    """Modo de pruebas del equipo: confirma el pedido en vez de llevarlo a la
+    pasarela y muestra su detalle."""
+    pedido = confirmar_sin_pago(pedido, request.user)
+    if pedido.order_status == OrderStatus.CONFIRMED:
+        messages.success(request, gettext('Pedido de prueba confirmado sin pago.'))
+    return redirect('orders:order_detail', order_number=pedido.order_number)
+
+
+@login_required
+@rate_limit('validar_tarjeta_regalo', limit=20, period_seconds=60)
+def validar_tarjeta_regalo(request):
+    """Vista previa en vivo del saldo de una tarjeta de regalo en el checkout.
+
+    Solo informa el saldo: cuanto cubre del pedido lo calcula el navegador
+    para mostrarlo, y el servidor lo vuelve a calcular (y lo toma, con la
+    tarjeta bloqueada) en `create_order_from_cart`. Cada codigo equivocado
+    cuenta para el tope de intentos de la cuenta."""
+    codigo = tarjetas_regalo.normalizar_codigo(request.GET.get('code'))
+    if not codigo:
+        return JsonResponse({'valid': False, 'message': gettext('Escribe el código de tu tarjeta.')})
+    error = error_de_tarjeta(codigo, request.user)
+    if error:
+        return JsonResponse({'valid': False, 'message': error})
+    tarjeta = tarjetas_regalo.buscar_por_codigo(codigo)
+    return JsonResponse({
+        'valid': True,
+        'code': tarjeta.display_code,
+        'balance': float(tarjeta.balance),
+        'expires': date_format(timezone.localtime(tarjeta.expires_at), 'DATE_FORMAT'),
+    })
+
+
+def tarjeta_regalo(request):
+    """Pagina de las tarjetas de regalo: se ve sin sesion, pero comprar exige
+    una cuenta (el pago y el pedido quedan a nombre de quien compra)."""
+    pausadas = compras_pausadas(request)
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return redirect_to_login(request.get_full_path())
+        form = GiftCardPurchaseForm(request.POST)
+        if pausadas:
+            messages.warning(request, str(MENSAJE_COMPRAS_PAUSADAS))
+        elif form.is_valid():
+            try:
+                pedido = create_gift_card_order(request.user, form.cleaned_data)
+            except CheckoutError as error:
+                messages.error(request, str(error))
+            else:
+                if confirma_sin_pagar(request):
+                    return _confirmado_sin_pago(request, pedido)
+                return redirect('payments:pending', order_number=pedido.order_number)
+    else:
+        inicial = {}
+        if request.user.is_authenticated:
+            inicial['sender_name'] = request.user.get_full_name() or request.user.first_name
+        form = GiftCardPurchaseForm(initial=inicial)
+
+    return render(request, 'orders/tarjeta_regalo.html', {
+        'form': form,
+        'valores_sugeridos': [int(v) for v in tarjetas_regalo.VALORES_SUGERIDOS],
+        'valor_minimo': int(tarjetas_regalo.VALOR_MINIMO),
+        'valor_maximo': int(tarjetas_regalo.VALOR_MAXIMO),
+        'meses_de_vigencia': tarjetas_regalo.MESES_DE_VIGENCIA,
+        'largo_dedicatoria': tarjetas_regalo.LARGO_DEDICATORIA,
+        'compras_pausadas': pausadas,
+    })
+
+
 @login_required
 def my_orders(request):
     orders = (
@@ -205,13 +291,18 @@ def my_orders(request):
 @login_required
 def order_detail(request, order_number):
     pedido = get_object_or_404(
-        Order.objects.prefetch_related('items__review').select_related('address', 'shipping_quote'),
+        Order.objects.prefetch_related('items__review').select_related(
+            'address', 'shipping_quote', 'purchased_gift_card', 'gift_card',
+        ),
         order_number=order_number,
         user=request.user,
     )
     return render(request, 'orders/order_detail.html', {
         'pedido': pedido,
         'puede_resenar': pedido.order_status in REVIEWABLE_ORDER_STATUSES,
+        # A quien compro una tarjeta se le muestra a quien se envio, no el
+        # codigo: el codigo es del destinatario.
+        'tarjeta_comprada': getattr(pedido, 'purchased_gift_card', None) if pedido.is_gift_card_purchase else None,
     })
 
 

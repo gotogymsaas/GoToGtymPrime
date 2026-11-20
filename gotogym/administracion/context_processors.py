@@ -13,6 +13,16 @@ def pagos_habilitados(request):
     return {'pagos_habilitados': ajustes_tienda.pagos_habilitados(request)}
 
 
+def modo_sin_pago(request):
+    """Expone si el modo de pruebas "Confirmar sin pagar (equipo)" esta
+    encendido (interruptor y aviso del panel) y si aplica a quien navega
+    (la tienda le muestra "Confirmar sin pagar" en vez del pago)."""
+    return {
+        'modo_sin_pago_activo': ajustes_tienda.modo_sin_pago_activo(request),
+        'confirma_sin_pagar': ajustes_tienda.confirma_sin_pagar(request),
+    }
+
+
 def coach_habilitado(request):
     """Expone al panel si el asistente (Coach) esta habilitado: pinta el
     interruptor "Habilitar Coach" de la barra superior."""

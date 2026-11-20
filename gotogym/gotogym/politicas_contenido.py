@@ -169,6 +169,13 @@ PAGOS = {
             'Si el pago no se completa dentro de las 48 horas siguientes a la creación del pedido, '
             'este se cancela automáticamente. Puedes volver a hacer tu compra cuando quieras.',
         ]},
+        # Breve a proposito: Quantum Coach recibe esta politica con un tope de
+        # largo (vendedor.contrato.MAX_LARGO_POLITICA). El detalle esta en los
+        # terminos y condiciones.
+        {'title': 'Tarjetas de regalo', 'paragraphs': [
+            'Puedes pagar con una tarjeta de regalo GoToGym, sola o junto con Mercado Pago. Vale por 12 meses '
+            'desde su emisión y usar una parte no amplía el plazo. Condiciones en los términos.',
+        ]},
         {'title': 'Pagos rechazados y reembolsos', 'paragraphs': [
             'Si tu pago es rechazado puedes intentarlo de nuevo con otro medio. Los reembolsos se hacen '
             'por el mismo medio de pago utilizado; consulta la política de devoluciones para los plazos.',

@@ -9,6 +9,10 @@
   <a class="button ghost" href="{% url 'admin_orders' %}">Volver</a>
 </section>
 
+{% if order.is_test_order %}
+<div class="panel"><p><span class="badge badge-gold">Prueba sin pago</span> Se confirmó sin pago desde el modo de pruebas del equipo: no se factura, no genera comisión y no cuenta como venta. Si ya no lo necesitas, cancélalo para reponer el stock.</p></div>
+{% endif %}
+
 <div class="panel">
   <p><strong>Estado del pedido:</strong> {{ order.get_order_status_display }}</p>
   <p>
@@ -20,7 +24,27 @@
   {% if order.referred_by %}
   <p><strong>Afiliado referido:</strong> {{ order.referred_by.user.email }}</p>
   {% endif %}
+  {% if order.gift_card_id %}
+  <p><strong>Pagado con tarjeta de regalo:</strong> ${{ order.gift_card_total|cop }} COP
+    (<a href="{% url 'admin_gift_card_detail' order.gift_card_id %}">{{ order.gift_card.masked_code }}</a>)</p>
+  {% endif %}
 </div>
+
+{% if tarjeta_comprada %}
+<div class="panel">
+  <h2>Tarjeta de regalo comprada</h2>
+  <p><strong>Para:</strong> {{ tarjeta_comprada.recipient_name }} &middot; {{ tarjeta_comprada.recipient_email }}</p>
+  <p><strong>De parte de:</strong> {{ tarjeta_comprada.sender_name }}</p>
+  <p><strong>Estado:</strong> {{ tarjeta_comprada.get_status_display }} &middot; saldo ${{ tarjeta_comprada.balance|cop }} de ${{ tarjeta_comprada.initial_amount|cop }} COP
+    &middot; <a href="{% url 'admin_gift_card_detail' tarjeta_comprada.pk %}">Ver tarjeta</a></p>
+  {% if order.paid_at %}<p><strong>Pagada:</strong> {{ order.paid_at|date:"d/m/Y H:i" }}</p>{% endif %}
+  {% if order.order_status == 'confirmed' %}
+  <p><small>Retracto: la persona puede pedir la devolución del dinero dentro de los 5 días hábiles siguientes a la compra si la tarjeta no se ha usado.
+    Para aplicarlo, cancela el pedido (la tarjeta queda anulada) y después reembolsa el pago.
+    {% if not next_statuses %}<strong>Esta tarjeta ya se usó: no admite retracto.</strong>{% endif %}</small></p>
+  {% endif %}
+</div>
+{% endif %}
 
 {% if next_statuses %}
 <div class="panel">
@@ -62,16 +86,17 @@
       <tr>
         <td>{{ item.sku_snapshot }}</td>
         <td>{{ item.product_name_snapshot }}</td>
-        <td>{{ item.size_snapshot }} / {{ item.color_snapshot }}</td>
+        <td>{% if item.size_snapshot or item.color_snapshot %}{{ item.size_snapshot }} / {{ item.color_snapshot }}{% else %}&mdash;{% endif %}</td>
         <td>{{ item.quantity }}</td>
         <td class="nowrap">${{ item.line_total|cop }} COP</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-  <p>Subtotal: ${{ order.subtotal|cop }} COP &middot; Envío: ${{ order.shipping_cost|cop }} COP &middot; <strong>Total: ${{ order.total|cop }} COP</strong></p>
+  <p>Subtotal: ${{ order.subtotal|cop }} COP{% if order.discount_total %} &middot; Descuento: -${{ order.discount_total|cop }} COP{% endif %} &middot; Envío: ${{ order.shipping_cost|cop }} COP{% if order.gift_card_total %} &middot; Tarjeta de regalo: -${{ order.gift_card_total|cop }} COP{% endif %} &middot; <strong>Total cobrado: ${{ order.total|cop }} COP</strong></p>
 </div>
 
+{% if not order.is_gift_card_purchase %}
 <div class="panel">
   <h2>Dirección de entrega</h2>
   {% with address=order.address %}
@@ -84,6 +109,7 @@
   <p>{{ order.shipping_quote.carrier_name }} &middot; {{ order.shipping_quote.method_name }} &middot; {{ order.shipping_quote.estimated_days }} días</p>
   {% endif %}
 </div>
+{% endif %}
 
 <div class="panel">
   <h2>Transacciones de pago</h2>

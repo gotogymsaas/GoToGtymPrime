@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="{% static 'images/apple-touch-icon.png' %}">
   <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261014-turquesa">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=20260922-editorial">
-  <link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261022-orden">
+  <link rel="stylesheet" href="{% static 'css/panel_quantum.css' %}?v=20261119-modo-pruebas">
 </head>
 <body class="panel-shell">
   <aside class="sidebar">
@@ -29,6 +29,7 @@
       <a class="panel-nav__link" href="{% url 'admin_analytics' %}">{% include "administracion/_nav_icon.html" with name="analitica" %}<span>Analítica</span></a>
       <a class="panel-nav__link" href="{% url 'admin_products' %}">{% include "administracion/_nav_icon.html" with name="productos" %}<span>Productos</span></a>
       <a class="panel-nav__link" href="{% url 'admin_coupons' %}">{% include "administracion/_nav_icon.html" with name="cupones" %}<span>Cupones y descuentos</span></a>
+      {% if perms.orders.view_order %}<a class="panel-nav__link" href="{% url 'admin_gift_cards' %}">{% include "administracion/_nav_icon.html" with name="tarjetas" %}<span>Tarjetas de regalo</span></a>{% endif %}
       <a class="panel-nav__link" href="{% url 'admin_orders' %}">{% include "administracion/_nav_icon.html" with name="pedidos" %}<span>Pedidos y pagos</span></a>
       <a class="panel-nav__link" href="{% url 'admin_atencion' %}">{% include "administracion/_nav_icon.html" with name="atencion" %}<span>Atención al cliente</span></a>
       <a class="panel-nav__link" href="{% url 'admin_afiliados' %}">{% include "administracion/_nav_icon.html" with name="afiliados" %}<span>Afiliados</span></a>
@@ -63,6 +64,16 @@
         {% elif not pagos_habilitados %}
           <span class="pause-badge">Pagos deshabilitados</span>
         {% endif %}
+        {% if perms.administracion.change_panelsettings %}
+          <button type="button" class="pause-switch{% if modo_sin_pago_activo %} is-test-mode{% else %} is-off{% endif %}" role="switch"
+                  aria-checked="{% if modo_sin_pago_activo %}true{% else %}false{% endif %}"
+                  aria-haspopup="dialog" data-test-mode-open>
+            <span class="pause-switch__track" aria-hidden="true"><span class="pause-switch__thumb"></span></span>
+            <span class="pause-switch__label">Confirmar sin pagar (equipo)</span>
+          </button>
+        {% elif modo_sin_pago_activo %}
+          <span class="pause-badge">Modo de pruebas</span>
+        {% endif %}
         <a class="ghost btn-sm" href="{% url 'tienda:producto_list' %}">Salir del panel</a>
         <form method="post" action="{% url 'logout' %}">
           {% csrf_token %}
@@ -72,6 +83,9 @@
     </header>
     {% if not coach_habilitado %}
       <p class="pause-notice" role="status">Quantum Coach está deshabilitado: no se muestra en la tienda.</p>
+    {% endif %}
+    {% if modo_sin_pago_activo %}
+      <p class="pause-notice pause-notice--test" role="status">Modo de pruebas encendido: las cuentas del equipo confirman pedidos y tarjetas de regalo sin pagar. Los clientes siguen pagando normal. Apágalo al terminar.</p>
     {% endif %}
     {% if not pagos_habilitados %}
       <p class="pause-notice" role="status">Los pagos en línea están deshabilitados: la tienda no abre pagos nuevos con Mercado Pago. Los pagos en curso se siguen confirmando.</p>
@@ -94,6 +108,25 @@
           <div class="pause-dialog__actions">
             <button type="button" class="ghost btn-sm" data-coach-cancel>Cancelar</button>
             <button type="submit" class="{% if coach_habilitado %}danger{% else %}button{% endif %} btn-sm">{% if coach_habilitado %}Deshabilitar Coach{% else %}Habilitar Coach{% endif %}</button>
+          </div>
+        </form>
+      </dialog>
+      <dialog class="pause-dialog" id="test-mode-dialog" aria-labelledby="test-mode-dialog-title">
+        <form method="post" action="{% url 'admin_staff_checkout_without_payment_toggle' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input type="hidden" name="activar" value="{% if modo_sin_pago_activo %}0{% else %}1{% endif %}">
+          {% if modo_sin_pago_activo %}
+            <h2 id="test-mode-dialog-title">¿Apagar el modo de pruebas?</h2>
+            <p>Las cuentas del equipo volverán a pagar sus pedidos como cualquier cliente.</p>
+          {% else %}
+            <h2 id="test-mode-dialog-title">¿Confirmar pedidos sin pagar?</h2>
+            <p>Mientras esté encendido, las cuentas del equipo (las que entran a este panel) confirman sus pedidos y tarjetas de regalo al pasar el checkout, sin ir a Mercado Pago. Los clientes siguen pagando normal.</p>
+            <p>Esos pedidos quedan marcados como prueba: no se facturan, no generan comisión y no cuentan como venta. Sí descuentan stock (se repone si los cancelas) y las tarjetas de regalo se activan y se envían por correo de verdad.</p>
+          {% endif %}
+          <div class="pause-dialog__actions">
+            <button type="button" class="ghost btn-sm" data-test-mode-cancel>Cancelar</button>
+            <button type="submit" class="{% if modo_sin_pago_activo %}button{% else %}danger{% endif %} btn-sm">{% if modo_sin_pago_activo %}Apagar modo de pruebas{% else %}Encender modo de pruebas{% endif %}</button>
           </div>
         </form>
       </dialog>
@@ -156,6 +189,7 @@
     }
     conectarDialogo('coach-dialog', 'data-coach-open', 'data-coach-cancel');
     conectarDialogo('payments-dialog', 'data-payments-open', 'data-payments-cancel');
+    conectarDialogo('test-mode-dialog', 'data-test-mode-open', 'data-test-mode-cancel');
     // Un panel con tabla ancha desplaza su contenido: sin foco no se puede
     // recorrer con el teclado.
     document.querySelectorAll('.panel').forEach(function (panel) {

@@ -40,8 +40,9 @@ from django.urls import reverse
 from django.utils import timezone, translation
 from inventory.models import Inventory
 from orders import correos as correos_pedido
+from orders import tarjetas_regalo
 from orders.models import Coupon, CouponDiscountType, OrderStatus, PaymentStatus
-from orders.services import create_order_from_cart
+from orders.services import create_gift_card_order, create_order_from_cart
 from products.models import Brand, Product, ProductCategory, ProductVariant
 
 BACKEND_EN_MEMORIA = 'django.core.mail.backends.locmem.EmailBackend'
@@ -106,6 +107,7 @@ class Command(BaseCommand):
 
         with translation.override(idioma):
             self._correos_del_pedido(capturar, idioma)
+            self._correos_de_tarjeta_regalo(capturar, idioma)
             self._correo_de_contrasena(capturar, idioma)
         self._correos_de_afiliados(capturar)
         return capturados
@@ -156,6 +158,27 @@ class Command(BaseCommand):
         pedido.save(update_fields=['order_status', 'payment_status'])
         capturar('Pedido cancelado (sin pago)', lambda: correos_pedido.pedido_cancelado(pedido.pk))
         self._pedido = pedido
+
+    def _correos_de_tarjeta_regalo(self, capturar, idioma):
+        comprador = self._usuario('andres@example.com', first_name='Andrés')
+        pedido = create_gift_card_order(comprador, {
+            'amount': Decimal('150000'), 'sender_name': 'Andrés', 'recipient_name': 'Laura',
+            'recipient_email': 'laura@example.com',
+            'message': '¡Feliz cumpleaños, Laura! Para que estrenes algo cómodo en tus entrenamientos. Te quiero mucho.',
+        })
+        pedido.language = idioma
+        pedido.save(update_fields=['language'])
+        capturar('Tarjeta de regalo: compra recibida', lambda: correos_pedido.pedido_recibido(pedido.pk))
+        tarjeta = tarjetas_regalo.activar_compra(pedido)
+        tarjeta.language = idioma
+        tarjeta.save(update_fields=['language'])
+        pedido.order_status = OrderStatus.CONFIRMED
+        pedido.payment_status = PaymentStatus.APPROVED
+        pedido.save(update_fields=['order_status', 'payment_status'])
+        capturar('Tarjeta de regalo: correo al destinatario',
+                 lambda: correos_pedido.tarjeta_regalo_para_destinatario(tarjeta.pk))
+        capturar('Tarjeta de regalo: confirmación al comprador',
+                 lambda: correos_pedido.tarjeta_regalo_comprada(pedido.pk))
 
     def _correo_de_contrasena(self, capturar, idioma):
         cliente = get_user_model().objects.get(email='camila@example.com')

@@ -31,12 +31,14 @@ from inventory.services import (
 from shipping.models import ShippingQuote, ShippingStatus
 from shipping.services import get_mock_quote
 
-from . import correos, facturacion
+from . import correos, facturacion, tarjetas_regalo
 from .models import (
     Address,
     Coupon,
+    GiftCard,
     Order,
     OrderItem,
+    OrderKind,
     OrderStatus,
     OrderStatusHistory,
     PaymentStatus,
@@ -110,6 +112,13 @@ def registrar_pago_revertido(order, motivo):
     )
     order.save(update_fields=['internal_note', 'updated_at'])
     revert_order_commission(order, motivo)
+    if order.is_gift_card_purchase:
+        # El saldo de una tarjeta cuyo pago se revirtio no esta respaldado: se
+        # bloquea (sin anularla) hasta que una persona resuelva el caso.
+        tarjeta = GiftCard.objects.filter(purchase_order=order).first()
+        if tarjeta is not None:
+            with transaction.atomic():
+                tarjetas_regalo.bloquear(tarjeta, f'Pago de la compra revertido por el proveedor: {motivo}')
     logger.error(
         'Pago revertido por el proveedor en el pedido %s (estado %s): %s',
         order.order_number, order.order_status, motivo,
@@ -124,6 +133,16 @@ def release_coupon(order):
     pago rechazado agotarian los cupones de uso limitado."""
     if order.coupon_id:
         Coupon.objects.filter(pk=order.coupon_id, times_used__gt=0).update(times_used=F('times_used') - 1)
+
+
+def _liberar_lo_reservado(order, nota):
+    """Deshace lo que un pedido que no se concreto tenia tomado: el uso del
+    cupon, el saldo de la tarjeta de regalo con que se pagaba y, si era la
+    compra de una tarjeta, la tarjeta misma."""
+    release_coupon(order)
+    tarjetas_regalo.devolver_saldo(order, nota)
+    if order.is_gift_card_purchase:
+        tarjetas_regalo.anular_compra(order, nota)
 
 
 # Estado del envio que corresponde a cada estado logistico del pedido.
@@ -234,6 +253,16 @@ def valid_next_statuses(order):
     if order.order_status not in ORDER_STATUS_SEQUENCE:
         return []
 
+    if order.is_gift_card_purchase:
+        # La compra de una tarjeta no tiene logistica: solo se cancela. Sin
+        # pago, siempre; ya pagada (retracto), solo si la tarjeta nunca se
+        # ha canjeado, porque ese saldo ya no se puede recuperar.
+        if order.order_status == OrderStatus.PENDING_PAYMENT:
+            return [OrderStatus.CANCELLED]
+        if order.order_status == OrderStatus.CONFIRMED and tarjetas_regalo.puede_retractarse(order):
+            return [OrderStatus.CANCELLED]
+        return []
+
     indice = ORDER_STATUS_SEQUENCE.index(order.order_status)
     restantes = ORDER_STATUS_SEQUENCE[indice + 1:]
 
@@ -318,8 +347,12 @@ def apply_order_status_transition(order, nuevo_estado, tracking_code=None, chang
     if nuevo_estado == OrderStatus.SHIPPED:
         enqueue(correos.pedido_enviado, order.pk)
     elif nuevo_estado == OrderStatus.CANCELLED:
-        release_coupon(order)
+        _liberar_lo_reservado(order, f'Pedido {order.order_number} cancelado.')
         enqueue(correos.pedido_cancelado, order.pk)
+    elif nuevo_estado == OrderStatus.RETURNED:
+        # Lo pagado con tarjeta de regalo se devuelve a la tarjeta; lo cobrado
+        # por el proveedor se reembolsa aparte, desde el panel.
+        tarjetas_regalo.devolver_saldo(order, f'Pedido {order.order_number} devuelto.', changed_by)
 
     return order
 
@@ -386,6 +419,12 @@ def create_order_from_cart(user, cart, datos):
     descuento = cupon.compute_discount(subtotal) if cupon else Decimal('0.00')
     total = subtotal + envio - descuento
 
+    tarjeta = None
+    if datos.get('gift_card_code'):
+        tarjeta = tarjetas_regalo.buscar_tarjeta_usable(datos['gift_card_code'])
+        if tarjeta is None:
+            raise CheckoutError(gettext('La tarjeta de regalo ya no está disponible.'))
+
     if cupon is not None:
         # El uso se toma con un UPDATE condicional: `get_usable_coupon` leyo el
         # contador antes, y dos compras simultaneas verian ambas un cupo libre.
@@ -417,12 +456,25 @@ def create_order_from_cart(user, cart, datos):
                     payment_status=PaymentStatus.PENDING,
                     referred_by=cupon.afiliado if cupon else None,
                     coupon=cupon,
+                    gift_card=tarjeta,
                 )
             break
         except IntegrityError:
             if intento == MAX_INTENTOS_NUMERO - 1:
                 raise
             continue
+
+    if tarjeta is not None:
+        # La tarjeta paga despues del cupon y cubre tambien el envio. El saldo
+        # se toma ya, con la tarjeta bloqueada; si el pedido no se paga, se
+        # devuelve al cancelarse (ver `_liberar_lo_reservado`).
+        try:
+            pagado_con_tarjeta = tarjetas_regalo.canjear(tarjeta, pedido, total)
+        except tarjetas_regalo.TarjetaNoDisponible:
+            raise CheckoutError(gettext('La tarjeta de regalo ya no está disponible.')) from None
+        pedido.gift_card_total = pagado_con_tarjeta
+        pedido.total = total - pagado_con_tarjeta
+        pedido.save(update_fields=['gift_card_total', 'total', 'updated_at'])
 
     for item in items:
         variante = item['variant']
@@ -462,6 +514,76 @@ def create_order_from_cart(user, cart, datos):
         estimated_days=cotizacion['estimated_days'],
     )
 
+    if tarjeta is not None and pedido.total == 0:
+        # Pagado por completo con tarjeta de regalo: no hay nada que cobrarle
+        # al proveedor de pago, se confirma de una vez.
+        _confirmar_pedido_pagado(pedido, nota='Pagado por completo con tarjeta de regalo.')
+    else:
+        enqueue(correos.pedido_recibido, pedido.pk)
+    return pedido
+
+
+@transaction.atomic
+def create_gift_card_order(user, datos):
+    """Crea la compra de una tarjeta de regalo: un pedido sin envio ni stock
+    con una sola linea, y la tarjeta todavia sin activar. Se activa (y se le
+    envia a quien la recibe) cuando el pago se aprueba.
+
+    No acepta cupon ni otra tarjeta: una tarjeta se compra por su valor.
+    `datos` trae `amount`, `sender_name`, `recipient_name`,
+    `recipient_email` y `message`, ya validados por el formulario."""
+    if compras_pausadas():
+        raise CheckoutError(str(MENSAJE_COMPRAS_PAUSADAS))
+
+    valor = Decimal(datos['amount']).quantize(Decimal('0.01'))
+    if not tarjetas_regalo.VALOR_MINIMO <= valor <= tarjetas_regalo.VALOR_MAXIMO:
+        raise CheckoutError(gettext('El valor de la tarjeta está fuera del rango permitido.'))
+
+    idioma = get_language() or 'es'
+    pedido = None
+    for intento in range(MAX_INTENTOS_NUMERO):
+        try:
+            with transaction.atomic():
+                pedido = Order.objects.create(
+                    kind=OrderKind.GIFT_CARD,
+                    user=user if getattr(user, 'is_authenticated', False) else None,
+                    order_number=generate_order_number(),
+                    language=idioma,
+                    email=user.email,
+                    phone=getattr(user, 'phone', '') or '',
+                    subtotal=valor,
+                    shipping_cost=Decimal('0.00'),
+                    discount_total=Decimal('0.00'),
+                    total=valor,
+                    order_status=OrderStatus.PENDING_PAYMENT,
+                    payment_status=PaymentStatus.PENDING,
+                )
+            break
+        except IntegrityError:
+            if intento == MAX_INTENTOS_NUMERO - 1:
+                raise
+            continue
+
+    OrderItem.objects.create(
+        order=pedido,
+        variant=None,
+        product_name_snapshot=tarjetas_regalo.NOMBRE_TARJETA,
+        sku_snapshot=tarjetas_regalo.SKU_TARJETA,
+        size_snapshot='',
+        color_snapshot='',
+        unit_price_snapshot=valor,
+        quantity=1,
+        line_total=valor,
+    )
+    tarjetas_regalo.crear_tarjeta_pendiente(
+        pedido, user, valor,
+        remitente=datos['sender_name'],
+        destinatario=datos['recipient_name'],
+        correo=datos['recipient_email'],
+        dedicatoria=datos.get('message', ''),
+        idioma=idioma,
+    )
+    _registrar_estado(pedido, '', OrderStatus.PENDING_PAYMENT)
     enqueue(correos.pedido_recibido, pedido.pk)
     return pedido
 
@@ -469,7 +591,15 @@ def create_order_from_cart(user, cart, datos):
 @transaction.atomic
 def confirm_payment(order, payment_transaction):
     """Aplica el efecto de un pago aprobado: descuenta stock y confirma el
-    pedido.
+    pedido (ver `_confirmar_pedido_pagado`)."""
+    if payment_transaction.status != 'approved':
+        raise PaymentNotApprovedError()
+    return _confirmar_pedido_pagado(order, nota='Pago aprobado.')
+
+
+def _confirmar_pedido_pagado(order, nota):
+    """Confirma un pedido ya pagado: por el proveedor (`confirm_payment`) o,
+    sin nada que cobrar, por completo con una tarjeta de regalo.
 
     Idempotente por `order_status`: si el pedido ya quedo `confirmed` o
     `cancelled`, no vuelve a tocar nada (evita que un doble aviso de pago
@@ -482,10 +612,10 @@ def confirm_payment(order, payment_transaction):
     no existe, el pedido no queda "confirmado a medias": se marca
     `cancelled` con una nota interna para revision humana. Un pago aprobado
     nunca se trata como si hubiera fallado en silencio.
-    """
-    if payment_transaction.status != 'approved':
-        raise PaymentNotApprovedError()
 
+    La compra de una tarjeta de regalo no descuenta stock, no genera comision
+    ni factura: activa la tarjeta y se la envia a quien la recibe.
+    """
     Order.objects.select_for_update().filter(pk=order.pk).first()
     order.refresh_from_db(fields=['order_status', 'payment_status', 'internal_note'])
     ahora = timezone.now()
@@ -511,6 +641,20 @@ def confirm_payment(order, payment_transaction):
     order.payment_status = PaymentStatus.APPROVED
     order.paid_at = ahora
 
+    if order.is_gift_card_purchase:
+        order.order_status = OrderStatus.CONFIRMED
+        order.save(update_fields=['payment_status', 'paid_at', 'order_status', 'updated_at'])
+        _registrar_estado(order, estado_previo, OrderStatus.CONFIRMED, nota=nota)
+        tarjeta = tarjetas_regalo.activar_compra(order, ahora)
+        if tarjeta is not None:
+            enqueue(correos.tarjeta_regalo_para_destinatario, tarjeta.pk)
+            enqueue(correos.tarjeta_regalo_comprada, order.pk)
+        return order
+
+    # Lo que se pago con tarjeta de regalo vuelve a la tarjeta si el pedido no
+    # se puede cumplir; solo lo cobrado por el proveedor requiere reembolso.
+    reembolso = 'Requiere reembolso manual.' if order.total > 0 else 'Lo pagado con tarjeta de regalo volvió a su saldo.'
+
     lineas = list(order.items.select_related('variant').all())
     lineas_sin_variante = [linea for linea in lineas if linea.variant_id is None]
 
@@ -526,7 +670,7 @@ def confirm_payment(order, payment_transaction):
             'payment_status', 'paid_at', 'order_status', 'cancelled_at', 'internal_note', 'updated_at',
         ])
         _registrar_estado(order, estado_previo, OrderStatus.CANCELLED, nota='Pago aprobado sin variante en el catálogo.')
-        release_coupon(order)
+        _liberar_lo_reservado(order, f'Pedido {order.order_number} cancelado: producto fuera del catálogo.')
         enqueue(correos.pedido_cancelado, order.pk)
         return order
 
@@ -540,23 +684,48 @@ def confirm_payment(order, payment_transaction):
         order.internal_note = (
             f'Pago aprobado pero sin stock suficiente para {error.variant.sku} '
             f'(pedidas {error.requested}, disponibles {error.available}). '
-            f'Requiere reembolso manual.'
+            f'{reembolso}'
         )
         order.save(update_fields=[
             'payment_status', 'paid_at', 'order_status', 'cancelled_at', 'internal_note', 'updated_at',
         ])
         _registrar_estado(order, estado_previo, OrderStatus.CANCELLED, nota='Pago aprobado sin stock suficiente.')
-        release_coupon(order)
+        _liberar_lo_reservado(order, f'Pedido {order.order_number} cancelado: sin stock suficiente.')
         enqueue(correos.pedido_cancelado, order.pk)
         return order
 
     order.order_status = OrderStatus.CONFIRMED
     order.save(update_fields=['payment_status', 'paid_at', 'order_status', 'updated_at'])
-    _registrar_estado(order, estado_previo, OrderStatus.CONFIRMED, nota='Pago aprobado.')
-    register_order_commission(order)
+    _registrar_estado(order, estado_previo, OrderStatus.CONFIRMED, nota=nota)
+    if not order.is_test_order:
+        # Un pedido de prueba no entro dinero: ni comision ni factura.
+        register_order_commission(order)
+        enqueue(facturacion.emitir_factura, order.pk)
     enqueue(correos.pedido_confirmado, order.pk)
-    enqueue(facturacion.emitir_factura, order.pk)
     return order
+
+
+@transaction.atomic
+def confirmar_sin_pago(order, usuario):
+    """Confirma un pedido sin cobrarlo: el modo de pruebas del panel para las
+    cuentas del equipo (quien llama comprueba que aplique, ver
+    `gotogym.ajustes_tienda.confirma_sin_pagar`).
+
+    El pedido queda marcado como prueba (`is_test_order`) antes de
+    confirmarse, para que no se facture ni genere comision, y con una nota
+    de quien lo confirmo. Por lo demas sigue el camino de un pago aprobado:
+    descuenta stock (se repone si se cancela) y, si es la compra de una
+    tarjeta de regalo, la activa y la envia por correo."""
+    pedido = Order.objects.select_for_update().get(pk=order.pk)
+    if pedido.order_status != OrderStatus.PENDING_PAYMENT or pedido.payment_status == PaymentStatus.APPROVED:
+        return pedido
+    quien = getattr(usuario, 'email', '') or 'el equipo'
+    pedido.is_test_order = True
+    pedido.internal_note = _anotar(
+        pedido.internal_note, f'Pedido de prueba: confirmado sin pago por {quien} (modo de pruebas del panel).',
+    )
+    pedido.save(update_fields=['is_test_order', 'internal_note', 'updated_at'])
+    return _confirmar_pedido_pagado(pedido, nota=f'Confirmado sin pago (prueba) por {quien}.')
 
 
 def cancel_expired_orders(ahora=None, horas=None):
@@ -601,7 +770,7 @@ def cancel_expired_orders(ahora=None, horas=None):
                 pedido, OrderStatus.PENDING_PAYMENT, OrderStatus.CANCELLED,
                 nota=f'Sin pago tras {horas} horas.',
             )
-            release_coupon(pedido)
+            _liberar_lo_reservado(pedido, f'Pedido {pedido.order_number} sin pago a tiempo.')
             enqueue(correos.pedido_cancelado, pedido.pk)
             canceladas += 1
     return canceladas

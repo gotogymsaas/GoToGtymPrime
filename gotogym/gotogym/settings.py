@@ -115,6 +115,7 @@ TEMPLATES = [
                 'accounts.oidc.oidc_habilitado',
                 'administracion.context_processors.compras_pausadas',
                 'administracion.context_processors.pagos_habilitados',
+                'administracion.context_processors.modo_sin_pago',
                 'administracion.context_processors.coach_habilitado',
                 'blog.context_processors.journal_visibility',
                 'vendedor.context_processors.vendedor',
@@ -347,6 +348,9 @@ ALEGRA_PRECIOS_INCLUYEN_IVA = _as_bool(os.environ.get('ALEGRA_PRECIOS_INCLUYEN_I
 # (que informa si fue tarjeta, transferencia PSE o efectivo). Catalogo de
 # Alegra Colombia.
 ALEGRA_MEDIO_DE_PAGO = os.environ.get('ALEGRA_MEDIO_DE_PAGO', 'INSTRUMENT_NOT_DEFINED')
+# Medio de pago de un pedido pagado por completo con tarjeta de regalo (no
+# pasa por Mercado Pago). Vacio: usa ALEGRA_MEDIO_DE_PAGO. Lo define el contador.
+ALEGRA_MEDIO_DE_PAGO_TARJETA_REGALO = os.environ.get('ALEGRA_MEDIO_DE_PAGO_TARJETA_REGALO', '')
 # Contacto de Alegra para ventas sin documento del comprador. Vacio: un
 # pedido sin documento queda con la factura fallida hasta que se complete.
 ALEGRA_CONSUMIDOR_FINAL_ID = os.environ.get('ALEGRA_CONSUMIDOR_FINAL_ID', '')

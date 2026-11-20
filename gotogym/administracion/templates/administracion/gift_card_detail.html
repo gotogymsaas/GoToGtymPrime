@@ -1,0 +1,78 @@
+{% extends "administracion/base.html" %}
+{% load tienda_filters %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Tarjeta de regalo</p>
+    <h1>{{ tarjeta.masked_code }}</h1>
+  </div>
+  <a class="button ghost" href="{% url 'admin_gift_cards' %}">Volver</a>
+</section>
+
+<div class="panel">
+  <p><strong>Estado:</strong>
+    {% if tarjeta.status == 'active' and tarjeta.expires_at and tarjeta.expires_at < ahora %}Vencida{% else %}{{ tarjeta.get_status_display }}{% endif %}
+    {% if tarjeta.disabled_reason %}<small>({{ tarjeta.disabled_reason }})</small>{% endif %}
+  </p>
+  <p><strong>Saldo:</strong> ${{ tarjeta.balance|cop }} de ${{ tarjeta.initial_amount|cop }} COP</p>
+  <p><strong>Emitida:</strong> {{ tarjeta.issued_at|date:"d/m/Y H:i"|default:"—" }} &middot; <strong>Vence:</strong> {{ tarjeta.expires_at|date:"d/m/Y H:i"|default:"—" }}</p>
+  <p><strong>Para:</strong> {{ tarjeta.recipient_name }} &middot; {{ tarjeta.recipient_email }}
+    &middot; <strong>Correo enviado:</strong> {{ tarjeta.sent_at|date:"d/m/Y H:i"|default:"no" }}</p>
+  <p><strong>De parte de:</strong> {{ tarjeta.sender_name }}
+    {% if tarjeta.buyer %}&middot; <strong>Comprada por:</strong> {{ tarjeta.buyer.email }}{% endif %}
+    {% if tarjeta.purchase_order %}&middot; <a href="{% url 'admin_order_detail' tarjeta.purchase_order.order_number %}">Pedido {{ tarjeta.purchase_order.order_number }}</a>{% endif %}</p>
+  {% if tarjeta.message %}<p><strong>Dedicatoria:</strong> {{ tarjeta.message|linebreaksbr }}</p>{% endif %}
+  {% if perms.orders.change_order %}
+  <details>
+    <summary>Mostrar el código completo</summary>
+    <p><code>{{ tarjeta.display_code }}</code> <small>Es de quien recibe el regalo: compártelo solo con esa persona.</small></p>
+  </details>
+  {% endif %}
+</div>
+
+{% if perms.orders.change_order and tarjeta.status == 'active' or perms.orders.change_order and tarjeta.status == 'disabled' %}
+<div class="grid-two">
+  <div class="panel">
+    <h2>{% if tarjeta.status == 'active' %}Bloquear{% else %}Desbloquear{% endif %}</h2>
+    <form method="post" action="{% url 'admin_gift_card_toggle' tarjeta.pk %}">
+      {% csrf_token %}
+      {% if tarjeta.status == 'active' %}
+      <input type="text" name="reason" maxlength="255" placeholder="Motivo (queda registrado)" aria-label="Motivo del bloqueo">
+      <button type="submit" class="button">Bloquear</button>
+      <p><small>Bloquear no cambia el saldo: solo impide canjearla mientras se resuelve el caso.</small></p>
+      {% else %}
+      <button type="submit" class="button">Desbloquear</button>
+      {% endif %}
+    </form>
+  </div>
+  <div class="panel">
+    <h2>Reenviar el correo</h2>
+    <form method="post" action="{% url 'admin_gift_card_resend' tarjeta.pk %}">
+      {% csrf_token %}
+      <input type="email" name="recipient_email" value="{{ tarjeta.recipient_email }}" aria-label="Correo del destinatario">
+      <button type="submit" class="button">Reenviar</button>
+      <p><small>Si cambias el correo, la tarjeta se envía al nuevo y queda guardado. Confirma el cambio con quien compró.</small></p>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<div class="panel">
+  <h2>Movimientos del saldo</h2>
+  <table>
+    <thead><tr><th>Fecha</th><th>Movimiento</th><th>Monto</th><th>Saldo</th><th>Pedido</th><th>Nota</th></tr></thead>
+    <tbody>
+      {% for movimiento in movimientos %}
+      <tr>
+        <td class="nowrap">{{ movimiento.created_at|date:"d/m/Y H:i" }}</td>
+        <td>{{ movimiento.get_kind_display }}</td>
+        <td class="nowrap">{% if movimiento.amount < 0 %}-${{ movimiento.amount|cop|cut:"-" }}{% else %}${{ movimiento.amount|cop }}{% endif %}</td>
+        <td class="nowrap">${{ movimiento.balance_after|cop }}</td>
+        <td>{% if movimiento.order %}<a href="{% url 'admin_order_detail' movimiento.order.order_number %}">{{ movimiento.order.order_number }}</a>{% endif %}</td>
+        <td><small>{{ movimiento.note }}{% if movimiento.created_by %} · {{ movimiento.created_by.email }}{% endif %}</small></td>
+      </tr>
+      {% empty %}<tr><td colspan="6">Sin movimientos: la compra aún no se paga.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
