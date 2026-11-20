@@ -29,6 +29,16 @@ El rango cubre español, inglés y portugués, más la puntuación y las
 flechas (`→ ↗ ←`) que usan las plantillas. Si se añade un idioma con otro
 alfabeto hay que ampliarlo.
 
+## Fuentes del PDF de la tarjeta de regalo
+
+El PDF que se adjunta al correo de regalo se dibuja con reportlab, que solo
+incrusta fuentes TrueType, y estos `.otf` tienen contornos CFF.
+`scripts/generar_fuentes_pdf.py` recorta Regular y ExtraBold al mismo rango
+de caracteres de arriba y las convierte a TrueType en
+`gotogym/orders/fuentes/` (fuera de `static`: el sitio no las publica). El
+PDF incrusta solo las letras que usa. Las dos caras declaran incrustación
+permitida (`fsType` 0); igual aplica lo dicho abajo sobre la licencia.
+
 ## Licencia
 
 TT Norms Pro es una tipografía comercial. El uso web requiere licencia

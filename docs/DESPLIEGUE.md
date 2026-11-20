@@ -15,6 +15,8 @@ Verificado contra Azure y el código el 14 de octubre de 2026. Para ejecutar el 
 
 ## Cómo se despliega
 
+**Dependencias.** El paquete que se publica no lleva el entorno virtual: App Service instala `requirements.txt` al recibirlo. Una librería nueva solo tiene que estar ahí, con su versión fija. La última agregada es `reportlab==5.1.0` (19 de noviembre de 2026), que genera el PDF de la tarjeta de regalo. Es Python puro, no necesita paquetes del sistema. Las fuentes que ese PDF incrusta están en `gotogym/orders/fuentes/` y viajan con el código; si faltaran, el PDF sale con Helvetica y el correo se envía igual.
+
 1. Un push a `main` (o ejecutar el workflow a mano) lanza `.github/workflows/main_gotogymweb.yml`.
 2. El job `build` valida: ruff, import-linter, mypy, `manage.py check`, pruebas con cobertura, gobernanza de diseño y smoke del frontend.
 3. El job `deploy` empaqueta y publica por Kudu (`zipdeploy`) y comprueba que el sitio responda.
@@ -94,6 +96,7 @@ El correo sale por **Azure Communication Services (correo)** usando SMTP; el pro
 | Pedido recibido | Al crear el pedido, antes de pagar: resumen, aviso de que está pendiente de pago y plazo de `ORDER_PAYMENT_WINDOW_HOURS` horas (48 por defecto) antes de la cancelación automática. Sale por cada intento de compra, aunque la persona abandone el pago | Se registra en el log (`orders.correos`); la creación del pedido no se deshace |
 | Pedido confirmado | Cuando el pago queda **aprobado** | Se registra en el log (`orders.correos`); la compra y el webhook no se deshacen |
 | Pedido enviado, pedido cancelado | Al cambiar el estado del pedido; el cancelado también sale al vencer el plazo sin pagar o si un pago aprobado no se pudo atender | Igual que el anterior |
+| Tarjeta de regalo | Al aprobarse el pago de la compra: a quien recibe el regalo, con el código, el valor, la dedicatoria, la vigencia y **la tarjeta en PDF adjunta**; y una confirmación a quien la compró, sin el código completo. Desde el panel se puede reenviar, incluso a un correo corregido | Se registra en el log (`orders.correos`) y el panel marca la tarjeta como "correo sin enviar". Si solo falla el PDF, el correo sale sin el adjunto |
 | Programa de afiliados | Solicitud recibida, **aprobada** (bienvenida con su código y enlace, el descuento que recibe quien compra con el código, su comisión, el mínimo y el plazo de pago, y los primeros pasos; los valores salen de la configuración del programa y del cupón del afiliado), rechazada, bajas, terminación, cambio de tasa, validación extendida y avisos generales | Se registra en el log (`afiliados.correos`) |
 
 Los enlaces de los correos de pedidos y afiliados se arman con `SITIO_URL`; el de recuperación recibe el mismo valor al cargar `accounts/urls.py`, así que cambiarlo exige reiniciar la aplicación. Los correos de pedidos salen en el idioma en que se hizo el pedido. Hoy el envío ocurre dentro de la petición (`TASK_BACKEND=sync`) con un tiempo máximo de 10 segundos por conexión (`EMAIL_TIMEOUT`).
@@ -102,12 +105,13 @@ Los enlaces de los correos de pedidos y afiliados se arman con `SITIO_URL`; el d
 
 - Los correos remiten a `support@gotogym.store` para dudas, no a responder el correo (el remitente es `DoNotReply`). Confirmar que esa dirección existe y que alguien la lee.
 - Los clientes de correo bloquean las imágenes hasta que la persona las permite, y algunos (Outlook de escritorio) no muestran imágenes WebP o AVIF: el correo se entiende sin ellas y usa el archivo original de cada foto.
-- La tipografía de marca (TT Norms) no se puede cargar en un correo; los correos usan Helvetica o Arial.
+- La tipografía de marca (TT Norms) no se puede cargar en un correo; los correos usan Helvetica o Arial. El PDF de la tarjeta de regalo sí la lleva.
 - El nombre visible del remitente es "DoNotReply", no "GoToGym": lo toma Azure de la dirección dada de alta (MailFrom addresses → Display Name), no de `DEFAULT_FROM_EMAIL`. Se cambia dando de alta otra dirección en el recurso de correo; `DEFAULT_FROM_EMAIL` debe apuntar siempre a una dirección ya dada de alta, o Azure rechaza los envíos y los correos se pierden con un error solo en el log.
 - Los correos de pedido solo están traducidos al inglés (`gotogym/locale/en/LC_MESSAGES/django.po`); en portugués salen en español. Al agregar textos nuevos, editar el `.po` y recompilar el `.mo` con `polib` (no hay `msgfmt` en Windows), como indica el README.
 - La cancelación automática de pedidos sin pagar (y su correo) solo se ejecuta cuando alguien abre el checkout. Hasta que `cancelar_pedidos_vencidos` se programe cada hora (ver Tareas periódicas), el aviso puede salir mucho después de las 48 horas en una tienda con poco tráfico.
 - El dominio publica **dos registros SPF**; solo puede haber uno. Debe quedar el que incluye `spf.protection.outlook.com` y `spf.azurecomm.net`, y borrarse el que solo incluye `spf.protection.outlook.com`. Se corrige en GoDaddy.
 - Con `PAYMENT_PROVIDER` sin declarar el pago es simulado y `PAYMENTS_MOCK_UI_ENABLED` está apagado: en producción no hay forma de aprobar un pago, así que la confirmación de pedido no se puede ejercitar hasta configurar Mercado Pago (o encender el panel de simulación de forma temporal, que `security_checklist` marca como hallazgo mientras esté activo).
+- Para probar en producción los correos de confirmación y de tarjeta de regalo sin pagar, el panel tiene el interruptor **«Confirmar sin pagar (equipo)»**: solo aplica a cuentas del equipo, y los pedidos quedan marcados como prueba (sin factura, sin comisión, fuera de las ventas). Ver `docs/TARJETAS_REGALO.md`. Apagarlo al terminar.
 
 ## Quantum Coach, la IA de GoToGym
 

@@ -7,6 +7,14 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/editorial_pages.css' %}?v=20261017-responsive">
 <link rel="stylesheet" href="{% static 'css/commerce_editorial.css' %}?v=20261118-favoritos">
+<style>
+  .checkout-codes { display: grid; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; }
+  .checkout-codes:empty { display: none; }
+  .checkout-codes li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; border: 1px solid #c8c8c5; background: #fff; font-size: .82rem; color: var(--ed-ink, #101012); }
+  .checkout-codes li span { min-width: 0; overflow-wrap: anywhere; }
+  .checkout-codes li small { display: block; color: var(--ed-muted, #5f6066); font-size: .74rem; }
+  .checkout-codes button { flex-shrink: 0; border: 0; background: transparent; color: var(--ed-muted, #5f6066); font-size: .75rem; font-weight: 800; text-decoration: underline; cursor: pointer; }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -63,7 +71,7 @@
         <p class="editorial-kicker" style="margin-top: 44px;">{% trans "Entrega" %}</p>
         <h2>{% trans "Dirección de entrega" %}</h2>
         <div class="account-fields">
-          {% for field in form %}{% if field.name not in 'first_name,last_name,email,phone,document_type,document_number,coupon_code,gift_card_code' %}
+          {% for field in form %}{% if field.name not in 'first_name,last_name,email,phone,document_type,document_number,coupon_code,gift_card_code,discount_code' %}
           <div class="account-field{% if field.name == 'address_line' or field.name == 'address_complement' or field.name == 'notes' %} account-field--full{% endif %}">
             <label for="{{ field.id_for_label }}">
               {{ field.label }}{% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
@@ -110,34 +118,30 @@
           {% endfor %}
         </ul>
 
-        <section class="checkout-coupon" aria-labelledby="coupon-title">
-          <h3 id="coupon-title">{% trans "Cupón de descuento" %}</h3>
-          <div class="checkout-coupon__field">
-            <label class="sr-only" for="id_coupon_code">{% trans "Código del cupón" %}</label>
-            <input id="id_coupon_code" name="coupon_code" type="text" maxlength="30"
-                   value="{{ form.coupon_code.value|default:'' }}" placeholder="{% trans 'Ingresa tu cupón' %}"
-                   autocomplete="off">
-            <button type="button" id="apply-coupon">{% trans "Aplicar" %}</button>
-          </div>
-          <p id="coupon-feedback" class="checkout-coupon__feedback{% if form.coupon_code.errors %} is-error{% endif %}" role="status" aria-live="polite">{% for error in form.coupon_code.errors %}{{ error }} {% endfor %}</p>
-        </section>
-
         {% comment %}
-        Tarjeta de regalo: aparte del cupon porque no es un descuento sino un
-        medio de pago. Se combina con el cupon y paga lo que queda, envio
-        incluido. Como en el cupon, el monto que se ve aqui es vista previa:
-        el servidor lo calcula y lo toma al confirmar el pedido.
+        Un solo campo para cupon y tarjeta de regalo: el servidor detecta que
+        es cada codigo (ver CheckoutForm._repartir_codigo). Lo ya aplicado viaja
+        en los campos ocultos coupon_code y gift_card_code y se ve como
+        etiquetas con su boton para quitarlo, asi un pedido puede llevar un
+        cupon y una tarjeta. Sin JS, el codigo escrito se reparte igual al
+        confirmar el pedido.
         {% endcomment %}
-        <section class="checkout-coupon" aria-labelledby="gift-card-title">
-          <h3 id="gift-card-title">{% trans "Tarjeta de regalo" %}</h3>
+        <section class="checkout-coupon" aria-labelledby="discount-title">
+          <h3 id="discount-title">{% trans "Cupón o tarjeta de regalo" %}</h3>
           <div class="checkout-coupon__field">
-            <label class="sr-only" for="id_gift_card_code">{% trans "Código de la tarjeta de regalo" %}</label>
-            <input id="id_gift_card_code" name="gift_card_code" type="text" maxlength="24"
-                   value="{{ form.gift_card_code.value|default:'' }}" placeholder="XXXX-XXXX-XXXX-XXXX"
-                   autocomplete="off" spellcheck="false" style="text-transform: uppercase;">
-            <button type="button" id="apply-gift-card">{% trans "Aplicar" %}</button>
+            <label class="sr-only" for="id_discount_code">{% trans "Código de cupón o tarjeta de regalo" %}</label>
+            <input id="id_discount_code" name="discount_code" type="text" maxlength="30"
+                   value="{{ form.discount_code.value|default:'' }}" placeholder="{% trans 'Ingresa tu código' %}"
+                   autocomplete="off" spellcheck="false">
+            <button type="button" id="apply-code">{% trans "Aplicar" %}</button>
           </div>
-          <p id="gift-card-feedback" class="checkout-coupon__feedback{% if form.gift_card_code.errors %} is-error{% endif %}" role="status" aria-live="polite">{% for error in form.gift_card_code.errors %}{{ error }} {% endfor %}</p>
+          <input type="hidden" name="coupon_code" id="id_coupon_code" value="{{ form.coupon_code.value|default:'' }}">
+          <input type="hidden" name="gift_card_code" id="id_gift_card_code" value="{{ form.gift_card_code.value|default:'' }}">
+          <ul class="checkout-codes" id="applied-codes">
+            {% if form.coupon_code.value %}<li data-code-kind="coupon"><span>{% trans "Cupón" %} · {{ form.coupon_code.value|upper }}</span></li>{% endif %}
+            {% if form.gift_card_code.value %}<li data-code-kind="gift_card"><span>{% trans "Tarjeta de regalo" %}</span></li>{% endif %}
+          </ul>
+          <p id="code-feedback" class="checkout-coupon__feedback{% if form.discount_code.errors or form.coupon_code.errors or form.gift_card_code.errors %} is-error{% endif %}" role="status" aria-live="polite">{% for error in form.discount_code.errors %}{{ error }} {% endfor %}{% for error in form.coupon_code.errors %}{{ error }} {% endfor %}{% for error in form.gift_card_code.errors %}{{ error }} {% endfor %}</p>
         </section>
 
         {% comment %}
@@ -260,21 +264,20 @@
     var valorEnvio = filaEnvio ? filaEnvio.querySelector('span:last-child') : null;
     var valorDescuento = filaDescuento ? filaDescuento.querySelector('span:last-child') : null;
     var valorTotal = filaTotal ? filaTotal.querySelector('span:last-child') : null;
-    var campoCupon = document.getElementById('id_coupon_code');
-    var botonCupon = document.getElementById('apply-coupon');
-    var mensajeCupon = document.getElementById('coupon-feedback');
+    var campoCodigo = document.getElementById('id_discount_code');
+    var botonCodigo = document.getElementById('apply-code');
+    var mensajeCodigo = document.getElementById('code-feedback');
+    var listaCodigos = document.getElementById('applied-codes');
+    var ocultoCupon = document.getElementById('id_coupon_code');
+    var ocultoTarjeta = document.getElementById('id_gift_card_code');
     var descuentoActual = 0;
     var filaTarjeta = document.getElementById('checkout-gift-card-row');
     var valorTarjeta = filaTarjeta ? filaTarjeta.querySelector('span:last-child') : null;
-    var campoTarjeta = document.getElementById('id_gift_card_code');
-    var botonTarjeta = document.getElementById('apply-gift-card');
-    var mensajeTarjeta = document.getElementById('gift-card-feedback');
     var saldoTarjeta = 0;
-    var urlValidarTarjeta = '{% url "orders:validar_tarjeta_regalo" %}';
+    var urlValidarCodigo = '{% url "orders:validar_codigo" %}';
     var datosSubtotal = document.getElementById('checkout-subtotal');
     var subtotalActual = datosSubtotal ? JSON.parse(datosSubtotal.textContent) : 0;
     var urlCotizar = '{% url "orders:cotizar_envio" %}';
-    var urlValidarCupon = '{% url "orders:validar_cupon" %}';
 
     function formatearPrecio(valor) {
       return '$' + Math.round(valor).toLocaleString('es-CO') + ' COP';
@@ -298,92 +301,99 @@
       return ciudadSelect.value ? Number((valorEnvio && valorEnvio.dataset.cost) || 0) : 0;
     }
 
-    function aplicarTarjeta() {
-      var codigo = campoTarjeta.value.trim().toUpperCase();
-      campoTarjeta.value = codigo;
-      if (!codigo) {
-        saldoTarjeta = 0;
-        mensajeTarjeta.textContent = '';
-        mensajeTarjeta.className = 'checkout-coupon__feedback';
-        actualizarTotal(envioMostrado());
-        return;
+    function avisar(texto, tipo) {
+      mensajeCodigo.textContent = texto || '';
+      mensajeCodigo.className = 'checkout-coupon__feedback' + (tipo ? ' is-' + tipo : '');
+    }
+
+    function pintarEtiqueta(tipo, titulo, detalle) {
+      var existente = listaCodigos.querySelector('[data-code-kind="' + tipo + '"]');
+      if (existente) existente.remove();
+      if (!titulo) return;
+      var item = document.createElement('li');
+      item.dataset.codeKind = tipo;
+      var texto = document.createElement('span');
+      texto.textContent = titulo;
+      if (detalle) {
+        var pequeno = document.createElement('small');
+        pequeno.textContent = detalle;
+        texto.appendChild(pequeno);
       }
-      fetch(urlValidarTarjeta + '?code=' + encodeURIComponent(codigo), {
+      var quitar = document.createElement('button');
+      quitar.type = 'button';
+      quitar.textContent = '{% trans "Quitar" %}';
+      quitar.addEventListener('click', function () { quitarCodigo(tipo); });
+      item.appendChild(texto);
+      item.appendChild(quitar);
+      listaCodigos.appendChild(item);
+    }
+
+    function quitarCodigo(tipo) {
+      if (tipo === 'coupon') { ocultoCupon.value = ''; descuentoActual = 0; }
+      else { ocultoTarjeta.value = ''; saldoTarjeta = 0; }
+      pintarEtiqueta(tipo, '');
+      avisar('');
+      actualizarTotal(envioMostrado());
+    }
+
+    // Valida un codigo y, si sirve, lo deja aplicado. `silencioso` es para
+    // volver a mostrar lo que ya venia aplicado al cargar la pagina.
+    function validarCodigo(codigo, silencioso) {
+      return fetch(urlValidarCodigo + '?code=' + encodeURIComponent(codigo), {
         credentials: 'same-origin'
       }).then(function (respuesta) {
         if (respuesta.status === 429) return {valid: false, message: '{% trans "Demasiados intentos. Espera un momento e inténtalo de nuevo." %}'};
         if (!respuesta.ok) throw new Error('validación no disponible');
         return respuesta.json();
       }).then(function (datos) {
-        if (datos.valid) {
+        if (!datos.valid) {
+          if (!silencioso) avisar(datos.message, 'error');
+          return;
+        }
+        if (datos.kind === 'gift_card') {
+          if (!silencioso && ocultoTarjeta.value && ocultoTarjeta.value !== datos.code) {
+            avisar('{% trans "Solo puedes usar una tarjeta de regalo por pedido." %}', 'error');
+            return;
+          }
+          ocultoTarjeta.value = datos.code;
           saldoTarjeta = datos.balance;
-          campoTarjeta.value = datos.code;
-          mensajeTarjeta.textContent = '{% trans "Saldo disponible:" %} ' + formatearPrecio(datos.balance) +
-            ' · {% trans "válida hasta el" %} ' + datos.expires + '.';
-          mensajeTarjeta.className = 'checkout-coupon__feedback is-success';
+          pintarEtiqueta('gift_card', '{% trans "Tarjeta de regalo" %} ' + datos.label,
+            '{% trans "Saldo disponible:" %} ' + formatearPrecio(datos.balance) + ' · {% trans "válida hasta el" %} ' + datos.expires);
         } else {
-          saldoTarjeta = 0;
-          mensajeTarjeta.textContent = datos.message;
-          mensajeTarjeta.className = 'checkout-coupon__feedback is-error';
-        }
-        actualizarTotal(envioMostrado());
-      }).catch(function () {
-        saldoTarjeta = 0;
-        actualizarTotal(envioMostrado());
-      });
-    }
-
-    botonTarjeta.addEventListener('click', aplicarTarjeta);
-    campoTarjeta.addEventListener('keydown', function (evento) {
-      if (evento.key === 'Enter') { evento.preventDefault(); aplicarTarjeta(); }
-    });
-    // Si el formulario vuelve con un codigo ya escrito (reenvio por otro
-    // error), muestra de una vez cuanto cubre.
-    if (campoTarjeta.value.trim() && !mensajeTarjeta.textContent.trim()) aplicarTarjeta();
-
-    function aplicarCupon() {
-      var codigo = campoCupon.value.trim().toUpperCase();
-      campoCupon.value = codigo;
-      var envioActual = ciudadSelect.value ? Number((valorEnvio && valorEnvio.dataset.cost) || 0) : 0;
-
-      if (!codigo) {
-        descuentoActual = 0;
-        mensajeCupon.textContent = '';
-        mensajeCupon.className = 'checkout-coupon__feedback';
-        actualizarTotal(envioActual);
-        return;
-      }
-
-      // El descuento que se muestra aqui es solo vista previa: el
-      // servidor vuelve a buscar y aplicar el cupon en create_order_from_cart,
-      // asi que esto nunca decide lo que realmente se cobra.
-      fetch(urlValidarCupon + '?code=' + encodeURIComponent(codigo), {
-        credentials: 'same-origin'
-      }).then(function (respuesta) {
-        if (!respuesta.ok) throw new Error('validación no disponible');
-        return respuesta.json();
-      }).then(function (datos) {
-        if (datos.valid) {
+          if (!silencioso && ocultoCupon.value && ocultoCupon.value !== datos.code) {
+            avisar('{% trans "Ya aplicaste un cupón: quítalo para usar otro." %}', 'error');
+            return;
+          }
+          ocultoCupon.value = datos.code;
           descuentoActual = datos.discount;
-          mensajeCupon.textContent = '{% trans "Cupón aplicado." %}';
-          mensajeCupon.className = 'checkout-coupon__feedback is-success';
-        } else {
-          descuentoActual = 0;
-          mensajeCupon.textContent = datos.reason === 'own_code'
-            ? '{% trans "No puedes usar tu propio código de afiliado en tus compras." %}'
-            : '{% trans "Cupón no válido." %}';
-          mensajeCupon.className = 'checkout-coupon__feedback is-error';
+          pintarEtiqueta('coupon', '{% trans "Cupón" %} ' + datos.label, '-' + formatearPrecio(datos.discount));
         }
-        actualizarTotal(envioActual);
+        if (!silencioso) {
+          campoCodigo.value = '';
+          avisar(datos.kind === 'gift_card' ? '{% trans "Tarjeta de regalo aplicada." %}' : '{% trans "Cupón aplicado." %}', 'success');
+        }
+        actualizarTotal(envioMostrado());
       }).catch(function () {
-        // Sin conexion: no se bloquea la compra, el servidor decide el
-        // descuento real al confirmar el pedido.
-        descuentoActual = 0;
-        actualizarTotal(envioActual);
+        // Sin conexion: no se bloquea la compra, el servidor decide al confirmar.
+        actualizarTotal(envioMostrado());
       });
     }
 
-    botonCupon.addEventListener('click', aplicarCupon);
+    function aplicarCodigo() {
+      var codigo = campoCodigo.value.trim();
+      if (!codigo) { avisar(''); return; }
+      validarCodigo(codigo, false);
+    }
+
+    botonCodigo.addEventListener('click', aplicarCodigo);
+    campoCodigo.addEventListener('keydown', function (evento) {
+      if (evento.key === 'Enter') { evento.preventDefault(); aplicarCodigo(); }
+    });
+    // Lo que ya venia aplicado (codigo del enlace de un afiliado o un reenvio
+    // del formulario por otro error) se vuelve a validar para mostrar montos.
+    if (ocultoCupon.value) validarCodigo(ocultoCupon.value, true);
+    if (ocultoTarjeta.value) validarCodigo(ocultoTarjeta.value, true);
+
 
     function cotizarEnvio() {
       if (!valorEnvio || !valorTotal || !ciudadSelect.value) return;

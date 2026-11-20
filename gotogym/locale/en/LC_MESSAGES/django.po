@@ -4791,8 +4791,8 @@ msgstr "Choose your garments in the GoToGym store."
 msgid "Inicia sesión o crea tu cuenta: la necesitas para pagar."
 msgstr "Sign in or create your account: you need it to pay."
 
-msgid "En el pago, escribe el código en el campo \"Tarjeta de regalo\"."
-msgstr "At checkout, enter the code in the \"Gift card\" field."
+msgid "En el pago, escribe el código en el campo \"Cupón o tarjeta de regalo\"."
+msgstr "At checkout, enter the code in the \"Coupon or gift card\" field."
 
 msgid "Tu tarjeta vence el %(fecha)s. Puedes usarla en una o varias compras hasta esa fecha; usar una parte del saldo no amplía el plazo. Si el saldo no alcanza para tu compra, pagas la diferencia con otro medio. Al vencer, el saldo que quede ya no se podrá usar. No se cambia por dinero."
 msgstr "Your card expires on %(fecha)s. You can use it in one or several purchases until then; using part of the balance does not extend that date. If the balance is not enough for your purchase, you pay the difference with another method. Once it expires, any remaining balance can no longer be used. It cannot be exchanged for cash."
@@ -5006,3 +5006,37 @@ msgstr "Team test mode: this order will be confirmed without payment."
 
 msgid "Modo de pruebas del equipo: la tarjeta se activa y se envía sin pagar."
 msgstr "Team test mode: the card is activated and sent without payment."
+
+# Tarjetas de regalo
+msgid "Cupón o tarjeta de regalo"
+msgstr "Coupon or gift card"
+
+msgid "El código no es válido."
+msgstr "The code is not valid."
+
+msgid "Escribe un código."
+msgstr "Enter a code."
+
+msgid "Tarjeta-de-regalo-GoToGym"
+msgstr "GoToGym-gift-card"
+
+msgid "Te adjuntamos la tarjeta en PDF, por si quieres imprimirla o guardarla."
+msgstr "We attached the card as a PDF in case you want to print it or keep it."
+
+msgid "Úsala en gotogym.store: inicia sesión y escribe el código en \"Cupón o tarjeta de regalo\" al pagar. Sirve para una o varias compras hasta su vencimiento. No se cambia por dinero."
+msgstr "Use it at gotogym.store: sign in and enter the code in \"Coupon or gift card\" at checkout. It works for one or several purchases until it expires. It cannot be exchanged for cash."
+
+msgid "Código de cupón o tarjeta de regalo"
+msgstr "Coupon or gift card code"
+
+msgid "Ingresa tu código"
+msgstr "Enter your code"
+
+msgid "Solo puedes usar una tarjeta de regalo por pedido."
+msgstr "You can only use one gift card per order."
+
+msgid "Ya aplicaste un cupón: quítalo para usar otro."
+msgstr "You already applied a coupon: remove it to use another one."
+
+msgid "Tarjeta de regalo aplicada."
+msgstr "Gift card applied."

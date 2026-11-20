@@ -18,7 +18,14 @@ from tienda.catalog import curated_product_cards
 
 from . import tarjetas_regalo
 from .colombia_data import MUNICIPIOS_POR_DEPARTAMENTO
-from .forms import CheckoutForm, GiftCardPurchaseForm, error_de_tarjeta
+from .forms import (
+    MENSAJE_DEMASIADOS_INTENTOS,
+    CheckoutForm,
+    GiftCardPurchaseForm,
+    clasificar_codigo,
+    error_de_tarjeta,
+    parece_tarjeta,
+)
 from .models import Order, OrderItem, OrderStatus, PaymentStatus
 from .services import (
     CheckoutError,
@@ -202,6 +209,50 @@ def validar_cupon(request):
         'discount': float(descuento),
         'discount_type': cupon.discount_type,
         'value': float(cupon.value),
+    })
+
+
+@login_required
+@rate_limit('validar_codigo', limit=20, period_seconds=60)
+def validar_codigo(request):
+    """Vista previa del campo unico "Cupon o tarjeta de regalo": dice si el
+    codigo es una tarjeta (con su saldo) o un cupon (con su descuento sobre el
+    carrito). Como las vistas previas de cupon y tarjeta, no decide nada: el
+    servidor lo recalcula al confirmar el pedido."""
+    codigo = (request.GET.get('code') or '').strip()
+    if not codigo:
+        return JsonResponse({'valid': False, 'message': gettext('Escribe un código.')})
+    tipo, tarjeta = clasificar_codigo(codigo, request.user)
+    if tipo == 'bloqueado':
+        return JsonResponse({'valid': False, 'message': str(MENSAJE_DEMASIADOS_INTENTOS)})
+    if tipo == 'tarjeta':
+        error = error_de_tarjeta(tarjeta.code, request.user)
+        if error:
+            return JsonResponse({'valid': False, 'message': error})
+        return JsonResponse({
+            'valid': True, 'kind': 'gift_card', 'code': tarjeta.code, 'label': tarjeta.masked_code,
+            'balance': float(tarjeta.balance),
+            'expires': date_format(timezone.localtime(tarjeta.expires_at), 'DATE_FORMAT'),
+        })
+
+    # El intento se cuenta antes de mirar el carrito: si no, un carrito vacio
+    # dejaria probar codigos de tarjeta sin tope.
+    cupon = get_usable_coupon(codigo, user=request.user)
+    if cupon is None:
+        if es_cupon_propio(codigo, request.user):
+            return JsonResponse({'valid': False, 'message': gettext(
+                'No puedes usar tu propio código de afiliado en tus compras.')})
+        if parece_tarjeta(codigo):
+            tarjetas_regalo.registrar_intento_fallido(request.user)
+        return JsonResponse({'valid': False, 'message': gettext('El código no es válido.')})
+    cart, _reiniciado = read_cart(request.session)
+    resumen = build_cart_context(cart)
+    if not resumen['items']:
+        return JsonResponse({'valid': False, 'message': gettext('El carrito está vacío.')})
+    subtotal = Decimal(resumen['subtotal']).quantize(Decimal('0.01'))
+    return JsonResponse({
+        'valid': True, 'kind': 'coupon', 'code': cupon.code, 'label': cupon.code,
+        'discount': float(cupon.compute_discount(subtotal)),
     })
 
 

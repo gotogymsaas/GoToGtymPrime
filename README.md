@@ -41,6 +41,7 @@ collectstatic --noinput && gunicorn --chdir gotogym gotogym.wsgi:application --b
 - **[docs/DESPLIEGUE.md](docs/DESPLIEGUE.md)** - Producción, variables de entorno, tareas periódicas y respaldos
 - **[docs/GUIA_ACCESO.md](docs/GUIA_ACCESO.md)** - Cómo ejecutar el proyecto y entrar a cada panel
 - **[docs/ANALISIS_ESTRUCTURA.md](docs/ANALISIS_ESTRUCTURA.md)** - Estructura, rutas, flujo de compra y configuración
+- **[docs/TARJETAS_REGALO.md](docs/TARJETAS_REGALO.md)** - Tarjetas de regalo: reglas, canje, PDF, panel y modo de pruebas sin pago
 
 ---
 
@@ -158,6 +159,8 @@ Con el selector en inglés, todo el sitio de cara al cliente sale en inglés: ti
 - **Autenticación:** Sesiones de Django, con reglas de contraseña y límite de intentos de acceso
 - **Pagos:** Mercado Pago (proveedor real construido, apagado por defecto)
 - **Contabilidad:** Alegra API
+- **PDF:** reportlab (la tarjeta de regalo que se adjunta al correo, vectorial y con TT Norms; ver `docs/TARJETAS_REGALO.md`)
+- **Imágenes:** Pillow (fotos de producto y derivados); pypdf lee los PDF que el cliente adjunta a Quantum Coach
 
 ---
 

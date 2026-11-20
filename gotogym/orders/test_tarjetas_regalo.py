@@ -112,7 +112,20 @@ class CompraDeTarjetaTests(_Base):
         self.assertIn('Válida hasta el', html)
         self.assertNotIn('font-style:italic', html)
 
+        (nombre, contenido, tipo), = para_laura.attachments
+        self.assertEqual((nombre, tipo), ('Tarjeta-de-regalo-GoToGym.pdf', 'application/pdf'))
+        self.assertTrue(contenido.startswith(b'%PDF'))
+        # Texto real, no una imagen: el codigo se puede seleccionar y copiar.
+        import io
+
+        from pypdf import PdfReader
+        texto_del_pdf = PdfReader(io.BytesIO(contenido)).pages[0].extract_text()
+        self.assertIn(tarjeta.display_code, texto_del_pdf)
+        self.assertIn('Laura', texto_del_pdf)
+        self.assertIn('Te adjuntamos la tarjeta en PDF', para_laura.body)
+
         self.assertEqual(para_comprador.to, [self.usuario.email])
+        self.assertEqual(para_comprador.attachments, [])
         self.assertNotIn(tarjeta.display_code, para_comprador.body)
         self.assertIn(tarjeta.masked_code, para_comprador.body)
 
@@ -125,6 +138,18 @@ class CompraDeTarjetaTests(_Base):
             confirm_payment(pedido, _FakeTransaction('approved'))
         self.assertEqual(mail.outbox, [])
         self.assertEqual(pedido.purchased_gift_card.movements.count(), 1)
+
+    def test_si_el_pdf_falla_el_correo_sale_igual_sin_adjunto(self):
+        from unittest.mock import patch
+
+        pedido = self._comprar()
+        mail.outbox.clear()
+        with patch('orders.correos.tarjeta_pdf.pdf_de_tarjeta', side_effect=RuntimeError('sin fuente')):
+            with self.captureOnCommitCallbacks(execute=True):
+                confirm_payment(pedido, _FakeTransaction('approved'))
+        para_laura = mail.outbox[0]
+        self.assertEqual(para_laura.attachments, [])
+        self.assertIn(pedido.purchased_gift_card.display_code, para_laura.body)
 
     def test_la_compra_no_se_factura(self):
         pedido = self._comprar()
@@ -244,13 +269,50 @@ class CanjeTests(_Base):
         tarjeta.refresh_from_db()
         self.assertEqual(tarjeta.balance, Decimal('500000'))
 
-    def test_el_formulario_avisa_si_la_tarjeta_va_en_el_campo_del_cupon(self):
+    def test_el_campo_unico_reparte_cupon_y_tarjeta(self):
         from .forms import CheckoutForm
 
+        Coupon.objects.create(code='DIEZ', discount_type=CouponDiscountType.PERCENTAGE, value=Decimal('10'))
         tarjeta = self._tarjeta_activa()
-        form = CheckoutForm(dict(DATOS, coupon_code=tarjeta.code), user=self.usuario)
+        form = CheckoutForm(dict(DATOS, discount_code=tarjeta.display_code.lower(), coupon_code='DIEZ'), user=self.usuario)
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.cleaned_data['gift_card_code'], tarjeta.code)
+        self.assertEqual(form.cleaned_data['coupon_code'], 'DIEZ')
+        form = CheckoutForm(dict(DATOS, discount_code='diez'), user=self.usuario)
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.cleaned_data['coupon_code'], 'DIEZ')
+
+    def test_el_campo_unico_acepta_una_sola_tarjeta(self):
+        from .forms import CheckoutForm
+
+        primera, segunda = self._tarjeta_activa(), self._tarjeta_activa()
+        form = CheckoutForm(dict(DATOS, gift_card_code=primera.code, discount_code=segunda.code), user=self.usuario)
         self.assertFalse(form.is_valid())
-        self.assertIn('Tarjeta de regalo', form.errors['coupon_code'][0])
+        self.assertIn('una tarjeta de regalo por pedido', form.errors['discount_code'][0])
+
+    def test_la_vista_previa_unica_distingue_tarjeta_cupon_e_invalido(self):
+        from carrito.services import write_cart
+
+        Coupon.objects.create(code='DIEZ', discount_type=CouponDiscountType.PERCENTAGE, value=Decimal('10'))
+        tarjeta = self._tarjeta_activa()
+        self.client.force_login(self.usuario)
+        sesion = self.client.session
+        write_cart(sesion, {str(self.variante.pk): 1})
+        sesion.save()
+        url = reverse('orders:validar_codigo')
+        datos = self.client.get(url, {'code': tarjeta.display_code}).json()
+        self.assertEqual((datos['kind'], datos['code'], datos['balance']), ('gift_card', tarjeta.code, 150000.0))
+        datos = self.client.get(url, {'code': 'diez'}).json()
+        self.assertEqual((datos['kind'], datos['discount']), ('coupon', 10000.0))
+        self.assertFalse(self.client.get(url, {'code': 'NOEXISTE'}).json()['valid'])
+
+    @override_settings(RATE_LIMIT_ENABLED=True)
+    def test_el_campo_unico_cuenta_los_codigos_de_tarjeta_inventados(self):
+        url = reverse('orders:validar_codigo')
+        self.client.force_login(self.usuario)
+        for _ in range(tarjetas_regalo.INTENTOS_FALLIDOS_MAXIMOS):
+            self.client.get(url, {'code': 'AAAABBBBCCCCDDDD'})
+        self.assertIn('demasiados intentos', self.client.get(url, {'code': 'ZZZZYYYYXXXXWWWW'}).json()['message'])
 
     @override_settings(RATE_LIMIT_ENABLED=True)
     def test_demasiados_codigos_equivocados_bloquean_la_validacion(self):
@@ -280,7 +342,7 @@ class CanjeTests(_Base):
         sesion = self.client.session
         write_cart(sesion, {str(self.variante.pk): 1})
         sesion.save()
-        respuesta = self.client.post(reverse('orders:checkout'), dict(DATOS, gift_card_code=tarjeta.display_code))
+        respuesta = self.client.post(reverse('orders:checkout'), dict(DATOS, discount_code=tarjeta.display_code))
         pedido = self.usuario.orders.get(kind=OrderKind.PRODUCTS)
         self.assertRedirects(respuesta, reverse('orders:order_detail', args=[pedido.order_number]))
         detalle = self.client.get(respuesta.url)

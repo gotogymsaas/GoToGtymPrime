@@ -153,11 +153,14 @@ def url_absoluta(ruta):
     return f'{settings.SITIO_URL}{ruta}'
 
 
-def enviar_correo(destinatario, correo):
-    """Envia `correo` con su version HTML. Un fallo se propaga: quien llama
-    decide si deshace algo o solo lo registra."""
+def enviar_correo(destinatario, correo, adjuntos=()):
+    """Envia `correo` con su version HTML y, si hay, sus adjuntos: tuplas
+    `(nombre, contenido en bytes, tipo MIME)`. Un fallo se propaga: quien
+    llama decide si deshace algo o solo lo registra."""
     mensaje = EmailMultiAlternatives(
         subject=correo.asunto, body=correo.texto(), from_email=None, to=[destinatario],
     )
     mensaje.attach_alternative(correo.html(), 'text/html')
+    for nombre, contenido, tipo in adjuntos:
+        mensaje.attach(nombre, contenido, tipo)
     return mensaje.send()

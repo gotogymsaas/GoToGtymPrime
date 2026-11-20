@@ -37,6 +37,7 @@ from gotogym.correo import (
 )
 from tienda.templatetags.imagenes import url_imagen_producto
 
+from . import tarjeta_pdf
 from .models import GiftCard, Order, PaymentStatus
 
 logger = logging.getLogger(__name__)
@@ -260,9 +261,10 @@ def _fecha(momento):
     return date_format(timezone.localtime(momento), 'DATE_FORMAT')
 
 
-def correo_tarjeta_regalo(tarjeta):
+def correo_tarjeta_regalo(tarjeta, con_pdf=False):
     """El correo de regalo que recibe el destinatario. Se arma aparte del envio
-    para poder previsualizarlo (`previsualizar_correos`)."""
+    para poder previsualizarlo (`previsualizar_correos`). `con_pdf` agrega la
+    frase que avisa del PDF adjunto."""
     remitente = tarjeta.sender_name
     vence = _fecha(tarjeta.expires_at)
     bloques = [
@@ -278,11 +280,15 @@ def correo_tarjeta_regalo(tarjeta):
     ]
     if tarjeta.message:
         bloques.append(dedicatoria(tarjeta.message, remitente))
+    if con_pdf:
+        bloques.append(parrafo(gettext(
+            'Te adjuntamos la tarjeta en PDF, por si quieres imprimirla o guardarla.'
+        )))
     bloques += [
         pasos(gettext('Cómo usarla'), [
             gettext('Elige tus prendas en la tienda de GoToGym.'),
             gettext('Inicia sesión o crea tu cuenta: la necesitas para pagar.'),
-            gettext('En el pago, escribe el código en el campo "Tarjeta de regalo".'),
+            gettext('En el pago, escribe el código en el campo "Cupón o tarjeta de regalo".'),
         ]),
         aviso(gettext(
             'Tu tarjeta vence el %(fecha)s. Puedes usarla en una o varias compras hasta esa fecha; usar una '
@@ -310,6 +316,18 @@ def correo_tarjeta_regalo(tarjeta):
     )
 
 
+def _pdf_adjunto(tarjeta):
+    """El PDF de la tarjeta como adjunto, o ninguno si no se pudo generar: el
+    correo con el codigo sale igual."""
+    try:
+        contenido = tarjeta_pdf.pdf_de_tarjeta(tarjeta)
+    except Exception:
+        logger.exception('No se pudo generar el PDF de la tarjeta de regalo %s', tarjeta.masked_code)
+        return []
+    nombre = gettext('Tarjeta-de-regalo-GoToGym') + '.pdf'
+    return [(nombre, contenido, 'application/pdf')]
+
+
 def tarjeta_regalo_para_destinatario(gift_card_id):
     """Envia la tarjeta a quien la recibe, en el idioma en que se compro.
     Registra el envio solo si salio bien, para que el panel muestre cuales
@@ -318,9 +336,10 @@ def tarjeta_regalo_para_destinatario(gift_card_id):
     if tarjeta is None or tarjeta.expires_at is None:
         return
     with translation.override(tarjeta.language or 'es'):
-        correo = correo_tarjeta_regalo(tarjeta)
+        adjuntos = _pdf_adjunto(tarjeta)
+        correo = correo_tarjeta_regalo(tarjeta, con_pdf=bool(adjuntos))
     try:
-        enviar_correo(tarjeta.recipient_email, correo)
+        enviar_correo(tarjeta.recipient_email, correo, adjuntos)
     except Exception:
         logger.exception('No se pudo enviar la tarjeta de regalo %s', tarjeta.masked_code)
         return

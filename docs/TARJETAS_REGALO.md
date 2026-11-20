@@ -11,6 +11,7 @@ Tarjetas de regalo virtuales: alguien compra un saldo, escribe una dedicatoria y
 | Combinación | Se combina con un cupón: el cupón rebaja el precio primero y la tarjeta paga lo que queda, envío incluido | `create_order_from_cart` |
 | Tarjetas por pedido | Una | Formulario del checkout |
 | Cuenta | Comprar y canjear exige sesión | Vistas |
+| PDF | El correo de regalo lleva adjunta la tarjeta en PDF (A5 horizontal, vectorial, con texto seleccionable), con la misma estética y la tipografía TT Norms. Si el PDF no se puede generar, el correo sale igual sin el adjunto | `orders/tarjeta_pdf.py`; fuentes en `orders/fuentes/` (`scripts/generar_fuentes_pdf.py`) |
 | Dedicatoria | Hasta 300 caracteres, sin enlaces ni direcciones web | `GiftCardPurchaseForm` |
 | Comisión de afiliados | Comprar una tarjeta no genera comisión. Un pedido pagado con tarjeta y hecho con código de afiliado sí, sobre el subtotal, como cualquier venta | La compra no admite cupón, así que no tiene afiliado |
 | Retracto | 5 días hábiles desde la compra, solo si la tarjeta nunca se ha usado | `valid_next_statuses`, `puede_retractarse` |
@@ -21,7 +22,7 @@ El sustento legal (Circular Única de la SIC, numeral 2.18, y la doctrina de la 
 
 1. **Compra** (`/tarjetas-regalo/`). Crea un pedido de tipo `gift_card`, sin dirección, envío ni stock, con una sola línea (`TARJETA-REGALO`), y una `GiftCard` en estado *pendiente de pago*. El código se genera desde ya, pero nadie lo ve. Al comprador le llega el aviso de compra recibida.
 2. **Pago aprobado** (Mercado Pago, mismo flujo que cualquier pedido). El pedido queda *confirmado*, la tarjeta pasa a *activa* con su fecha de vencimiento, y salen dos correos: el de regalo al destinatario (con el código, el valor, la dedicatoria, cómo usarla y la vigencia) y la confirmación al comprador (sin el código completo). No se factura ni genera comisión.
-3. **Canje.** En el checkout, el campo «Tarjeta de regalo» (aparte del cupón) muestra el saldo y cuánto cubre. Al confirmar el pedido, el saldo se toma con la tarjeta bloqueada en la base, para que dos compras simultáneas no gasten el mismo dinero. Si la tarjeta cubre todo, el pedido se confirma sin pasar por Mercado Pago.
+3. **Canje.** En el checkout hay un solo campo, «Cupón o tarjeta de regalo»: el sistema detecta qué es cada código y lo deja aplicado como una etiqueta que se puede quitar, así que un pedido puede llevar un cupón y una tarjeta. La tarjeta muestra su saldo y cuánto cubre. Al confirmar el pedido, el saldo se toma con la tarjeta bloqueada en la base, para que dos compras simultáneas no gasten el mismo dinero. Si la tarjeta cubre todo, el pedido se confirma sin pasar por Mercado Pago.
 4. **Cancelación o devolución** del pedido en que se usó: lo pagado con la tarjeta vuelve a su saldo automáticamente. Lo cobrado por Mercado Pago se reembolsa como siempre, desde el panel.
 
 Cada cambio de saldo queda en `GiftCardMovement` (emisión, canje, devolución de saldo, anulación), con el pedido que lo causó.
@@ -64,8 +65,14 @@ En la barra superior del panel está el interruptor **«Confirmar sin pagar (equ
 
 Las compras de tarjetas no cuentan como ventas en la analítica del panel, porque la venta ocurre cuando la tarjeta se canjea, igual que en la factura. Se ven en el panel de tarjetas. La exportación CSV de pedidos sí las incluye, con la columna `tipo = gift_card`, y agrega la columna `tarjeta_regalo` con lo pagado con tarjeta.
 
+## Dependencias
+
+- `reportlab==5.1.0` (en `requirements.txt`) dibuja el PDF. Se instala sola en el despliegue.
+- Las fuentes del PDF están en `gotogym/orders/fuentes/`. Si cambia la tipografía, se regeneran con `python scripts/generar_fuentes_pdf.py` (necesita `fontTools`, solo en el equipo de quien la regenera).
+- `pypdf`, que ya estaba, lo usan las pruebas para comprobar que el código del PDF se puede copiar como texto.
+
 ## Pendiente o por decidir
 
 - **Contador:** cuál es el medio de pago de Alegra para un pedido pagado por completo con tarjeta (`ALEGRA_MEDIO_DE_PAGO_TARJETA_REGALO`) y el tratamiento contable del saldo que vence sin usarse.
 - **Envío programado** (por ejemplo, que el regalo llegue el día del cumpleaños): necesita un programador de tareas desplegado, que hoy no existe.
-- **Varios diseños de tarjeta y PDF imprimible.**
+- **Varios diseños de tarjeta.**

@@ -39,6 +39,34 @@ def error_de_tarjeta(codigo, user):
         return gettext('La tarjeta de regalo ya no tiene saldo.')
     return gettext('La tarjeta de regalo no está disponible.')
 
+
+def parece_tarjeta(codigo):
+    """Si el codigo tiene la forma de una tarjeta de regalo (16 caracteres
+    sin contar guiones). Un codigo asi que no existe cuenta como intento
+    fallido aunque se haya escrito como cupon: si no, el campo unico serviria
+    para probar codigos de tarjeta sin tope."""
+    return len(tarjetas_regalo.normalizar_codigo(codigo)) == tarjetas_regalo.LARGO_CODIGO
+
+
+def clasificar_codigo(codigo, user):
+    """Que es un codigo escrito en el campo "Cupon o tarjeta de regalo".
+
+    Devuelve `('tarjeta', GiftCard)` si es una tarjeta (usable o no),
+    `('bloqueado', None)` si la cuenta agoto sus intentos y el codigo tiene
+    forma de tarjeta, o `('cupon', None)` en cualquier otro caso: quien llama
+    lo valida como cupon. No cuenta intentos: eso lo hace quien sabe que el
+    codigo tampoco era un cupon valido."""
+    if parece_tarjeta(codigo):
+        if tarjetas_regalo.demasiados_intentos(user):
+            return 'bloqueado', None
+        tarjeta = tarjetas_regalo.buscar_por_codigo(codigo)
+        if tarjeta is not None:
+            return 'tarjeta', tarjeta
+    return 'cupon', None
+
+
+MENSAJE_DEMASIADOS_INTENTOS = _('Hiciste demasiados intentos con códigos de tarjeta. Inténtalo de nuevo en una hora.')
+
 TELEFONO_VALIDO = re.compile(r'^[0-9+()\s-]{7,20}$')
 
 
@@ -78,6 +106,11 @@ class CheckoutForm(forms.Form):
         label=_('Información adicional para la entrega'), required=False,
         widget=forms.Textarea(attrs={'rows': 3}),
     )
+    # Campo unico "Cupon o tarjeta de regalo": lo que se escribe aqui se
+    # reparte en `coupon_code` o `gift_card_code` (ver `clean`). Esos dos
+    # viajan ocultos con lo ya aplicado, para poder combinar un cupon y una
+    # tarjeta en el mismo pedido.
+    discount_code = forms.CharField(label=_('Cupón o tarjeta de regalo'), required=False, max_length=30)
     coupon_code = forms.CharField(label=_('Cupón'), required=False, max_length=30)
     # Admite el codigo con guiones o espacios (XXXX-XXXX-XXXX-XXXX).
     gift_card_code = forms.CharField(label=_('Tarjeta de regalo'), required=False, max_length=24)
@@ -109,18 +142,40 @@ class CheckoutForm(forms.Form):
             raise forms.ValidationError(gettext('La dirección es demasiado corta.'))
         return direccion
 
+    def _repartir_codigo(self, cleaned_data):
+        """Lleva lo escrito en el campo unico a `coupon_code` o a
+        `gift_card_code`. Un pedido admite un cupon y una tarjeta."""
+        codigo = (cleaned_data.get('discount_code') or '').strip()
+        if not codigo:
+            return
+        tipo, _tarjeta = clasificar_codigo(codigo, self._user)
+        if tipo == 'bloqueado':
+            self.add_error('discount_code', str(MENSAJE_DEMASIADOS_INTENTOS))
+            return
+        campo = 'gift_card_code' if tipo == 'tarjeta' else 'coupon_code'
+        nuevo = tarjetas_regalo.normalizar_codigo(codigo) if tipo == 'tarjeta' else codigo.upper()
+        anterior = (cleaned_data.get(campo) or '').strip()
+        if tipo == 'tarjeta':
+            anterior = tarjetas_regalo.normalizar_codigo(anterior)
+        if anterior and anterior != nuevo.upper():
+            self.add_error('discount_code', gettext(
+                'Solo puedes usar una tarjeta de regalo por pedido.' if tipo == 'tarjeta'
+                else 'Ya aplicaste un cupón: quítalo para usar otro.'
+            ))
+            return
+        cleaned_data[campo] = nuevo
+
     def clean(self):
         cleaned_data = super().clean()
-        codigo_cupon = cleaned_data.get('coupon_code', '').strip().upper()
+        self._repartir_codigo(cleaned_data)
+        codigo_cupon = (cleaned_data.get('coupon_code') or '').strip().upper()
         if codigo_cupon and get_usable_coupon(codigo_cupon, user=self._user) is None:
             if es_cupon_propio(codigo_cupon, self._user):
                 self.add_error('coupon_code', 'No puedes usar tu propio código de afiliado en tus compras.')
-            elif tarjetas_regalo.buscar_por_codigo(codigo_cupon) is not None:
-                self.add_error('coupon_code', gettext(
-                    'Ese es el código de una tarjeta de regalo: escríbelo en el campo "Tarjeta de regalo".'
-                ))
             else:
-                self.add_error('coupon_code', 'El cupón no es válido.')
+                if parece_tarjeta(codigo_cupon):
+                    tarjetas_regalo.registrar_intento_fallido(self._user)
+                self.add_error('coupon_code', gettext('El código no es válido.'))
         cleaned_data['coupon_code'] = codigo_cupon
         codigo_tarjeta = tarjetas_regalo.normalizar_codigo(cleaned_data.get('gift_card_code', ''))
         if codigo_tarjeta:

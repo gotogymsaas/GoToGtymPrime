@@ -260,9 +260,15 @@ class Command(BaseCommand):
             nombre = f'{numero:02d}.html'
             (carpeta / nombre).write_text(self._a_imagenes_locales(self._html(mensaje)), encoding='utf-8')
             (carpeta / f'{numero:02d}.txt').write_text(mensaje.body, encoding='utf-8')
+            # Los adjuntos (el PDF de la tarjeta de regalo) se guardan al lado.
+            enlaces_adjuntos = ''
+            for indice, (adjunto, contenido, _tipo) in enumerate(mensaje.attachments, start=1):
+                archivo = f'{numero:02d}-{indice}-{adjunto}'
+                (carpeta / archivo).write_bytes(contenido)
+                enlaces_adjuntos += f' &middot; <a href="{archivo}">{adjunto}</a>'
             filas.append(
                 f'<li><a href="{nombre}">{etiqueta}</a> &middot; <small>{mensaje.subject}</small> '
-                f'&middot; <a href="{numero:02d}.txt">texto</a></li>'
+                f'&middot; <a href="{numero:02d}.txt">texto</a>{enlaces_adjuntos}</li>'
             )
         indice = (
             '<!doctype html><meta charset="utf-8"><title>Vista previa de correos</title>'
