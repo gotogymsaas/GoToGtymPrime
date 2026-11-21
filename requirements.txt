@@ -2,7 +2,7 @@ Django==5.2.18
 django-widget-tweaks==1.5.1
 Pillow==13.0.0
 # Lectura en memoria de archivos que el cliente adjunta a Quantum Coach.
-pypdf==6.21.4
+pypdf==7.1.0
 # PDF de la tarjeta de regalo (vectorial, con texto seleccionable).
 reportlab==5.1.0
 openpyxl==3.1.5
@@ -11,8 +11,8 @@ psycopg2-binary==2.9.13
 requests==2.34.2
 cryptography==50.0.2
 mercadopago==3.6.0
-sentry-sdk==2.72.0
+sentry-sdk==2.75.0
 redis==8.1.0
 
 PyJWT[crypto]==2.15.1
-gunicorn==26.2.0
+gunicorn==27.0.1
