@@ -61,6 +61,16 @@ En la barra superior del panel está el interruptor **«Confirmar sin pagar (equ
 - **Qué sí pasa de verdad.** Descuenta stock (se repone si cancelas el pedido) y las tarjetas de regalo se activan, se envían por correo y se pueden canjear. Las tarjetas de prueba no suman al saldo por canjear del panel.
 - **Apágalo al terminar.** Cancela los pedidos de prueba de productos que no necesites, para devolver el stock.
 
+## Quantum Coach
+
+El Coach puede recomendar las tarjetas y mostrar el botón **«Ver tarjetas de regalo»**, que lleva a `/tarjetas-regalo/`.
+
+- **Cuándo las sugiere.** Solo si la persona pregunta por regalos o tarjetas, dice que compra para otra persona o no sabe la talla o el gusto de quien recibe el regalo. Nunca a quien compra para sí ni en cada respuesta.
+- **Qué sabe.** En cada turno la tienda le envía `evidence.gift_cards`: si se pueden comprar ahora, el rango de valores, los sugeridos y la vigencia (`vendedor/evidencia.py`, `tarjetas_de_regalo`). Solo puede citar esos montos: cualquier otro bloquea su respuesta.
+- **Con las compras en pausa** se envían como no disponibles y el botón se descarta.
+- **Dónde vive cada parte.** La tienda arma el bloque y pinta el botón. El servicio del Coach (repositorio `appdesplegada`, PR #941) decide cuándo ofrecerlas. Se despliega primero el Coach: un Coach anterior ignora el bloque, y uno nuevo sin el bloque no las menciona.
+- El contrato está en `vendedor/ejemplos/LEEME.md`.
+
 ## Métricas
 
 Las compras de tarjetas no cuentan como ventas en la analítica del panel, porque la venta ocurre cuando la tarjeta se canjea, igual que en la factura. Se ven en el panel de tarjetas. La exportación CSV de pedidos sí las incluye, con la columna `tipo = gift_card`, y agrega la columna `tarjeta_regalo` con lo pagado con tarjeta.

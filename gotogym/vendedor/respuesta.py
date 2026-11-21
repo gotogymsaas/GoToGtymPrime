@@ -203,6 +203,15 @@ def sanear(respuesta, solicitud):
                 'url': reverse('orders:checkout'),
                 'label': gettext('Ir al pago'),
             })
+        elif accion.tipo == 'open_gift_cards':
+            if pausadas:
+                descartadas += 1
+                continue
+            acciones.append({
+                'type': 'open_gift_cards',
+                'url': reverse('tarjeta_regalo'),
+                'label': gettext('Ver tarjetas de regalo'),
+            })
         elif accion.tipo == 'open_solution':
             url = _url_de_solucion(accion.solucion)
             if not url:

@@ -43,6 +43,13 @@
         "review_status": "pending_review"
       }
     ],
+    "gift_cards": {
+      "available": true,
+      "min_amount": "50000.00",
+      "max_amount": "1000000.00",
+      "suggested_amounts": ["50000.00", "100000.00", "200000.00", "500000.00"],
+      "validity_months": 12
+    },
     "claims_policy": {
       "version": "sha256:0f4a9c1e",
       "prohibited": ["secado rápido", "protección solar", "antimicrobian"]

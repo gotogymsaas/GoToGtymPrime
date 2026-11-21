@@ -22,6 +22,13 @@ es la implementación de referencia.
 El cuerpo no contiene correo, teléfono, documento, dirección ni códigos de
 afiliado. Los precios son texto decimal. Tope: 24 KB y 8 candidatos.
 
+`evidence.gift_cards` (opcional) describe las tarjetas de regalo de la tienda:
+`available` (si hoy se pueden comprar), `min_amount` y `max_amount` (rango de
+valores, texto decimal), `suggested_amounts` (hasta 6 valores sugeridos) y
+`validity_months` (vigencia). Un Coach que no lo conozca lo ignora; el que sí,
+solo puede citar esos montos y proponer `open_gift_cards` cuando `available` es
+verdadero.
+
 ## Respuesta
 
 El cuerpo de `respuesta_ok.json`. Si `meta.status` es `error`, la tienda muestra
@@ -29,8 +36,10 @@ su propio mensaje con la opción de reintentar y respeta `retry_after_seconds`.
 Los campos desconocidos se ignoran.
 
 Acciones permitidas en `ui_actions`: `add_to_cart` (con `variant_id`),
-`open_product` (con `product_id`), `go_checkout`, `open_contact`. Cualquier otra
-se descarta. La tienda genera las etiquetas de los botones; `label` es opcional
+`open_product` (con `product_id`), `go_checkout`, `open_contact`, `open_solution`
+(con `solution`: `coach_app` o `developers`) y `open_gift_cards` (lleva a la
+página de tarjetas de regalo; se descarta si las compras están en pausa).
+Cualquier otra se descarta. La tienda genera las etiquetas de los botones; `label` es opcional
 y se ignora.
 
 ## Búsqueda por foto (contrato `vision-1`)

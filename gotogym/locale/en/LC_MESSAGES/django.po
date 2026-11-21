@@ -5040,3 +5040,7 @@ msgstr "You already applied a coupon: remove it to use another one."
 
 msgid "Tarjeta de regalo aplicada."
 msgstr "Gift card applied."
+
+# Tarjetas de regalo
+msgid "Ver tarjetas de regalo"
+msgstr "See gift cards"

@@ -228,6 +228,7 @@ def armar_solicitud(request, mensaje, conversation_id, request_id=None, ahora=No
             ),
             'policies': evidencia.politicas(idioma),
             'promotions': evidencia.promociones(),
+            'gift_cards': evidencia.tarjetas_de_regalo(pausadas=bool(compras_pausadas())),
             'claims_policy': evidencia.afirmaciones_prohibidas(),
         },
         'timestamp': int(time.time() if ahora is None else ahora),

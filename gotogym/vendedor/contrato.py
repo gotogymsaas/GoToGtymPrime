@@ -28,6 +28,8 @@ MAX_LARGO_ASERCION = 1024
 # Cupones de libre acceso (evidencia.promociones). Nunca los de afiliados.
 MAX_PROMOCIONES = 5
 CLAVES_PROMOCION = frozenset({'code', 'discount_type', 'value', 'min_purchase', 'ends_on'})
+CLAVES_TARJETAS_REGALO = frozenset({'available', 'min_amount', 'max_amount', 'suggested_amounts', 'validity_months'})
+MAX_VALORES_SUGERIDOS = 6
 
 # Presupuesto de la solicitud. El proveedor del modelo ya rechazo con HTTP 429
 # solicitudes muy grandes, asi que el tope es duro: el paquete se recorta antes
@@ -56,7 +58,9 @@ MAX_SEGUNDOS_REINTENTO = 3600
 IDIOMAS = ('es', 'en')
 MONEDA = 'COP'
 
-ACCIONES_PERMITIDAS = frozenset({'add_to_cart', 'open_product', 'go_checkout', 'open_contact', 'open_solution'})
+ACCIONES_PERMITIDAS = frozenset({
+    'add_to_cart', 'open_product', 'go_checkout', 'open_contact', 'open_solution', 'open_gift_cards',
+})
 # Claves de `open_solution`. La direccion de cada una la pone la tienda.
 SOLUCIONES_PERMITIDAS = frozenset({'coach_app', 'developers'})
 # Linea de cada candidato y preferencia de la persona (products/linea.py).
@@ -296,6 +300,20 @@ def _validar_adjunto(adjunto):
     _requerir(isinstance(adjunto['truncated'], bool), 'attachment.truncated')
 
 
+def _validar_tarjetas_regalo(tarjetas):
+    ruta = 'evidence.gift_cards'
+    _requerir(isinstance(tarjetas, dict) and set(tarjetas) == CLAVES_TARJETAS_REGALO, ruta)
+    _requerir(isinstance(tarjetas['available'], bool), f'{ruta}.available')
+    _decimal_texto(tarjetas['min_amount'], f'{ruta}.min_amount')
+    _decimal_texto(tarjetas['max_amount'], f'{ruta}.max_amount')
+    sugeridos = tarjetas['suggested_amounts']
+    _requerir(isinstance(sugeridos, list) and len(sugeridos) <= MAX_VALORES_SUGERIDOS, f'{ruta}.suggested_amounts')
+    for valor in sugeridos:
+        _decimal_texto(valor, f'{ruta}.suggested_amounts')
+    meses = tarjetas['validity_months']
+    _requerir(_entero(meses) and 1 <= meses <= 60, f'{ruta}.validity_months')
+
+
 def validar_solicitud(solicitud):
     """Comprueba que `solicitud` (un dict) cumple el contrato. No devuelve
     nada: lanza `ContratoInvalido` ante el primer incumplimiento."""
@@ -383,6 +401,9 @@ def validar_solicitud(solicitud):
             _decimal_texto(promo['min_purchase'], f'{ruta}.min_purchase')
         _requerir(promo['ends_on'] is None or re.fullmatch(r'\d{4}-\d{2}-\d{2}', str(promo['ends_on'])),
                   f'{ruta}.ends_on')
+    tarjetas = evidencia.get('gift_cards')
+    if tarjetas is not None:
+        _validar_tarjetas_regalo(tarjetas)
     afirmaciones = evidencia.get('claims_policy')
     _requerir(isinstance(afirmaciones, dict), 'evidence.claims_policy')
     _texto(afirmaciones.get('version'), 'evidence.claims_policy.version', 64)

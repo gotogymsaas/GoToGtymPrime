@@ -56,7 +56,7 @@
   var ESPERA_POR_DEFECTO = 10;
   var VIGENCIA_MS = (configuracion.vigenciaHistorial > 0 ? configuracion.vigenciaHistorial : 1800) * 1000;
   // Rutas internas a las que puede apuntar un enlace del panel.
-  var RUTA_ENLACE = /^\/[a-z]{2}\/(tienda|carrito|pedidos-tienda|contacto)\/[A-Za-z0-9\-_\/.%]*$/;
+  var RUTA_ENLACE = /^\/[a-z]{2}\/(tienda|carrito|pedidos-tienda|contacto|tarjetas-regalo)\/[A-Za-z0-9\-_\/.%]*$/;
   var RUTA_IMAGEN = /^\/(media|static)\/[A-Za-z0-9\-_\/.%]+$/;
   var RUTA_AGREGAR = /^\/[a-z]{2}\/carrito\/add\/\d+\/$/;
   var RUTA_RECORDAR = /^\/[a-z]{2}\/vendedor\/personalizacion\/recordar\/$/;

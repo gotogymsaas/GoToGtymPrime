@@ -29,6 +29,7 @@ from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils import timezone
 from gotogym.afirmaciones import PROHIBIDAS
+from orders import tarjetas_regalo
 from orders.models import Coupon
 from products import atributos, linea
 from tienda.catalog import (
@@ -218,6 +219,20 @@ def promociones(momento=None):
         if len(filas) >= MAX_PROMOCIONES:
             break
     return filas
+
+
+def tarjetas_de_regalo(pausadas=False):
+    """Lo que el Coach puede decir de las tarjetas de regalo: si se pueden
+    comprar ahora, el rango de valores, los sugeridos y la vigencia. Los montos
+    viajan como texto decimal, igual que los precios: el Coach solo cita los que
+    llegan aqui."""
+    return {
+        'available': not pausadas,
+        'min_amount': precio_texto(tarjetas_regalo.VALOR_MINIMO),
+        'max_amount': precio_texto(tarjetas_regalo.VALOR_MAXIMO),
+        'suggested_amounts': [precio_texto(valor) for valor in tarjetas_regalo.VALORES_SUGERIDOS],
+        'validity_months': tarjetas_regalo.MESES_DE_VIGENCIA,
+    }
 
 
 MAX_COINCIDENCIAS_VISUALES = 5
