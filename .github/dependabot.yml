@@ -1,12 +1,50 @@
 version: 2
+
+# Politica de actualizaciones:
+# - Los cambios menores y de parche llegan agrupados en un solo PR semanal por
+#   ecosistema; si el CI pasa, `dependabot-automerge.yml` los fusiona.
+# - Los saltos mayores de las librerias criticas (abajo) no se proponen: se
+#   actualizan a mano, con tiempo para leer las notas de la version.
+# - Los saltos mayores del resto de paquetes y de las GitHub Actions si se
+#   abren como PR propio y se revisan a mano (el automerge los ignora).
 updates:
   - package-ecosystem: pip
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      pip-menores-y-parches:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+    ignore:
+      - dependency-name: django
+        update-types: ["version-update:semver-major"]
+      - dependency-name: redis
+        update-types: ["version-update:semver-major"]
+      - dependency-name: pillow
+        update-types: ["version-update:semver-major"]
+      - dependency-name: psycopg2-binary
+        update-types: ["version-update:semver-major"]
+      - dependency-name: cryptography
+        update-types: ["version-update:semver-major"]
+      - dependency-name: mercadopago
+        update-types: ["version-update:semver-major"]
+      - dependency-name: gunicorn
+        update-types: ["version-update:semver-major"]
+
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      actions-menores-y-parches:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch

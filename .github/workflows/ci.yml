@@ -23,15 +23,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
 
       # ruff, import-linter, mypy, migraciones pendientes, check --deploy y
       # todas las pruebas con cobertura.
       - name: Validaciones del backend
+        env:
+          # Piso de cobertura: medido 93.8 % con la suite completa; se deja un
+          # margen de 3 puntos. Solo se sube cuando sube la cobertura (ver
+          # environments/README.md).
+          COVERAGE_FAIL_UNDER: 90
         run: bash environments/backend/run_backend_checks.sh
 
       - name: Pruebas de las herramientas de identidad
@@ -44,18 +49,35 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     # Informa sin bloquear: una vulnerabilidad nueva en una libreria no debe
-    # impedir un despliegue que no la introduce. Se revisa en el resumen.
+    # impedir un despliegue que no la introduce. pip-audit no distingue la
+    # severidad (ni su salida ni sus opciones la incluyen: solo se puede
+    # ignorar un identificador concreto con --ignore-vuln), asi que no hay
+    # forma de bloquear solo las altas o criticas. El resultado queda escrito
+    # en el resumen del job para revisarlo.
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
 
       - run: pip install pip-audit
 
-      - run: pip-audit -r requirements.txt
+      - name: Auditar requirements.txt
+        run: |
+          status=0
+          pip-audit -r requirements.txt --progress-spinner off -f markdown -o pip-audit.md || status=$?
+          {
+            echo '## pip-audit: vulnerabilidades conocidas en requirements.txt'
+            echo
+            if [ "$status" -eq 0 ]; then
+              echo 'Sin vulnerabilidades conocidas.'
+            else
+              cat pip-audit.md 2>/dev/null || echo 'pip-audit termino con error y no genero informe; ver el log del paso.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
 
   postgres:
     name: Pruebas contra PostgreSQL
@@ -78,9 +100,9 @@ jobs:
       POSTGRES_HOST: localhost
       POSTGRES_PASSWORD: postgres
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
           cache: pip

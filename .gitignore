@@ -40,3 +40,6 @@ Temp/
 
 # Material de marca subido por el equipo (contenido de la operacion, no del codigo)
 gotogym/recursos_afiliados/
+
+# Sesiones locales de la herramienta de Copilot para Azure (no son del proyecto)
+.copilot-azure/

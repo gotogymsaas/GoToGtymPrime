@@ -1,0 +1,134 @@
+name: Dependabot automerge
+
+# Fusiona solos los PR de Dependabot que solo traen actualizaciones menores o
+# de parche, y solo cuando TODOS los checks del PR terminaron en verde. Los
+# saltos mayores, cualquier PR que no sea de Dependabot y cualquier caso dudoso
+# (sin checks, un check fallido, un tipo de actualizacion que no se pudo
+# determinar) se dejan sin tocar para revision manual.
+#
+# Se usa `pull_request_target` porque el GITHUB_TOKEN de `pull_request` es de
+# solo lectura en los PR de Dependabot y no podria fusionar. Es seguro porque
+# este workflow NUNCA hace checkout ni ejecuta codigo del PR: solo lee sus
+# metadatos y llama a la API de GitHub.
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+# Sin permisos por defecto; el job declara solo los que necesita.
+permissions: {}
+
+# Un empujon nuevo de Dependabot (rebase) invalida la espera anterior.
+concurrency:
+  group: dependabot-automerge-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  automerge:
+    name: Fusionar actualizaciones menores y de parche
+    # El autor del PR y quien empujo el ultimo commit deben ser Dependabot: si
+    # una persona modifica la rama, ya no se fusiona sola.
+    if: >-
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    # Mayor que el timeout del CI (45 min) para poder esperarlo completo.
+    timeout-minutes: 70
+    permissions:
+      contents: write        # fusionar el PR
+      pull-requests: write   # fusionar el PR
+      checks: read           # leer el resultado de los checks del PR
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      # Nombre de este mismo job: se excluye al contar checks, o esperaria
+      # a que termine el propio job.
+      NOMBRE_ESTE_JOB: Fusionar actualizaciones menores y de parche
+      # Checks que deben existir y estar en verde. Si se renombra un job de
+      # ci.yml hay que actualizar esta lista; mientras tanto no se fusiona
+      # nada (falla hacia el lado seguro).
+      CHECKS_OBLIGATORIOS: >-
+        Validacion y suite completa|Pruebas contra PostgreSQL
+    steps:
+      - name: Leer metadatos de la actualizacion
+        id: metadata
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Un PR agrupado trae varias dependencias: todas deben ser menores o de
+      # parche. Si la lista esta vacia o algun tipo viene vacio o es otro
+      # (mayor, desconocido), no es elegible.
+      - name: Decidir si es elegible
+        id: decision
+        env:
+          DEPENDENCIAS_JSON: ${{ steps.metadata.outputs.updated-dependencies-json }}
+        run: |
+          set -euo pipefail
+          elegible=$(printf '%s' "$DEPENDENCIAS_JSON" | jq -r '
+            if (type == "array") and (length > 0)
+               and all(.[]; .updateType == "version-update:semver-minor"
+                         or .updateType == "version-update:semver-patch")
+            then "true" else "false" end')
+          echo "elegible=$elegible" >> "$GITHUB_OUTPUT"
+          if [ "$elegible" != "true" ]; then
+            echo "El PR no es solo de menores/parches: queda para revision manual."
+            printf '%s' "$DEPENDENCIAS_JSON" | jq -r '.[]? | "- \(.dependencyName): \(.updateType)"'
+          fi
+
+      - name: Esperar los checks y fusionar
+        if: steps.decision.outputs.elegible == 'true'
+        run: |
+          set -euo pipefail
+          limite=$((SECONDS + 3900))
+
+          while :; do
+            # Si el PR se cerro o Dependabot empujo otro commit, esta espera
+            # ya no aplica (el nuevo empujon dispara su propia ejecucion).
+            estado=$(gh api "repos/$REPO/pulls/$PR_NUMBER" --jq '.state + " " + .head.sha')
+            if [ "$estado" != "open $HEAD_SHA" ]; then
+              echo "El PR cambio o se cerro ($estado); no se fusiona."
+              exit 1
+            fi
+
+            checks=$(gh api --paginate "repos/$REPO/commits/$HEAD_SHA/check-runs?per_page=100" \
+              --jq '.check_runs[]' | jq -s --arg yo "$NOMBRE_ESTE_JOB" '[.[] | select(.name != $yo)]')
+
+            fallidos=$(jq '[.[] | select(.status == "completed"
+              and (.conclusion | IN("success", "skipped", "neutral") | not))] | length' <<<"$checks")
+            pendientes=$(jq '[.[] | select(.status != "completed")] | length' <<<"$checks")
+            total=$(jq 'length' <<<"$checks")
+
+            if [ "$fallidos" -gt 0 ]; then
+              echo "Hay checks fallidos; no se fusiona:"
+              jq -r '.[] | select(.status == "completed"
+                and (.conclusion | IN("success", "skipped", "neutral") | not))
+                | "- \(.name): \(.conclusion)"' <<<"$checks"
+              exit 1
+            fi
+
+            faltan=""
+            IFS='|' read -ra obligatorios <<<"$CHECKS_OBLIGATORIOS"
+            for nombre in "${obligatorios[@]}"; do
+              ok=$(jq --arg n "$nombre" '[.[] | select(.name == $n and .conclusion == "success")] | length' <<<"$checks")
+              [ "$ok" -ge 1 ] || faltan="$faltan [$nombre]"
+            done
+
+            if [ "$total" -gt 0 ] && [ "$pendientes" -eq 0 ] && [ -z "$faltan" ]; then
+              break
+            fi
+
+            if [ "$SECONDS" -ge "$limite" ]; then
+              echo "Se agoto la espera (total=$total, pendientes=$pendientes, sin resultado en verde:${faltan:- ninguno}); no se fusiona."
+              exit 1
+            fi
+            echo "Esperando checks (total=$total, pendientes=$pendientes, sin resultado en verde:${faltan:- ninguno})..."
+            sleep 30
+          done
+
+          echo "Todos los checks en verde ($total). Fusionando."
+          # `--match-head-commit` garantiza que se fusiona exactamente el
+          # commit cuyos checks se verificaron. Sin `--admin`: si la rama
+          # exige algo mas (revision, proteccion), la fusion se rechaza.
+          gh pr merge "$PR_NUMBER" --repo "$REPO" --squash --match-head-commit "$HEAD_SHA"

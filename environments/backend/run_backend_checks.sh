@@ -51,11 +51,10 @@ DATABASE_URL="postgresql://usuario:clave@localhost:5432/gotogym" \
   --settings=gotogym.settings_verificacion_despliegue
 
 echo "[backend] Ejecutando la suite completa con cobertura (settings_test)..."
-# Todas las pruebas siguen siendo obligatorias. La modalidad `auto`
-# provoca errores no serializables al transportar tracebacks entre workers
-# (Django/coverage en GitHub Actions), y el job queda vivo hasta el timeout.
-# Un worker hace determinista la suite; habilitar paralelismo solo cuando la
-# configuracion y los tests soporten correctamente aislamiento por proceso.
+# Todas las pruebas siguen siendo obligatorias. El CI usa un solo worker.
+# Para repetirla en paralelo en local: `TEST_PARALLEL=2`. `tblib` (en
+# requirements-dev.txt) es lo que permite ver el error real de una prueba que
+# falla en un worker; sin el se reporta como "cannot pickle 'traceback' object".
 TEST_PARALLEL="${TEST_PARALLEL:-1}"
 coverage erase --rcfile="${ROOT_DIR}/pyproject.toml"
 coverage run --rcfile="${ROOT_DIR}/pyproject.toml" manage.py test . \

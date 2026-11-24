@@ -56,5 +56,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # Configuración de idioma para desarrollo
 LANGUAGE_CODE = 'es'
 
-print("✅ Usando configuración LOCAL (SQLite)")
+# Sin emoji ni tildes: las consolas de Windows en cp1252 no pueden codificarlos
+# y un `print` que falla impide hasta `manage.py check`.
+print("[OK] Usando configuracion LOCAL (SQLite)")
 print(f"Base de datos: {DATABASES['default']['NAME']}")
