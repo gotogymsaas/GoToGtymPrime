@@ -108,7 +108,7 @@ class PermisoParaEncenderTests(TestCase):
 
     def test_solo_con_change_panelsettings_no_puede_encender(self):
         self.client.force_login(self.con_cambio)
-        with patch('administracion.views.sentry_sdk.capture_message') as sentry:
+        with patch('administracion.views.ajustes.sentry_sdk.capture_message') as sentry:
             self.client.post(self.url, {'activar': '1'})
         self.assertFalse(PanelSettings.load().staff_checkout_without_payment)
         sentry.assert_not_called()
@@ -163,8 +163,8 @@ class AvisoASentryTests(TestCase):
     def test_encender_fuera_de_debug_emite_un_aviso_solo_con_el_id_del_usuario(self):
         self.client.force_login(self.admin)
         with override_settings(DEBUG=False), \
-                patch('administracion.views.sentry_sdk.capture_message') as capturar, \
-                patch('administracion.views.sentry_sdk.new_scope') as nuevo_ambito:
+                patch('administracion.views.ajustes.sentry_sdk.capture_message') as capturar, \
+                patch('administracion.views.ajustes.sentry_sdk.new_scope') as nuevo_ambito:
             self.client.post(reverse('admin_staff_checkout_without_payment_toggle'), {'activar': '1'})
         capturar.assert_called_once()
         self.assertEqual(capturar.call_args.kwargs['level'], 'warning')
@@ -175,13 +175,13 @@ class AvisoASentryTests(TestCase):
 
     def test_con_debug_no_emite_nada(self):
         self.client.force_login(self.admin)
-        with override_settings(DEBUG=True), patch('administracion.views.sentry_sdk.capture_message') as capturar:
+        with override_settings(DEBUG=True), patch('administracion.views.ajustes.sentry_sdk.capture_message') as capturar:
             self.client.post(reverse('admin_staff_checkout_without_payment_toggle'), {'activar': '1'})
         capturar.assert_not_called()
 
     def test_apagar_no_emite_nada(self):
         self.client.force_login(self.admin)
-        with override_settings(DEBUG=False), patch('administracion.views.sentry_sdk.capture_message') as capturar:
+        with override_settings(DEBUG=False), patch('administracion.views.ajustes.sentry_sdk.capture_message') as capturar:
             self.client.post(reverse('admin_staff_checkout_without_payment_toggle'), {'activar': '0'})
         capturar.assert_not_called()
 
