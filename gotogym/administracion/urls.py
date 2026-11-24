@@ -1,9 +1,10 @@
-from django.urls import path
+from django.urls import include, path
 
 from . import views, views_atencion
 
 urlpatterns = [
     path("", views.dashboard, name="admin_dashboard"),
+    path("tareas/", include("tareas.urls")),
     path("atencion/", views_atencion.atencion_list, name="admin_atencion"),
     path("atencion/<int:pk>/", views_atencion.atencion_detail, name="admin_atencion_detail"),
     path("atencion/<int:pk>/estado/", views_atencion.atencion_update_estado, name="admin_atencion_estado"),

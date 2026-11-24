@@ -15,6 +15,7 @@ from django.urls import reverse
 from django.utils import timezone
 from gotogym.correo import Correo, aviso, boton, datos, enviar_correo, parrafo
 from orders.models import CouponDiscountType
+from tareas.idempotencia import efecto_unico
 from tienda.templatetags.tienda_filters import cop
 
 from .models import Commission, ConfiguracionProgramaAfiliados, PerfilAfiliado, RecursoMarca
@@ -46,6 +47,9 @@ def _enviar(usuario, correo):
         enviar_correo(usuario.email, correo)
     except Exception:
         logger.exception('No se pudo enviar el correo "%s" a %s', correo.asunto, usuario.pk)
+        # Se propaga para que el trabajador reintente la tarea; con el backend
+        # `sync` lo captura quien la ejecuta, igual que antes.
+        raise
 
 
 def _perfil(perfil_id):
@@ -61,6 +65,7 @@ def _ir_al_panel(texto, frase_con_enlace=None):
     return boton(texto, enlace, texto_plano=f'{frase_con_enlace}: {enlace}' if frase_con_enlace else None)
 
 
+@efecto_unico
 def solicitud_recibida(perfil_id):
     perfil = _perfil(perfil_id)
     _enviar(perfil.user, _correo(
@@ -95,6 +100,7 @@ def _descuento_del_codigo(cupon):
     return filas
 
 
+@efecto_unico
 def afiliado_aprobado(perfil_id):
     """Bienvenida al aprobarse: su codigo y enlace, el descuento que recibe quien
     compra con el codigo, lo que gana el afiliado y como empezar."""
@@ -140,6 +146,7 @@ def afiliado_aprobado(perfil_id):
     ))
 
 
+@efecto_unico
 def afiliado_rechazado(perfil_id):
     perfil = _perfil(perfil_id)
     bloques = [parrafo('Revisamos tu solicitud y, por ahora, no podemos aprobarla.')]
@@ -155,6 +162,7 @@ def afiliado_rechazado(perfil_id):
     ))
 
 
+@efecto_unico
 def baja_solicitada(perfil_id):
     perfil = _perfil(perfil_id)
     _enviar(perfil.user, _correo(
@@ -173,6 +181,7 @@ def baja_solicitada(perfil_id):
     ))
 
 
+@efecto_unico
 def baja_efectiva(perfil_id):
     perfil = _perfil(perfil_id)
     _enviar(perfil.user, _correo(
@@ -186,6 +195,7 @@ def baja_efectiva(perfil_id):
     ))
 
 
+@efecto_unico
 def terminacion(perfil_id):
     perfil = _perfil(perfil_id)
     motivo = perfil.get_exit_reason_display()
@@ -205,6 +215,7 @@ def terminacion(perfil_id):
     ))
 
 
+@efecto_unico
 def validacion_extendida(comision_id):
     comision = Commission.objects.select_related('afiliado__user', 'order').get(pk=comision_id)
     usuario = comision.afiliado.user
@@ -220,6 +231,7 @@ def validacion_extendida(comision_id):
     ))
 
 
+@efecto_unico
 def cambio_de_tasa(perfil_id, tasa):
     perfil = _perfil(perfil_id)
     _enviar(perfil.user, _correo(
@@ -234,6 +246,7 @@ def cambio_de_tasa(perfil_id, tasa):
     ))
 
 
+@efecto_unico
 def aviso_general(perfil_id, asunto, mensaje):
     perfil = _perfil(perfil_id)
     _enviar(perfil.user, _correo(perfil.user, asunto, asunto, [parrafo(mensaje)]))

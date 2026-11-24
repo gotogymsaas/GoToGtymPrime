@@ -19,7 +19,9 @@ Para que eso sea posible, una tarea tiene que poder viajar por una cola:
 instale la cola.
 
 Un backend propio es una clase con `enqueue(ruta, args, kwargs)` y se declara
-con su ruta completa: `TASK_BACKEND=mi_paquete.MiBackend`.
+con su ruta completa: `TASK_BACKEND=mi_paquete.MiBackend`. Si guarda la tarea
+en la misma base de datos del negocio, puede declarar
+`dentro_de_la_transaccion = True` para que se llame sin esperar al commit.
 """
 import importlib
 import json
@@ -88,10 +90,15 @@ def enqueue(funcion, *args, after_commit=True, **kwargs):
             f'Los argumentos de {ruta} deben ser datos simples (ids, texto, números): {error}'
         ) from error
 
-    def lanzar():
-        _backend().enqueue(ruta, list(args), dict(kwargs))
+    backend = _backend()
 
-    if after_commit:
+    def lanzar():
+        backend.enqueue(ruta, list(args), dict(kwargs))
+
+    # Un backend que escribe en la misma base de datos (`dentro_de_la_transaccion`)
+    # se llama de inmediato: su insercion forma parte de la transaccion en
+    # curso, asi que se revierte o se confirma junto con el hecho de negocio.
+    if after_commit and not getattr(backend, 'dentro_de_la_transaccion', False):
         transaction.on_commit(lanzar)
     else:
         lanzar()

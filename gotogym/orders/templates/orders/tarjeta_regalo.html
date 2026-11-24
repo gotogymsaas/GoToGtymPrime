@@ -127,7 +127,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
+<script nonce="{{ csp_nonce }}">
   // Vista previa y valores sugeridos. Es mejora progresiva: sin JS el
   // formulario se llena a mano y el servidor valida todo igual.
   document.addEventListener('DOMContentLoaded', function () {

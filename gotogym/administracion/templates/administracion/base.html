@@ -64,7 +64,7 @@
         {% elif not pagos_habilitados %}
           <span class="pause-badge">Pagos deshabilitados</span>
         {% endif %}
-        {% if perms.administracion.change_panelsettings %}
+        {% if perms.administracion.change_panelsettings and modo_sin_pago_activo or perms.administracion.change_panelsettings and perms.administracion.toggle_test_mode %}
           <button type="button" class="pause-switch{% if modo_sin_pago_activo %} is-test-mode{% else %} is-off{% endif %}" role="switch"
                   aria-checked="{% if modo_sin_pago_activo %}true{% else %}false{% endif %}"
                   aria-haspopup="dialog" data-test-mode-open>
@@ -85,7 +85,7 @@
       <p class="pause-notice" role="status">Quantum Coach está deshabilitado: no se muestra en la tienda.</p>
     {% endif %}
     {% if modo_sin_pago_activo %}
-      <p class="pause-notice pause-notice--test" role="status">Modo de pruebas encendido: las cuentas del equipo confirman pedidos y tarjetas de regalo sin pagar. Los clientes siguen pagando normal. Apágalo al terminar.</p>
+      <p class="pause-notice pause-notice--test" role="status">Modo de pruebas encendido: las cuentas del equipo confirman pedidos y tarjetas de regalo sin pagar. Los clientes siguen pagando normal. Apágalo al terminar.{% if modo_sin_pago_vence %} Se apaga solo el <time datetime="{{ modo_sin_pago_vence|date:'c' }}">{{ modo_sin_pago_vence|date:"d/m/Y H:i" }}</time>.{% endif %}</p>
     {% endif %}
     {% if not pagos_habilitados %}
       <p class="pause-notice" role="status">Los pagos en línea están deshabilitados: la tienda no abre pagos nuevos con Mercado Pago. Los pagos en curso se siguen confirmando.</p>
@@ -121,7 +121,7 @@
             <p>Las cuentas del equipo volverán a pagar sus pedidos como cualquier cliente.</p>
           {% else %}
             <h2 id="test-mode-dialog-title">¿Confirmar pedidos sin pagar?</h2>
-            <p>Mientras esté encendido, las cuentas del equipo (las que entran a este panel) confirman sus pedidos y tarjetas de regalo al pasar el checkout, sin ir a Mercado Pago. Los clientes siguen pagando normal.</p>
+            <p>Mientras esté encendido, las cuentas del equipo (las que entran a este panel) confirman sus pedidos y tarjetas de regalo al pasar el checkout, sin ir a Mercado Pago. Los clientes siguen pagando normal. Se apaga solo a las 24 horas.</p>
             <p>Esos pedidos quedan marcados como prueba: no se facturan, no generan comisión y no cuentan como venta. Sí descuentan stock (se repone si los cancelas) y las tarjetas de regalo se activan y se envían por correo de verdad.</p>
           {% endif %}
           <div class="pause-dialog__actions">
@@ -164,7 +164,7 @@
       </div>
     {% endif %}
   </main>
-  <script>
+  <script nonce="{{ csp_nonce }}">
     // En celular el menu lateral queda cerrado y se abre con el boton; sin
     // JavaScript se queda visible, como en escritorio.
     (function () {

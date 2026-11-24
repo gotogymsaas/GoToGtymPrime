@@ -68,7 +68,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
+<script nonce="{{ csp_nonce }}">
   document.addEventListener('DOMContentLoaded', function () {
     const toggle = document.querySelector('[data-password-toggle]');
     const password = document.getElementById('id_password');

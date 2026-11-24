@@ -497,6 +497,10 @@ class RecursoMarcaForm(forms.ModelForm):
 MAX_BYTES_IMAGEN = 5 * 1024 * 1024
 MAX_LADO_IMAGEN = 6000
 FORMATOS_DE_IMAGEN = {'JPEG', 'PNG', 'WEBP'}
+# La extension decide con que tipo se sirve el archivo desde /media/: una foto
+# valida guardada como `.html` o `.svg` se serviria como pagina o script del
+# propio sitio. Por eso, ademas del contenido, el nombre debe ser de imagen.
+EXTENSIONES_DE_IMAGEN = {'jpg', 'jpeg', 'png', 'webp'}
 
 
 def validar_imagen(archivo):
@@ -510,6 +514,9 @@ def validar_imagen(archivo):
         raise ValidationError(
             f'"{archivo.name}" pesa más de {MAX_BYTES_IMAGEN // (1024 * 1024)} MB.',
         )
+    extension = archivo.name.rsplit('.', 1)[-1].lower() if '.' in archivo.name else ''
+    if extension not in EXTENSIONES_DE_IMAGEN:
+        raise ValidationError(f'"{archivo.name}" debe llamarse con extensión .jpg, .png o .webp.')
     try:
         archivo.seek(0)
         with Image.open(archivo) as imagen:

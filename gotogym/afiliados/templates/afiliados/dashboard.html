@@ -206,7 +206,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
+<script nonce="{{ csp_nonce }}">
   document.addEventListener('click', function (event) {
     const button = event.target.closest('[data-copy-code], [data-copy-target]');
     if (!button) return;

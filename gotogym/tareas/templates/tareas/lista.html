@@ -1,0 +1,99 @@
+{% extends "administracion/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Tareas en segundo plano" %} · GoToGym Admin{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">{% trans "Correos, facturas y tareas programadas" %}</p>
+    <h1>{% trans "Tareas en segundo plano" %}</h1>
+  </div>
+  {% if not habilitado %}
+    <span class="pill pill-off">{% trans "Apagadas: las tareas se ejecutan en la misma petición" %}</span>
+  {% elif latido_caido %}
+    <span class="badge badge-gold">{% trans "El trabajador no responde" %}</span>
+  {% else %}
+    <span class="pill pill-ok">{% trans "Trabajador activo" %}</span>
+  {% endif %}
+</section>
+{% if habilitado %}
+<p class="muted">
+  {% if latido_edad is None %}{% trans "El trabajador todavía no ha registrado ningún ciclo." %}
+  {% else %}{% blocktrans %}Último ciclo del trabajador hace {{ latido_edad }} segundos.{% endblocktrans %}{% endif %}
+</p>
+{% endif %}
+
+<h2>{% trans "Fallidas" %} ({{ total_fallidas }})</h2>
+<div class="panel">
+  <table>
+    <thead><tr>
+      <th>{% trans "Tarea" %}</th><th>{% trans "Intentos" %}</th><th>{% trans "Terminó" %}</th>
+      <th>{% trans "Último error" %}</th><th><span class="sr-only">{% trans "Acciones" %}</span></th>
+    </tr></thead>
+    <tbody>
+      {% for tarea in fallidas %}
+      <tr>
+        <td><strong>{{ tarea.ruta }}</strong><br><small>#{{ tarea.pk }}</small></td>
+        <td>{{ tarea.intentos }}/{{ tarea.maximo_intentos }}</td>
+        <td><small>{{ tarea.terminada|date:"d/m/Y H:i" }}</small></td>
+        <td><small>{{ tarea.ultimo_error }}</small></td>
+        <td class="actions">
+          {% if puede_reintentar %}
+          <form method="post" action="{% url 'admin_tarea_reintentar' tarea.pk %}">
+            {% csrf_token %}
+            <button class="ghost btn-sm" type="submit">{% trans "Reintentar" %}</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">{% trans "No hay tareas fallidas." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2>{% trans "Pendientes y en curso" %} ({{ total_pendientes }})</h2>
+<div class="panel">
+  <table>
+    <thead><tr>
+      <th>{% trans "Tarea" %}</th><th>{% trans "Estado" %}</th><th>{% trans "Intentos" %}</th>
+      <th>{% trans "Próximo intento" %}</th><th>{% trans "Último error" %}</th>
+    </tr></thead>
+    <tbody>
+      {% for tarea in pendientes %}
+      <tr>
+        <td><strong>{{ tarea.ruta }}</strong><br><small>#{{ tarea.pk }}</small></td>
+        <td>{{ tarea.get_estado_display }}</td>
+        <td>{{ tarea.intentos }}/{{ tarea.maximo_intentos }}</td>
+        <td><small>{{ tarea.proximo_intento|date:"d/m/Y H:i" }}</small></td>
+        <td><small>{{ tarea.ultimo_error }}</small></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">{% trans "No hay tareas pendientes." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2>{% trans "Tareas periódicas" %}</h2>
+<div class="panel">
+  <table>
+    <thead><tr>
+      <th>{% trans "Nombre" %}</th><th>{% trans "Cada (segundos)" %}</th>
+      <th>{% trans "Última ejecución" %}</th><th>{% trans "Estado" %}</th>
+    </tr></thead>
+    <tbody>
+      {% for periodica in periodicas %}
+      <tr>
+        <td><strong>{{ periodica.nombre }}</strong></td>
+        <td>{{ periodica.intervalo_segundos }}</td>
+        <td><small>{{ periodica.ultima_ejecucion|date:"d/m/Y H:i"|default:"—" }}</small></td>
+        <td>{% if periodica.activa %}<span class="pill pill-ok">{% trans "Activa" %}</span>{% else %}<span class="pill pill-off">{% trans "Apagada" %}</span>{% endif %}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">{% trans "El trabajador aún no ha registrado las tareas periódicas." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

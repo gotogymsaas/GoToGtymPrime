@@ -50,6 +50,7 @@ ADMIN_PERM_SPECS = [
     ('auth', 'change_group'),
     ('auth', 'delete_group'),
     ('administracion', 'change_panelsettings'),
+    ('administracion', 'toggle_test_mode'),
     ('afiliados', 'change_perfilafiliado'),
     ('afiliados', 'delete_perfilafiliado'),
     ('afiliados', 'change_withdrawalrequest'),
@@ -164,6 +165,9 @@ def _registrar_accion(request, vista, argumentos, codigo_estado):
     bitacora no debe deshacer ni ocultar lo que la persona acaba de hacer."""
     from .models import AccionDePanel
 
+    # Una vista puede dejar en `request.datos_de_bitacora` datos de la accion
+    # que no viajan en la URL (p. ej. si un interruptor se encendio o se apago).
+    argumentos = {**argumentos, **getattr(request, 'datos_de_bitacora', {})}
     try:
         AccionDePanel.objects.create(
             usuario=request.user, vista=vista[:100],

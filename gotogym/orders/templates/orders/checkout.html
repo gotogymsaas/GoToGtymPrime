@@ -177,7 +177,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
+<script nonce="{{ csp_nonce }}">
   // --- "Usar datos de usuario" ----------------------------------------------
   // Al marcarla vuelca los datos de la cuenta en los campos de contacto (solo
   // los que la cuenta tiene) y guarda lo que habia escrito; al desmarcarla lo
@@ -209,7 +209,7 @@
     });
   });
 </script>
-<script>
+<script nonce="{{ csp_nonce }}">
   document.addEventListener('DOMContentLoaded', function () {
     var datosEl = document.getElementById('municipios-data');
     var deptoSelect = document.getElementById('id_department');

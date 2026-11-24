@@ -45,7 +45,7 @@
     <p class="hint field-full">La imagen del producto se agrega después de guardar, en la sección "Imágenes" de abajo.</p>
   {% endif %}
 
-  <script>
+  <script nonce="{{ csp_nonce }}">
   // Precio en pesos: mientras se escribe, muestra puntos de miles
   // ("300.000"); el servidor limpia esos puntos antes de guardar (ver
   // COPPriceField.to_python), asi que aqui solo importa la vista. Se
@@ -139,7 +139,7 @@
       <td data-label="Eliminar" class="cell-check"><button type="button" class="ghost btn-sm remove-variant-row">Quitar</button></td>
     </tr>
   </template>
-  <script>
+  <script nonce="{{ csp_nonce }}">
   (function () {
     var addButton = document.getElementById('add-variant-row');
     var body = document.getElementById('variants-body');
@@ -180,7 +180,7 @@
     <button class="button" type="submit" data-submit-once>Guardar</button>
   </div>
 </form>
-<script>
+<script nonce="{{ csp_nonce }}">
 (function () {
   // Un doble clic (o un envio lento en una red mala) en "Guardar" crea dos
   // productos identicos, cada uno con su propio POST: el servidor no tiene
@@ -231,7 +231,7 @@
     <button class="button" type="submit">Agregar imágenes</button>
   </form>
 </div>
-<script>
+<script nonce="{{ csp_nonce }}">
 (function () {
   var gallery = document.getElementById('media-gallery');
   if (!gallery) return;

@@ -11,6 +11,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import get_language, gettext
 from django.utils.translation import gettext as _
+from tareas.latido import revisar_latido
 from tienda.catalog import curated_product_cards
 from vendedor.exposicion import coach_en_servicio
 
@@ -77,9 +78,17 @@ def readyz(request):
     except Exception:
         logger.exception('readyz: la cache no responde.')
         cache_disponible = False
+    # Antigüedad del latido del trabajador de tareas: dato informativo. Un
+    # trabajador caído no debe tumbar el sitio, así que nunca cambia el estado.
+    try:
+        edad_del_trabajador = revisar_latido()
+    except Exception:
+        logger.exception('readyz: no se pudo leer el latido del trabajador.')
+        edad_del_trabajador = None
     return JsonResponse({
         'status': 'ready', 'database': 'available',
         'cache': 'available' if cache_disponible else 'unavailable',
+        'worker_age_seconds': edad_del_trabajador,
     })
 
 

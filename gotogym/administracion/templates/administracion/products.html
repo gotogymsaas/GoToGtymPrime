@@ -90,7 +90,7 @@
   </table>
 </div>
 {% if puede_reordenar %}
-<script>
+<script nonce="{{ csp_nonce }}">
 (function () {
   var body = document.getElementById('products-body');
   var status = document.getElementById('reorder-status');

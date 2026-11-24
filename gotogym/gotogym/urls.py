@@ -28,8 +28,21 @@ from django.views.static import serve
 from orders import views as orders_views
 from payments import views as payments_views
 
-from . import views
+from . import csp, views
 from .sitemaps import SITEMAPS
+
+# Los archivos subidos tienen nombre unico (Django anade un sufijo si ya existe
+# uno igual), asi que un dia de cache publica es seguro. Un archivo que se
+# reemplaza conservando su nombre tarda hasta ese tiempo en verse.
+CACHE_MEDIA_SEGUNDOS = 86400
+
+
+def servir_media(request, path, document_root):
+    respuesta = serve(request, path, document_root=document_root)
+    if respuesta.status_code in (200, 304):
+        respuesta['Cache-Control'] = f'public, max-age={CACHE_MEDIA_SEGUNDOS}'
+    return respuesta
+
 
 urlpatterns: list[URLPattern | URLResolver] = [
     path('accounts', lambda request: redirect('commercial_login', permanent=False)),
@@ -39,7 +52,10 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path('robots.txt', views.robots_txt, name='robots_txt'),
     path('sitemap.xml', sitemap, {'sitemaps': SITEMAPS}, name='sitemap'),
     path('crm/healthz', views.healthz, name='legacy_crm_healthz'),
-    path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
+    path('media/<path:path>', servir_media, {'document_root': settings.MEDIA_ROOT}),
+    # Fuera de i18n_patterns: el navegador manda el reporte a la ruta exacta de
+    # la politica, sin prefijo de idioma.
+    path('csp-reporte/', csp.reporte, name='csp_reporte'),
     path('products/products/', RedirectView.as_view(pattern_name='tienda:producto_list', permanent=False), name='legacy_products_products'),
     # Fuera de i18n_patterns a proposito: un webhook real no antepone un
     # prefijo de idioma a la URL.

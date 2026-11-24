@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 from gotogym.ajustes_tienda import coach_habilitado, compras_pausadas, pagos_habilitados
 
 
@@ -38,14 +39,37 @@ class PanelSettings(models.Model):
                   "sin pagar. Los clientes siguen pagando normal. Esos pedidos quedan marcados como prueba: "
                   "no se facturan, no generan comisión y no cuentan como venta.",
     )
+    staff_checkout_without_payment_since = models.DateTimeField(
+        null=True, blank=True,
+        help_text="Cuándo se encendió el modo de pruebas. El modo vence 24 horas después "
+                  "(ver `gotogym.ajustes_tienda.VIGENCIA_MODO_SIN_PAGO`); sin fecha se considera vencido.",
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "Configuración del panel"
         verbose_name_plural = "Configuración del panel"
+        permissions = [
+            ("toggle_test_mode", 'Puede encender el modo "Confirmar sin pagar (equipo)"'),
+        ]
 
     def __str__(self):
         return "Configuración del panel"
+
+    def save(self, *args, **kwargs):
+        """Lleva la fecha de encendido del modo de pruebas: se anota al
+        pasar de apagado a encendido (o si falta) y se borra al apagarlo, sea
+        cual sea la via por la que se cambie el interruptor. Que la fecha se
+        decida aqui, y no en cada vista, evita un modo encendido sin vencimiento."""
+        campos = kwargs.get('update_fields')
+        if self.staff_checkout_without_payment:
+            if self.staff_checkout_without_payment_since is None:
+                self.staff_checkout_without_payment_since = timezone.now()
+        else:
+            self.staff_checkout_without_payment_since = None
+        if campos is not None and 'staff_checkout_without_payment' in campos:
+            kwargs['update_fields'] = {*campos, 'staff_checkout_without_payment_since'}
+        super().save(*args, **kwargs)
 
     @classmethod
     def load(cls):

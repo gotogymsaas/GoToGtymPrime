@@ -1,7 +1,9 @@
 import csv
+import logging
 from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 
+import sentry_sdk
 from afiliados.models import (
     Commission,
     CommissionStatus,
@@ -84,6 +86,8 @@ from products.models import (
 from products.variant_parsing import COLOR_UNKNOWN, SIZE_UNKNOWN, build_sku
 from tienda.catalog import ORDEN_DEL_PANEL, SIZE_ORDER
 
+from gotogym import ajustes_tienda
+
 from . import metrics
 from .forms import (
     AfiliadoCommissionRateForm,
@@ -108,6 +112,8 @@ from .permissions import (
     revoke_full_admin_permissions,
     staff_required,
 )
+
+logger = logging.getLogger(__name__)
 
 # Dias sin entregar tras el envio a partir de los cuales un pedido se lista
 # como demorado.
@@ -742,6 +748,22 @@ def coach_toggle(request):
     return _safe_redirect(request, "admin_dashboard")
 
 
+def _avisar_modo_sin_pago_encendido(usuario):
+    """Avisa a Sentry de que se encendio el modo de pruebas en un entorno real.
+    Solo lleva el id de la cuenta (nada de correo ni datos personales). Un fallo
+    del aviso no debe impedir encender el modo ni ocultar el resultado."""
+    if settings.DEBUG:
+        return
+    try:
+        with sentry_sdk.new_scope() as scope:
+            scope.set_user({"id": str(usuario.pk)})
+            sentry_sdk.capture_message(
+                "Modo de pruebas 'Confirmar sin pagar (equipo)' encendido en un entorno real", level="warning",
+            )
+    except Exception:
+        logger.exception("No se pudo avisar a Sentry del modo de pruebas.")
+
+
 @require_perms("administracion.change_panelsettings")
 @require_POST
 def staff_checkout_without_payment_toggle(request):
@@ -752,15 +774,26 @@ def staff_checkout_without_payment_toggle(request):
     la pasarela. Los clientes siguen pagando. Esos pedidos quedan marcados
     como prueba (ver `orders.services.confirmar_sin_pago`)."""
     activar = request.POST.get("activar") == "1"
+    if activar and not request.user.has_perm("administracion.toggle_test_mode"):
+        # Apagarlo basta con `change_panelsettings`; encenderlo, que abre una
+        # via de confirmar pedidos sin cobrar, exige un permiso propio.
+        request.datos_de_bitacora = {"activar": "1", "resultado": "sin_permiso"}
+        messages.error(request, "No tienes permiso para encender el modo de pruebas.")
+        return _safe_redirect(request, "admin_dashboard")
     ajustes = PanelSettings.load()
-    if ajustes.staff_checkout_without_payment != activar:
+    # El modo vencido sigue marcado en la base: encenderlo de nuevo renueva el plazo.
+    if ajustes.staff_checkout_without_payment != activar or activar != ajustes_tienda.modo_sin_pago_activo():
         ajustes.staff_checkout_without_payment = activar
+        ajustes.staff_checkout_without_payment_since = timezone.now() if activar else None
         ajustes.save(update_fields=["staff_checkout_without_payment", "updated_at"])
+        if activar:
+            _avisar_modo_sin_pago_encendido(request.user)
+    request.datos_de_bitacora = {"activar": "1" if activar else "0"}
     if activar:
         messages.warning(
             request,
             "Modo de pruebas encendido: las cuentas del equipo confirman pedidos sin pagar. "
-            "Apágalo al terminar de probar.",
+            "Se apaga solo a las 24 horas; apágalo antes al terminar de probar.",
         )
     else:
         messages.success(request, "Modo de pruebas apagado: todos los pedidos vuelven a requerir pago.")

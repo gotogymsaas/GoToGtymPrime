@@ -76,11 +76,13 @@ INSTALLED_APPS = [
     'analitica',
     'vendedor',
     'atencion',
+    'tareas',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'gotogym.middleware.CSPMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'gotogym.middleware.DefaultLanguageMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -113,6 +115,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'carrito.context_processors.cart_count',
                 'accounts.oidc.oidc_habilitado',
+                'gotogym.csp.csp_nonce',
                 'administracion.context_processors.compras_pausadas',
                 'administracion.context_processors.pagos_habilitados',
                 'administracion.context_processors.modo_sin_pago',
@@ -292,10 +295,30 @@ else:
 # Tareas en segundo plano (ver gotogym/tasks.py). "sync" ejecuta en el mismo
 # proceso; cuando exista una cola, se cambia aqui sin tocar quien encola.
 TASK_BACKEND = os.environ.get('TASK_BACKEND', 'sync')
+# Con TASK_BACKEND=tareas.backend.DatabaseBackend (ver tareas/LEEME.md):
+# intentos antes de dar una tarea por fallida, segundos entre ciclos del
+# trabajador, segundos tras los que una tarea "en curso" se da por perdida y
+# dias que se conservan las tareas terminadas.
+TAREAS_MAX_INTENTOS = int(os.environ.get('TAREAS_MAX_INTENTOS', '5'))
+TAREAS_INTERVALO_SEGUNDOS = float(os.environ.get('TAREAS_INTERVALO_SEGUNDOS', '10'))
+TAREAS_TIEMPO_MAXIMO_SEGUNDOS = int(os.environ.get('TAREAS_TIEMPO_MAXIMO_SEGUNDOS', '900'))
+TAREAS_RETENCION_DIAS = int(os.environ.get('TAREAS_RETENCION_DIAS', '30'))
 
 # Limite de tasa (ver gotogym/ratelimit.py). Las pruebas lo apagan: comparten
 # la misma IP y la misma cache durante toda la suite.
 RATE_LIMIT_ENABLED = _as_bool(os.environ.get('RATE_LIMIT_ENABLED'), True)
+
+# Content-Security-Policy (ver `gotogym.middleware.CSPMiddleware`):
+# `reportar` (por defecto) solo avisa a /csp-reporte/ de lo que la politica
+# bloquearia; `aplicar` hace que el navegador bloquee; `apagado` quita la cabecera.
+CSP_MODO = os.environ.get('CSP_MODO', 'reportar').strip().lower()
+if CSP_MODO not in ('reportar', 'aplicar', 'apagado'):
+    # Un valor mal escrito no debe tumbar el sitio: se vuelve al modo que no
+    # bloquea nada y se deja constancia en el log.
+    logging.getLogger(__name__).critical(
+        "CSP_MODO debe ser 'reportar', 'aplicar' o 'apagado' (recibido: %r); se usa 'reportar'.", CSP_MODO,
+    )
+    CSP_MODO = 'reportar'
 
 # Cuantos proxies de confianza hay delante de la aplicacion (en Azure App
 # Service, uno). Con 1, la IP real del cliente es la ultima de

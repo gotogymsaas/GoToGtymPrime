@@ -19,6 +19,7 @@ def modo_sin_pago(request):
     (la tienda le muestra "Confirmar sin pagar" en vez del pago)."""
     return {
         'modo_sin_pago_activo': ajustes_tienda.modo_sin_pago_activo(request),
+        'modo_sin_pago_vence': ajustes_tienda.modo_sin_pago_vence_el(request),
         'confirma_sin_pagar': ajustes_tienda.confirma_sin_pagar(request),
     }
 

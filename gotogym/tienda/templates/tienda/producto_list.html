@@ -200,7 +200,7 @@
 {% block extra_scripts %}
 <script src="{% static 'js/quantum_lens.js' %}" defer></script>
 <script src="{% static 'js/favoritos.js' %}" defer></script>
-<script>
+<script nonce="{{ csp_nonce }}">
   document.addEventListener('DOMContentLoaded', function () {
     var toggle = document.querySelector('[data-filters-toggle]');
     var panel = document.querySelector('[data-filters-panel]');

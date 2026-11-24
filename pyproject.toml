@@ -79,7 +79,7 @@ precision = 1
 root_packages = [
     "accounts", "administracion", "analitica", "blog", "carrito", "contabilidad",
     "gotogym", "afiliados", "inventory", "orders", "payments", "products",
-    "shipping", "tienda", "vendedor", "atencion",
+    "shipping", "tienda", "vendedor", "atencion", "tareas",
 ]
 include_external_packages = false
 
@@ -102,6 +102,8 @@ layers = [
     "shipping",
     "tienda | inventory | analitica | blog",
     "products",
+    # Cola de tareas: no conoce ninguna app (resuelve las funciones por su ruta).
+    "tareas",
     # Utilidades compartidas: no pueden conocer ninguna app.
     "gotogym.seo | gotogym.ratelimit | gotogym.tasks | gotogym.correo | gotogym.ajustes_tienda",
 ]

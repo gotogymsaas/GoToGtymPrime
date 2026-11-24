@@ -35,6 +35,7 @@ from gotogym.correo import (
     totales,
     url_absoluta,
 )
+from tareas.idempotencia import efecto_unico
 from tienda.templatetags.imagenes import url_imagen_producto
 
 from . import tarjeta_pdf
@@ -87,10 +88,14 @@ def _correo(pedido, asunto, titulo, bloques):
 
 
 def _enviar(pedido, correo):
+    # El fallo se registra y se propaga: la tarea queda como fallida y el
+    # trabajador la reintenta (con el backend `sync` lo captura quien la
+    # ejecuta, igual que antes).
     try:
         enviar_correo(pedido.email, correo)
     except Exception:
         logger.exception('No se pudo enviar el correo "%s" del pedido %s', correo.asunto, pedido.order_number)
+        raise
 
 
 def _imagen_del_producto(item):
@@ -138,6 +143,7 @@ def _boton_del_pedido(pedido, frase_con_enlace):
     return boton(gettext('Ver mi pedido'), enlace, texto_plano=frase_con_enlace % {'enlace': enlace})
 
 
+@efecto_unico
 def pedido_recibido(order_id):
     """Sale al crear el pedido, antes de que el pago se confirme: deja claro que
     esta pendiente y cuanto tiempo hay para pagarlo."""
@@ -161,6 +167,7 @@ def pedido_recibido(order_id):
         ))
 
 
+@efecto_unico
 def pedido_confirmado(order_id):
     pedido = _pedido(order_id)
     with _en_el_idioma_del_pedido(pedido):
@@ -195,6 +202,7 @@ def _datos_de_la_guia(pedido):
     ])]
 
 
+@efecto_unico
 def pedido_enviado(order_id):
     pedido = _pedido(order_id)
     with _en_el_idioma_del_pedido(pedido):
@@ -214,6 +222,7 @@ def pedido_enviado(order_id):
         ))
 
 
+@efecto_unico
 def pedido_cancelado(order_id):
     pedido = _pedido(order_id)
     with _en_el_idioma_del_pedido(pedido):
@@ -328,6 +337,7 @@ def _pdf_adjunto(tarjeta):
     return [(nombre, contenido, 'application/pdf')]
 
 
+@efecto_unico
 def tarjeta_regalo_para_destinatario(gift_card_id):
     """Envia la tarjeta a quien la recibe, en el idioma en que se compro.
     Registra el envio solo si salio bien, para que el panel muestre cuales
@@ -342,10 +352,11 @@ def tarjeta_regalo_para_destinatario(gift_card_id):
         enviar_correo(tarjeta.recipient_email, correo, adjuntos)
     except Exception:
         logger.exception('No se pudo enviar la tarjeta de regalo %s', tarjeta.masked_code)
-        return
+        raise
     GiftCard.objects.filter(pk=tarjeta.pk).update(sent_at=timezone.now())
 
 
+@efecto_unico
 def tarjeta_regalo_comprada(order_id):
     """Confirmacion a quien compro la tarjeta. No lleva el codigo completo: el
     codigo es de quien recibe el regalo."""

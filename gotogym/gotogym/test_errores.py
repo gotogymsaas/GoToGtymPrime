@@ -111,7 +111,9 @@ class PaginasDeErrorTests(TestCase):
     def test_readiness_confirma_la_base_de_datos(self):
         r = self.cliente.get('/readyz')
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.json(), {'status': 'ready', 'database': 'available', 'cache': 'available'})
+        self.assertEqual(r.json(), {
+            'status': 'ready', 'database': 'available', 'cache': 'available', 'worker_age_seconds': None,
+        })
 
     def test_readiness_informa_la_cache_caida_sin_responder_503(self):
         from unittest.mock import patch
