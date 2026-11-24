@@ -1,10 +1,9 @@
 """Clientes de integraciones externas, siempre contra dobles: ninguna prueba
 hace una llamada de red real."""
-import os
 from unittest.mock import MagicMock, patch
 
 import requests
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 
 from integrations.alegra import alegra_client
 from integrations.alegra.alegra_client import AlegraClient, AlegraError
@@ -22,7 +21,7 @@ class AlegraClientHttpTests(SimpleTestCase):
         return respuesta
 
     def test_exige_credenciales(self):
-        with patch.dict(os.environ, {}, clear=True):
+        with override_settings(ALEGRA_EMAIL='', ALEGRA_API_TOKEN=''):
             with self.assertRaises(ValueError):
                 AlegraClient()
 
@@ -137,9 +136,7 @@ class AlegraClientHttpTests(SimpleTestCase):
         self.assertTrue(delete.call_args.args[0].endswith('/invoices/55'))
 
     def test_el_token_del_entorno_prefiere_alegra_api_token(self):
-        with patch.dict(os.environ, {
-            'ALEGRA_EMAIL': 'a@b.co', 'ALEGRA_API_TOKEN': 'nuevo', 'ALEGRA_TOKEN': 'viejo',
-        }):
+        with override_settings(ALEGRA_EMAIL='a@b.co', ALEGRA_API_TOKEN='nuevo'):
             self.assertEqual(AlegraClient().token, 'nuevo')
 
 
@@ -197,7 +194,7 @@ class MercadoPagoClientTests(SimpleTestCase):
         self.sdk.refund.return_value.list_all.assert_called_once_with('pay-1')
 
     def test_sin_token_no_se_crea_el_cliente(self):
-        with patch.dict(os.environ, {'MERCADOPAGO_ACCESS_TOKEN': ''}):
+        with override_settings(MERCADOPAGO_ACCESS_TOKEN=''):
             with self.assertRaises(RuntimeError):
                 MercadoPagoClient()
 
@@ -225,7 +222,7 @@ class MercadoPagoClientTests(SimpleTestCase):
         self.assertIs(opciones, mercadopago_client.mercadopago.config.RequestOptions.return_value)
 
     def test_toma_el_token_del_entorno(self):
-        with patch.dict(os.environ, {'MERCADOPAGO_ACCESS_TOKEN': 'del-entorno'}):
+        with override_settings(MERCADOPAGO_ACCESS_TOKEN='del-entorno'):
             self.assertEqual(MercadoPagoClient().access_token, 'del-entorno')
 
 

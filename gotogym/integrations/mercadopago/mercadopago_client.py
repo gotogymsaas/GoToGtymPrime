@@ -1,4 +1,4 @@
-import os
+from django.conf import settings
 
 try:
     import mercadopago
@@ -48,7 +48,7 @@ class MercadoPagoClient:
     """Lightweight Mercado Pago wrapper."""
 
     def __init__(self, access_token: str | None = None) -> None:
-        self.access_token = access_token or os.environ.get("MERCADOPAGO_ACCESS_TOKEN")
+        self.access_token = access_token or getattr(settings, "MERCADOPAGO_ACCESS_TOKEN", None)
         if mercadopago is None:
             raise RuntimeError("mercadopago package is required")
         if not self.access_token:

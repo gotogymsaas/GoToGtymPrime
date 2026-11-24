@@ -251,7 +251,7 @@ class MercadoPagoPaymentProvider(PaymentProvider):
 
         estado_previo = transaction.status
         transaction.payment_id = payment_id
-        transaction.status = nuevo_estado
+        transaction.status = nuevo_estado  # type: ignore[assignment]
         # La preferencia (con su `init_point`) se conserva: el comprador puede
         # volver a pagar con ella tras un rechazo.
         transaction.raw_payload = {**(transaction.raw_payload or {}), 'payment': pago}

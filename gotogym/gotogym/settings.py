@@ -133,12 +133,12 @@ WSGI_APPLICATION = 'gotogym.wsgi.application'
 #
 # 1. DATABASE_URL  -> PostgreSQL. Es el motor objetivo para los entornos
 #    desplegados; el driver (psycopg2-binary) esta en requirements.txt.
-# 2. MYSQL_*       -> MySQL. Solo para entornos heredados que aun declaren
-#    esas variables de forma explicita. El driver requerido por este backend
-#    (mysqlclient) NO esta en requirements.txt, asi que un entorno que caiga
-#    aqui debe instalarlo aparte. No usar en entornos nuevos.
-# 3. Sin variables -> SQLite local, para poder ejecutar manage.py sin
+# 2. Sin variables -> SQLite local, para poder ejecutar manage.py sin
 #    configuracion previa. Nunca apunta a un servidor remoto por defecto.
+#
+# MySQL ya no es una opcion: su driver (mysqlclient) no esta en
+# requirements.txt. Si el entorno aun declara MYSQL_*, el arranque falla con
+# un mensaje claro en vez de caer en una base que no se puede usar.
 _db_url = os.environ.get('DATABASE_URL', '')
 if _db_url:
     _p = urllib.parse.urlparse(_db_url)
@@ -160,16 +160,11 @@ if _db_url:
         }
     }
 elif os.environ.get('MYSQL_HOST') or os.environ.get('MYSQL_DATABASE'):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ.get('MYSQL_DATABASE', 'gotogym_bd'),
-            'USER': os.environ.get('MYSQL_USER', 'gotogym_user'),
-            'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
-            'HOST': os.environ.get('MYSQL_HOST', ''),
-            'PORT': os.environ.get('MYSQL_PORT', '3306'),
-        }
-    }
+    raise ImproperlyConfigured(
+        'MySQL ya no esta soportado (el driver mysqlclient no se instala). '
+        'Define DATABASE_URL con la cadena de conexion de PostgreSQL y quita '
+        'las variables MYSQL_*.'
+    )
 else:
     DATABASES = {
         'default': {

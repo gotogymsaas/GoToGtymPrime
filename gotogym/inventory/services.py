@@ -89,7 +89,7 @@ def _normalize(items):
     bloqueos siempre en el mismo orden, de modo que no puedan quedarse
     esperandose mutuamente.
     """
-    grouped = OrderedDict()
+    grouped: OrderedDict[int, tuple] = OrderedDict()
     for variant, quantity in items:
         if quantity <= 0:
             continue

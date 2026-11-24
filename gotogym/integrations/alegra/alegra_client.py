@@ -1,9 +1,9 @@
 import base64
-import os
 import re
 from typing import Any
 
 import requests
+from django.conf import settings
 
 # Segundos que se espera a Alegra por llamada. Emitir ante la DIAN es lo mas
 # lento; sin tope, un Alegra caido dejaria colgada la peticion que lo origino.
@@ -48,8 +48,9 @@ class AlegraClient:
     BASE_URL = "https://api.alegra.com/api/v1/"
 
     def __init__(self, email: str | None = None, token: str | None = None) -> None:
-        self.email = email or os.environ.get("ALEGRA_EMAIL")
-        self.token = token or os.environ.get("ALEGRA_API_TOKEN") or os.environ.get("ALEGRA_TOKEN")
+        # `settings.ALEGRA_API_TOKEN` ya cae en `ALEGRA_TOKEN` si falta.
+        self.email = email or getattr(settings, "ALEGRA_EMAIL", None)
+        self.token = token or getattr(settings, "ALEGRA_API_TOKEN", None)
         if not self.email or not self.token:
             raise AlegraConfigError("Alegra credentials are required")
         credentials = f"{self.email}:{self.token}"
@@ -59,8 +60,6 @@ class AlegraClient:
     @classmethod
     def from_settings(cls) -> "AlegraClient":
         """Cliente con las credenciales de `settings` (donde las lee el sitio)."""
-        from django.conf import settings
-
         return cls(
             email=getattr(settings, "ALEGRA_EMAIL", None),
             token=getattr(settings, "ALEGRA_API_TOKEN", None),

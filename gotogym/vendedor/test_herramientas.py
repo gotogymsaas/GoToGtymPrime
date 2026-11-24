@@ -379,7 +379,7 @@ class VozVistaTests(TestCase):
     @override_settings(RATE_LIMIT_ENABLED=True)
     def test_tope_diario_por_persona(self):
         self._con_coach()
-        with mock.patch.object(views, 'VOZ_MAX_DIA', 1):
+        with mock.patch.object(views.subida_voz, 'VOZ_MAX_DIA', 1):
             self.assertEqual(self._enviar().status_code, 200)
             respuesta = self._enviar()
         self.assertEqual((respuesta.status_code, respuesta.json()['error']), (429, 'limite_voz'))

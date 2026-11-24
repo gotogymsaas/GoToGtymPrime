@@ -316,7 +316,7 @@ class HandleCallbackTests(TestCase):
 
         self._aprobar_y_confirmar()
 
-        with mock.patch('orders.services.revert_order_commission') as revertir:
+        with mock.patch('afiliados.receptores.revert_order_commission') as revertir:
             with self.assertLogs('orders.services', level='ERROR'):
                 self.provider.handle_callback(self._payload('charged_back'))
 

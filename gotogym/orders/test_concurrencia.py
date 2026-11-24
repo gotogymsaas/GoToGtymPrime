@@ -111,7 +111,7 @@ class UsoSimultaneoDeUnCuponTests(TransactionTestCase):
                 usuario, {str(self.variante.pk): 1}, {**DATOS, 'coupon_code': 'UNICO'},
             )
 
-        with patch('orders.services.get_usable_coupon', leer_y_esperar):
+        with patch('orders.services.creacion.get_usable_coupon', leer_y_esperar):
             resultados = _en_hilos(*(comprar(u) for u in self.usuarios))
 
         errores = [r for r in resultados if isinstance(r, CheckoutError)]

@@ -5,6 +5,7 @@ saltarselos y la peticion puede llegar sin pasar por el formulario.
 """
 import re
 from decimal import Decimal, InvalidOperation
+from typing import Any
 
 from django import forms
 from django.utils import timezone
@@ -166,7 +167,7 @@ class CheckoutForm(forms.Form):
         cleaned_data[campo] = nuevo
 
     def clean(self):
-        cleaned_data = super().clean()
+        cleaned_data: dict[str, Any] = super().clean()  # type: ignore[assignment]
         self._repartir_codigo(cleaned_data)
         codigo_cupon = (cleaned_data.get('coupon_code') or '').strip().upper()
         if codigo_cupon and get_usable_coupon(codigo_cupon, user=self._user) is None:
@@ -267,7 +268,7 @@ class GiftCardPurchaseForm(forms.Form):
         return mensaje
 
     def clean(self):
-        cleaned_data = super().clean()
+        cleaned_data: dict[str, Any] = super().clean()  # type: ignore[assignment]
         correo, confirmacion = cleaned_data.get('recipient_email'), cleaned_data.get('recipient_email_confirm')
         if correo and confirmacion and correo != confirmacion:
             self.add_error('recipient_email_confirm', gettext('Los correos no coinciden.'))

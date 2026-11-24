@@ -39,7 +39,7 @@ class ModoSinPagoTests(ConfirmPaymentBaseTestCase):
 
     def test_el_equipo_confirma_sin_pagar_y_queda_como_prueba(self):
         _modo_de_pruebas(True)
-        with patch('orders.services.register_order_commission') as comision:
+        with patch('afiliados.receptores.register_order_commission') as comision:
             respuesta, pedido = self._checkout(self.staff)
         self.assertRedirects(respuesta, reverse('orders:order_detail', args=[pedido.order_number]))
         pedido.refresh_from_db()

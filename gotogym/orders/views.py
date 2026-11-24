@@ -376,7 +376,7 @@ def create_review(request, order_number, item_id):
     form = ProductReviewForm(request.POST)
     if form.is_valid():
         review = form.save(commit=False)
-        review.product = item.variant.product
+        review.product = item.variant.product  # type: ignore[union-attr]
         review.order_item = item
         review.user = request.user
         review.save()

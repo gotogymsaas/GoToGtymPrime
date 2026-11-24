@@ -58,7 +58,7 @@ def normalizar_llave(llave):
 
 def codigo_referido_disponible(codigo, excluir_profile_pk=None):
     """El codigo elegido por el afiliado tambien se vuelve `Coupon.code` al
-    aprobarse (ver `afiliados.services._ensure_personal_coupon`), asi que
+    aprobarse (ver `afiliados.services.afiliacion._ensure_personal_coupon`), asi que
     debe ser unico contra ambas tablas antes de aceptarlo."""
     from orders.models import Coupon
 

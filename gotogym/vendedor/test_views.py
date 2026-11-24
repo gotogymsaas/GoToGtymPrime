@@ -286,7 +286,7 @@ class VendedorViewTests(TestCase):
         self._enviar()
         ahora = views._ahora()
 
-        with mock.patch.object(views, '_ahora', return_value=ahora + 30):
+        with mock.patch.object(views.comun, '_ahora', return_value=ahora + 30):
             respuesta = self._enviar()
 
         self.assertEqual(respuesta.status_code, 200)

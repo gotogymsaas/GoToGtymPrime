@@ -20,6 +20,7 @@ descuento, asi que no rebaja ninguna linea.
 import logging
 from datetime import date, datetime, time, timedelta
 from decimal import ROUND_HALF_UP, Decimal
+from typing import Any
 
 from django.conf import settings
 from django.db import IntegrityError, transaction
@@ -158,7 +159,7 @@ def medio_de_pago(pago, order=None):
         return getattr(settings, 'ALEGRA_MEDIO_DE_PAGO_TARJETA_REGALO', '') or getattr(
             settings, 'ALEGRA_MEDIO_DE_PAGO', 'INSTRUMENT_NOT_DEFINED',
         )
-    tipo = ((pago.raw_payload or {}).get('payment') or {}).get('payment_type_id') if pago else None
+    tipo: Any = ((pago.raw_payload or {}).get('payment') or {}).get('payment_type_id') if pago else None
     return MEDIO_DE_PAGO_MERCADO_PAGO.get(
         tipo, getattr(settings, 'ALEGRA_MEDIO_DE_PAGO', 'INSTRUMENT_NOT_DEFINED'),
     )
@@ -432,7 +433,7 @@ def emitir_factura(order_id):
         _registrar_fallo(factura, error)
         return InvoiceStatus.FAILED
 
-    stamp = respuesta.get('stamp') if isinstance(respuesta.get('stamp'), dict) else {}
+    stamp: Any = respuesta.get('stamp') if isinstance(respuesta.get('stamp'), dict) else {}
     Invoice.objects.filter(pk=factura.pk).update(
         status=InvoiceStatus.ISSUED,
         alegra_contact_id=contacto_id,

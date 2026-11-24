@@ -131,6 +131,16 @@ class PerfilAfiliado(models.Model):
     def baja_solicitada(self):
         return self.is_active and self.exit_requested_at is not None
 
+    def es_operativo(self, ahora=None):
+        """Si el codigo del afiliado todavia debe aceptarse: esta activo y su
+        preaviso de baja, si lo hay, no ha vencido (aunque la baja aun no se
+        haya aplicado en la base). `orders` lo consulta sobre el afiliado de un
+        cupon sin importar esta app."""
+        ahora = ahora or timezone.now()
+        if not self.is_active:
+            return False
+        return not (self.exit_effective_at and self.exit_effective_at <= ahora)
+
 
 class SocialPlatform(models.TextChoices):
     INSTAGRAM = 'instagram', gettext_lazy('Instagram')

@@ -253,7 +253,7 @@ class CanjeTests(_Base):
         # confirmacion: la comprobacion optimista del checkout no lo ve.
         self.variante.inventory.quantity_available = 0
         self.variante.inventory.save()
-        with patch('orders.services._validar_disponibilidad'):
+        with patch('orders.services.creacion._validar_disponibilidad'):
             pedido = self._pedido(gift_card_code=tarjeta.code)
         pedido.refresh_from_db()
         self.assertEqual(pedido.order_status, OrderStatus.CANCELLED)

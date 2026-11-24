@@ -26,7 +26,7 @@ class CupoDelCuponTests(ConfirmPaymentBaseTestCase):
         leido_con_cupo = Coupon.objects.get(pk=cupon.pk)
         Coupon.objects.filter(pk=cupon.pk).update(times_used=1)
 
-        with patch('orders.services.get_usable_coupon', return_value=leido_con_cupo):
+        with patch('orders.services.creacion.get_usable_coupon', return_value=leido_con_cupo):
             with self.assertRaises(CheckoutError):
                 self._comprar('ULTIMO')
 

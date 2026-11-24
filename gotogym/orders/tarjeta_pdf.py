@@ -133,7 +133,7 @@ def _dibujar(c, tarjeta):
     lienzo.rect(CINTA_X, CINTA_Y, CINTA_ANCHO, CINTA_ALTO, DORADO_OSCURO)
 
     # Cabecera: logo, marca y rotulo.
-    x = MARGEN
+    x: float = MARGEN
     ruta_logo = finders.find(LOGO)
     if ruta_logo:
         alto_logo = 96

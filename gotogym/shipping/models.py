@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import gettext_lazy
-from orders.models import Order
 
 
 class ShippingStatus(models.TextChoices):
@@ -19,7 +18,9 @@ class ShippingQuote(models.Model):
     sola fuente de verdad, no dos numeros que puedan divergir.
     """
 
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='shipping_quote')
+    # Por nombre y no por importacion: `orders` calcula el envio de sus
+    # pedidos, asi que importar su modelo aqui formaria un ciclo.
+    order = models.OneToOneField('orders.Order', on_delete=models.CASCADE, related_name='shipping_quote')
 
     carrier_name = models.CharField(max_length=80)
     method_name = models.CharField(max_length=80)

@@ -45,6 +45,38 @@ exclude = ["migrations/", "GoToGymAdmin", "go-to-gym-platform"]
 ignore_missing_imports = true
 check_untyped_defs = false
 
+# Las apps de dinero y existencias se revisan tambien por dentro de las
+# funciones sin anotar: es donde un tipo equivocado cuesta mas.
+[[tool.mypy.overrides]]
+module = ["payments.*", "orders.*", "inventory.*"]
+check_untyped_defs = true
+
+# Las pruebas de estas apps leen atributos que `setUpTestData` asigna a la
+# clase y respuestas de Django sin tipar: mypy no los ve y lo marca como
+# error en cientos de lineas que no son codigo de la aplicacion. Se listan
+# por nombre (el comodin `test_*` no es un patron valido de mypy).
+[[tool.mypy.overrides]]
+module = [
+    "inventory.tests",
+    "orders.test_concurrencia",
+    "orders.test_confirm_payment",
+    "orders.test_correos_reintento",
+    "orders.test_correos_y_vencimiento",
+    "orders.test_facturacion",
+    "orders.test_integridad",
+    "orders.test_integridad_y_auditoria",
+    "orders.test_modo_sin_pago",
+    "orders.test_my_orders",
+    "orders.test_security_hardening",
+    "orders.test_senales",
+    "orders.test_tarjetas_regalo",
+    "orders.tests",
+    "payments.test_concurrencia",
+    "payments.test_mercadopago",
+    "payments.tests",
+]
+check_untyped_defs = false
+
 [tool.django-stubs]
 django_settings_module = "gotogym.settings_test"
 
@@ -124,17 +156,6 @@ ignore_imports = [
     "orders.test_security_hardening -> payments.models",
     "orders.test_correos_y_vencimiento -> payments.models",
     "afiliados.tests -> administracion.permissions",
-    # Ciclos que ya existian al introducir la regla. Cada uno es deuda
-    # conocida: la regla impide que aparezcan nuevos, y estos se quitan al
-    # resolverlos (no se agregan otros sin discutirlo).
-    #
-    # Al crear un pedido se registra la comision del afiliado, pero el
-    # afiliado lee pedidos. Se resuelve con una senal que el pedido emita.
-    "orders.services -> afiliados.services",
-    # Un envio apunta a su pedido, y el pedido calcula su envio.
-    "shipping.models -> orders.models",
-    # El comando de auditoria lee el inventario de cada producto.
-    "products.management.commands.audit_catalog -> inventory.models",
 ]
 
 [[tool.importlinter.contracts]]
