@@ -14,6 +14,9 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   # Las mismas validaciones y la suite completa que corren en cada pull
   # request (ver ci.yml). Si fallan, no se construye ni se despliega nada.
@@ -27,10 +30,10 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Set up Python version
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: '3.12'
 
@@ -69,7 +72,7 @@ jobs:
           bash environments/frontend/run_frontend_smoke.sh
 
       - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: python-app
           path: |
@@ -97,7 +100,7 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: python-app
 
@@ -112,14 +115,38 @@ jobs:
           echo "Verificando script de arranque..."
           test -f environments/azure/startup.sh
 
+          # Solo viaja lo que la aplicacion ejecuta en produccion. Quedan fuera
+          # el codigo y los datos de desarrollo: documentacion, manuscritos
+          # (QAF), tipografia fuente (design), pruebas de raiz, scripts de
+          # herramientas, la compilacion de Tailwind (el CSS ya esta versionado
+          # en gotogym/static) y las dependencias de desarrollo. Los patrones
+          # estan anclados a la raiz del repositorio: `tests/*` no toca las
+          # carpetas `tests` de las apps dentro de `gotogym/`.
           echo "Comprimiendo artefactos..."
-          zip -r deploy.zip . \
+          zip -qr deploy.zip . \
             -x "*.pyc" -x ".venv*" -x "venv/*" -x "__pycache__/*" -x ".git/*" \
-            -x ".github/*" -x "docs/*" -x "*.sqlite3" -x "*.bat" -x "deploy.zip"
+            -x ".github/*" -x "docs/*" -x "*.sqlite3" -x "*.bat" -x "deploy.zip" \
+            -x "QAF/*" -x "design/*" -x "tests/*" -x "scripts/*" \
+            -x ".copilot-azure/*" -x "node_modules/*" -x "Temp/*" -x "logs/*" \
+            -x "package.json" -x "package-lock.json" -x "tailwind.config.js" \
+            -x "requirements-dev.txt" -x "README.md"
           echo "Tamaño del paquete: $(du -sh deploy.zip | cut -f1)"
+          unzip -Z1 deploy.zip > /tmp/contenido_paquete.txt
+          echo "Contenido de primer nivel del paquete (entradas por carpeta o archivo):"
+          cut -d/ -f1 /tmp/contenido_paquete.txt | sort | uniq -c
 
           echo "Verificando contenido del paquete..."
-          unzip -l deploy.zip | grep -F "environments/azure/startup.sh"
+          for requerido in environments/azure/startup.sh requirements.txt \
+                           gotogym/manage.py gotogym/gotogym/wsgi.py; do
+            grep -Fxq "$requerido" /tmp/contenido_paquete.txt \
+              || { echo "ERROR: falta $requerido en el paquete."; exit 1; }
+          done
+          for excluido in QAF design tests scripts node_modules Temp logs; do
+            if grep -q "^${excluido}/" /tmp/contenido_paquete.txt; then
+              echo "ERROR: el paquete incluye ${excluido}/, que debia quedar fuera."
+              exit 1
+            fi
+          done
 
           echo "Enviando a Kudu zipdeploy..."
           HTTP_STATUS=$(curl -s -o /tmp/deploy_response.txt -w "%{http_code}" \
@@ -224,3 +251,43 @@ jobs:
             exit 1
           fi
           echo "Smokes OIDC posteriores al despliegue: correctos."
+
+          # /readyz abre una conexion a la base: un 503 sostenido significa que la
+          # aplicacion arranco pero no puede atender. La cache solo se informa:
+          # sin ella el sitio sigue sirviendo.
+          cat > /tmp/verificar_readyz.py <<'PY'
+          import json
+          import sys
+
+          with open(sys.argv[1], encoding='utf-8') as fh:
+              respuesta = json.load(fh)
+          if not isinstance(respuesta, dict):
+              sys.exit('la respuesta no es un objeto JSON')
+          if respuesta.get('status') != 'ready' or respuesta.get('database') != 'available':
+              sys.exit('status=%r database=%r' % (respuesta.get('status'), respuesta.get('database')))
+          print('status=ready database=available cache=%s' % respuesta.get('cache', 'desconocido'))
+          PY
+          echo "Verificando /readyz (base de datos disponible)..."
+          READY_OK=0
+          for intento in $(seq 1 18); do
+            READY_STATUS=$(curl -sS --max-time 15 -o /tmp/prime-readyz.json -w "%{http_code}" \
+              "https://shop.gotogym.store/readyz" || true)
+            READY_STATUS="${READY_STATUS:-000}"
+            if [[ "$READY_STATUS" == "200" ]]; then
+              if READY_DETALLE=$(python3 /tmp/verificar_readyz.py /tmp/prime-readyz.json 2>&1); then
+                echo "/readyz: HTTP 200, ${READY_DETALLE}"
+                READY_OK=1
+                break
+              fi
+              echo "/readyz respondió 200 pero no está listo (${READY_DETALLE}); reintentando..."
+            else
+              echo "/readyz: HTTP ${READY_STATUS} (intento ${intento}/18); reintentando..."
+            fi
+            sleep 10
+          done
+          if [[ "$READY_OK" -ne 1 ]]; then
+            echo "ERROR: /readyz no confirmó la base de datos tras ~3 minutos (último HTTP ${READY_STATUS})."
+            echo "Revisa DATABASE_URL, el estado de PostgreSQL y los logs de arranque."
+            exit 1
+          fi
+          echo "Verificación de /readyz: correcta."

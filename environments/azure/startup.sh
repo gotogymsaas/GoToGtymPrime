@@ -33,17 +33,25 @@ echo "[startup] Recolectando estaticos..."
 echo "[startup] Cargando entradas del Journal (solo las que faltan)..."
 "${PYTHON_BIN}" gotogym/manage.py seed_journal --solo-faltantes   || echo "[startup] AVISO: no se pudieron cargar las entradas del Journal; el sitio arranca igual."
 
-# Este script quedo desincronizado de lo que el App Service corria de
-# verdad (el Startup Command configurado a mano en el Portal, invisible
-# para git) el tiempo suficiente para provocar una caida: revertir este
-# archivo no arreglaba nada porque Azure ni lo estaba ejecutando. La
-# version de abajo es exactamente el comando que se verifico funcionando
-# en produccion -- puerto, workers y timeout incluidos -- para que este
-# archivo deje de ser documentacion aspiracional y vuelva a ser la fuente
-# de verdad real.
+# Este es el comando de arranque versionado y recomendado. El Startup Command
+# que ejecuta el App Service se configura en el Portal de Azure y git no lo
+# ve: solo ejecuta este archivo si alguien con acceso al Portal lo configuro
+# como `bash environments/azure/startup.sh`. Mientras eso no este confirmado,
+# produccion puede seguir corriendo la version anterior (migrate, collectstatic
+# y gunicorn con 2 workers sincronos y timeout 120, sin seed_journal). Ver
+# docs/DESPLIEGUE.md, "Pendientes que requieren acceso a Azure".
+#
+# gunicorn con hilos (gthread): 2 procesos x 8 hilos atienden 16 peticiones a
+# la vez. Una peticion lenta (el Coach, el correo, Alegra) ocupa un hilo y no
+# un proceso entero. Cada hilo mantiene su propia conexion a PostgreSQL
+# (DB_CONN_MAX_AGE), asi que el maximo en regimen es workers x threads = 16;
+# ver el calculo completo en docs/DESPLIEGUE.md antes de subir estos valores.
+# Los valores viven solo aqui: el Dockerfile ejecuta este mismo script.
 echo "[startup] Iniciando gunicorn..."
 exec gunicorn --chdir gotogym gotogym.wsgi:application \
   --bind "0.0.0.0:${PORT:-8000}" \
+  --worker-class gthread \
   --workers 2 \
-  --timeout 120 \
+  --threads 8 \
+  --timeout 60 \
   --error-logfile -

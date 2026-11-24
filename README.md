@@ -26,11 +26,15 @@ Producción no se levanta a mano con `runserver`: corre en Azure App Service,
 detrás de gunicorn, desplegado por el workflow de GitHub Actions
 (`.github/workflows/main_gotogymweb.yml`). La base de datos es PostgreSQL,
 resuelta desde la variable de entorno `DATABASE_URL` (ver `gotogym/gotogym/settings.py`).
-El comando de arranque real vive en la configuración del App Service
-(Azure Portal) y es: `python gotogym/manage.py migrate --noinput && python gotogym/manage.py
-collectstatic --noinput && gunicorn --chdir gotogym gotogym.wsgi:application --bind 0.0.0.0:8000
---workers 2 --timeout 120`. Las migraciones se aplican ahí, una vez por arranque; `wsgi.py` no migra.
-`environments/azure/startup.sh` es una versión de referencia que además carga el Journal.
+
+El **Startup Command vive en el Portal de Azure**, no en git. El comando
+versionado y recomendado es el de `environments/azure/startup.sh` (migrar,
+recolectar estáticos, cargar el Journal y arrancar gunicorn con
+`--worker-class gthread --workers 2 --threads 8 --timeout 60`), y quien tenga
+acceso al Portal debe igualarlo a `bash environments/azure/startup.sh`. Hasta
+confirmarlo, producción puede estar corriendo la versión anterior (2 workers
+síncronos, timeout 120). El `Dockerfile` ejecuta ese mismo script. Las
+migraciones se aplican en el arranque, una vez por arranque; `wsgi.py` no migra.
 
 **📖 Guía completa:** Ver [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md)
 
@@ -42,6 +46,10 @@ collectstatic --noinput && gunicorn --chdir gotogym gotogym.wsgi:application --b
 - **[docs/GUIA_ACCESO.md](docs/GUIA_ACCESO.md)** - Cómo ejecutar el proyecto y entrar a cada panel
 - **[docs/ANALISIS_ESTRUCTURA.md](docs/ANALISIS_ESTRUCTURA.md)** - Estructura, rutas, flujo de compra y configuración
 - **[docs/TARJETAS_REGALO.md](docs/TARJETAS_REGALO.md)** - Tarjetas de regalo: reglas, canje, PDF, panel y modo de pruebas sin pago
+- **[docs/FACTURACION_ALEGRA.md](docs/FACTURACION_ALEGRA.md)** - Facturación electrónica con Alegra
+- **[docs/CONFIGURACION_CORREO.md](docs/CONFIGURACION_CORREO.md)** - Correo saliente con Azure Communication Services
+- **[docs/DIAGRAMA_BD.md](docs/DIAGRAMA_BD.md)** - Diagrama de la base de datos
+- **[environments/README.md](environments/README.md)** - Entornos de pruebas y validaciones del pipeline
 
 ---
 
@@ -51,11 +59,12 @@ collectstatic --noinput && gunicorn --chdir gotogym gotogym.wsgi:application --b
 
 **Apps implementadas:**
 - `accounts` - Gestión de usuarios y autenticación
-- `products` - Catálogo de productos
+- `gotogym_oidc` - Universal Identity: vinculación de cuentas con el proveedor de identidad central (OIDC)
+- `products` - Catálogo de productos y favoritos de cada cliente
 - `inventory` - Inventario y stock
 - `carrito` - Carrito de compras
-- `tienda` - Tienda online (catálogo, PDP)
-- `orders` - Checkout y pedidos
+- `tienda` - Tienda online (catálogo, PDP, lista de favoritos)
+- `orders` - Checkout, pedidos y tarjetas de regalo (compra, canje, PDF y panel)
 - `payments` - Pagos
 - `shipping` - Cotización de envío
 - `blog` - Sistema de blog
@@ -63,6 +72,9 @@ collectstatic --noinput && gunicorn --chdir gotogym gotogym.wsgi:application --b
 - `afiliados` - Gestión de afiliados y referidos
 - `administracion` - Panel administrativo interno
 - `analitica` - Analítica de producto sin PII
+- `vendedor` - Quantum Coach, el asistente de IA de la tienda (contrato firmado con el servicio Coach, consentimiento, búsqueda por foto)
+- `atencion` - Solicitudes de atención humana con radicado verificable
+- `tareas` - Tareas en segundo plano
 
 ### Integraciones: `gotogym/integrations/`
 
@@ -172,25 +184,29 @@ GoToGtymPrime/
 │   ├── accounts/           # Usuarios
 │   ├── products/           # Productos
 │   ├── carrito/            # Carrito
-│   ├── tienda/             # Tienda
+│   ├── tienda/             # Tienda (catálogo, favoritos)
+│   ├── orders/             # Pedidos y tarjetas de regalo
+│   ├── vendedor/           # Quantum Coach
+│   ├── atencion/           # Atención humana
+│   ├── gotogym_oidc/       # Universal Identity (OIDC)
 │   ├── integrations/       # Integraciones externas
 │   │   ├── alegra/
 │   │   ├── mercadopago/
 │   └── ...                 # Otras apps
 ├── environments/           # Scripts de CI, despliegue y checks
-├── design/                 # Fuentes tipográficas fuente
-└── docs/                   # Documentación
+├── design/                 # Fuentes tipográficas fuente (no se despliegan)
+└── docs/                   # Documentación (no se despliega)
 ```
 
 ---
 
 ## 🤝 Contribuir
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+1. Crea una rama desde `main` (`git checkout -b mejoras/descripcion-corta`).
+2. Activa una sola vez por clon los hooks locales (`bash environments/install_git_hooks.sh`): cada commit pasa por el lint y cada push por la validación del pipeline.
+3. Antes de subir, ejecuta todas las validaciones en tu equipo: `bash environments/run_all_checks.sh` (lint, tipos, migraciones pendientes, pruebas y smoke del frontend; detalles en [environments/README.md](environments/README.md)).
+4. Sube la rama y abre un pull request hacia `main`. El workflow `CI` (`.github/workflows/ci.yml`) corre en cada pull request: el cambio no se integra si falla.
+5. Cada push a `main` (es decir, cada merge) despliega a producción: vuelve a correr `CI` y, si pasa, `.github/workflows/main_gotogymweb.yml` construye el paquete, lo publica en Azure y verifica el sitio (`/readyz` incluido). Ver [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md).
 
 ---
 

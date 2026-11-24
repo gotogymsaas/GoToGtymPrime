@@ -18,18 +18,21 @@ Verificado contra Azure y el código el 14 de octubre de 2026. Para ejecutar el 
 **Dependencias.** El paquete que se publica no lleva el entorno virtual: App Service instala `requirements.txt` al recibirlo. Una librería nueva solo tiene que estar ahí, con su versión fija. La última agregada es `reportlab==5.1.0` (19 de noviembre de 2026), que genera el PDF de la tarjeta de regalo. Es Python puro, no necesita paquetes del sistema. Las fuentes que ese PDF incrusta están en `gotogym/orders/fuentes/` y viajan con el código; si faltaran, el PDF sale con Helvetica y el correo se envía igual.
 
 1. Un push a `main` (o ejecutar el workflow a mano) lanza `.github/workflows/main_gotogymweb.yml`.
-2. El job `build` valida: ruff, import-linter, mypy, `manage.py check`, pruebas con cobertura, gobernanza de diseño y smoke del frontend.
-3. El job `deploy` empaqueta y publica por Kudu (`zipdeploy`) y comprueba que el sitio responda.
-4. El **Startup Command** que ejecuta el App Service (configurado en el Portal, no en git) es:
+2. El job `ci` (el mismo que corre en cada pull request, ver `.github/workflows/ci.yml`) ejecuta lint, import-linter, mypy, `manage.py check`, las pruebas con cobertura y las pruebas contra PostgreSQL. Si falla, no se construye ni se despliega nada. Después, el job `build` valida la gobernanza de diseño y el smoke del frontend.
+3. El job `deploy` empaqueta y publica por Kudu (`zipdeploy`, con las credenciales básicas `AZURE_SCM_USER` y `AZURE_SCM_PASS`). El paquete lleva solo lo que la aplicación ejecuta: se excluyen `QAF/`, `design/`, `tests/`, `scripts/`, `.copilot-azure/`, `node_modules/`, `Temp/`, `logs/`, `docs/`, `.github/`, `package.json`, `package-lock.json`, `tailwind.config.js`, `requirements-dev.txt` y el `README.md` de la raíz. Se conservan `environments/azure/`, `requirements.txt` y todo `gotogym/` (incluido `gotogym/media/`: producción puede depender de esas fotos). El log del despliegue imprime el tamaño del paquete y su contenido de primer nivel, y el job falla si falta `startup.sh`, `requirements.txt` o `gotogym/manage.py`, o si alguna de las carpetas excluidas sigue dentro.
+4. Después de publicar, el job verifica el sitio: que `gotogym-prime.azurewebsites.net` responda (un 4xx se acepta con aviso, porque puede ser `ALLOWED_HOSTS`), los endpoints de Universal Identity (`/accounts/identity/status/` y la ruta protegida de diagnóstico) y `https://shop.gotogym.store/readyz`, con reintentos durante unos 3 minutos. `/readyz` debe responder 200 con `status` igual a `ready` y `database` igual a `available`; el campo `cache` solo se informa. Un 503 sostenido (la aplicación arrancó pero no llega a la base) hace fallar el job.
+5. **Comando de arranque.** El Startup Command del App Service vive en el Portal de Azure y git no lo ve. El comando versionado y recomendado es el de `environments/azure/startup.sh`, y quien tenga acceso al Portal debe igualarlo a:
 
    ```
-   python gotogym/manage.py migrate --noinput && python gotogym/manage.py collectstatic --noinput && gunicorn --chdir gotogym gotogym.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120 --error-logfile '-'
+   bash environments/azure/startup.sh
    ```
 
-   El `migrate` es el del proyecto: adapta una base antigua del programa "influencer" y crea la tabla de caché (`django_cache`) si la caché vive en la base. `wsgi.py` no migra.
+   El script migra, recolecta estáticos, carga las entradas del Journal que falten (`seed_journal --solo-faltantes`, sin pisar las existentes) y arranca gunicorn con `--worker-class gthread --workers 2 --threads 8 --timeout 60 --error-logfile -`. El `Dockerfile` ejecuta ese mismo script, así que los valores viven en un solo lugar. **Hasta confirmar el Startup Command real, producción puede estar corriendo la versión anterior**: `migrate`, `collectstatic` y gunicorn con 2 workers síncronos y `--timeout 120`, sin cargar el Journal (en ese caso, `seed_journal --solo-faltantes` se ejecuta por SSH cuando haga falta). El `migrate` es el del proyecto: adapta una base antigua del programa "influencer" y crea la tabla de caché (`django_cache`) si la caché vive en la base. `wsgi.py` no migra.
 
-   **Antes de desplegar migraciones que agregan restricciones** (`CheckConstraint`), ejecutar contra la base real `python gotogym/manage.py verificar_restricciones`. Solo lee: lista las filas existentes que las violarían. PostgreSQL valida los datos al crear la restricción y, si alguna fila no cumple, `migrate` falla y la aplicación no arranca con el Startup Command de arriba.
-5. `environments/azure/startup.sh` es una versión de referencia del mismo arranque que además carga el Journal (`seed_journal --solo-faltantes`). Producción **no** la usa; si hace falta cargar entradas del Journal, ejecutar ese comando por SSH.
+   **Antes de desplegar migraciones que agregan restricciones** (`CheckConstraint`), ejecutar contra la base real `python gotogym/manage.py verificar_restricciones`. Solo lee: lista las filas existentes que las violarían. PostgreSQL valida los datos al crear la restricción y, si alguna fila no cumple, `migrate` falla y la aplicación no arranca con ninguno de los dos comandos de arranque.
+
+   **Conexiones a PostgreSQL.** Django guarda una conexión por hilo y `DB_CONN_MAX_AGE` (60 segundos por defecto en `settings.py`) la mantiene abierta entre peticiones. Con gunicorn de hilos, el máximo en régimen es `workers x threads = 2 x 8 = 16` conexiones abiertas a la vez (con la versión anterior eran 2). Con `DB_CONN_MAX_AGE=0` cada hilo cierra su conexión al terminar la petición: el máximo teórico sigue siendo 16, pero casi nunca se sostiene. Hay que sumar las conexiones de los comandos de gestión: `migrate` al arrancar, una sesión SSH o un WebJob (1 cada uno). Durante un despliegue el contenedor nuevo arranca mientras el anterior termina, de modo que el pico transitorio puede llegar a `2 x 16 = 32` más las de gestión (del orden de 35). Ese total debe quedar por debajo de `max_connections` de `psql-gotogym-prod` (consultarlo con `SHOW max_connections;`; los tamaños pequeños de servidor flexible tienen límites de decenas de conexiones, y parte está reservada para administración). Si no alcanza, bajar `--threads` en `startup.sh` o poner un PgBouncer antes de subir los valores.
+
 6. **Catálogo ampliado.** La migración `administracion.0006_catalogo_ampliacion` se ejecuta sola con el `migrate` del arranque y deja el catálogo como el del panel local: crea 11 prendas (con inventario 0), ordena el catálogo, oculta Pantalón verde y X5 Generation Mujer y pone en 0 el inventario de los 7 productos antiguos. **Eso último sobrescribe su stock real**; cada variante que cambia deja un asiento manual en el kardex con la cantidad anterior, de modo que los valores previos se pueden reconstruir. Si algo falla (o faltan fotos en `media/products`), el error se registra y el arranque continúa sin los cambios; el mismo trabajo se hace después con `python gotogym/manage.py seed_catalog_ampliacion` (con `--dry-run` primero). La migración solo actúa si crea algún producto, así que en una base que ya los tiene no toca nada. El ajuste `CATALOGO_AMPLIACION_EN_MIGRACION = False` la desactiva (lo usa `settings_test`).
 7. **Prendas nuevas.** La migración `administracion.0010_catalogo_camiseta_enterizo_chaqueta` también corre sola con el `migrate` del arranque y crea tres prendas con su ficha completa (camiseta lila con textura hexagonal, conjunto enterizo negro con blazer satinado y chaqueta gris oscuro con cremallera), con 5 unidades por talla y su asiento en el kardex. Solo crea: no reordena, no oculta ni cambia el inventario de nada existente, y omite una prenda si ya hay un producto con su nombre o si faltan sus fotos en `media/products`. Si falla, lo registra y el arranque continúa; para reintentarla, `python gotogym/manage.py migrate administracion 0009` y luego `migrate` (la reversa no borra nada). La desactiva el mismo ajuste que la 0006.
 
@@ -58,7 +61,7 @@ Las lee `gotogym/gotogym/settings.py`. Con `DEBUG` apagado y sin `DJANGO_SECRET_
 | `VENDEDOR_ENABLED` | Corte técnico de emergencia de Quantum Coach, la IA de GoToGym. Por defecto `true`: quien decide si se usa es el administrador, con el interruptor «Habilitar Coach» del panel. En `false` no hay botón, ni panel, ni ruta aunque el panel lo habilite. Ver [Quantum Coach](#quantum-coach-la-ia-de-gotogym) | Sin declarar (encendido) |
 | `COACH_API_URL`, `COACH_SERVICE_KEY_ID`, `COACH_SERVICE_SECRET` | Servicio de IA (Coach) al que la tienda envía los mensajes del asistente, y la credencial de servicio con la que los firma | Faltan |
 | `VENDEDOR_RATE_ANON`, `VENDEDOR_RATE_AUTH`, `VENDEDOR_MAX_TURNOS`, `VENDEDOR_MAX_MENSAJES_DIA` | Límites de uso del asistente: mensajes por minuto (anónimos y con sesión), por conversación y por día. Por defecto 6, 12, 30 y 100 | Sin declarar |
-| `VENDEDOR_TIMEOUT_SECONDS` | Espera máxima al Coach, en segundos (15). Cada turno ocupa un worker de gunicorn mientras tanto | Sin declarar |
+| `VENDEDOR_TIMEOUT_SECONDS` | Espera máxima al Coach, en segundos (15). Cada turno ocupa un hilo de gunicorn (8 por worker) mientras tanto | Sin declarar |
 | `VENDEDOR_ROLLOUT_PERCENT` | Porcentaje de visitantes que ven el asistente, de 0 a 100 (100). Permite un piloto y un grupo de control | Sin declarar |
 | `VENDEDOR_POLITICAS_PENDIENTES` | Claves de política (`cambios`, `devoluciones`, `garantia`, `envios`, `pagos`) cuyo texto aún no valida la asesoría jurídica: el asistente no las cita. Por defecto `devoluciones` | Sin declarar |
 | `VENDEDOR_COACH_SIMULADO` | Responde con un Coach simulado y rotulado como tal. Solo vale por defecto en desarrollo y pruebas; **nunca** debe activarse en producción | Sin declarar |
@@ -123,7 +126,7 @@ La inteligencia de Quantum Coach vive en el Coach (otro servicio); en la tienda 
 
 **Sin IA configurada:** si no hay `COACH_API_URL`, Quantum Coach se muestra igual y el propio panel responde, desde el navegador y sin llamar al servidor, «En este momento la IA de GoToGym no está disponible. Vuelve más tarde.», con el camino a «Hablar con una persona». En ese estado no se envía ningún dato a un servicio externo, así que las políticas de privacidad no incluyen la sección del Coach hasta que haya una IA en servicio. Al desplegar, la migración `administracion.0007` agrega el ajuste y, si la base tenía las compras en pausa, las reanuda (el interruptor de pausa salió del panel y nadie podría reanudarlas).
 
-**Apagado de emergencia:** `VENDEDOR_ENABLED=false` en la configuración de la aplicación. Gana sobre el panel; no hace falta desplegar código, pero App Service reinicia la aplicación al cambiar la configuración. Si el Coach falla, el panel lo dice y ofrece reintentar o ir a Contacto; tras 5 fallos seguidos la tienda deja de llamarlo durante un minuto para no ocupar sus dos workers.
+**Apagado de emergencia:** `VENDEDOR_ENABLED=false` en la configuración de la aplicación. Gana sobre el panel; no hace falta desplegar código, pero App Service reinicia la aplicación al cambiar la configuración. Si el Coach falla, el panel lo dice y ofrece reintentar o ir a Contacto; tras 5 fallos seguidos la tienda deja de llamarlo durante un minuto para no ocupar sus hilos.
 
 **Firma:** cada solicitud lleva `X-Coach-Key-Id`, `X-Coach-Timestamp` y `X-Coach-Signature` (HMAC-SHA256 de `marca.cuerpo`). El Coach rechaza marcas con más de 60 segundos de diferencia, así que ambos servidores deben tener la hora sincronizada. Para rotar el secreto, cambiarlo en el Coach y en `COACH_SERVICE_SECRET`; mientras difieran, el panel mostrará un error y el registro mostrará `el Coach respondio HTTP 401`.
 
@@ -153,9 +156,44 @@ Todo WARNING o superior (404, 403, 405, 429, fallos de CSRF, excepciones no cont
 - Las páginas 500 muestran una **referencia** (`ref=`). Si un cliente la reporta, `grep BE9EE7D6 logs/errores.txt` lleva a la línea y al traceback.
 - Cada código tiene su página (400, 403, 404, 405, 429, 500) en `gotogym/errores.py`. El 500 es autónomo (`templates/errores/500.html`, sin base de datos ni estáticos).
 
+## Pendientes que requieren acceso a Azure
+
+Nada de esto se puede hacer ni comprobar desde el repositorio. Cada punto es una acción para quien tenga acceso al Portal de Azure (o a los ajustes del repositorio en GitHub); márcalo al terminarlo.
+
+- [ ] **Startup Command.** En el Portal: App Service `gotogym-prime` > Configuration > General settings > Startup Command. Leer lo que hay, anotarlo y, si es distinto, reemplazarlo por `bash environments/azure/startup.sh`. Confirmar en el Log stream que aparecen las líneas `[startup] ...` y que gunicorn arranca con `gthread` y 2 workers. Hasta entonces producción puede estar con 2 workers síncronos y `--timeout 120`.
+- [ ] **`MEDIA_ROOT` persistente y copia de los medios existentes, antes de sacar `gotogym/media/` de git.** Crear la carpeta bajo `/home` (por ejemplo `/home/media`), declarar `MEDIA_ROOT=/home/media` y **copiar una sola vez** a esa carpeta lo que hoy sirve la aplicación (`gotogym/media/` desplegado, más lo subido desde el panel, si hay algo que no esté en git), por SSH o Kudu. Verificar que las fotos del catálogo se sirven desde la nueva ruta. Solo entonces es seguro dejar de versionar `gotogym/media/`: si se saca de git sin este paso, las fotos del catálogo desaparecen en el siguiente despliegue.
+- [ ] **`ADMIN_URL`.** Declarar una ruta no obvia para el administrador de Django (por ejemplo `gestion-xxxx/`); por defecto es `admin/`.
+- [ ] **`SENTRY_DSN` y `SENTRY_RELEASE`.** `SENTRY_DSN` es requisito del preflight de producción. `SENTRY_RELEASE` (el identificador de versión que agrupa los errores por despliegue, por ejemplo el SHA del commit) se declara como app setting; el workflow no lo fija porque eso exigiría acceso a Azure.
+- [ ] **`REDIS_URL` (opcional).** Sin ella, la caché es una tabla de la base de datos. Declararla solo si el volumen lo justifica; la caché sostiene el límite de tasa y el circuito del Coach.
+- [ ] **`CSP_MODO`.** Política de seguridad de contenido. Valores: `reportar` (solo informa de violaciones), `aplicar` (las bloquea) y `apagado`. Empezar en `reportar`, revisar los informes y pasar a `aplicar`.
+- [ ] **`TASK_BACKEND`.** Por defecto `sync` (las tareas corren dentro de la petición). Hay un backend sobre la base de datos como alternativa; ver `gotogym/tareas/LEEME.md` cuando exista, que describe cómo activarlo y cómo correr su trabajador.
+- [ ] **Identidad federada para el despliegue y retiro de las credenciales básicas.** Hoy el despliegue usa Kudu `zipdeploy` con `AZURE_SCM_USER` y `AZURE_SCM_PASS`. No migrar a ciegas: seguir los pasos en orden y probar cada uno en un despliegue manual (`workflow_dispatch`).
+  1. En Microsoft Entra, crear una aplicación (o una identidad administrada) y agregarle una credencial federada para GitHub: organización `gotogymsaas`, repositorio `GoToGtymPrime`, tipo "Environment" con el entorno `production`.
+  2. Asignarle el rol Website Contributor sobre el App Service `gotogym-prime`.
+  3. En GitHub, declarar las variables del repositorio `AZURE_CLIENT_ID`, `AZURE_TENANT_ID` y `AZURE_SUBSCRIPTION_ID` (el workflow `identity-prime-readiness.yml` ya las usa para su inspección de solo lectura).
+  4. En el job `deploy` de `main_gotogymweb.yml`, agregar `id-token: write` a sus permisos y reemplazar el paso de `curl` a Kudu por `azure/login` seguido de `azure/webapps-deploy` (fijar cada acción por SHA, como las demás):
+
+     ```yaml
+     - uses: azure/login@<sha-fijado> # v2
+       with:
+         client-id: ${{ vars.AZURE_CLIENT_ID }}
+         tenant-id: ${{ vars.AZURE_TENANT_ID }}
+         subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+     - uses: azure/webapps-deploy@<sha-fijado> # v3
+       with:
+         app-name: gotogym-prime
+         package: deploy.zip
+     ```
+
+     Conservar después los pasos de espera y de verificación (`/readyz` y los smokes OIDC).
+  5. Con un despliegue exitoso por esta vía, en el Portal desactivar "SCM Basic Auth Publishing Credentials" y "FTP Basic Auth Publishing Credentials" y borrar los secretos `AZURE_SCM_USER` y `AZURE_SCM_PASS` de GitHub.
+- [ ] **Revisores en el entorno `production` de GitHub.** Settings > Environments > production > Required reviewers. El job `deploy` ya declara ese entorno, así que basta activar la regla para que cada despliegue pida aprobación.
+- [ ] **Protección de la rama `main`.** Settings > Branches (o Rulesets): exigir pull request y los checks de `CI` (`Validacion y suite completa` y `Pruebas contra PostgreSQL`), y bloquear los push directos.
+- [ ] **Programar los comandos periódicos.** Ver "Cómo programarlas hoy" en el apartado siguiente.
+
 ## Tareas periódicas
 
-No hay un programador desplegado. Cada una se ejecuta también al abrir la pantalla que la necesita, pero conviene programarlas (WebJob de Azure o una tarea programada):
+No hay un programador desplegado. Cada una se ejecuta también al abrir la pantalla que la necesita, pero conviene programarlas (ver "Cómo programarlas hoy" más abajo):
 
 | Comando | Cada cuánto | Qué hace |
 |---|---|---|
@@ -163,6 +201,8 @@ No hay un programador desplegado. Cada una se ejecuta también al abrir la panta
 | `python manage.py emitir_facturas_pendientes` | Cada 15 minutos | Emite en Alegra las facturas pendientes y reintenta las fallidas (hasta 5 intentos). No hace nada si `ALEGRA_FACTURACION_ACTIVA` está apagada |
 | `python manage.py confirmar_comisiones` | A diario | Confirma comisiones de afiliados cuyo periodo de validación terminó |
 | `python manage.py aplicar_bajas` | A diario | Aplica las bajas de afiliados con preaviso vencido |
+
+**Cómo programarlas hoy.** La opción que no necesita código nuevo es un WebJob programado del App Service (Portal > App Service > WebJobs > Add, tipo "Triggered", con una expresión CRON de seis campos, por ejemplo `0 0 * * * *` para cada hora). El script del WebJob debe ejecutarse en la carpeta de la aplicación y con el mismo Python y las mismas app settings que la web; por ejemplo, `cd /home/site/wwwroot && python gotogym/manage.py cancelar_pedidos_vencidos`. Antes de confiar en él hay que comprobar por SSH qué `python` resuelve y dónde queda el código extraído (Oryx puede extraerlo fuera de `/home/site/wwwroot`), y que un despliegue no borra el WebJob: no está verificado desde el repositorio. Mientras tanto, los comandos se pueden ejecutar a mano por SSH en el App Service (`cd` a la carpeta de la aplicación, luego `python gotogym/manage.py <comando>`). Hay otros comandos de mantenimiento (`purgar_analitica`, `conciliar_reembolsos`): ver su `--help` para decidir su frecuencia.
 
 ## Facturación electrónica con Alegra
 
@@ -172,7 +212,7 @@ Está terminada y apagada (`ALEGRA_FACTURACION_ACTIVA=false`). Qué hace, cómo 
 
 - **Base de datos.** Restauración a un punto en el tiempo de los últimos 7 días: crea un servidor nuevo, no pisa el actual (`az postgres flexible-server restore --resource-group rg-gotogym-data --name <servidor-nuevo> --source-server psql-gotogym-prod --restore-time <fecha-hora-UTC>`). Ensayada el 15 de octubre de 2026: el servidor restaurado quedó listo con todos los datos (44 tablas, pedidos, catálogo y Journal) y tarda unos 30 minutos; se borró al terminar. Valorar subir la retención de 7 días.
 - **Código.** Para volver a una versión anterior, ejecutar el workflow sobre el commit anterior o revertir el commit en `main`. La reversión debe validarse con el health check y los logs de arranque.
-- **Archivos subidos.** Las imágenes que se suban desde el panel quedan en `gotogym/media/` dentro de la aplicación desplegada; verificar que ese almacenamiento persista entre despliegues (pendiente de resolver).
+- **Archivos subidos.** Las imágenes que se suban desde el panel quedan en `gotogym/media/` dentro de la aplicación desplegada; ese disco se reemplaza en cada despliegue. Mientras `MEDIA_ROOT` no apunte a una ruta persistente bajo `/home`, lo subido desde el panel se pierde en el siguiente despliegue (ver "Pendientes que requieren acceso a Azure").
 
 ## Antes de abrir al público
 

@@ -121,7 +121,7 @@ Variables de entorno que lee la configuración: `DJANGO_SECRET_KEY`, `DEBUG`, `A
 
 ## Despliegue
 
-Se despliega a Azure App Service con el flujo de `.github/workflows/main_gotogymweb.yml`, que valida, empaqueta y publica por Kudu. El Startup Command del App Service (configurado en el Portal) migra, recolecta estáticos y arranca gunicorn con 2 workers; `environments/azure/startup.sh` es la versión de referencia versionada, que además carga las entradas del Journal. Los datos reales del entorno, las variables, las tareas periódicas, los respaldos y la lista previa a abrir al público están en `docs/DESPLIEGUE.md`.
+Se despliega a Azure App Service con el flujo de `.github/workflows/main_gotogymweb.yml`, que valida, empaqueta y publica por Kudu. El Startup Command del App Service se configura en el Portal (git no lo ve); el comando versionado y recomendado es `environments/azure/startup.sh`, que migra, recolecta estáticos, carga las entradas del Journal y arranca gunicorn con hilos (2 workers x 8 hilos). Hasta confirmar el comando real, producción puede seguir con la versión anterior (2 workers síncronos). Los datos reales del entorno, las variables, las tareas periódicas, los respaldos y la lista previa a abrir al público están en `docs/DESPLIEGUE.md`.
 
 ## Otros documentos
 
