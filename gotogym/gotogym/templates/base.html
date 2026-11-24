@@ -14,7 +14,7 @@
   <meta property="og:title" content="{{ seo_title|default:'GoToGym' }}">
   <meta property="og:description" content="{{ seo_description|default:"GoToGym: ropa deportiva con tecnología textil, diseño y bienestar." }}">
   <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
-  <meta property="og:image" content="{% if seo_image %}{{ seo_image }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/hero_gotogym.webp' %}{% endif %}">
+  <meta property="og:image" content="{% if seo_image %}{{ seo_image }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/hero_gotogym_opt.webp' %}{% endif %}">
   <meta property="og:locale" content="{% if LANGUAGE_CODE == 'en' %}en_US{% elif LANGUAGE_CODE == 'pt' %}pt_BR{% else %}es_CO{% endif %}">
   <meta name="twitter:card" content="summary_large_image">
   {% if seo_json_ld %}<script type="application/ld+json">{{ seo_json_ld }}</script>{% endif %}

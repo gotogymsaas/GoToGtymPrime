@@ -84,7 +84,7 @@ def url_imagen_producto(nombre):
     (para plantillas que ya arman su propia galeria/lightbox, como la
     ficha de producto)."""
     if not nombre:
-        return static('images/img/placeholder.webp')
+        return static('images/img/opt/placeholder.webp')
     _clave, respaldo = _clave_y_respaldo_producto(nombre)
     return respaldo
 
@@ -93,7 +93,7 @@ def url_imagen_producto(nombre):
 def imagen_producto(nombre, alt='', sizes='100vw', clase='', prioridad=False, cargar='lazy'):
     """Imagen de catalogo, con <picture> AVIF/WebP cuando hay derivados."""
     if not nombre:
-        return {'fuentes': [], 'respaldo': static('images/img/placeholder.webp'),
+        return {'fuentes': [], 'respaldo': static('images/img/opt/placeholder.webp'),
                 'alt': alt, 'sizes': sizes, 'clase': clase, 'ancho': None,
                 'alto': None, 'cargar': cargar, 'prioridad': ''}
     clave, respaldo = _clave_y_respaldo_producto(nombre)
