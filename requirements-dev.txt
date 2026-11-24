@@ -2,9 +2,9 @@
 # imagen de despliegue -- esa sigue usando solo requirements.txt.
 -r requirements.txt
 
-ruff==0.17.5
+ruff==0.17.6
 django-stubs==6.1.2
-mypy==2.4.0
-coverage==7.17.2
-import-linter==2.15
+mypy==2.4.1
+coverage==7.17.4
+import-linter==2.17
 tblib==3.2.2
