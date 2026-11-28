@@ -11,7 +11,7 @@ psycopg2-binary==2.9.13
 requests==2.34.2
 cryptography==50.0.2
 mercadopago==3.6.1
-sentry-sdk==2.75.0
+sentry-sdk==3.0.0
 redis==8.2.0
 
 PyJWT[crypto]==2.15.1
